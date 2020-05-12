@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="50dp"
+    android:paddingTop="50dp"
+    android:paddingEnd="50dp"
+    android:paddingBottom="20dp"
+    tools:context=".ui.login.ConexionActivity">
+
+
+    <TextView
+        android:id="@+id/olvidoTitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="@string/app_name"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="44dp"
+        android:gravity="center"
+        android:text="@string/conexion_continuar"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/olvidoTitulo"
+        tools:layout_editor_absoluteX="49dp" />
+
+    <LinearLayout
+        android:id="@+id/llGoogle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="96dp"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@+id/textView7"
+        tools:layout_editor_absoluteX="49dp">
+
+        <ImageView
+            android:layout_width="45dp"
+            android:layout_height="56dp"
+            android:src="@drawable/google" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="10dp"
+            android:gravity="center"
+            android:text="@string/conexion_cuenta_google"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/conexionBtnRegistrar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_gravity="start"
+        android:layout_marginTop="72dp"
+        android:enabled="false"
+        android:text="@string/conexion_registrar"
+        android:textAllCaps="false"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.505"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llGoogle" />
+
+    <Button
+        android:id="@+id/conexionBtnConectar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_gravity="start"
+        android:layout_marginTop="40dp"
+        android:enabled="false"
+        android:text="@string/conexion_conectar"
+        android:textAllCaps="false"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/conexionBtnRegistrar"
+        tools:layout_editor_absoluteX="49dp" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
