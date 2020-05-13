@@ -1,59 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.login.LoginActivity">
-
-    <ImageButton
-        android:id="@+id/olvidoBtnAtras"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:adjustViewBounds="true"
-        android:background=""
-        android:src="@drawable/atras"
-        tools:layout_editor_absoluteX="2dp" />
-
+    android:fillViewport="true"
+    tools:context=".ui.login.OlvidoActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingStart="50dp"
-        android:paddingTop="50dp"
-        android:paddingEnd="50dp"
-        android:paddingBottom="20dp">
-
-        <TextView
-            android:id="@+id/olvidoTitulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="24dp"
-            android:text="@string/olvido_titulo"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.496"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:paddingHorizontal="@dimen/padHorizontalPrincipales"
+        android:paddingTop="@dimen/padTopPrincipales"
+        android:paddingBottom="@dimen/padBotPrincipales">
 
 
         <TextView
             android:id="@+id/textView10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="56dp"
+            android:layout_marginTop="24dp"
             android:gravity="center"
             android:text="@string/olvido_descripcion"
             android:textSize="18sp"
+            android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.505"
+            app:layout_constraintHorizontal_bias="0.375"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/olvidoTitulo" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView"
@@ -62,6 +37,7 @@
             android:layout_marginTop="44dp"
             android:text="@string/conexion_email_nombre"
             android:textSize="20sp"
+            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView10" />
 
@@ -107,6 +83,9 @@
             android:enabled="false"
             android:text="@string/olvido_enviar"
             android:textSize="30sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:background="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.444"
@@ -114,4 +93,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</RelativeLayout>
+</ScrollView>

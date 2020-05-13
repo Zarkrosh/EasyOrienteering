@@ -3,6 +3,11 @@
 
     <string name="app_name">EasyOrienteering</string>
 
+    <!-- ¿Esto qué eees? -->
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
     <!-- Comunes (conexión) -->
     <string name="conexion_cuenta_google">Usar cuenta de Google</string>
     <string name="conexion_email_nombre">Email o nombre de usuario</string>
@@ -32,7 +37,9 @@
     <string name="registro_acepto">Acepto las condiciones de uso y la política de tratamiento de estos datos</string>
     <string name="registro_email_existente">Ya existe una cuenta con este email</string>
     <string name="registro_email_no_valido">El email no es válido</string>
+    <string name="registro_nombre_invalido">Solo números, letras y \'_\'</string>
     <string name="registro_nombre_existente">Ese nombre ya está usado por otro usuario</string>
+    <string name="registro_pass_largo">Al menos 8 caracteres</string>
     <string name="registro_pass_no_coinciden">Las contraseñas no coinciden</string>
     <string name="registro_registrar">REGISTRAR CUENTA</string>
     <string name="registro_registrando">Registrando</string>
@@ -49,10 +56,11 @@
 
     <!-- Pantalla de olvido de contraseña -->
     <string name="olvido_titulo">¿Olvidaste tu contraseña?</string>
-    <string name="olvido_descripcion">No te preocupes, introduce el email o nombre con el que te registraste y recibirás un correo con el que podrás crear una nueva</string>
+    <string name="olvido_descripcion">No te preocupes, introduce el email o nombre con el que te registraste y recibirás un correo con el que podrás crear una nueva contraseña</string>
     <string name="olvido_enviar">ENVIAR</string>
     <string name="olvido_listo">Listo. Recibirás un correo si existe el usuario con el email o nombre introducido</string>
     <string name="olvido_error">Ocurrió un error. Comprueba tu conexión e inténtalo de nuevo</string>
+
 
 
 </resources>

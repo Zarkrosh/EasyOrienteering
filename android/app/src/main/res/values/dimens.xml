@@ -6,5 +6,11 @@
 
 
     <dimen name="margin_lados_conectarse">30dp</dimen>
+    <dimen name="altoTitulos">56dp</dimen>
+    <dimen name="sizeBtnAtras">30dp</dimen>
+    <dimen name="padHorizontalPrincipales">40dp</dimen>
+    <dimen name="padTopPrincipales">20dp</dimen>
+    <dimen name="padBotPrincipales">20dp</dimen>
+    <dimen name="altoBotonesPoliticas">60dp</dimen>
 
 </resources>

@@ -1,20 +1,19 @@
 package com.hergomsoft.easyorienteering.ui.login;
 
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -22,16 +21,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.ui.login.olvido.OlvidoActivity;
+import com.hergomsoft.easyorienteering.ui.BackableActivity;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BackableActivity {
 
-    public final static String ARG_EMAIL = "ARG_EMAIL";
+    public final static String ARG_EMAIL_NOMBRE = "ARG_EMAIL_NOMBRE";
 
-    private ImageButton btnAtras;
     private EditText inputEmailNombre;
     private EditText inputPassword;
     private TextView textError;
@@ -44,17 +41,18 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle(getString(R.string.login_titulo));
         setContentView(R.layout.activity_conectarse);
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
-        btnAtras = findViewById(R.id.conectarseBtnAtras);
         inputEmailNombre = findViewById(R.id.conectarseEmailNombre);
         inputPassword = findViewById(R.id.conectarsePassword);
         textError = findViewById(R.id.conectarseError);
         btnConectar = findViewById(R.id.btnConectar);
         loadingProgressBar = findViewById(R.id.loading);
         olvidoPass = findViewById(R.id.conectarseOlvido);
+        olvidoPass.setPaintFlags(olvidoPass.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG); // Subrayado
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override
@@ -131,18 +129,11 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        btnAtras.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
         olvidoPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, OlvidoActivity.class);
-                intent.putExtra(ARG_EMAIL, inputEmailNombre.getText().toString().trim());
+                intent.putExtra(ARG_EMAIL_NOMBRE, inputEmailNombre.getText().toString().trim());
                 startActivity(intent);
             }
         });

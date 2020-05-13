@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
@@ -21,11 +23,16 @@ public class ConexionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_conexion);
 
         btnGoogle = findViewById(R.id.llGoogle);
         btnRegistrar = findViewById(R.id.conexionBtnRegistrar);
         btnConectar = findViewById(R.id.conexionBtnConectar);
+
+        btnGoogle.setEnabled(true);
+        btnRegistrar.setEnabled(true);
+        btnConectar.setEnabled(true);
 
         btnGoogle.setOnClickListener(new View.OnClickListener() {
             @Override

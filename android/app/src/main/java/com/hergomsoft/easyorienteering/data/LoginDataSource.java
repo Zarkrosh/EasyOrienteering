@@ -25,7 +25,7 @@ public class LoginDataSource {
 
     public Result<Void> register(String email, String username, String password) {
         // TODO: envía petición al servidor de registro
-        return new Result.Success<>(null);
+        return new Result.Success<Void>(null);
     }
 
     public void logout() {

@@ -1,10 +1,6 @@
 package com.hergomsoft.easyorienteering.ui.registro;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,23 +11,26 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.hergomsoft.easyorienteering.R;
+import com.hergomsoft.easyorienteering.ui.BackableActivity;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends BackableActivity {
 
-    private ImageButton btnAtras;
     private EditText inputEmail;
     private EditText inputNombre;
-    private TextView textErrorNombre;
     private EditText inputPassword;
     private ImageView fuerzaPass;
     private EditText inputPasswordConf;
     private ImageView confirmPass;
-    private TextView textErrorPasses;
     private CheckBox checkAcepto;
+    private ImageButton btnPoliticas;
     private Button btnRegistrar;
 
     private RegisterViewModel registerViewModel;
@@ -41,32 +40,23 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle(getString(R.string.registro_titulo));
         setContentView(R.layout.activity_registrarse);
         registerViewModel = ViewModelProviders.of(this, new RegisterViewModelFactory())
                 .get(RegisterViewModel.class);
 
-        btnAtras = findViewById(R.id.registrarseBtnAtras);
         inputEmail = findViewById(R.id.registrarseEmail);
         inputNombre = findViewById(R.id.registrarseNombre);
-        textErrorNombre = findViewById(R.id.registrarseErrorNombre);
         inputPassword = findViewById(R.id.registrarsePassword);
         fuerzaPass = findViewById(R.id.registrarseIndicadorPass);
         inputPasswordConf = findViewById(R.id.registrarsePasswordConf);
         confirmPass = findViewById(R.id.registrarseIndicadorConf);
-        textErrorPasses = findViewById(R.id.registrarseErrorPasses);
         checkAcepto = findViewById(R.id.registrarseAcepto);
+        btnPoliticas = findViewById(R.id.registrarsePoliticas);
         btnRegistrar = findViewById(R.id.btnRegistrar);
 
         btnRegistrar.setEnabled(false); // Deshabilitado por defecto
         passConfError = false;
-
-        // Botón para volver a la actividad anterior
-        btnAtras.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
 
         // Habilita el envío de los datos si estos son válidos
         registerViewModel.getRegisterFormState().observe(this, new Observer<RegisterFormState>() {
@@ -77,21 +67,24 @@ public class RegisterActivity extends AppCompatActivity {
                 }
 
                 btnRegistrar.setEnabled(registerFormState.isDataValid() && checkAcepto.isChecked());
-                if (registerFormState.getEmailError() != null) {
+                if (registerFormState.getEmailError() != null && !inputEmail.isFocused()) {
                     // TODO: Comprobar cómo aparece el error en el ET
-                    inputNombre.setError(getString(registerFormState.getEmailError()));
+                    inputEmail.setError(getString(registerFormState.getEmailError()));
                 }
                 if (registerFormState.getUsernameError() != null) {
-                    textErrorNombre.setError(getString(registerFormState.getUsernameError()));
+                    inputNombre.setError(getString(registerFormState.getUsernameError()));
                 }
                 if (registerFormState.getPasswordError() != null) {
-                    textErrorPasses.setError(getString(registerFormState.getPasswordError()));
+                    inputPasswordConf.setError(getString(registerFormState.getPasswordError()));
                 }
                 if (registerFormState.getPasswordConfError() != null) {
                     if(registerFormState.getPasswordConfError()) {
                         // Las contraseñas no coinciden
                         if(!passConfError) {
-                            // TODO: Mostrar imagen error
+                            // Mostrar imagen error
+                            // TODO
+                            inputPasswordConf.setError(getString(R.string.registro_pass_no_coinciden));
+
                             passConfError = true;
                         }
                     } else {
@@ -113,9 +106,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                registerViewModel.registerDataChanged(
-                    inputEmail.getText().toString(), inputNombre.getText().toString(),
-                    inputPassword.getText().toString(), inputPasswordConf.getText().toString());
+                refreshForm();
             }
         };
         inputEmail.addTextChangedListener(afterTextChangedListener);
@@ -163,9 +154,15 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // Comprueba indirectamente el cambio del botón mediante un falso cambio en los datos
-                registerViewModel.registerDataChanged(
-                        inputEmail.getText().toString(), inputNombre.getText().toString(),
-                        inputPassword.getText().toString(), inputPasswordConf.getText().toString());
+                refreshForm();
+            }
+        });
+
+        // Botón de visión de políticas de uso y datos
+        btnPoliticas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(RegisterActivity.this, PoliticasActivity.class));
             }
         });
 
@@ -178,4 +175,11 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void refreshForm() {
+        registerViewModel.registerDataChanged(
+                inputEmail.getText().toString(), inputNombre.getText().toString(),
+                inputPassword.getText().toString(), inputPasswordConf.getText().toString());
+    }
+
 }

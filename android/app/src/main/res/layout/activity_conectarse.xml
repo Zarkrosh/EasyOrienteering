@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
@@ -7,50 +7,23 @@
     android:layout_height="match_parent"
     tools:context=".ui.login.LoginActivity">
 
-    <ImageButton
-        android:id="@+id/conectarseBtnAtras"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:adjustViewBounds="true"
-        android:background=""
-        android:src="@drawable/atras"
-        tools:layout_editor_absoluteX="2dp" />
-
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingStart="50dp"
-        android:paddingTop="50dp"
-        android:paddingEnd="50dp"
-        android:paddingBottom="20dp">
-
-        <TextView
-            android:id="@+id/olvidoTitulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="24dp"
-            android:text="@string/login_titulo"
-            android:textSize="36sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.496"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/padHorizontalPrincipales"
+        android:paddingTop="@dimen/padTopPrincipales"
+        android:paddingBottom="@dimen/padBotPrincipales">
 
 
         <LinearLayout
             android:id="@+id/llGoogle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="88dp"
+            android:layout_marginTop="36dp"
             android:orientation="horizontal"
             android:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@+id/olvidoTitulo"
-            tools:layout_editor_absoluteX="49dp">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="40dp">
 
             <ImageView
                 android:layout_width="45dp"
@@ -65,7 +38,7 @@
                 android:gravity="center"
                 android:text="@string/conexion_cuenta_google"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textColor="@android:color/black" />
         </LinearLayout>
 
         <TextView
@@ -75,6 +48,7 @@
             android:layout_marginTop="32dp"
             android:text="@string/conexion_email_nombre"
             android:textSize="20sp"
+            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/llGoogle" />
 
@@ -96,6 +70,7 @@
             android:layout_marginTop="16dp"
             android:text="@string/conexion_password"
             android:textSize="20sp"
+            android:textColor="@android:color/black"
             app:layout_constraintTop_toBottomOf="@+id/conectarseEmailNombre"
             tools:layout_editor_absoluteX="0dp" />
 
@@ -127,14 +102,16 @@
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_gravity="start"
-            android:layout_marginBottom="32dp"
+            android:layout_marginTop="24dp"
             android:enabled="false"
             android:text="@string/login_conectar"
             android:textSize="30sp"
-            app:layout_constraintBottom_toTopOf="@id/conectarseOlvido"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:background="@color/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.505"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/conectarseOlvido" />
 
         <ProgressBar
             android:id="@+id/loading"
@@ -145,19 +122,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/login" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <TextView
             android:id="@+id/conectarseOlvido"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="56dp"
             android:text="@string/login_olvidaste_password"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:textColor="@android:color/holo_blue_light"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/conectarseError" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</RelativeLayout>
+</ScrollView>
