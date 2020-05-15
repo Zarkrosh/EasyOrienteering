@@ -50,7 +50,7 @@
     <string name="registro_pass_largo">Al menos 8 caracteres</string>
     <string name="registro_pass_no_coinciden">Las contraseñas no coinciden</string>
     <string name="registro_registrar">REGISTRAR CUENTA</string>
-    <string name="registro_registrando">Registrando</string>
+    <string name="registro_registrando">Registrando...</string>
     <string name="registro_registrada">Cuenta registrada</string>
     <string name="registro_error">Error al registrar</string>
     <string name="registro_error2">Comprueba tu conexión</string>

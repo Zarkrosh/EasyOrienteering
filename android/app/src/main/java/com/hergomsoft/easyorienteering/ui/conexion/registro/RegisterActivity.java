@@ -1,7 +1,12 @@
 package com.hergomsoft.easyorienteering.ui.conexion.registro;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.InsetDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -65,7 +70,8 @@ public class RegisterActivity extends BackableActivity {
                     return;
                 }
 
-                btnRegistrar.setEnabled(registerFormState.isDataValid() && checkAcepto.isChecked());
+                btnRegistrar.setEnabled(true);
+                //btnRegistrar.setEnabled(registerFormState.isDataValid() && checkAcepto.isChecked());
                 if (registerFormState.getEmailError() != null && !inputEmail.isFocused()) {
                     // TODO: Comprobar cómo aparece el error en el ET
                     inputEmail.setError(getString(registerFormState.getEmailError()));
@@ -171,14 +177,26 @@ public class RegisterActivity extends BackableActivity {
             public void onClick(View v) {
                 // TODO
                 Toast.makeText(RegisterActivity.this, "[TODO] Registrando cuenta...", Toast.LENGTH_SHORT).show();
+
+                final RegisterDialog dialog = new RegisterDialog(RegisterActivity.this);
+                // Fondo transparente para los bordes redondeados
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.muestraMensajeError("No se pudo contactar con el servidor. Comprueba tu conexión a Internet");
+                    }
+                }, 3000);
             }
         });
     }
 
     public void refreshForm() {
         registerViewModel.registerDataChanged(
-                inputEmail.getText().toString(), inputNombre.getText().toString(),
-                inputPassword.getText().toString(), inputPasswordConf.getText().toString());
+            inputEmail.getText().toString(), inputNombre.getText().toString(),
+            inputPassword.getText().toString(), inputPasswordConf.getText().toString());
     }
 
 }
