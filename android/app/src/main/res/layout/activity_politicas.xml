@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="@dimen/padTopPrincipales"
-    tools:context=".ui.registro.PoliticasActivity">
+    tools:context=".ui.conexion.registro.PoliticasActivity">
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/politicasPager"

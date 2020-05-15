@@ -1,10 +1,8 @@
-package com.hergomsoft.easyorienteering.ui.login;
+package com.hergomsoft.easyorienteering.ui.conexion.login;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
-import android.util.Patterns;
 
 import com.hergomsoft.easyorienteering.data.LoginRepository;
 import com.hergomsoft.easyorienteering.data.Result;

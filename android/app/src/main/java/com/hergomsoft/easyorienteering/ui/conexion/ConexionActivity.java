@@ -5,14 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.ui.login.LoginActivity;
-import com.hergomsoft.easyorienteering.ui.registro.RegisterActivity;
+import com.hergomsoft.easyorienteering.ui.conexion.login.LoginActivity;
+import com.hergomsoft.easyorienteering.ui.conexion.registro.RegisterActivity;
 
 public class ConexionActivity extends AppCompatActivity {
 

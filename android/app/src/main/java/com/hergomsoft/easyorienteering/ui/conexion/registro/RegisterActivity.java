@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.ui.registro;
+package com.hergomsoft.easyorienteering.ui.conexion.registro;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 

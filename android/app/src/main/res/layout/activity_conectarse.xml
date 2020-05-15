@@ -5,7 +5,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.login.LoginActivity">
+    tools:context=".ui.conexion.login.LoginActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -108,7 +108,7 @@
             android:textSize="30sp"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            android:background="@color/colorPrimary"
+            android:background="@drawable/button_appearance"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/conectarseOlvido" />

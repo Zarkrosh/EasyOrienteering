@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.ui.login;
+package com.hergomsoft.easyorienteering.ui.conexion.login;
 
 import androidx.annotation.Nullable;
 

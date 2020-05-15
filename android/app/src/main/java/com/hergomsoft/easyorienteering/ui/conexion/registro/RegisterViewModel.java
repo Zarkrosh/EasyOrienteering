@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.ui.registro;
+package com.hergomsoft.easyorienteering.ui.conexion.registro;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

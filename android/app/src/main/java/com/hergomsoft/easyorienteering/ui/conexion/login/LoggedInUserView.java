@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.ui.login;
+package com.hergomsoft.easyorienteering.ui.conexion.login;
 
 /**
  * Class exposing authenticated user details to the UI.

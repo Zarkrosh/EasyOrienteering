@@ -3,6 +3,15 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <!-- Resumen -->
+    <dimen name="puntosMaxWidth">20dp</dimen>
+    <dimen name="marginBotPuntos">20dp</dimen>
+    <dimen name="marginTopTitResumen">100dp</dimen>
+    <dimen name="marginTopContResumen">100dp</dimen>
+    <dimen name="padHorizContResumen">30dp</dimen>
+    <dimen name="tamTitulo">30sp</dimen>
+    <dimen name="tamContenido">22sp</dimen>
+
 
 
     <dimen name="margin_lados_conectarse">30dp</dimen>

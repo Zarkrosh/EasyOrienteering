@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.ui.inicial;
+package com.hergomsoft.easyorienteering.ui.splash;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,8 +9,9 @@ import android.widget.Toast;
 
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.ui.conexion.ConexionActivity;
+import com.hergomsoft.easyorienteering.ui.resumen.ResumenActivity;
 
-public class InicialActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity {
 
     private final int MIN_TIEMPO_LOGOTIPO = 1000; // ms
 
@@ -43,7 +44,12 @@ public class InicialActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(InicialActivity.this, ConexionActivity.class));
+            //startActivity(new Intent(SplashActivity.this, ConexionActivity.class));
+
+            // Muestra el resumen de la aplicación
+            Intent i = new Intent(SplashActivity.this, ResumenActivity.class);
+            i.putExtra(ResumenActivity.ARG_VOLUNTARIO, false);
+            startActivity(i);
             }
         }, MIN_TIEMPO_LOGOTIPO);
 

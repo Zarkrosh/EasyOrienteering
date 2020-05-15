@@ -8,6 +8,14 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
+    <!-- Resumen -->
+    <string name="resumenTitulo">Resumen</string>
+    <string name="resumenOmitir">OMITIR</string>
+    <string name="resumen_primera_titulo">Ejemplo 1</string>
+    <string name="resumen_primera_contenido">Este es un texto de ejemplo para la primera parte del resumen</string>
+    <string name="resumen_segunda_titulo">Segundo ejemplo</string>
+    <string name="resumen_segunda_contenido">Este es un texto de ejemplo para la segunda parte del resumen</string>
+
     <!-- Comunes (conexión) -->
     <string name="conexion_cuenta_google">Usar cuenta de Google</string>
     <string name="conexion_email_nombre">Email o nombre de usuario</string>
@@ -60,7 +68,6 @@
     <string name="olvido_enviar">ENVIAR</string>
     <string name="olvido_listo">Listo. Recibirás un correo si existe el usuario con el email o nombre introducido</string>
     <string name="olvido_error">Ocurrió un error. Comprueba tu conexión e inténtalo de nuevo</string>
-
 
 
 </resources>

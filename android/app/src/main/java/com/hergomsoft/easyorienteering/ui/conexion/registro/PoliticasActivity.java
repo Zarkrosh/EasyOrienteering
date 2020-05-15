@@ -1,11 +1,8 @@
-package com.hergomsoft.easyorienteering.ui.registro;
+package com.hergomsoft.easyorienteering.ui.conexion.registro;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageButton;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hergomsoft.easyorienteering.R;
