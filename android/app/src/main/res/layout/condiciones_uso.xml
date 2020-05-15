@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:id="@+id/llTituloRegistrar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/altoTitulos"
+            android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+            android:gravity="center"
+            android:text="@string/politicas_condiciones"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            app:autoSizeMaxTextSize="100sp"
+            app:autoSizeMinTextSize="12sp"
+            app:autoSizeStepGranularity="2sp"
+            app:autoSizeTextType="uniform" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
+
+    </LinearLayout>
+
+</ScrollView>

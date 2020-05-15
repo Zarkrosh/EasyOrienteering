@@ -1,0 +1,73 @@
+<resources>
+    <string name="TODO">_TODO_</string>
+
+    <string name="app_name">EasyOrienteering</string>
+
+    <!-- ¿Esto qué eees? -->
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <!-- Resumen -->
+    <string name="resumenTitulo">Resumen</string>
+    <string name="resumenOmitir">OMITIR</string>
+    <string name="resumen_primera_titulo">Ejemplo 1</string>
+    <string name="resumen_primera_contenido">Este es un texto de ejemplo para la primera parte del resumen</string>
+    <string name="resumen_segunda_titulo">Segundo ejemplo</string>
+    <string name="resumen_segunda_contenido">Este es un texto de ejemplo para la segunda parte del resumen</string>
+
+    <!-- Comunes (conexión) -->
+    <string name="conexion_cuenta_google">Usar cuenta de Google</string>
+    <string name="conexion_email_nombre">Email o nombre de usuario</string>
+    <string name="conexion_nombre_email_invalido">Email o nombre de usuario no válido</string>
+    <string name="conexion_password_largo">La contraseña debe ser de al menos 8 caracteres de largo</string>
+    <string name="conexion_password">Contraseña</string>
+
+    <!-- Pantalla conexión -->
+    <string name="conexion_continuar">Para continuar tienes que usar una cuenta\n\nEs gratis y rápido</string>
+    <string name="conexion_registrar">Registrar nueva cuenta</string>
+    <string name="conexion_conectar">¿Ya tienes una cuenta?</string>
+
+    <!-- Pantalla de login -->
+    <string name="login_titulo">Conectar cuenta</string>
+    <string name="login_olvidaste_password">¿Olvidaste tu contraseña?</string>
+    <string name="login_conectar">CONECTAR</string>
+    <string name="login_incorrecto">Email/nombre o contraseña incorrectos</string>
+    <string name="login_error">Ocurrió un error al conectar. Comprueba tu conexión e inténtalo de nuevo</string>
+    <string name="login_limite">Has intentado conectarte sin éxito 5 veces. Espera un minuto para volver a intentarlo</string>
+
+    <!-- Pantalla de registro -->
+    <string name="registro_titulo">Registrar cuenta</string>
+    <string name="registro_email">Email</string>
+    <string name="registro_nombre">Nombre</string>
+    <string name="registro_nombre_publico">(este será tu nombre público)</string>
+    <string name="registro_password_conf">Contraseña (confirmación)</string>
+    <string name="registro_acepto">Acepto las condiciones de uso y la política de tratamiento de estos datos</string>
+    <string name="registro_email_existente">Ya existe una cuenta con este email</string>
+    <string name="registro_email_no_valido">El email no es válido</string>
+    <string name="registro_nombre_invalido">Solo números, letras y \'_\'</string>
+    <string name="registro_nombre_existente">Ese nombre ya está usado por otro usuario</string>
+    <string name="registro_pass_largo">Al menos 8 caracteres</string>
+    <string name="registro_pass_no_coinciden">Las contraseñas no coinciden</string>
+    <string name="registro_registrar">REGISTRAR CUENTA</string>
+    <string name="registro_registrando">Registrando</string>
+    <string name="registro_registrada">Cuenta registrada</string>
+    <string name="registro_error">Error al registrar</string>
+    <string name="registro_error2">Comprueba tu conexión</string>
+
+    <!-- Pantalla de política y condiciones -->
+    <string name="politicas_politica">POLÍTICA DE DATOS</string>
+    <string name="politicas_politica_corto">POLÍTICA</string>
+    <string name="politicas_condiciones">CONDICIONES DE USO</string>
+    <string name="politicas_condiciones_corto">CONDICIONES</string>
+    <!-- TODO: Contenidos de las políticas -->
+
+    <!-- Pantalla de olvido de contraseña -->
+    <string name="olvido_titulo">¿Olvidaste tu contraseña?</string>
+    <string name="olvido_descripcion">No te preocupes, introduce el email o nombre con el que te registraste y recibirás un correo con el que podrás crear una nueva contraseña</string>
+    <string name="olvido_enviar">ENVIAR</string>
+    <string name="olvido_listo">Listo. Recibirás un correo si existe el usuario con el email o nombre introducido</string>
+    <string name="olvido_error">Ocurrió un error. Comprueba tu conexión e inténtalo de nuevo</string>
+
+
+</resources>
