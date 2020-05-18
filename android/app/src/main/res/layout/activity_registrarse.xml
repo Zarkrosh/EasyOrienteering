@@ -69,6 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="5dp"
+            android:hint="Al menos 3 letras"
             android:inputType="textEmailAddress"
             app:layout_constraintTop_toBottomOf="@+id/llNombre"
             tools:layout_editor_absoluteX="50dp" />
@@ -84,23 +85,30 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/registrarseNombre" />
 
-        <EditText
-            android:id="@+id/registrarsePassword"
+        <LinearLayout
+            android:id="@+id/llPass"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:inputType="textPassword"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.494"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textView2" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/textView2">
 
-        <ImageView
-            android:id="@+id/registrarseIndicadorPass"
-            android:layout_width="40dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/registrarsePassword"
-            app:layout_constraintStart_toEndOf="@id/registrarsePassword"
-            app:layout_constraintTop_toTopOf="@id/registrarsePassword" />
+            <EditText
+                android:id="@+id/registrarsePassword"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:hint="@string/registro_pass_largo"
+                android:inputType="textPassword"/>
+
+            <ImageView
+                android:id="@+id/registrarseIndicadorPass"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"  />
+
+        </LinearLayout>
 
 
         <TextView
@@ -112,25 +120,34 @@
             android:textSize="20sp"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/registrarsePassword" />
+            app:layout_constraintTop_toBottomOf="@+id/llPass" />
 
-        <EditText
-            android:id="@+id/registrarsePasswordConf"
+        <LinearLayout
+            android:id="@+id/llPassConf"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:inputType="textPassword"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.717"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textView6" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/textView6">
 
-        <ImageView
-            android:id="@+id/registrarseIndicadorConf"
-            android:layout_width="40dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/registrarsePasswordConf"
-            app:layout_constraintStart_toEndOf="@id/registrarsePasswordConf"
-            app:layout_constraintTop_toTopOf="@id/registrarsePasswordConf" />
+            <EditText
+                android:id="@+id/registrarsePasswordConf"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:inputType="textPassword"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.717"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageView
+                android:id="@+id/registrarseIndicadorConf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/llRegistrarseAcepto"
@@ -139,7 +156,7 @@
             android:layout_marginTop="40dp"
             android:gravity="center"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/registrarsePasswordConf"
+            app:layout_constraintTop_toBottomOf="@+id/llPassConf"
             android:orientation="horizontal">
 
             <CheckBox

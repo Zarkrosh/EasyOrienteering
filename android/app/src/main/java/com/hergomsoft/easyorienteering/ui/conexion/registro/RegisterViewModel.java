@@ -1,17 +1,22 @@
 package com.hergomsoft.easyorienteering.ui.conexion.registro;
 
+import android.os.Handler;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.data.Result;
+import com.hergomsoft.easyorienteering.model.Result;
 import com.hergomsoft.easyorienteering.data.RegisterRepository;
-import com.hergomsoft.easyorienteering.data.model.Utils;
+import com.hergomsoft.easyorienteering.model.Utils;
 
 public class RegisterViewModel extends ViewModel {
+    private final int TIMEOUT_MENSAJE_EXITO = 2500;
+    private final int TIMEOUT_MENSAJE_ERROR = 4000;
+
     private MutableLiveData<RegisterFormState> registerFormState = new MutableLiveData<>();
-    private MutableLiveData<RegisterResult> registerResult = new MutableLiveData<>();
+    private MutableLiveData<RegisterState> registerState = new MutableLiveData<>();
     private RegisterRepository registerRepository;
 
     RegisterViewModel(RegisterRepository registerRepository) {
@@ -22,19 +27,50 @@ public class RegisterViewModel extends ViewModel {
         return registerFormState;
     }
 
-    LiveData<RegisterResult> getRegisterResult() {
-        return registerResult;
+    LiveData<RegisterState> getRegisterState() {
+        return registerState;
     }
 
     public void register(String email, String username, String password) {
-        // can be launched in a separate asynchronous job
-        Result<Void> result = registerRepository.register(email, username, password);
+        final RegisterState state = new RegisterState();
+        registerState.setValue(state);
 
-        if (result instanceof Result.Success) {
-            // TODO Mostrar éxito
-        } else {
-            // TODO Mostrar error
-        }
+        // TODO Lanzar asíncronamente
+        final Result<Void> result = registerRepository.register(email, username, password);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (result instanceof Result.Success) {
+                    state.setEstado(RegisterState.ESTADO_EXITO_PRE);
+                    registerState.setValue(state);
+
+                    // Tras un pequeño lapso de tiempo, actualiza el estado para la redirección
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            state.setEstado(RegisterState.ESTADO_EXITO_FIN);
+                            registerState.setValue(state);
+                        }
+                    }, TIMEOUT_MENSAJE_EXITO);
+                } else {
+                    state.setEstado(RegisterState.ESTADO_ERROR);
+                    // Mensaje de error
+                    // TODO
+                    // state.setMensaje(R.string.*);
+                    registerState.setValue(state);
+
+                    // Tras un pequeño lapso de tiempo, oculta el diálogo
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            state.setEstado(RegisterState.ESTADO_OCULTO);
+                            registerState.setValue(state);
+                        }
+                    }, TIMEOUT_MENSAJE_ERROR);
+                }
+            }
+        }, 3000);
+
     }
 
     public void registerDataChanged(String email, String username, String password, String passwordConf) {
@@ -49,6 +85,14 @@ public class RegisterViewModel extends ViewModel {
         } else {
             registerFormState.setValue(new RegisterFormState(true));
         }
+    }
+
+    /**
+     * Comprueba si la dirección de email especificada ya está asociada a una cuenta.
+     * @param email Dirección de email
+     */
+    public void checkEmailOcupado(String email) {
+        // TODO: comprobar si el email ya está asociado a una cuenta
     }
 
 }

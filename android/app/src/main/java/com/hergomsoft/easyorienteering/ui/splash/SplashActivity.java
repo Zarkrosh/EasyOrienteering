@@ -44,12 +44,13 @@ public class SplashActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-            //startActivity(new Intent(SplashActivity.this, ConexionActivity.class));
-
-            // Muestra el resumen de la aplicación
-            Intent i = new Intent(SplashActivity.this, ResumenActivity.class);
-            i.putExtra(ResumenActivity.ARG_VOLUNTARIO, false);
-            startActivity(i);
+                startActivity(new Intent(SplashActivity.this, ConexionActivity.class));
+                /*
+                // Muestra el resumen de la aplicación
+                Intent i = new Intent(SplashActivity.this, ResumenActivity.class);
+                i.putExtra(ResumenActivity.ARG_VOLUNTARIO, false);
+                startActivity(i);
+                */
             }
         }, MIN_TIEMPO_LOGOTIPO);
 

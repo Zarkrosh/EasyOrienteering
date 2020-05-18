@@ -1,6 +1,4 @@
-package com.hergomsoft.easyorienteering.data;
-
-import com.hergomsoft.easyorienteering.data.model.Usuario;
+package com.hergomsoft.easyorienteering.model;
 
 import java.io.IOException;
 

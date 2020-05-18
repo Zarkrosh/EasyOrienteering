@@ -1,6 +1,9 @@
 package com.hergomsoft.easyorienteering.ui.conexion.registro;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,6 +22,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.ui.BackableActivity;
+import com.hergomsoft.easyorienteering.ui.VisualUtils;
 
 public class RegisterActivity extends BackableActivity {
 
@@ -31,18 +35,22 @@ public class RegisterActivity extends BackableActivity {
     private CheckBox checkAcepto;
     private ImageButton btnPoliticas;
     private Button btnRegistrar;
+    private RegisterDialog dialog;
 
-    private RegisterViewModel registerViewModel;
+    private RegisterViewModel viewModel;
 
     private boolean passConfError;
+
+    private Activity activity; // Referencia para la ocultación de teclado
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle(getString(R.string.registro_titulo));
         setContentView(R.layout.activity_registrarse);
-        registerViewModel = ViewModelProviders.of(this, new RegisterViewModelFactory())
+        viewModel = ViewModelProviders.of(this, new RegisterViewModelFactory())
                 .get(RegisterViewModel.class);
+        activity = this;
 
         inputEmail = findViewById(R.id.registrarseEmail);
         inputNombre = findViewById(R.id.registrarseNombre);
@@ -54,11 +62,14 @@ public class RegisterActivity extends BackableActivity {
         btnPoliticas = findViewById(R.id.registrarsePoliticas);
         btnRegistrar = findViewById(R.id.btnRegistrar);
 
+        dialog = new RegisterDialog(RegisterActivity.this);
+        // Fondo transparente para los bordes redondeados
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         btnRegistrar.setEnabled(false); // Deshabilitado por defecto
         passConfError = false;
 
         // Habilita el envío de los datos si estos son válidos
-        registerViewModel.getRegisterFormState().observe(this, new Observer<RegisterFormState>() {
+        viewModel.getRegisterFormState().observe(this, new Observer<RegisterFormState>() {
             @Override
             public void onChanged(@Nullable RegisterFormState registerFormState) {
                 if (registerFormState == null) {
@@ -67,35 +78,67 @@ public class RegisterActivity extends BackableActivity {
 
                 btnRegistrar.setEnabled(registerFormState.isDataValid() && checkAcepto.isChecked());
                 if (registerFormState.getEmailError() != null && !inputEmail.isFocused()) {
-                    // TODO: Comprobar cómo aparece el error en el ET
                     inputEmail.setError(getString(registerFormState.getEmailError()));
                 }
                 if (registerFormState.getUsernameError() != null) {
                     inputNombre.setError(getString(registerFormState.getUsernameError()));
                 }
                 if (registerFormState.getPasswordError() != null) {
-                    inputPasswordConf.setError(getString(registerFormState.getPasswordError()));
+                    inputPassword.setError(getString(registerFormState.getPasswordError()));
                 }
                 if (registerFormState.getPasswordConfError() != null) {
+                    // TODO: Mejorar la lógica de esto
                     if(registerFormState.getPasswordConfError()) {
                         // Las contraseñas no coinciden
-                        if(!passConfError) {
-                            // Mostrar imagen error
-                            // TODO
-                            inputPasswordConf.setError(getString(R.string.registro_pass_no_coinciden));
+                        // Muestra imagen de error
+                        confirmPass.setImageDrawable(getResources().getDrawable(R.drawable.incorrect));
+                        inputPasswordConf.setError(getString(R.string.registro_pass_no_coinciden));
+                        passConfError = true;
 
-                            passConfError = true;
-                        }
-                    } else {
+                    } else if(!inputPasswordConf.getText().toString().isEmpty()) {
                         // Las contraseñas coinciden
-                        // TODO: Mostrar imagen correcto
+                        // Muestra imagen correcta
+                        confirmPass.setImageDrawable(getResources().getDrawable(R.drawable.correct));
+                        passConfError = false;
+
+                    } else {
+                        confirmPass.setImageDrawable(null);
                     }
                 }
-
-                // TODO Comprobar que la confirmación es igual, ¿de este modo?
             }
         });
 
+        // Muestra el diálogo de registro (o no) y sus mensajes
+        viewModel.getRegisterState().observe(this, new Observer<RegisterState>() {
+            @Override
+            public void onChanged(RegisterState registerResult) {
+                switch (registerResult.getEstado()) {
+                    case RegisterState.ESTADO_REGISTRANDO:
+                        dialog.muestraMensajeRegistrando();
+                        break;
+                    case RegisterState.ESTADO_EXITO_PRE:
+                        // Muestra que el registro ha sido exitoso
+                        dialog.muestraMensajeExito();
+                        break;
+                    case RegisterState.ESTADO_EXITO_FIN:
+                        // Tras registro exitoso redirige a la pantalla principal
+                        //startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
+                        dialog.dismiss(); // TODO Borrar
+                        break;
+                    case RegisterState.ESTADO_ERROR:
+                        Integer idMensaje = registerResult.getMensaje();
+                        String mensaje = "";
+                        if(idMensaje != null) mensaje = getString(idMensaje);
+                        dialog.muestraMensajeError(mensaje);
+                        break;
+                    case RegisterState.ESTADO_OCULTO:
+                    default:
+                        dialog.dismiss();
+                }
+            }
+        });
+
+        // Cuando se modifica un campo de datos, se actualiza el modelo
         TextWatcher afterTextChangedListener = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -113,7 +156,7 @@ public class RegisterActivity extends BackableActivity {
         inputPassword.addTextChangedListener(afterTextChangedListener);
         inputPasswordConf.addTextChangedListener(afterTextChangedListener);
 
-        // Indicador de fuerza de la contraseña (TODO)
+        // Indicador de fuerza de la contraseña
         TextWatcher passwordStrengthChecker = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -128,12 +171,12 @@ public class RegisterActivity extends BackableActivity {
         };
         inputPasswordConf.addTextChangedListener(passwordStrengthChecker);
 
-        // Comprobación de email existente
+        // Comprueba si el email está asociado a otra cuenta al perder el focus (TODO No funciona correctamente)
         inputEmail.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
-                    // TODO: comprobar si el email ya está asociado a una cuenta
+                    viewModel.checkEmailOcupado(inputEmail.getText().toString());
                 }
             }
         });
@@ -161,6 +204,7 @@ public class RegisterActivity extends BackableActivity {
         btnPoliticas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Muestra la vista de políticas
                 startActivity(new Intent(RegisterActivity.this, PoliticasActivity.class));
             }
         });
@@ -169,16 +213,20 @@ public class RegisterActivity extends BackableActivity {
         btnRegistrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
+                // Oculta teclado
+                VisualUtils.hideKeyboard(activity);
+
                 Toast.makeText(RegisterActivity.this, "[TODO] Registrando cuenta...", Toast.LENGTH_SHORT).show();
+                viewModel.register(inputEmail.getText().toString(),
+                    inputNombre.getText().toString(), inputPassword.getText().toString());
             }
         });
     }
 
-    public void refreshForm() {
-        registerViewModel.registerDataChanged(
-                inputEmail.getText().toString(), inputNombre.getText().toString(),
-                inputPassword.getText().toString(), inputPasswordConf.getText().toString());
+    private void refreshForm() {
+        viewModel.registerDataChanged(
+            inputEmail.getText().toString(), inputNombre.getText().toString(),
+            inputPassword.getText().toString(), inputPasswordConf.getText().toString());
     }
 
 }

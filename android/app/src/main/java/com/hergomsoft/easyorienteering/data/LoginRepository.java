@@ -1,6 +1,8 @@
 package com.hergomsoft.easyorienteering.data;
 
-import com.hergomsoft.easyorienteering.data.model.Usuario;
+import com.hergomsoft.easyorienteering.model.LoginDataSource;
+import com.hergomsoft.easyorienteering.model.Result;
+import com.hergomsoft.easyorienteering.model.Usuario;
 
 /**
  * Class that requests authentication and user information from the remote data source and
