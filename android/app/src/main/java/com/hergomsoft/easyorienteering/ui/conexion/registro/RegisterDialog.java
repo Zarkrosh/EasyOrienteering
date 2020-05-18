@@ -25,9 +25,8 @@ public class RegisterDialog extends AlertDialog {
     private ProgressBar progress;
     private TextView mensaje;
 
-    private RegisterDialog(Context context) {
+    protected RegisterDialog(Context context) {
         super(context);
-        setCancelable(false);
     }
 
     @Override
@@ -40,11 +39,12 @@ public class RegisterDialog extends AlertDialog {
         imagen = content.findViewById(R.id.dialog_registro_imagen);
         mensaje = content.findViewById(R.id.dialog_registro_mensaje);
 
+        setCancelable(false);
+
         // Color del spinner circular
         progress.getIndeterminateDrawable()
                 .setColorFilter(ContextCompat.getColor(getContext(), R.color.colorPrimary), PorterDuff.Mode.SRC_IN );
 
-        muestraMensajeRegistrando();
         super.onCreate(savedInstanceState);
     }
 
@@ -52,10 +52,13 @@ public class RegisterDialog extends AlertDialog {
      * Muestra el mensaje de estado "Registrando" con un indicador de carga.
      */
     public void muestraMensajeRegistrando() {
+        show();
         titulo.setText(R.string.registro_registrando);
         progress.setVisibility(View.VISIBLE);
         imagen.setVisibility(View.INVISIBLE);
         setMensaje("");
+        // Colores por defecto
+        titulo.setTextColor(Color.BLACK);
         mensaje.setTextColor(Color.BLACK);
     }
 
@@ -63,6 +66,7 @@ public class RegisterDialog extends AlertDialog {
      * Muestra un mensaje indicando que se ha registrado la cuenta con éxito.
      */
     public void muestraMensajeExito() {
+        show();
         titulo.setText(R.string.registro_registrada);
         imagen.setImageDrawable(getContext().getResources().getDrawable(R.drawable.success));
         imagen.setVisibility(View.VISIBLE);
@@ -78,6 +82,7 @@ public class RegisterDialog extends AlertDialog {
      * @param error Mensaje de error
      */
     public void muestraMensajeError(String error) {
+        show();
         titulo.setText(R.string.registro_error);
         imagen.setImageDrawable(getContext().getResources().getDrawable(R.drawable.error));
         imagen.setVisibility(View.VISIBLE);
@@ -93,7 +98,8 @@ public class RegisterDialog extends AlertDialog {
      * el campo de texto.
      * @param sMensaje Mensaje
      */
-    public void setMensaje(String sMensaje) {
+    private void setMensaje(String sMensaje) {
+        if(sMensaje == null) sMensaje = "";
         mensaje.setText(sMensaje);
         if(sMensaje.isEmpty()) {
             // Si no se usa, desaparece

@@ -47,7 +47,7 @@
     <string name="registro_email_no_valido">El email no es válido</string>
     <string name="registro_nombre_invalido">Solo números, letras y \'_\'</string>
     <string name="registro_nombre_existente">Ese nombre ya está usado por otro usuario</string>
-    <string name="registro_pass_largo">Al menos 8 caracteres</string>
+    <string name="registro_pass_largo">Al menos 8 letras</string>
     <string name="registro_pass_no_coinciden">Las contraseñas no coinciden</string>
     <string name="registro_registrar">REGISTRAR CUENTA</string>
     <string name="registro_registrando">Registrando...</string>
@@ -68,6 +68,5 @@
     <string name="olvido_enviar">ENVIAR</string>
     <string name="olvido_listo">Listo. Recibirás un correo si existe el usuario con el email o nombre introducido</string>
     <string name="olvido_error">Ocurrió un error. Comprueba tu conexión e inténtalo de nuevo</string>
-
 
 </resources>

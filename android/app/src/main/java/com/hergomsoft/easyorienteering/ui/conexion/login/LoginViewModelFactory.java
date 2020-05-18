@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.NonNull;
 
-import com.hergomsoft.easyorienteering.data.LoginDataSource;
+import com.hergomsoft.easyorienteering.model.LoginDataSource;
 import com.hergomsoft.easyorienteering.data.LoginRepository;
 
 /**

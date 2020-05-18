@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.data;
+package com.hergomsoft.easyorienteering.data.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,19 +7,19 @@ import android.view.ViewGroup;
 
 import androidx.viewpager.widget.PagerAdapter;
 
-import com.hergomsoft.easyorienteering.data.model.PoliticasPages;
+import com.hergomsoft.easyorienteering.model.pagers.ResumenPages;
 
-public class PoliticasPagerAdapter extends PagerAdapter {
+public class ResumenPagerAdapter extends PagerAdapter {
 
     private Context mContext;
 
-    public PoliticasPagerAdapter(Context context) {
+    public ResumenPagerAdapter(Context context) {
         mContext = context;
     }
 
     @Override
     public Object instantiateItem(ViewGroup collection, int position) {
-        PoliticasPages modelObject = PoliticasPages.values()[position];
+        ResumenPages modelObject = ResumenPages.values()[position];
         LayoutInflater inflater = LayoutInflater.from(mContext);
         ViewGroup layout = (ViewGroup) inflater.inflate(modelObject.getLayoutResId(), collection, false);
         collection.addView(layout);
@@ -33,7 +33,7 @@ public class PoliticasPagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return PoliticasPages.values().length;
+        return ResumenPages.values().length;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class PoliticasPagerAdapter extends PagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        PoliticasPages customPagerEnum = PoliticasPages.values()[position];
+        ResumenPages customPagerEnum = ResumenPages.values()[position];
         return mContext.getString(customPagerEnum.getTitleResId());
     }
 

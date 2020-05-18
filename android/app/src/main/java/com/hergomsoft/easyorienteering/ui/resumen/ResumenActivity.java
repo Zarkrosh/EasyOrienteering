@@ -9,7 +9,7 @@ import android.widget.Button;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.data.ResumenPagerAdapter;
+import com.hergomsoft.easyorienteering.data.adapters.ResumenPagerAdapter;
 import com.hergomsoft.easyorienteering.ui.BackableActivity;
 import com.hergomsoft.easyorienteering.ui.conexion.ConexionActivity;
 

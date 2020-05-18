@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.data;
+package com.hergomsoft.easyorienteering.model;
 
 /**
  * A generic class that holds a result success w/ data or an error exception.

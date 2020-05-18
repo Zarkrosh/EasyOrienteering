@@ -12,7 +12,8 @@
     <dimen name="tamTitulo">30sp</dimen>
     <dimen name="tamContenido">22sp</dimen>
 
-
+    <!-- Registro -->
+    <dimen name="tamIndicadorDialogoRegistro">120dp</dimen>
 
     <dimen name="margin_lados_conectarse">30dp</dimen>
     <dimen name="altoTitulos">56dp</dimen>

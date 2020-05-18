@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.hergomsoft.easyorienteering.data.LoginRepository;
-import com.hergomsoft.easyorienteering.data.Result;
-import com.hergomsoft.easyorienteering.data.model.Usuario;
+import com.hergomsoft.easyorienteering.model.Result;
+import com.hergomsoft.easyorienteering.model.Usuario;
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.data.model.Utils;
+import com.hergomsoft.easyorienteering.model.Utils;
 
 public class LoginViewModel extends ViewModel {
     private final int MIN_PASSWORD_LENGTH = 8;

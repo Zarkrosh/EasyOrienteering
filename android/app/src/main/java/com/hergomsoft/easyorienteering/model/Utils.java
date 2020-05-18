@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.data.model;
+package com.hergomsoft.easyorienteering.model;
 
 public final class Utils {
 

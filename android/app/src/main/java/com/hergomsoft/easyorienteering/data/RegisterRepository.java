@@ -1,5 +1,8 @@
 package com.hergomsoft.easyorienteering.data;
 
+import com.hergomsoft.easyorienteering.model.LoginDataSource;
+import com.hergomsoft.easyorienteering.model.Result;
+
 public class RegisterRepository {
 
     private static volatile RegisterRepository instance;
