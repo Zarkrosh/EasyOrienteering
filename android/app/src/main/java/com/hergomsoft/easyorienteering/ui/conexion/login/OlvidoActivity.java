@@ -1,6 +1,7 @@
 package com.hergomsoft.easyorienteering.ui.conexion.login;
 
 import android.app.Activity;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,6 +11,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.content.ContextCompat;
 
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.model.Utils;
@@ -36,6 +39,10 @@ public class OlvidoActivity extends BackableActivity {
         progress = findViewById(R.id.olvidoLoading);
         textResultado = findViewById(R.id.olvidoResultado);
         btnEnviar = findViewById(R.id.olvidoEnviar);
+
+        // Color del spinner circular
+        progress.getIndeterminateDrawable()
+                .setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN );
 
         // Carga valor del login
         String emailNombre = getIntent().getStringExtra(LoginActivity.ARG_EMAIL_NOMBRE);

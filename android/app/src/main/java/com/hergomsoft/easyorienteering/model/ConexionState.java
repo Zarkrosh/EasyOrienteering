@@ -1,13 +1,13 @@
-package com.hergomsoft.easyorienteering.ui.conexion.registro;
+package com.hergomsoft.easyorienteering.model;
 
 import androidx.annotation.Nullable;
 
 /**
- * Estado de la petición de registro.
+ * Estado de la petición de login o registro.
  */
-class RegisterState {
+public class ConexionState {
     public static final int ESTADO_OCULTO = 0;
-    public static final int ESTADO_REGISTRANDO = 1;
+    public static final int ESTADO_CARGANDO = 1;
     public static final int ESTADO_EXITO_PRE = 2; // Para mostrar el registro exitoso
     public static final int ESTADO_EXITO_FIN = 3; // Para redirigir tras registro
     public static final int ESTADO_ERROR = 4;
@@ -16,14 +16,14 @@ class RegisterState {
     @Nullable
     private Integer mensaje;
 
-    RegisterState() {
-        this.estado = ESTADO_REGISTRANDO;
+    public ConexionState() {
+        this.estado = ESTADO_CARGANDO;
     }
 
-    int getEstado() { return estado; }
+    public int getEstado() { return estado; }
 
     @Nullable
-    Integer getMensaje() {
+    public Integer getMensaje() {
         return mensaje;
     }
 

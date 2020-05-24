@@ -21,6 +21,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.hergomsoft.easyorienteering.R;
+import com.hergomsoft.easyorienteering.model.ConexionState;
 import com.hergomsoft.easyorienteering.ui.BackableActivity;
 import com.hergomsoft.easyorienteering.ui.VisualUtils;
 
@@ -109,29 +110,29 @@ public class RegisterActivity extends BackableActivity {
         });
 
         // Muestra el diálogo de registro (o no) y sus mensajes
-        viewModel.getRegisterState().observe(this, new Observer<RegisterState>() {
+        viewModel.getRegisterState().observe(this, new Observer<ConexionState>() {
             @Override
-            public void onChanged(RegisterState registerResult) {
+            public void onChanged(ConexionState registerResult) {
                 switch (registerResult.getEstado()) {
-                    case RegisterState.ESTADO_REGISTRANDO:
+                    case ConexionState.ESTADO_CARGANDO:
                         dialog.muestraMensajeRegistrando();
                         break;
-                    case RegisterState.ESTADO_EXITO_PRE:
+                    case ConexionState.ESTADO_EXITO_PRE:
                         // Muestra que el registro ha sido exitoso
                         dialog.muestraMensajeExito();
                         break;
-                    case RegisterState.ESTADO_EXITO_FIN:
+                    case ConexionState.ESTADO_EXITO_FIN:
                         // Tras registro exitoso redirige a la pantalla principal
                         //startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
                         dialog.dismiss(); // TODO Borrar
                         break;
-                    case RegisterState.ESTADO_ERROR:
+                    case ConexionState.ESTADO_ERROR:
                         Integer idMensaje = registerResult.getMensaje();
                         String mensaje = "";
                         if(idMensaje != null) mensaje = getString(idMensaje);
                         dialog.muestraMensajeError(mensaje);
                         break;
-                    case RegisterState.ESTADO_OCULTO:
+                    case ConexionState.ESTADO_OCULTO:
                     default:
                         dialog.dismiss();
                 }

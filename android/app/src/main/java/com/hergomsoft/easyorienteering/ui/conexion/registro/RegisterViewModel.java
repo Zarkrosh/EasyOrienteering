@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.hergomsoft.easyorienteering.R;
+import com.hergomsoft.easyorienteering.model.ConexionState;
 import com.hergomsoft.easyorienteering.model.Result;
 import com.hergomsoft.easyorienteering.data.RegisterRepository;
 import com.hergomsoft.easyorienteering.model.Utils;
@@ -16,7 +17,7 @@ public class RegisterViewModel extends ViewModel {
     private final int TIMEOUT_MENSAJE_ERROR = 4000;
 
     private MutableLiveData<RegisterFormState> registerFormState = new MutableLiveData<>();
-    private MutableLiveData<RegisterState> registerState = new MutableLiveData<>();
+    private MutableLiveData<ConexionState> registerState = new MutableLiveData<>();
     private RegisterRepository registerRepository;
 
     RegisterViewModel(RegisterRepository registerRepository) {
@@ -27,12 +28,12 @@ public class RegisterViewModel extends ViewModel {
         return registerFormState;
     }
 
-    LiveData<RegisterState> getRegisterState() {
+    LiveData<ConexionState> getRegisterState() {
         return registerState;
     }
 
     public void register(String email, String username, String password) {
-        final RegisterState state = new RegisterState();
+        final ConexionState state = new ConexionState();
         registerState.setValue(state);
 
         // TODO Lanzar asíncronamente
@@ -41,19 +42,19 @@ public class RegisterViewModel extends ViewModel {
             @Override
             public void run() {
                 if (result instanceof Result.Success) {
-                    state.setEstado(RegisterState.ESTADO_EXITO_PRE);
+                    state.setEstado(ConexionState.ESTADO_EXITO_PRE);
                     registerState.setValue(state);
 
                     // Tras un pequeño lapso de tiempo, actualiza el estado para la redirección
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            state.setEstado(RegisterState.ESTADO_EXITO_FIN);
+                            state.setEstado(ConexionState.ESTADO_EXITO_FIN);
                             registerState.setValue(state);
                         }
                     }, TIMEOUT_MENSAJE_EXITO);
                 } else {
-                    state.setEstado(RegisterState.ESTADO_ERROR);
+                    state.setEstado(ConexionState.ESTADO_ERROR);
                     // Mensaje de error
                     // TODO
                     // state.setMensaje(R.string.*);
@@ -63,7 +64,7 @@ public class RegisterViewModel extends ViewModel {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            state.setEstado(RegisterState.ESTADO_OCULTO);
+                            state.setEstado(ConexionState.ESTADO_OCULTO);
                             registerState.setValue(state);
                         }
                     }, TIMEOUT_MENSAJE_ERROR);
