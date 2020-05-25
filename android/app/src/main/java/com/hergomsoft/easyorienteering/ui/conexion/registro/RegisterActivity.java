@@ -24,6 +24,7 @@ import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.model.ConexionState;
 import com.hergomsoft.easyorienteering.ui.BackableActivity;
 import com.hergomsoft.easyorienteering.ui.VisualUtils;
+import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
 
 public class RegisterActivity extends BackableActivity {
 
@@ -123,8 +124,8 @@ public class RegisterActivity extends BackableActivity {
                         break;
                     case ConexionState.ESTADO_EXITO_FIN:
                         // Tras registro exitoso redirige a la pantalla principal
-                        //startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
-                        dialog.dismiss(); // TODO Borrar
+                        startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
+                        finish();
                         break;
                     case ConexionState.ESTADO_ERROR:
                         Integer idMensaje = registerResult.getMensaje();

@@ -10,7 +10,7 @@ import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.model.ConexionState;
 import com.hergomsoft.easyorienteering.model.Result;
 import com.hergomsoft.easyorienteering.data.RegisterRepository;
-import com.hergomsoft.easyorienteering.model.Utils;
+import com.hergomsoft.easyorienteering.util.Utils;
 
 public class RegisterViewModel extends ViewModel {
     private final int TIMEOUT_MENSAJE_EXITO = 2500;

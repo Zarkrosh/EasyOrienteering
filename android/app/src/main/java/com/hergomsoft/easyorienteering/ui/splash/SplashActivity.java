@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.ui.conexion.ConexionActivity;
+import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
 import com.hergomsoft.easyorienteering.ui.resumen.ResumenActivity;
 
 public class SplashActivity extends AppCompatActivity {
@@ -44,13 +45,16 @@ public class SplashActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashActivity.this, ConexionActivity.class));
+                // Muestra la pantalla de conexión de cuenta
+                //startActivity(new Intent(SplashActivity.this, ConexionActivity.class));
                 /*
                 // Muestra el resumen de la aplicación
                 Intent i = new Intent(SplashActivity.this, ResumenActivity.class);
                 i.putExtra(ResumenActivity.ARG_VOLUNTARIO, false);
                 startActivity(i);
                 */
+
+                startActivity(new Intent(SplashActivity.this, HomeActivity.class));
             }
         }, MIN_TIEMPO_LOGOTIPO);
 

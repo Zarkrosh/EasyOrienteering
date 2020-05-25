@@ -15,7 +15,7 @@ import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.model.Utils;
+import com.hergomsoft.easyorienteering.util.Utils;
 import com.hergomsoft.easyorienteering.ui.BackableActivity;
 import com.hergomsoft.easyorienteering.ui.VisualUtils;
 

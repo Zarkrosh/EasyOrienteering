@@ -11,7 +11,7 @@ import com.hergomsoft.easyorienteering.model.ConexionState;
 import com.hergomsoft.easyorienteering.model.Result;
 import com.hergomsoft.easyorienteering.model.Usuario;
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.model.Utils;
+import com.hergomsoft.easyorienteering.util.Utils;
 
 public class LoginViewModel extends ViewModel {
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();

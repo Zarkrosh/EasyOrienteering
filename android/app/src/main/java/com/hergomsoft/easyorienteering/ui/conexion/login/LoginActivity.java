@@ -27,6 +27,7 @@ import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.model.ConexionState;
 import com.hergomsoft.easyorienteering.ui.BackableActivity;
 import com.hergomsoft.easyorienteering.ui.VisualUtils;
+import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
 
 public class LoginActivity extends BackableActivity {
 
@@ -94,8 +95,8 @@ public class LoginActivity extends BackableActivity {
                         break;
                     case ConexionState.ESTADO_EXITO_FIN:
                         // Tras login exitoso redirige a la pantalla principal
-                        //startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
-                        Toast.makeText(LoginActivity.this, "[TODO] Exito, redirige a pantalla principal", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                        finish();
                         break;
                     case ConexionState.ESTADO_ERROR:
                         Integer idMensaje = loginState.getMensaje();
