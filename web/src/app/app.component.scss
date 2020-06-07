@@ -1,0 +1,44 @@
+@import "../styles.scss";
+
+$nav-link-interspacing: 15px;
+
+nav {
+    background-color: $color-orientacion !important;
+}
+
+nav .container-fluid {
+    padding-left: 0;
+}
+
+.navbar-nav > * {
+    margin: auto $nav-link-interspacing;
+}
+
+.navbar-header a {
+    font-size: x-large;
+    color: white !important;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#navbar a {
+    font-size: larger;
+    color: white !important;
+    font-weight: bold;
+}
+
+
+.botones-conexion-registro {
+    display: inline-flex;
+    border: 2px solid black;
+    border-radius: 20px;
+    overflow: hidden;
+}
+.btn-conectarse {
+    background-color: yellowgreen;
+    border-right: 2px solid black;
+}
+.btn-registro {
+    background-color: darkmagenta;
+}
+
