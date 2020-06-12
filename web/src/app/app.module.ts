@@ -11,6 +11,9 @@ import { LoginComponent } from './auth/login/login.component';
 import { RegistroComponent } from './auth/registro/registro.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OlvidoComponent } from './auth/olvido/olvido.component';
+import { CreacionCarreraComponent } from './creacion-carrera/creacion-carrera.component';
+import { EditorRecorridosComponent } from './editor-recorridos/editor-recorridos.component';
+import { EditorTrazadoComponent } from './editor-trazado/editor-trazado.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +22,10 @@ import { OlvidoComponent } from './auth/olvido/olvido.component';
     LoginComponent,
     PerfilComponent,
     RegistroComponent,
-    OlvidoComponent
+    OlvidoComponent,
+    CreacionCarreraComponent,
+    EditorRecorridosComponent,
+    EditorTrazadoComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,20 @@
+<div id="barra-superior">
+    <input id="input-purplepen" type="file" class="inputfile" (change)="importarPurplePen($event)">
+    <label id="label-importar-purplepen" for="input-purplepen" class="btn btn-primary">Importar desde PurplePen</label>
+
+    <input id="input-mapa" type="file" class="inputfile" (change)="importarPurplePen($event)">
+    <label id="label-seleccionar-mapa" for="input-mapa" class="btn btn-primary">Seleccionar mapa base</label>
+</div>
+
+<div id="wrapper-inferior">
+    <!-- Editor de trazados -->
+    <div id="trazador">
+
+    </div>
+
+    <!-- Barra lateral -->
+    <div id="barra-lateral">
+        <div id="configuraciones"></div>
+        <button id="btn-guardar" class="btn btn-primary">Guardar recorridos</button>
+    </div>
+</div>

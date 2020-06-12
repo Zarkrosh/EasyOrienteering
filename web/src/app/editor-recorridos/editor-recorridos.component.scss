@@ -1,0 +1,101 @@
+@import "../../styles.scss";
+
+/*********** LAYOUT GENERAL ***********/
+#barra-superior {
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+#wrapper-inferior {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+    padding: 0 15px;
+}
+
+#trazador {
+    flex-grow: 1;
+    min-width: 600px;
+    min-height: 600px;
+    margin-right: 50px;
+    border: 2px solid black;
+    border-radius: 20px;
+}
+
+#barra-lateral {
+    min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+}
+
+/*********** BOTÓN IMPORTAR PURPLE PEN ***********/
+#label-importar-purplepen {
+    margin-left: 30px;
+    background-color: purple;
+    border-color: purple;
+    padding: 10px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif, fontawesome;
+    font-weight: bold;
+    cursor: pointer;
+}
+#label-importar-purplepen:before {
+    margin-right: 10px;
+    content: "\f07c";
+}
+
+/*********** BOTÓN SELECCIONAR MAPA BASE ***********/
+#label-seleccionar-mapa {
+    margin-left: 20px;
+    background-color: limegreen;
+    border-color: limegreen;
+    padding: 10px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif, fontawesome;
+    font-weight: bold;
+    cursor: pointer;
+}
+#label-seleccionar-mapa:before {
+    margin-right: 10px;
+    content: "\f279";
+}
+
+/* Oculta la parte fea del input file */
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+.inputfile + label * {
+	pointer-events: none;
+}
+
+
+/*********** BARRA LATERAL DE CONFIGURACIONES ***********/
+#configuraciones {
+    flex-grow: 1;
+    overflow-y: scroll;
+    border: 2px solid black;
+}
+
+/*********** BOTÓN GUARDAR RECORRIDOS ***********/
+#btn-guardar {
+    width: 50%;
+    margin: 15px auto;
+    font-size: large;
+    font-weight: bold;
+}
+
+
+
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/

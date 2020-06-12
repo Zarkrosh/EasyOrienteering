@@ -1,0 +1,22 @@
+@import "../../styles.scss";
+
+.formHeader {
+    text-align: center;
+}
+
+.selector-opcion {
+    display: inline-block;
+    width: 200px;
+    height: 200px;
+    margin: auto 40px;
+    border: 2px solid black;
+    border-radius: 20%;
+    text-align: center;
+    font-weight: bold;
+    transition: .3s all;
+}
+
+.selector-opcion:hover {
+    background-color: $color-orientacion;
+    color: white;
+}

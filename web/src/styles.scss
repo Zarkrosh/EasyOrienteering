@@ -12,12 +12,17 @@ alert {
     font-size: 1.3em;
 }
 
-
 .flex-content-end {
     justify-content: end;
 }
 
-
+.btn-primary {
+    background-color: $color-orientacion;
+    border-color: $color-orientacion;
+}
+.btn-primary:hover {
+    background-color: $color-orientacion-dark;
+}
 
 #footer-web {
     width: 100%;

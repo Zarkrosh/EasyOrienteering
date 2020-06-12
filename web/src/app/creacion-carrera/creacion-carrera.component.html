@@ -1,0 +1,75 @@
+<div class="container">
+    <h1 class="formHeader">Crear carrera</h1>
+    <form id="carreraForm" [formGroup]="carreraForm" (ngSubmit)="onSubmit()">
+        <h2>Tipo de carrera</h2>
+        <div class="form-group">
+            <label class="selector-opcion">
+                <input type="radio" formControlName="tipo" name="tipo" value="circuito" class="form-control" required/>
+                <span>Circuito</span>
+            </label>
+            <label class="selector-opcion">
+                <input type="radio" formControlName="tipo" name="tipo" value="evento" class="form-control"/>
+                <span>Evento</span>
+            </label>
+        </div>
+
+        <h2>Modalidad</h2>
+        <div class="form-group">
+            <label class="selector-opcion">
+                <input type="radio" formControlName="modalidad" name="modalidad" value="trazado" class="form-control" required/>
+                <span>Trazado</span>
+            </label>
+            <label class="selector-opcion">
+                <input type="radio" formControlName="modalidad" name="modalidad" value="score" class="form-control"/>
+                <span>Score</span>
+            </label>
+        </div>
+
+        <h2>Tipo de cronometraje</h2>
+        <div class="form-group">
+            <label class="selector-opcion">
+                <input type="radio" formControlName="cronometraje" name="cronometraje" value="QR" class="form-control" required/>
+                <span>QR</span>
+            </label>
+            <label class="selector-opcion">
+                <input type="radio" formControlName="cronometraje" name="cronometraje" value="GPS" class="form-control" disabled/>
+                <span>GPS (aún no)</span>
+            </label>
+        </div>
+
+        <h2>Modo de mapa</h2>
+        <div class="form-group">
+            <label class="selector-opcion">
+                <input type="radio" formControlName="modomapa" name="modomapa" value="movil" class="form-control" required/>
+                <span>En el móvil</span>
+            </label>
+            <label class="selector-opcion">
+                <input type="radio" formControlName="modomapa" name="modomapa" value="impreso" class="form-control" />
+                <span>Impreso</span>
+            </label>
+        </div>
+
+        <!-- TODO: ¿Simbología personalizada? -->
+
+        <!-- Solo en mapas georeferenciados 
+        <h2>Modo ayuda</h2>
+        <div class="form-group">
+            <label class="selector-opcion">
+                <input type="radio" formControlName="modoayuda" name="modoayuda" value="permitir" class="form-control" required/>
+                <span>Permitir</span>
+            </label>
+            <label class="selector-opcion">
+                <input type="radio" formControlName="modoayuda" name="modoayuda" value="nopermitir" class="form-control" disabled/>
+                <span>No permitir</span>
+            </label>
+        </div> -->
+
+        <h2>Recorridos</h2>
+        <h4>¿Cómo se van a generar los recorridos?</h4>
+        <div class="form-group">
+            <a class="selector-opcion" routerLink='recorridos'>Trazar aquí</a>
+            <a class="selector-opcion" routerLink='recorridos'>Importar desde PurplePen</a>
+        </div>
+
+    </form>
+</div>
