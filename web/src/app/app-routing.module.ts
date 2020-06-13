@@ -6,8 +6,7 @@ import { PerfilComponent } from './perfil/perfil.component';
 import { RegistroComponent } from './auth/registro/registro.component';
 import { OlvidoComponent } from './auth/olvido/olvido.component';
 import { CreacionCarreraComponent } from './creacion-carrera/creacion-carrera.component';
-import { TrazadorComponent } from './trazador/trazador.component';
-import { EditorRecorridosComponent } from './editor-recorridos/editor-recorridos.component';
+import { EditorRecorridosComponent } from './editor/editor-recorridos/editor-recorridos.component';
 
 
 const routes: Routes = [

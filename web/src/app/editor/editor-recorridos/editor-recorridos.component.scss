@@ -1,4 +1,4 @@
-@import "../../styles.scss";
+@import "../../../styles.scss";
 
 /*********** LAYOUT GENERAL ***********/
 #barra-superior {
@@ -22,6 +22,7 @@
     margin-right: 50px;
     border: 2px solid black;
     border-radius: 20px;
+    overflow: hidden;
 }
 
 #barra-lateral {
@@ -82,6 +83,12 @@
     flex-grow: 1;
     overflow-y: scroll;
     border: 2px solid black;
+}
+
+// TEST
+#configuraciones table {
+    width: 100%;
+    text-align: center;
 }
 
 /*********** BOTÓN GUARDAR RECORRIDOS ***********/
