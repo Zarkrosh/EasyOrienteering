@@ -59,7 +59,7 @@ export class SharedEditorService {
    * Notifica el borrado de un control del recorrido.
    * @param control Control a borrar
    */
-  borrarControl(control) {
+  borrarControl(control: Control) {
     this._controlBorrado.next(control);
   }
 

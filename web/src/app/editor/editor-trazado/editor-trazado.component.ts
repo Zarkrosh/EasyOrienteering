@@ -32,7 +32,7 @@ export class EditorTrazadoComponent implements OnInit {
   MARKER_STATE: number;
   MOVE_MARKER_COLOR = 'rgba(0,0,255,0.6)'; // Azul
   MOVE_MARKER_RADIUS = this.MM_UNIT;
-  MARKED_CONTROL: Control;
+  ID_CONTROL_MARCADO: string;
   BOOL_PRINTED_MARKED = false;
 
   // Lienzos
@@ -56,7 +56,7 @@ export class EditorTrazadoComponent implements OnInit {
   MAX_OFFSET_Y;        // Offset de máximo desplazamiento vertical
   zoomLevel: number;   // Nivel de zoom
   MAX_ZOOM = 5;
-  MIN_ZOOM = 0;
+  MIN_ZOOM = -2;
   ZOOM_SCALING = 0.2;  // Porcentaje de cambio de niveles de zoom
 
   // Ratón
@@ -65,8 +65,10 @@ export class EditorTrazadoComponent implements OnInit {
   moviendoControl: boolean;
   dragX: number;
   dragY: number;
-  mapX: number;
-  mapY: number;
+  mapX: number; // TEST
+  mapY: number; // TEST
+  canvX: number; // TEST
+  canvY: number; // TEST
 
   // Modelo compartido
   controles: Map<string, Control>; // TODO Buscar mejor alternativa de tipo
@@ -84,41 +86,19 @@ export class EditorTrazadoComponent implements OnInit {
 
   ngOnInit() {
     this.clicking = this.moviendoControl = this.moviendoMapa = false;
-    this.imgMapa = this.MARKED_CONTROL = null;
+    this.imgMapa = this.ID_CONTROL_MARCADO = null;
     this.offsetX = this.offsetY = 0;
-    this.MARKER_STATE = Control.START;
+    this.MARKER_STATE = Control.SALIDA;
 
     // DEBUG Para no tener que estar cargándolo a mano
     this.cargaMapaAutomatico();
 
-    this.setZoom(0);
     this.updateCanvasDims(this.canvasMarcador.nativeElement);
     this.setupCanvas(false);
 
     // Controlador de cambio del mapa
     this.sharedData.mapaBase.subscribe((nMapa) => {
-      /*
-      if(nMapa !== null) {
-        var reader = new FileReader();
-        reader.onload = ((e) => {
-          this.imgMapa = new Image();
-          this.imgMapa.onload = (() => {
-            //resetBasics();
-            //this.MAX_OFFSET_X = -(this.imgMapa.naturalWidth - this.CANVAS_DIMX);
-            //this.MAX_OFFSET_Y = -(this.imgMapa.naturalHeight - this.CANVAS_DIMY);
-            //updateRecorrido();
-
-            // TEST
-            this.setupCanvas(true);
-            this.redibujaMapa();
-          });
-
-          this.imgMapa.src = e.target.result as string;
-        });
-
-        reader.readAsDataURL(nMapa);
-      }
-      */
+      // TODO COPIAR DEL AUTOMATICO
     });
 
     // Controlador de cambio de los controles
@@ -139,11 +119,11 @@ export class EditorTrazadoComponent implements OnInit {
 
     // Controlador de confirmación de borrado de control
     this.sharedData.controlBorradoConf.subscribe((tipo) => {
-      if(tipo === Control.START) {
+      if(tipo === Control.SALIDA) {
         this.startSelected();
       } else if(tipo === Control.CONTROL) {
         this.controlSelected();
-      } else if(tipo === Control.FINISH) {
+      } else if(tipo === Control.META) {
         this.finishSelected();
       }
 
@@ -198,8 +178,8 @@ export class EditorTrazadoComponent implements OnInit {
   startSelected() {
     this.removeSelected(); // Borra el actual seleccionado
     $("#tipo-salida").addClass("tipo-seleccionado"); // Y selecciona el nuevo
-    this.MARKER_STATE = Control.START;
-    //this.redibujaTrazado();
+    this.MARKER_STATE = Control.SALIDA;
+    this.redibujaTrazado();
   }
   
   /* El usuario selecciona que quiere marcar un control */
@@ -207,15 +187,15 @@ export class EditorTrazadoComponent implements OnInit {
     this.removeSelected(); // Borra el actual seleccionado
     $("#tipo-control").addClass("tipo-seleccionado"); // Y selecciona el nuevo
     this.MARKER_STATE = Control.CONTROL;
-    //this.redibujaTrazado();
+    this.redibujaTrazado();
   }
   
   /* El usuario selecciona que quiere marcar una meta */
   finishSelected() {
     this.removeSelected(); // Borra el actual seleccionado
     $("#tipo-meta").addClass("tipo-seleccionado"); // Y selecciona el nuevo
-    this.MARKER_STATE = Control.FINISH;
-    //this.redibujaTrazado();
+    this.MARKER_STATE = Control.META;
+    this.redibujaTrazado();
   }
   
   /* Elimina la selección del actualmente seleccionado */
@@ -250,21 +230,21 @@ export class EditorTrazadoComponent implements OnInit {
   /* Controla el evento de desplazamiento del ratón por el lienzo del marcador */
   mouseMoveMarcador(evento) {
     var fCoords = this.getCoordenadasCanvasMarcador(evento); // Coordenadas en el lienzo de marcador
-    var rCoords = this.getCoordenadasSistema(fCoords);  // Coordenadas reales del sistema
+    var rCoords = this.getCoordenadasSistema(fCoords);       // Coordenadas reales del sistema
     this.mapX = rCoords.x; // DEBUG
     this.mapY = rCoords.y; // DEBUG
+    this.canvX = fCoords.x + Math.abs(this.offsetX);
+    this.canvY = fCoords.y + Math.abs(this.offsetY);
 
     if(this.clicking) {
       // Está moviendo el cursor sobre el mapa con el botón izquierdo del ratón pulsado
-      this.clearCanvasMarker(); // Borra el marcador
+      this.limpiaCanvasMarcador(); // Borra el marcador
       
-      if(this.MARKED_CONTROL !== null && this.recorridoActual.idControles.includes(this.MARKED_CONTROL.codigo)) {
+      if(this.ID_CONTROL_MARCADO !== null && this.recorridoActual.idControles.includes(this.ID_CONTROL_MARCADO)) {
         // Está moviendo un control -> actualiza sus coordenadas
-        //this.MARKED_CONTROL.coords.x = cCoordX;
-        //this.MARKED_CONTROL.coords.y = cCoordY;
-        
+        this.controles.get(this.ID_CONTROL_MARCADO).coords = rCoords;
         // Pinta una cruz marcadora
-        this.drawMarkerCross(fCoords.x, fCoords.y);
+        this.dibujaCruzMarcador(fCoords);
         this.redibujaTrazado();
       } else {
         // Está haciendo un drag del mapa
@@ -286,23 +266,37 @@ export class EditorTrazadoComponent implements OnInit {
         if(this.offsetX < this.MAX_OFFSET_X) this.offsetX = this.MAX_OFFSET_X;
         if(this.offsetY < this.MAX_OFFSET_Y) this.offsetY = this.MAX_OFFSET_Y;
         // Desplaza los canvas
-        this.desplazaCanvas(this.canvasMapa.nativeElement);
-        this.desplazaCanvas(this.canvasTrazado.nativeElement);
+        this.desplazaCanvas();
       }
     } else {
-      // Dibujado de marcador
+      // Está moviendo el cursor libremente por encima del mapa
       // Comprueba si está encima de un control
-      // TODO
-
+      var prevMarked = this.ID_CONTROL_MARCADO;
+      this.ID_CONTROL_MARCADO = null;
+      for(let [codigo, control] of this.controles) {
+        if(control.tipo === this.MARKER_STATE) {
+          if(Math.abs(control.coords.x - rCoords.x) <= this.CONTROL_RADIUS &&
+            Math.abs(control.coords.y - rCoords.y) <= this.CONTROL_RADIUS) {
+            // Está encima -> se selecciona
+            this.ID_CONTROL_MARCADO = control.codigo;
+            break;
+          }
+        }
+      }
+      
+      if(prevMarked !== null && this.ID_CONTROL_MARCADO === null) {
+        this.BOOL_PRINTED_MARKED = false;
+      }
+      
       // Redibuja el marcador
-      this.redrawMarker(fCoords.x, fCoords.y);
+      this.redrawMarker(fCoords);
     }
   }
 
   /* Controla el evento de salida del desplazamiento del ratón por el lienzo del marcador */
   mouseLeaveMarcador(evento) {
-    this.clearCanvasMarker();
-    this.resetDraggingConfig();
+    this.limpiaCanvasMarcador();
+    this.resetConfiguracionRaton();
   }
 
   /* Evento de pulsado del marcador */
@@ -311,7 +305,7 @@ export class EditorTrazadoComponent implements OnInit {
       // Botón izquierdo
       this.clicking = true;
       
-      if(this.MARKED_CONTROL !== null) {
+      if(this.ID_CONTROL_MARCADO !== null) {
           // Movimiento de control
           // TODO Cambiar el marcador a rellenado por ejemplo
       }
@@ -325,21 +319,30 @@ export class EditorTrazadoComponent implements OnInit {
   /* Evento de soltado del marcador */
   mouseUpMarcador(evento) {
     var fCoords = this.getCoordenadasCanvasMarcador(evento); // Coordenadas en el lienzo marcador
-    var rCoords = this.getCoordenadasSistema(fCoords);  // Coordenadas reales del sistema
+    var rCoords = this.getCoordenadasSistema(fCoords);       // Coordenadas reales del sistema
 
     if(evento.which === 1) {
       // Click izquierdo
-      if(this.MARKED_CONTROL !== null && this.recorridoActual.idControles.includes(this.MARKED_CONTROL.codigo)) {
+      if(this.ID_CONTROL_MARCADO !== null && this.recorridoActual.idControles.includes(this.ID_CONTROL_MARCADO)) {
         // Acaba de resituar un control
-        // TODO Notificar de cambio de coordenadas al modelo
+        this.limpiaCanvasMarcador();
       } else if(this.moviendoMapa) {
         // Suelta después de hacer un drag -> se dibuja de nuevo el marcador
-        this.redrawMarker(fCoords.x, fCoords.y);
+        this.redrawMarker(fCoords);
       } else {
-        // Nuevo control
+        // Adición de control
         if(this.recorridoActual !== null) {
-          this.sharedData.anadirControl(new Control(this.MARKER_STATE, rCoords));
-          if(this.MARKER_STATE === Control.START) {
+          if(this.ID_CONTROL_MARCADO !== null) {
+            // Reutiliza control
+            console.log("REUTILIZA CONTROL " + this.ID_CONTROL_MARCADO);
+            this.recorridoActual.idControles.push(this.ID_CONTROL_MARCADO);
+            this.redibujaTrazado();
+          } else {
+            // Nuevo control
+            this.sharedData.anadirControl(new Control(this.MARKER_STATE, rCoords));
+          }
+
+          if(this.MARKER_STATE === Control.SALIDA) {
             // Cambia automáticamente a control
             this.controlSelected();
           }
@@ -351,25 +354,27 @@ export class EditorTrazadoComponent implements OnInit {
     } else if(evento.which === 2) {
       // Click central -> selecciona la meta
       this.finishSelected();
-      this.redrawMarker(fCoords.x, fCoords.y);
+      this.redrawMarker(fCoords);
     } else if(evento.which === 3) {
       // Click derecho -> elimina el último control, o el marcado
       if(this.recorridoActual.idControles.length > 0) {
-        var control;
-        if(this.MARKED_CONTROL !== null && this.recorridoActual.idControles.includes(this.MARKED_CONTROL.codigo)) {
+        let control: Control;
+        if(this.ID_CONTROL_MARCADO !== null && this.recorridoActual.idControles.includes(this.ID_CONTROL_MARCADO)) {
           // Borra control marcado
-          control = this.MARKED_CONTROL;
+          control = this.controles.get(this.ID_CONTROL_MARCADO);
         } else {
           // Borra último control
-          control = this.controles[this.recorridoActual.idControles[this.recorridoActual.idControles.length-1]];
+          control = this.controles.get(this.recorridoActual.idControles[this.recorridoActual.idControles.length-1]);
         }
 
         // Notifica el borrado del control
         this.sharedData.borrarControl(control);
+        // Redibuja el marcador
+        this.redrawMarker(fCoords);
       }
     }
 
-    this.resetDraggingConfig();
+    this.resetConfiguracionRaton();
   }
 
   /* Evento de rueda de ratón para cambiar el zoom */
@@ -377,7 +382,7 @@ export class EditorTrazadoComponent implements OnInit {
     evento.preventDefault();
     var fCoords = this.getCoordenadasCanvasMarcador(evento);
     //var delta = Math.max(-1, Math.min(1, (evento.wheelDelta || -evento.detail)));
-    var delta = -(evento.deltaY / Math.abs(evento.deltaY));
+    var delta = -(evento.deltaY / Math.abs(evento.deltaY)); // Normaliza el delta
     // TODO Verificar que funciona en más navegadores
 
     this.zoomLevel += delta;
@@ -391,98 +396,149 @@ export class EditorTrazadoComponent implements OnInit {
     }
 
     // Cambia el zoom
-    this.setZoom(this.zoomLevel);
-    this.redrawMarker(fCoords.x, fCoords.y);
+    this.setZoom(this.zoomLevel, fCoords, delta);
+    // Redibuja el marcador
+    this.redrawMarker(fCoords);
   }
 
   /**
    * Asigna el nivel de zoom especificado y actualiza la vista.
    * @param nivel Nivel de zoom
    */
-  setZoom(nivel) {
+  setZoom(nivel, coordsMarcador, delta) {
     console.log("ZOOM: " + this.zoomLevel); // DEBUG
     this.zoomLevel = nivel;
-    var scale = this.getScale();
+    var scale = this.getEscaladoZoom();
 
     // Actualiza las métricas
     this.actualizaMetricas();
 
+    // Actualiza los offsets para un zoom en la zona de marcado
+    // TODO No acabado
+    this.offsetX += (-delta * coordsMarcador.x) * scale;
+    this.offsetY += (-delta * coordsMarcador.y) * scale;
+    this.desplazaCanvas();
+
     // Modifica el tamaño de la imagen para generar el zoom
     this.imgMapa.width = this.imgMapaOrig.width * scale;
     this.imgMapa.height = this.imgMapaOrig.height * scale;
-    this.actualizaLimites();    // Actualiza los nuevos límites
-    this.setupCanvas(true); // Reajusta los lienzos
-    this.redibujaMapa();       // Redibuja el mapa
-    this.redibujaTrazado();   // Redibuja el trazado
+    this.actualizaLimites(); // Actualiza los nuevos límites
+    this.setupCanvas(true);  // Reajusta los lienzos
+    this.redibujaMapa();     // Redibuja el mapa
+    this.redibujaTrazado();  // Redibuja el trazado
   }
 
   /* Dibuja el marcador de control */
-  drawStartMarker(x, y) {
+  dibujaSalidaMarker(coordenadas: Coordenadas) {
     // Dibuja el triángulo orientado hacia el norte
-    this.drawStart(x, y, x, -y, this.contextMarcador, true);
+    this.dibujaSalida(coordenadas, coordenadas.x, -coordenadas.y, this.contextMarcador, true);
     // Y luego la cruz central
-    this.drawMarkerCross(x, y);
+    this.dibujaCruzMarcador(coordenadas);
   }
 
   /* Dibuja el marcador de control */
-  dibujaControlMarker(x, y) {
+  dibujaControlMarker(coordenadas: Coordenadas) {
     // Dibuja el círculo
-    this.dibujaControl(x, y, this.contextMarcador, true);
+    this.dibujaControl(coordenadas, this.contextMarcador, true);
     // Y luego la cruz central
-    this.drawMarkerCross(x, y);
+    this.dibujaCruzMarcador(coordenadas);
   }
 
   /* Dibuja el marcador de meta */
-  dibujaMetaMarker(x, y) {
+  dibujaMetaMarker(coordenadas: Coordenadas) {
     // Dibuja los círculos exterior e interior
-    this.dibujaMeta(x, y, this.contextMarcador, true);
+    this.dibujaMeta(coordenadas, this.contextMarcador, true);
     // Y luego la cruz central
-    this.drawMarkerCross(x, y);
+    this.dibujaCruzMarcador(coordenadas);
   }
 
   /**
-   * Dibuja el marcador del tipo actual de control seleccionado.
+   * Dibuja el marcador del tipo actual de control seleccionado. Tiene en cuenta
+   * si está encima de un control, y lo marca en dicho caso.
    * @param x Coordenada x
    * @param y Coordenada y
    */
-  redrawMarker(x, y) {
-    // Comprobar si está encima de un control
-    // TODO
-    if(true) {
+  redrawMarker(coordenadas: Coordenadas) {
+    if(this.ID_CONTROL_MARCADO === null) {
       // Movimiento libre
-      this.clearCanvasMarker(); // Borra marcador anterior
+      this.limpiaCanvasMarcador(); // Borra marcador anterior
       switch(this.MARKER_STATE) {
-        case Control.START:
-          this.drawStartMarker(x, y);
+        case Control.SALIDA:
+          this.dibujaSalidaMarker(coordenadas);
           break;
         case Control.CONTROL:
-          this.dibujaControlMarker(x, y);
+          this.dibujaControlMarker(coordenadas);
           break;
-        case Control.FINISH:
-          this.dibujaMetaMarker(x, y);
+        case Control.META:
+          this.dibujaMetaMarker(coordenadas);
           break;
       }
 
       // Efecto de orientación del triángulo de salida cuando dibuja el primer control
       var idsControles = this.recorridoActual.idControles;
       if(idsControles.length > 0) {
-        var ultimo = this.controles[idsControles[idsControles.length-1]];
-        if(ultimo.tipo === Control.START) {
-          this.drawStart(ultimo.coords.x + this.offsetX, ultimo.coords.y + this.offsetY, x, y, this.contextMarcador, true);
+        let ultimo = this.controles.get(idsControles[idsControles.length-1]);
+        let coords = this.getCoordenadasCanvasTrazado(ultimo.coords);
+        coords.x += this.offsetX;
+        coords.y += this.offsetY;
+        if(ultimo.tipo === Control.SALIDA) {
+          this.dibujaSalida(coords, coordenadas.x, coordenadas.y, this.contextMarcador, true);
         }
       }
     } else {
       // Está encima de un control
-      // TODO
+      if(!this.BOOL_PRINTED_MARKED) {
+        this.BOOL_PRINTED_MARKED = true;
+        // Limpia el marcador anterior
+        this.limpiaCanvasMarcador();
+        
+        let control = this.controles.get(this.ID_CONTROL_MARCADO);
+        let coords = this.getCoordenadasCanvasTrazado(control.coords);
+        coords.x += this.offsetX;
+        coords.y += this.offsetY;
+        
+        if(this.recorridoActual.idControles.includes(control.codigo)) {
+          // Encima de un control del recorrido actual -> opción de mover control
+          this.dibujaMarcadorDesplazamiento(coords);
+        } else {
+          // Encima de un control de otro recorrido -> opción de añadir control a recorrido
+          switch(this.MARKER_STATE) {
+            case Control.SALIDA:
+              this.dibujaSalida(coords, coords.x, -coords.y, this.contextMarcador, true);
+              break;
+            case Control.CONTROL:
+              this.dibujaControl(coords, this.contextMarcador, true);
+              break;
+            case Control.META:
+              this.dibujaMeta(coords, this.contextMarcador, true);
+              break;
+          }
+
+          this.dibujaCruzMarcador(coords);
+
+          // Efecto de orientación del triángulo de salida cuando es el último elemento
+          var idsControles = this.recorridoActual.idControles;
+          if(idsControles.length > 0) {
+            var ultimo = this.controles.get(idsControles[idsControles.length-1]);
+            if(ultimo.tipo === Control.SALIDA) {
+              let coordsUlt = this.getCoordenadasCanvasTrazado(ultimo.coords);
+              coordsUlt.x += this.offsetX;
+              coordsUlt.y += this.offsetY;
+              this.dibujaSalida(coordsUlt, coords.x, coords.y, this.contextMarcador, true);
+            }
+          }
+        }
+      } else {
+        // Evita redibujar de nuevo, optimizando el canvas
+      }
     }
   }
 
   /**
    * Dibuja una cruz en el centro del marcador para una mayor precisión.
-   * @param x Coordenada x
-   * @param y Coordenada y
+   * @param coordenadas Coordenadas de la cruz
    */
-  drawMarkerCross(x, y) { 
+  dibujaCruzMarcador(coordenadas: Coordenadas) { 
     // Guarda estado anterior
     this.contextMarcador.save();
     
@@ -490,21 +546,34 @@ export class EditorTrazadoComponent implements OnInit {
     this.contextMarcador.beginPath();
     this.contextMarcador.lineWidth = this.MARKER_LINE_WIDTH;
     this.contextMarcador.strokeStyle = this.MARKER_COLOR;
-    this.contextMarcador.moveTo(x - this.MARKER_DIAMETER, y); 
-    this.contextMarcador.lineTo(x + this.MARKER_DIAMETER, y); // Linea horizontal
-    this.contextMarcador.moveTo(x, y - this.MARKER_DIAMETER); 
-    this.contextMarcador.lineTo(x, y + this.MARKER_DIAMETER); // Linea vertical
+    this.contextMarcador.moveTo(coordenadas.x - this.MARKER_DIAMETER, coordenadas.y); 
+    this.contextMarcador.lineTo(coordenadas.x + this.MARKER_DIAMETER, coordenadas.y); // Linea horizontal
+    this.contextMarcador.moveTo(coordenadas.x, coordenadas.y - this.MARKER_DIAMETER); 
+    this.contextMarcador.lineTo(coordenadas.x, coordenadas.y + this.MARKER_DIAMETER); // Linea vertical
     this.contextMarcador.stroke();
     
     // Restaura el estado
     this.contextMarcador.restore();
   }
 
-  //drawMoveMarker(x, y)
-  // TODO
+  /* Dibuja el indicio de desplazamiento de control */
+  dibujaMarcadorDesplazamiento(coordenadas: Coordenadas) {
+    // Guarda estado anterior
+    this.contextMarcador.save();
+    
+    // Dibuja un círculo azul
+    this.contextMarcador.beginPath();
+    this.contextMarcador.lineWidth = this.GENERAL_LINE_WIDTH;
+    this.contextMarcador.strokeStyle = this.MOVE_MARKER_COLOR;
+    this.contextMarcador.arc(coordenadas.x, coordenadas.y, this.MOVE_MARKER_RADIUS, 0, 2 * Math.PI);
+    this.contextMarcador.stroke();
+    
+    // Restaura el estado
+    this.contextMarcador.restore();
+  }
 
   /* Limpia el lienzo del trazado */
-  clearCanvasMarker() {
+  limpiaCanvasMarcador() {
     this.contextMarcador.clearRect(0, 0, this.canvasMarcador.nativeElement.width, this.canvasMarcador.nativeElement.height);
   }
 
@@ -524,25 +593,24 @@ export class EditorTrazadoComponent implements OnInit {
 
     // Borra el trazado anterior
     this.borraTrazado();
-    
-    // Pinta los controles del recorrido actual
+
     var idsControles = this.recorridoActual.idControles;
     if(idsControles.length === 1) {
-      var primerControl = this.controles[idsControles[0]];
+      var primerControl = this.controles.get(idsControles[0]);
       let coords = this.getCoordenadasCanvasTrazado(primerControl.coords);
-      if(primerControl.tipo === Control.START) {
+      if(primerControl.tipo === Control.SALIDA) {
         // El triángulo se orienta hacia el cursor en el canvas del marcador
       } else if (primerControl.tipo === Control.CONTROL) {
-        this.dibujaControl(coords.x, coords.y, this.contextTrazado, true);
+        this.dibujaControl(coords, this.contextTrazado, true);
       } else {
-        this.dibujaMeta(coords.x, coords.y, this.contextTrazado, true);
+        this.dibujaMeta(coords, this.contextTrazado, true);
       }
     } else {
         // Itera sobre los elementos dibujando los tramos
         for(var i = 0; i < idsControles.length-1; i++) {
             // Controles del tramo
-            let actual = this.controles[idsControles[i]];
-            let siguiente = this.controles[idsControles[i+1]];
+            let actual = this.controles.get(idsControles[i]);
+            let siguiente = this.controles.get(idsControles[i+1]);
 
             // Dibuja el tramo
             this.dibujaTramo(actual, siguiente);
@@ -550,37 +618,38 @@ export class EditorTrazadoComponent implements OnInit {
         // Vuelve a iterar por tríos para dibujar el orden de los controles
         var numControl = 1;
         for(i = 0; i < idsControles.length; i++) {
-            let previo = null, actual = this.controles[idsControles[i]], siguiente = null;
+            let previo = null, actual = this.controles.get(idsControles[i]), siguiente = null;
             // No tiene sentido un control como primer punto, pero por si acaso para que no de un error
-            if(i > 0) previo = this.controles[idsControles[i-1]];
+            if(i > 0) previo = this.controles.get(idsControles[i-1]);
             // Tiene sentido un control como último punto, mientras se está trazando
-            if(i < idsControles.length-1) siguiente = this.controles[idsControles[i+1]];
+            if(i < idsControles.length-1) siguiente = this.controles.get(idsControles[i+1]);
             
             // Dibuja el número si es un control
             if(actual.tipo === Control.CONTROL) {
-                this.drawNumber(previo, actual, siguiente, numControl);
+                this.dibujaNumero(previo, actual, siguiente, numControl);
                 numControl++;
             }
         }
     }
     
     // Pinta los controles de otros recorridos (del mismo tipo actual)
-    for(var kPunto in this.controles) {
-        var punto = this.controles[kPunto];
-        if(punto.tipo === this.MARKER_STATE && !idsControles.includes(punto.codigo)) {
-            switch(punto.tipo) {
-                case Control.START:
-                  this.drawStart(punto.coords.x, punto.coords.y, punto.coords.x, -punto.coords.y, this.contextTrazado, false); // Orientado al norte
-                    break;
-                case Control.CONTROL:
-                  this.dibujaControl(punto.coords.x, punto.coords.y, this.contextTrazado, false);
-                    break;
-                case Control.FINISH:
-                    this.dibujaMeta(punto.coords.x, punto.coords.y, this.contextTrazado, false);
-                    break;
-            }
-        } 
-    }
+    this.controles.forEach((control, codigo, map) => {
+      if(control.tipo === this.MARKER_STATE && !idsControles.includes(control.codigo)) {
+        // Controles del mismo tipo seleccionado que no están en el recorrido actual
+        let coords = this.getCoordenadasCanvasTrazado(control.coords);
+        switch(control.tipo) {
+          case Control.SALIDA:
+          this.dibujaSalida(coords, coords.x, -coords.y, this.contextTrazado, false); // Orientado al norte
+            break;
+          case Control.CONTROL:
+          this.dibujaControl(coords, this.contextTrazado, false);
+            break;
+          case Control.META:
+            this.dibujaMeta(coords, this.contextTrazado, false);
+            break;
+        }
+      }
+    });
   }
 
   /**
@@ -591,7 +660,7 @@ export class EditorTrazadoComponent implements OnInit {
    * @param siguiente Control siguiente (null para el último control)
    * @param numero Número del control
    */
-  drawNumber(previo: Control, actual: Control, siguiente: Control, numero) {
+  dibujaNumero(previo: Control, actual: Control, siguiente: Control, numero) {
     // Recalcula las coordenadas de los controles según el zoom
     var coordsPre = (previo) ? this.getCoordenadasCanvasTrazado(previo.coords) : null;
     var coordsAct = this.getCoordenadasCanvasTrazado(actual.coords);
@@ -650,18 +719,18 @@ export class EditorTrazadoComponent implements OnInit {
     var angulo = Math.atan2(dY, dX); // (radianes)
     // Obtiene las coordenadas del primer control
     var pR;
-    if(initial.tipo === Control.START) {
+    if(initial.tipo === Control.SALIDA) {
         // Triángulo de salida
         pR = Math.sqrt(3) / 3 * this.START_SIDE_LENGTH; 
-        this.drawStart(coordsIni.x, coordsIni.y, coordsFin.x, coordsFin.y, this.contextTrazado, true);
+        this.dibujaSalida(coordsIni, coordsFin.x, coordsFin.y, this.contextTrazado, true);
     } else if(initial.tipo === Control.CONTROL) {
         // Control intermedio
         pR = this.CONTROL_RADIUS;
-        this.dibujaControl(coordsIni.x, coordsIni.y, this.contextTrazado, true);
+        this.dibujaControl(coordsIni, this.contextTrazado, true);
     } else {
         // Meta
         pR = this.FINISH_EXT_RADIUS;
-        this.dibujaMeta(coordsIni.x, coordsIni.y, this.contextTrazado, true);
+        this.dibujaMeta(coordsIni, this.contextTrazado, true);
     }
     var pX = coordsIni.x + (pR * Math.cos(angulo));
     var pY = coordsIni.y - (pR * Math.sin(angulo));
@@ -669,7 +738,7 @@ export class EditorTrazadoComponent implements OnInit {
     // Obtiene las coordenadas del segundo control
     angulo += Math.PI; // Ángulo opuesto
     var sR;
-    if(final.tipo === Control.START) {
+    if(final.tipo === Control.SALIDA) {
         // Triángulo de salida
         sR = Math.sqrt(3) / 3 * this.START_SIDE_LENGTH; 
         // No se pinta el triángulo por su orientación al siguiente control
@@ -678,11 +747,11 @@ export class EditorTrazadoComponent implements OnInit {
     } else if(final.tipo === Control.CONTROL) {
         // Control intermedio
         sR = this.CONTROL_RADIUS;
-        this.dibujaControl(coordsFin.x, coordsFin.y, this.contextTrazado, true);
+        this.dibujaControl(coordsFin, this.contextTrazado, true);
     } else {
         // Meta
         sR = this.FINISH_EXT_RADIUS;
-        this.dibujaMeta(coordsFin.x, coordsFin.y, this.contextTrazado, true);
+        this.dibujaMeta(coordsFin, this.contextTrazado, true);
     }
     var sX = coordsFin.x + (sR * Math.cos(angulo));
     var sY = coordsFin.y - (sR * Math.sin(angulo));
@@ -694,18 +763,24 @@ export class EditorTrazadoComponent implements OnInit {
     this.contextTrazado.stroke();
   }
 
-
-  /* Dibuja un punto de salida orientado hacia unas coordenadas */
-  drawStart(x, y, nX, nY, ctx, activo) {
+  /**
+   * Dibuja un control de salida orientado hacia unas coordenadas.
+   * @param coordenadas Coordenadas del control 
+   * @param nX Coordenada X del punto hacia el que se orienta
+   * @param nY Coordenada Y del punto hacia el que se orienta
+   * @param ctx Contexto usado para el dibujo
+   * @param activo True para color activo, false para un poco transparente
+   */
+  dibujaSalida(coordenadas: Coordenadas, nX: number, nY: number, ctx, activo: boolean) {
     var radExt = Math.sqrt(3) / 3 * this.START_SIDE_LENGTH; // Radio del círculo circunscrito
-    var dX = nX - x; // 30 parece una buena distancia de margen
-    var dY = y - nY;
+    var dX = nX - coordenadas.x; // 30 parece una buena distancia de margen
+    var dY = coordenadas.y - nY;
 
     var grados = Math.atan2(dY, dX); // Ángulo con el siguiente punto
     // Calcula el primer punto
     var pX = radExt * Math.cos(grados);
     var pY = radExt * Math.sin(grados);
-    var pPunto = [x + pX, y - pY];
+    var pPunto = [coordenadas.x + pX, coordenadas.y - pY];
     // Calcula el resto de puntos a partir del primero. Diferencias de 120º por ser equilátero.
     // Ley de rotación: x' = x cos α - y sin α   |   y' = y cos α + x sin α
     var c120 = Math.cos(this.toRad(120));
@@ -715,10 +790,10 @@ export class EditorTrazadoComponent implements OnInit {
     var sPunto = [pX * c120 - pY * s120, -pY * c120 - pX * s120];
     var tPunto = [pX * c240 - pY * s240, -pY * c240 - pX * s240];
     // Reacomoda los puntos con el primero
-    sPunto[0] += x;
-    sPunto[1] += y;
-    tPunto[0] += x;
-    tPunto[1] += y;
+    sPunto[0] += coordenadas.x;
+    sPunto[1] += coordenadas.y;
+    tPunto[0] += coordenadas.x;
+    tPunto[1] += coordenadas.y;
     
     // Dibuja el triángulo
     ctx.beginPath();
@@ -733,27 +808,27 @@ export class EditorTrazadoComponent implements OnInit {
   }
 
   /* Dibuja un punto de control */
-  dibujaControl(x, y, ctx, activo) {
+  dibujaControl(coordenadas: Coordenadas, ctx, activo) {
     // Dibuja el círculo
     ctx.beginPath();
     ctx.lineWidth = this.GENERAL_LINE_WIDTH;
     if(activo) ctx.strokeStyle = this.GENERAL_COLOR;
     else ctx.strokeStyle = this.GENERAL_COLOR_INACTIVE;
-    ctx.arc(x, y, this.CONTROL_RADIUS, 0, 2 * Math.PI);
+    ctx.arc(coordenadas.x, coordenadas.y, this.CONTROL_RADIUS, 0, 2 * Math.PI);
     ctx.stroke();
   }
 
   /* Dibuja un punto de meta */
-  dibujaMeta(x, y, ctx, activo) {
+  dibujaMeta(coordenadas: Coordenadas, ctx, activo) {
     // Dibuja los círculos exterior e interior
     ctx.beginPath();
     ctx.lineWidth = this.GENERAL_LINE_WIDTH;
     if(activo) ctx.strokeStyle = this.GENERAL_COLOR;
     else ctx.strokeStyle = this.GENERAL_COLOR_INACTIVE;
-    ctx.arc(x, y, this.FINISH_EXT_RADIUS, 0, 2 * Math.PI);
+    ctx.arc(coordenadas.x, coordenadas.y, this.FINISH_EXT_RADIUS, 0, 2 * Math.PI);
     ctx.stroke();
     ctx.beginPath();
-    ctx.arc(x, y, this.FINISH_INT_RADIUS, 0, 2 * Math.PI);
+    ctx.arc(coordenadas.x, coordenadas.y, this.FINISH_INT_RADIUS, 0, 2 * Math.PI);
     ctx.stroke();
   }
 
@@ -785,15 +860,17 @@ export class EditorTrazadoComponent implements OnInit {
 
 
   /* Devuelve el factor de escalado del zoom actual */
-  getScale() {
+  getEscaladoZoom() {
     return 1 + this.ZOOM_SCALING * this.zoomLevel;
   }
 
 
-  /* Coloca el lienzo en la posición indicada por los offsets */
-  desplazaCanvas(canvas: HTMLCanvasElement) {
-    canvas.style.left = this.offsetX + "px";
-    canvas.style.top = this.offsetY + "px";
+  /* Coloca los lienzos móviles en la posición indicada por los offsets */
+  desplazaCanvas() {
+    this.canvasMapa.nativeElement.style.left = this.offsetX + "px";
+    this.canvasMapa.nativeElement.style.top = this.offsetY + "px";
+    this.canvasTrazado.nativeElement.style.left = this.offsetX + "px";
+    this.canvasTrazado.nativeElement.style.top = this.offsetY + "px";
   }
 
   /* DEBUG: borrar */
@@ -801,14 +878,15 @@ export class EditorTrazadoComponent implements OnInit {
     this.imgMapa = new Image();
     this.imgMapaOrig = new Image();
     this.imgMapa.onload = (() => {
-      //resetBasics();
+      this.setZoom(0, new Coordenadas(0,0), 0);
       this.actualizaLimites();
       //updateRecorrido();
 
+      //this.offsetX = -(this.imgMapa.width / 2);
+      //this.offsetY = -(this.imgMapa.height / 2);
       this.offsetX = -500;
       this.offsetY = -1000;
-      this.desplazaCanvas(this.canvasMapa.nativeElement);
-      this.desplazaCanvas(this.canvasTrazado.nativeElement);
+      this.desplazaCanvas(); // Actualiza posiciones de los canvas
 
       // TEST
       this.setupCanvas(true);
@@ -824,15 +902,16 @@ export class EditorTrazadoComponent implements OnInit {
     this.MAX_OFFSET_X = -(this.imgMapa.width - this.vistaMapa.nativeElement.getBoundingClientRect().width);
     this.MAX_OFFSET_Y = -(this.imgMapa.height - this.vistaMapa.nativeElement.getBoundingClientRect().height);
     // Resitúa si al quitar zoom se está fuera del máximo
+    if(this.offsetX > 0) this.offsetX = 0;
+    if(this.offsetY > 0) this.offsetY = 0;
     if(this.offsetX < this.MAX_OFFSET_X) this.offsetX = this.MAX_OFFSET_X;
     if(this.offsetY < this.MAX_OFFSET_Y) this.offsetY = this.MAX_OFFSET_Y;
     // Recoloca los canvas por si acaso
-    this.desplazaCanvas(this.canvasMapa.nativeElement);
-    this.desplazaCanvas(this.canvasTrazado.nativeElement);
+    this.desplazaCanvas();
   }
 
   /* Resetea las configuraciones del sistema de drag/click */
-  resetDraggingConfig() {
+  resetConfiguracionRaton() {
     this.clicking = this.moviendoMapa = this.moviendoControl = false;
     this.vistaMapa.nativeElement.style.cursor = "none";
   }
@@ -848,7 +927,7 @@ export class EditorTrazadoComponent implements OnInit {
 
   /* Actualiza las métricas acorde al valor actual de MM_UNIT */
   actualizaMetricas() {
-    this.MM_UNIT = this.getScale() * this.MM_UNIT_ORI;
+    this.MM_UNIT = this.getEscaladoZoom() * this.MM_UNIT_ORI;
     // Cálculo de medidas acorde a la ISOM 2017
     this.GENERAL_LINE_WIDTH = 0.35 * this.MM_UNIT;  // 0.35mm
     this.START_SIDE_LENGTH  = 6 * this.MM_UNIT;     
@@ -880,8 +959,8 @@ export class EditorTrazadoComponent implements OnInit {
    * @param coordsMarcador Coordenadas en el lienzo de marcador
    */
   getCoordenadasSistema(coordsMarcador): Coordenadas {
-    let x = (coordsMarcador.x + Math.abs(this.offsetX)) / this.getScale();
-    let y = (coordsMarcador.y + Math.abs(this.offsetY)) / this.getScale();
+    let x = (coordsMarcador.x + Math.abs(this.offsetX)) / this.getEscaladoZoom();
+    let y = (coordsMarcador.y + Math.abs(this.offsetY)) / this.getEscaladoZoom();
 
     return new Coordenadas(x, y);
   }
@@ -892,8 +971,8 @@ export class EditorTrazadoComponent implements OnInit {
    * @param coordsSistema Coordenadas del sistema
    */
   getCoordenadasCanvasTrazado(coordsSistema): Coordenadas {
-    let x = coordsSistema.x * this.getScale();
-    let y = coordsSistema.y * this.getScale();
+    let x = coordsSistema.x * this.getEscaladoZoom();
+    let y = coordsSistema.y * this.getEscaladoZoom();
 
     return new Coordenadas(x, y);
   }

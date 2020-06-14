@@ -5,8 +5,15 @@
     <input #inputMapa id="input-mapa" type="file" class="inputfile" (change)="cargarMapa($event)">
     <label id="label-seleccionar-mapa" for="input-mapa" class="btn btn-primary">Seleccionar mapa base</label>
 
+    <!--
     <label for="input-escala">Escala:</label>
     <input id="input-escala" type="text" disabled>
+    -->
+
+    <button id="btn-nuevo-recorrido" class="btn btn-primary nuevo-rec-test" (click)="nuevoRecorrido()"><i class="fa fa-plus"></i>Nuevo recorrido</button>
+
+    <!-- Botón de nuevo recorrido: OPCION BOTON A LA DERECHA -->
+    <button id="btn-nuevo-recorrido" class="btn" style="position: absolute;right: 15px;" (click)="nuevoRecorrido()"><i class="fa fa-plus-circle"></i></button>
 </div>
 
 <div id="wrapper-inferior">
@@ -18,9 +25,13 @@
     <!-- Barra lateral -->
     <div id="barra-lateral">
         <div id="configuraciones">
-            <table>
+            <div id="lista-recorridos">
+                <div *ngFor="let nombre of getNombresRecorridos()" class="noselect"
+                    [class.seleccionado]="nombre === recorridoActual" (click)="seleccionaRecorrido(nombre)">{{nombre}}</div>
+            </div>
+            <table id="descripcion-controles">
                 <tbody>
-                    <tr *ngFor="let c of recorridos.get(recorridoActual).idControles">{{c}} {{controles[c].coords.x}} ~ {{controles[c].coords.y}}</tr>
+                    <tr *ngFor="let c of recorridos.get(recorridoActual).idControles">{{c}} {{controles.get(c).coords.x}} ~ {{controles.get(c).coords.y}}</tr>
                 </tbody>
             </table>
         </div>

@@ -19,9 +19,6 @@ export class EditorRecorridosComponent implements OnInit {
   CONTROL_MIN_CODE = 31;
   FINISH_PRECODE = "M-";
   FINISH_MIN_CODE = 1;
-  contadorSalidas: number;
-  contadorControles: number;
-  contadorMetas: number;
 
   RECORRIDO_DEFAULT_PRE = "Rec-";
 
@@ -31,6 +28,7 @@ export class EditorRecorridosComponent implements OnInit {
   
   recorridos: Map<string, Recorrido>;
   recorridoActual: string;
+  nombresRecorridos: string[];
   controles: Map<string, Control>;
 
   // Diálogos modales
@@ -53,7 +51,7 @@ export class EditorRecorridosComponent implements OnInit {
     $("#wrapper-inferior").height(wHeight - offset - 20);
 
     // Inicia el modelo
-    this.contadorSalidas = this.contadorControles = this.contadorMetas = 0;
+    this.nombresRecorridos = [];
     this.recorridos = new Map();
     this.controles = new Map();
     this.nuevoRecorrido();
@@ -64,7 +62,7 @@ export class EditorRecorridosComponent implements OnInit {
         // Obtiene el código del control y crea el control
         var codigo = this.pullCodigoControl(control.tipo);
         control.codigo = codigo;
-        this.controles[codigo] = control;
+        this.controles.set(codigo, control);
         this.sharedData.actualizaControles(this.controles);
 
         // Lo añade al recorrido actualmente seleccionado (si lo hay)
@@ -82,18 +80,15 @@ export class EditorRecorridosComponent implements OnInit {
         // Borra el control del recorrido actual
         var sinUsar = true;
         // Itera sobre el resto de recorridos para ver si está en ellos el control
-        /*
-        for(var i = 0; i < this.listaRecorridos.length && sinUsar; i++) {
-          var currRec = this.listarecorridos.get(i];
-          if(this.recorridoActual !== currRec) {
-            for(var j = 0; j < currRec.controles.length && sinUsar; j++) {
-              if(currRec.idControles[j] === control.codigo) {
+        for(let [nombre, recorrido] of this.recorridos) {
+          if(nombre != this.recorridoActual) {
+            for(var i = 0; i < recorrido.idControles.length && sinUsar; i++) {
+              if(recorrido.idControles[i] === control.codigo) {
                 sinUsar = false;
               }
             }
           }
         }
-        */
 
         if(sinUsar) {
           // Como solo está en el trazado actual, se borra de ambos
@@ -154,6 +149,17 @@ export class EditorRecorridosComponent implements OnInit {
     
   }
 
+  /**
+   * Selecciona un recorrido de la lista.
+   * @param nombre Nombre del recorrido seleccionado
+   */
+  seleccionaRecorrido(nombre) {
+    if(this.recorridoActual !== nombre) {
+      this.recorridoActual = nombre;
+      this.sharedData.actualizaRecorrido(this.recorridos.get(nombre));
+    }
+  }
+
   /* Añade un nuevo recorrido */
   nuevoRecorrido() {
     // Busca nombre por defecto para el nuevo recorrido
@@ -166,9 +172,9 @@ export class EditorRecorridosComponent implements OnInit {
       i++;
     }
     
-    this.recorridoActual = nombre;
     this.recorridos.set(nombre, new Recorrido(nombre));
-    this.sharedData.actualizaRecorrido(this.recorridos.get(nombre));
+    this.seleccionaRecorrido(nombre);
+    this.nombresRecorridos.push(nombre); // TEST
   }
 
   /* Confirmación de borrado total de control */
@@ -191,7 +197,7 @@ export class EditorRecorridosComponent implements OnInit {
         if(index !== -1) value.idControles.splice(index, 1);
       });
       // Borra de la lista general de controles
-      delete this.controles[control.codigo];
+      this.controles.delete(control.codigo);
     } else {
       // Lo elimina solo del recorrido actual
       var index = this.recorridos.get(this.recorridoActual).idControles.indexOf(control.codigo);
@@ -201,65 +207,38 @@ export class EditorRecorridosComponent implements OnInit {
     this.sharedData.confirmaBorrado(control.tipo);
   }
 
+  getNombresRecorridos() {
+    return this.nombresRecorridos;
+  }
+
   /**
    * Devuelve el siguiente código de control libre, dependiendo del tipo.
    * @param tipo Tipo de control
    */
   pullCodigoControl(tipo: number) {
-    var codigo = null, codigosTipo = [];
-    // Primero obtiene la lista de códigos de controles del mismo tipo ya existentes
-    for(var kPunto in this.controles) {
-        var control = this.controles[kPunto];
-        if(control.tipo === tipo) codigosTipo.push(control.codigo);
-    }
-    
-    // Comprueba si hay alguno borrado
-    var precodigo, numeroMinimo, contador;
+    var codigo = null, aux;
     switch(tipo) {
-        case Control.START:
-            if(this.contadorSalidas - codigosTipo.length > this.START_MIN_CODE) {
-                // Hay alguna borrada
-                precodigo = this.START_PRECODE;
-                numeroMinimo = this.START_MIN_CODE;
-                contador = this.contadorSalidas;
-            } else {
-                // Se usa el siguiente
-                codigo = this.START_PRECODE + (this.START_MIN_CODE + this.contadorSalidas++);
-            }
-            break;
+        case Control.SALIDA:
+          aux = this.START_MIN_CODE;
+          while(codigo === null) {
+            if(!this.controles.has(this.START_PRECODE + aux)) codigo = this.START_PRECODE + aux;
+            aux++;
+          }
+          break;
         case Control.CONTROL:
-            if(this.contadorControles - codigosTipo.length > this.CONTROL_MIN_CODE) {
-                // Hay alguno borrado
-                precodigo = this.CONTROL_PRECODE;
-                numeroMinimo = this.CONTROL_MIN_CODE;
-                contador = this.contadorControles;
-            } else {
-                // Se usa el siguiente
-                codigo = this.CONTROL_PRECODE + (this.CONTROL_MIN_CODE + this.contadorControles++);
-            }
-            break;
-        case Control.FINISH:
-            if(this.contadorMetas - codigosTipo.length > this.FINISH_MIN_CODE) {
-                // Hay alguna borrada
-                precodigo = this.FINISH_PRECODE;
-                numeroMinimo = this.FINISH_MIN_CODE;
-                contador = this.contadorMetas;
-            } else {
-                // Se usa el siguiente
-                codigo = this.FINISH_PRECODE + (this.FINISH_MIN_CODE + this.contadorMetas++);
-            }
-            break;
-    }
-    
-    if(codigo === null) {
-        // Se ha borrado alguno -> se va buscando con el array de códigos
-        for(var i = numeroMinimo; i < contador && codigo === null; i++) {
-            var nCodigo = precodigo + i;
-            if(!codigosTipo.includes(nCodigo)) {
-                // ¡Libre!
-                codigo = nCodigo;
-            }
-        }
+          aux = this.CONTROL_MIN_CODE;
+          while(codigo === null) {
+            if(!this.controles.has(this.CONTROL_PRECODE + aux)) codigo = this.CONTROL_PRECODE + aux;
+            aux++;
+          }
+          break;
+        case Control.META:
+          aux = this.FINISH_MIN_CODE;
+          while(codigo === null) {
+            if(!this.controles.has(this.FINISH_PRECODE + aux)) codigo = this.FINISH_PRECODE + aux;
+            aux++;
+          }
+          break;
     }
     
     return codigo;

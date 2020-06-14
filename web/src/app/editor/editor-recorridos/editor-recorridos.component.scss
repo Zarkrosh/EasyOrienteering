@@ -26,7 +26,7 @@
 }
 
 #barra-lateral {
-    min-width: 400px;
+    width: 400px;
     display: flex;
     flex-direction: column;
     margin-left: 20px;
@@ -81,8 +81,70 @@
 /*********** BARRA LATERAL DE CONFIGURACIONES ***********/
 #configuraciones {
     flex-grow: 1;
-    overflow-y: scroll;
     border: 2px solid black;
+}
+
+#lista-recorridos {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+#lista-recorridos > div {
+    margin: 10px;
+    border: 2px solid black;
+    border-radius: 15px;
+    background-color: $color-orientacion-light;
+    padding: 10px 20px;
+    text-align: center;
+    font-weight: bold;
+}
+#lista-recorridos > div:hover {
+    background-color: $color-orientacion !important;
+    cursor: pointer;
+}
+.seleccionado {
+    background-color: $color-orientacion-dark !important;
+    cursor: auto !important;
+    transform: scale(0.8);
+    border: 2px solid gray !important;
+}
+
+// TEST DE POSICION Y ESTILO DEL BOTÓN
+.nuevo-rec-test {
+    background-color: $color-orientacion !important;
+    color: white !important;
+    padding: 10px !important;
+    margin-left: 30px !important;
+    font-weight: bold !important;
+    font-size: 1rem !important;
+    margin-bottom: 0.5rem;
+    font-family: Arial, Helvetica, sans-serif, fontawesome;
+}
+.nuevo-rec-test i {
+    margin-right: 10px;
+}
+
+
+#btn-nuevo-recorrido {
+    color: $color-orientacion;
+    font-size: 2.5em;
+    padding: 0;
+}
+#btn-nuevo-recorrido:focus { 
+    box-shadow: none;
+    //color: $color-orientacion-dark;
+    // Al soltar no se quita el color
+}
+#btn-nuevo-recorrido .fa {
+    transition: all .3s ease-out;
+}
+#btn-nuevo-recorrido:hover .fa {
+    transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+}
+
+#descripcion-controles {
+    overflow-y: scroll;
 }
 
 // TEST

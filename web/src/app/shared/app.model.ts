@@ -7,9 +7,9 @@ export class Usuario {
 
 export class Control {
     // Tipos de puntos
-    public static readonly START = 0;
+    public static readonly SALIDA = 0;
     public static readonly CONTROL = 1;
-    public static readonly FINISH = 2;
+    public static readonly META = 2;
 
     codigo: string;
     tipo: number;
