@@ -12,11 +12,17 @@ export class SharedEditorService {
   private _recorridoActual = new BehaviorSubject<Recorrido>(null);
   recorridoActual = this._recorridoActual.asObservable();
 
-  private _controles = new BehaviorSubject<Record<string, Control>>({});
+  private _controles = new BehaviorSubject<Map<string, Control>>(new Map());
   controles = this._controles.asObservable();
 
   private _nuevoControl = new BehaviorSubject<Control>(null);
   nuevoControl = this._nuevoControl.asObservable();
+  
+  private _controlBorrado = new BehaviorSubject<Control>(null);
+  controlBorrado = this._controlBorrado.asObservable();
+  // Confirmación de control borrado
+  private _controlBorradoConf = new BehaviorSubject<number>(null);
+  controlBorradoConf = this._controlBorradoConf.asObservable();
 
   constructor() { }
 
@@ -28,7 +34,7 @@ export class SharedEditorService {
     this._mapaBase.next(mapa);
   }
 
-  actualizaControles(controles: Record<string, Control>) {
+  actualizaControles(controles: Map<string, Control>) {
     this._controles.next(controles);
   }
 
@@ -41,7 +47,27 @@ export class SharedEditorService {
     this._recorridoActual.next(recorrido);
   }
 
+  /**
+   * Notifica la adición de un control.
+   * @param nControl Nuevo control
+   */
   anadirControl(nControl) {
     this._nuevoControl.next(nControl);
+  }
+  
+  /**
+   * Notifica el borrado de un control del recorrido.
+   * @param control Control a borrar
+   */
+  borrarControl(control) {
+    this._controlBorrado.next(control);
+  }
+
+  /**
+   * Confirma el borrado de un control del tipo especificado.
+   * @param tipo Tipo de control
+   */
+  confirmaBorrado(tipo) {
+    this._controlBorradoConf.next(tipo);
   }
 }

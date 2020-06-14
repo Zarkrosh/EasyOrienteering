@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { AlertService } from '../../alert';
 import { SharedEditorService } from '../shared-editor.service';
 import { Control, Recorrido, Coordenadas } from 'src/app/shared/app.model';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 declare var $: any; // JQuery
 
@@ -22,11 +23,18 @@ export class EditorRecorridosComponent implements OnInit {
   contadorControles: number;
   contadorMetas: number;
 
+  RECORRIDO_DEFAULT_PRE = "Rec-";
+
   @ViewChild('inputPurplePen', {static: true}) inputPurplePen: ElementRef<HTMLInputElement>; 
   @ViewChild('inputMapa', {static: true}) inputMapa: ElementRef<HTMLInputElement>;
+  @ViewChild('modalBorrado', {static: true}) modalBorrado: ElementRef<NgbModal>;
   
-  recorridoActual: Recorrido;
-  controles: Record<string, Control>;
+  recorridos: Map<string, Recorrido>;
+  recorridoActual: string;
+  controles: Map<string, Control>;
+
+  // Diálogos modales
+  tempControl: Control; // Temporal para la confirmación de borrado
 
   // Alertas
   options = {
@@ -35,7 +43,8 @@ export class EditorRecorridosComponent implements OnInit {
   };
 
   constructor(private sharedData: SharedEditorService,
-    protected alertService: AlertService) { }
+    protected alertService: AlertService,
+    private modalService: NgbModal) { }
 
   ngOnInit() {
     // Chapucilla que funciona de momento para completar pantalla
@@ -43,7 +52,13 @@ export class EditorRecorridosComponent implements OnInit {
     var offset = $("#wrapper-inferior").offset().top;
     $("#wrapper-inferior").height(wHeight - offset - 20);
 
-    // Controlador de adición de controles
+    // Inicia el modelo
+    this.contadorSalidas = this.contadorControles = this.contadorMetas = 0;
+    this.recorridos = new Map();
+    this.controles = new Map();
+    this.nuevoRecorrido();
+
+    // Controlador de adición de control
     this.sharedData.nuevoControl.subscribe((control) => {
       if(control !== null) {
         // Obtiene el código del control y crea el control
@@ -54,19 +69,45 @@ export class EditorRecorridosComponent implements OnInit {
 
         // Lo añade al recorrido actualmente seleccionado (si lo hay)
         if(this.recorridoActual !== null) {
-          this.recorridoActual.idControles.push(codigo);
+          this.recorridos.get(this.recorridoActual).idControles.push(codigo);
           // Actualiza el recorrido
-          this.sharedData.actualizaRecorrido(this.recorridoActual);
+          this.sharedData.actualizaRecorrido(this.recorridos.get(this.recorridoActual));
         }
       }
     });
 
+    // Controlador de borrado de control
+    this.sharedData.controlBorrado.subscribe((control) => {
+      if(control !== null) {
+        // Borra el control del recorrido actual
+        var sinUsar = true;
+        // Itera sobre el resto de recorridos para ver si está en ellos el control
+        /*
+        for(var i = 0; i < this.listaRecorridos.length && sinUsar; i++) {
+          var currRec = this.listarecorridos.get(i];
+          if(this.recorridoActual !== currRec) {
+            for(var j = 0; j < currRec.controles.length && sinUsar; j++) {
+              if(currRec.idControles[j] === control.codigo) {
+                sinUsar = false;
+              }
+            }
+          }
+        }
+        */
 
-    // Inicia el modelo
-    this.contadorSalidas = this.contadorControles = this.contadorMetas = 0;
-    this.controles = {};
-    this.recorridoActual = new Recorrido("R-1");
-    this.sharedData.actualizaRecorrido(this.recorridoActual);
+        if(sinUsar) {
+          // Como solo está en el trazado actual, se borra de ambos
+          this.borrarControl(control, true);
+        } else {
+          // Se usa en otro trazado, solo se borra del actual
+          this.borrarControl(control, false);
+        }
+        
+        // Actualiza el trazador
+        this.sharedData.actualizaControles(this.controles);
+        this.sharedData.actualizaRecorrido(this.recorridos.get(this.recorridoActual));
+      }
+    });
   }
 
   /**
@@ -97,7 +138,10 @@ export class EditorRecorridosComponent implements OnInit {
     }
   }
 
-
+  /**
+   * Carga el mapa seleccionado en el editor de trazados.
+   * @param event Evento de selección de archivo
+   */
   cargarMapa(event) {
     if(!this.checkFileAPIs()) return;
     
@@ -110,11 +154,57 @@ export class EditorRecorridosComponent implements OnInit {
     
   }
 
+  /* Añade un nuevo recorrido */
+  nuevoRecorrido() {
+    // Busca nombre por defecto para el nuevo recorrido
+    var nombre = null;
+    var i = 1;
+    while(nombre === null) {
+      if(!this.recorridos.has(this.RECORRIDO_DEFAULT_PRE + i)) {
+        nombre = this.RECORRIDO_DEFAULT_PRE + i;
+      }
+      i++;
+    }
+    
+    this.recorridoActual = nombre;
+    this.recorridos.set(nombre, new Recorrido(nombre));
+    this.sharedData.actualizaRecorrido(this.recorridos.get(nombre));
+  }
 
+  /* Confirmación de borrado total de control */
+  // this.modalService.open(this.modalBorrado, {centered: true, size: 'lg'});
+  borrarConfirmed() {
+    this.modalService.dismissAll();
+    this.borrarControl(this.tempControl, true);
+  }
 
+  /**
+   * Borra un control del recorrido actual o de todos.
+   * @param control Control a borrar
+   * @param borradoGeneral True para borrado total de todos los recorridos, false solo para le actual
+   */
+  borrarControl(control: Control, borradoGeneral: boolean) {
+    if(borradoGeneral) {
+      // Borra el control de todos los recorridos
+      this.recorridos.forEach((value, key, map) => {
+        var index = value.idControles.indexOf(control.codigo);
+        if(index !== -1) value.idControles.splice(index, 1);
+      });
+      // Borra de la lista general de controles
+      delete this.controles[control.codigo];
+    } else {
+      // Lo elimina solo del recorrido actual
+      var index = this.recorridos.get(this.recorridoActual).idControles.indexOf(control.codigo);
+      this.recorridos.get(this.recorridoActual).idControles.splice(index, 1);
+    }
 
+    this.sharedData.confirmaBorrado(control.tipo);
+  }
 
-  /* Devuelve el siguiente código de control libre, dependiendo del tipo */
+  /**
+   * Devuelve el siguiente código de control libre, dependiendo del tipo.
+   * @param tipo Tipo de control
+   */
   pullCodigoControl(tipo: number) {
     var codigo = null, codigosTipo = [];
     // Primero obtiene la lista de códigos de controles del mismo tipo ya existentes
@@ -175,6 +265,9 @@ export class EditorRecorridosComponent implements OnInit {
     return codigo;
   }
 
+  /**
+   * Devuelve true si el navegador soporta las APIs de gestión de archivos, false en caso contrario.
+   */
   checkFileAPIs(): boolean {
     /* // TODO Fix para Angular "Property 'File' does not exist on type 'Window'"
     let w = document.defaultView;

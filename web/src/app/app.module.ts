@@ -15,6 +15,8 @@ import { CreacionCarreraComponent } from './creacion-carrera/creacion-carrera.co
 import { EditorRecorridosComponent } from './editor/editor-recorridos/editor-recorridos.component';
 import { EditorTrazadoComponent } from './editor/editor-trazado/editor-trazado.component';
 
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -32,7 +34,8 @@ import { EditorTrazadoComponent } from './editor/editor-trazado/editor-trazado.c
     AppRoutingModule,
     HttpClientModule,
     AlertModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgbModule
   ],
   providers: [],
   bootstrap: [AppComponent]
