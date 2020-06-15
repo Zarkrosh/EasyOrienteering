@@ -26,12 +26,16 @@
     <div id="barra-lateral">
         <div id="configuraciones">
             <div id="lista-recorridos">
+                <div class="noselect" [class.seleccionado]="recorridoActual === null" (click)="todosLosControles()">Todos los controles</div>
                 <div *ngFor="let nombre of getNombresRecorridos()" class="noselect"
                     [class.seleccionado]="nombre === recorridoActual" (click)="seleccionaRecorrido(nombre)">{{nombre}}</div>
             </div>
             <table id="descripcion-controles">
                 <tbody>
-                    <tr *ngFor="let c of recorridos.get(recorridoActual).idControles">{{c}} {{controles.get(c).coords.x}} ~ {{controles.get(c).coords.y}}</tr>
+                    <ng-template *ngIf="recorridoActual !== null">
+                        <tr *ngFor="let c of recorridos.get(recorridoActual).idControles">{{c}} {{controles.get(c).coords.x}} ~ {{controles.get(c).coords.y}}</tr>
+                        <span *ngIf="recorridos.get(recorridoActual).idControles.length === 0">Sin controles</span>
+                    </ng-template>
                 </tbody>
             </table>
         </div>

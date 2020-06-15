@@ -54,7 +54,7 @@ export class EditorRecorridosComponent implements OnInit {
     this.nombresRecorridos = [];
     this.recorridos = new Map();
     this.controles = new Map();
-    this.nuevoRecorrido();
+    this.recorridoActual = null;
 
     // Controlador de adición de control
     this.sharedData.nuevoControl.subscribe((control) => {
@@ -147,6 +147,14 @@ export class EditorRecorridosComponent implements OnInit {
       this.alertService.error("Ocurrió un error al cargar el mapa.");
     }
     
+  }
+
+  /**
+   * Muestra todos los controles de la carrera.
+   */
+  todosLosControles() {
+    this.recorridoActual = null;
+    this.sharedData.actualizaRecorrido(null);
   }
 
   /**
