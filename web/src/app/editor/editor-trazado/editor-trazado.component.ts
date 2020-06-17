@@ -11,6 +11,8 @@ declare var $:any;
   styleUrls: ['./editor-trazado.component.scss']
 })
 export class EditorTrazadoComponent implements OnInit {
+  DEBUG_VISUAL = false;
+
   // Medidas y aspectos de los símbolos (según ISOM 2017)
   MM_UNIT_ORI = 8; // Valor (original) para controlar el escalado
   MM_UNIT = 8;     // Valor para controlar el escalado
@@ -72,7 +74,7 @@ export class EditorTrazadoComponent implements OnInit {
 
   // Modelo compartido
   controles: Map<string, Control>; // TODO Buscar mejor alternativa de tipo
-  recorridoActual: Recorrido;
+  recorridoActual: Recorrido = null;
 
   // Alertas
   options = {
@@ -98,7 +100,9 @@ export class EditorTrazadoComponent implements OnInit {
 
     // Controlador de cambio del mapa
     this.sharedData.mapaBase.subscribe((nMapa) => {
-      // TODO COPIAR DEL AUTOMATICO
+      if(nMapa !== null) {
+        // TODO Copiar del automático
+      }
     });
 
     // Controlador de cambio de los controles
@@ -108,6 +112,7 @@ export class EditorTrazadoComponent implements OnInit {
 
     // Controlador de cambio del recorrido
     this.sharedData.recorridoActual.subscribe((nRecorrido) => {
+      if(!nRecorrido) nRecorrido = null;
       this.recorridoActual = nRecorrido;
       this.redibujaTrazado();
     });
@@ -349,7 +354,12 @@ export class EditorTrazadoComponent implements OnInit {
       this.redibujaMarcador(fCoords);
     } else if(evento.which === 3) {
       // Click derecho -> elimina el último control, o el marcado
-      if(this.recorridoActual.idControles.length > 0) {
+      if(this.recorridoActual === null && this.ID_CONTROL_MARCADO) {
+        // Borra el control marcado del global de controles
+        this.sharedData.borrarControl(this.controles.get(this.ID_CONTROL_MARCADO));
+        // Redibuja el marcador
+        this.redibujaMarcador(fCoords);
+      } else if(this.recorridoActual.idControles.length > 0) {
         let control: Control;
         if(this.ID_CONTROL_MARCADO !== null && this.recorridoActual.idControles.includes(this.ID_CONTROL_MARCADO)) {
           // Borra control marcado
@@ -595,7 +605,6 @@ export class EditorTrazadoComponent implements OnInit {
         else if(control.tipo === Control.META) this.dibujaMeta(coords, this.contextTrazado, true);
         // Dibuja al lado el código
         this.dibujaNumero(null, control, null, codigo, true);
-        numControl++;
       }
     } else {
       var idsControles = this.recorridoActual.idControles;

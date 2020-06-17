@@ -8,7 +8,7 @@
 
     <div *ngIf="!imgMapa" id="mensaje-falta-mapa"><span class="noselect">Selecciona un mapa base</span></div>
 
-    <div id="debug-info">
+    <div id="debug-info" *ngIf="DEBUG_VISUAL">
         <span><b>Clicking</b>: {{clicking}}</span>
         <span><b>Mov. mapa</b>: {{moviendoMapa}}</span>
         <span><b>Mov. control</b>: {{moviendoControl}}</span>

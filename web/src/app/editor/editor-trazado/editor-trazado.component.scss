@@ -22,7 +22,8 @@
     cursor: none;
     overflow: hidden;
     z-index: 0;
-    padding: auto;
+    border: 2px solid black;
+    border-radius: 20px;
 }
 
 #mensaje-falta-mapa {

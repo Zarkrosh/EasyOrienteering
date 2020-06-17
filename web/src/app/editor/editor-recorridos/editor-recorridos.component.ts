@@ -21,15 +21,21 @@ export class EditorRecorridosComponent implements OnInit {
   FINISH_MIN_CODE = 1;
 
   RECORRIDO_DEFAULT_PRE = "Rec-";
+  MAX_RECORRIDOS = 10;
+  MAX_CONTROLES_RECORRIDO = 32;
 
   @ViewChild('inputPurplePen', {static: true}) inputPurplePen: ElementRef<HTMLInputElement>; 
   @ViewChild('inputMapa', {static: true}) inputMapa: ElementRef<HTMLInputElement>;
-  @ViewChild('modalBorrado', {static: true}) modalBorrado: ElementRef<NgbModal>;
+  @ViewChild('nombreRecorrido', {static: true}) nombreRecorrido: ElementRef<HTMLInputElement>;
+  @ViewChild('modalControl', {static: true}) modalControl: ElementRef<NgbModal>;
+  @ViewChild('modalRecorrido', {static: true}) modalRecorrido: ElementRef<NgbModal>;
   
   recorridos: Map<string, Recorrido>;
   recorridoActual: string;
   nombresRecorridos: string[];
   controles: Map<string, Control>;
+
+  editandoNombreRecorrido: boolean;
 
   // Diálogos modales
   tempControl: Control; // Temporal para la confirmación de borrado
@@ -47,14 +53,17 @@ export class EditorRecorridosComponent implements OnInit {
   ngOnInit() {
     // Chapucilla que funciona de momento para completar pantalla
     var wHeight = $(window).height();
-    var offset = $("#wrapper-inferior").offset().top;
-    $("#wrapper-inferior").height(wHeight - offset - 20);
+    var offset = $("#wrapper").offset().top;
+    $("#wrapper").height(wHeight - offset - 20);
 
     // Inicia el modelo
     this.nombresRecorridos = [];
     this.recorridos = new Map();
     this.controles = new Map();
     this.recorridoActual = null;
+
+    // Vista
+    this.editandoNombreRecorrido = false;
 
     // Controlador de adición de control
     this.sharedData.nuevoControl.subscribe((control) => {
@@ -94,7 +103,14 @@ export class EditorRecorridosComponent implements OnInit {
           // Como solo está en el trazado actual, se borra de ambos
           this.borrarControl(control, true);
         } else {
-          // Se usa en otro trazado, solo se borra del actual
+          // Se usa en otro trazado
+          if(this.recorridoActual === null) {
+            // Se desea borrado global -> se confirma
+            this.tempControl = control;
+            this.modalService.open(this.modalControl, {centered: true, size: 'lg'});
+            return;
+          }
+
           this.borrarControl(control, false);
         }
         
@@ -103,6 +119,11 @@ export class EditorRecorridosComponent implements OnInit {
         this.sharedData.actualizaRecorrido(this.recorridos.get(this.recorridoActual));
       }
     });
+  }
+
+  /* Finaliza la pantalla de 
+  guardarRecorridos() {
+
   }
 
   /**
@@ -170,24 +191,85 @@ export class EditorRecorridosComponent implements OnInit {
 
   /* Añade un nuevo recorrido */
   nuevoRecorrido() {
-    // Busca nombre por defecto para el nuevo recorrido
-    var nombre = null;
-    var i = 1;
-    while(nombre === null) {
-      if(!this.recorridos.has(this.RECORRIDO_DEFAULT_PRE + i)) {
-        nombre = this.RECORRIDO_DEFAULT_PRE + i;
+    if(this.recorridos.size < this.MAX_RECORRIDOS) {
+      // Busca nombre por defecto para el nuevo recorrido
+      var nombre = null;
+      var i = 1;
+      while(nombre === null) {
+        if(!this.recorridos.has(this.RECORRIDO_DEFAULT_PRE + i)) {
+          nombre = this.RECORRIDO_DEFAULT_PRE + i;
+        }
+        i++;
       }
-      i++;
+      
+      this.recorridos.set(nombre, new Recorrido(nombre));
+      this.seleccionaRecorrido(nombre);
+      this.nombresRecorridos.push(nombre); // Optimización
+      }
+  }
+
+  /**
+   * Habilita/deshabilita la edición del nombre de un recorrido.
+   * Si se deshabilita, se actualiza el nombre del recorrido.
+   * @param valor True para habilitar la edición, false para guardar el nombre
+   */
+  editarNombreRecorrido(valor: boolean) {
+    let nuevoNombre = this.nombreRecorrido.nativeElement.value;
+    if(!valor && this.recorridoActual !== null && this.recorridoActual !== nuevoNombre) {
+      if(nuevoNombre.trim().length > 0) {
+        if(!this.recorridos.has(nuevoNombre)) {
+          // Se actualiza el nombre del recorrido
+          let recorrido = this.recorridos.get(this.recorridoActual);
+          recorrido.nombre = nuevoNombre;
+          this.recorridos.delete(this.recorridoActual);
+          this.recorridos.set(nuevoNombre, recorrido);
+          // Actualiza el nombre también en el array de optimización de nombres
+          let index = this.nombresRecorridos.indexOf(this.recorridoActual)
+          this.nombresRecorridos[index] = nuevoNombre;
+          // Vuelve a seleccionar el recorrido
+          this.seleccionaRecorrido(nuevoNombre);
+          this.editandoNombreRecorrido = valor;
+        } else {
+          // Otro recorrido tiene ese nombre
+          this.alertService.error("Ya existe un recorrido con ese nombre", this.options);
+        }
+      } else {
+        // No se permite un nombre vacío
+        this.alertService.error("El nombre no puede estar vacío", this.options);
+      }
+    } else {
+      this.editandoNombreRecorrido = valor;
     }
-    
-    this.recorridos.set(nombre, new Recorrido(nombre));
-    this.seleccionaRecorrido(nombre);
-    this.nombresRecorridos.push(nombre); // TEST
+  }
+
+  /* Muestra un diálogo de confirmación de borrado del recorrido actual */
+  borrarRecorrido() {
+    // Muestra diálogo de confirmación
+    this.modalService.open(this.modalRecorrido, {centered: true, size: 'lg'});
+  }
+
+  /* Borra el recorrido actualmente seleccionado */
+  borrarRecorridoConfirmado() {
+    this.modalService.dismissAll();
+
+    if(this.recorridoActual !== null) {
+      // Borra el nombre del recorrido de la lista de optimización de la vista
+      let index = this.nombresRecorridos.indexOf(this.recorridoActual);
+      if (index > -1) {
+        this.nombresRecorridos.splice(index, 1);
+      }
+
+      // Borra el recorrido
+      this.recorridos.delete(this.recorridoActual);
+    }
+
+    // Muestra la vista general de controles
+    this.recorridoActual = null;
+    this.sharedData.actualizaRecorrido(null);
   }
 
   /* Confirmación de borrado total de control */
-  // this.modalService.open(this.modalBorrado, {centered: true, size: 'lg'});
-  borrarConfirmed() {
+  borrarControlConfirmado() {
     this.modalService.dismissAll();
     this.borrarControl(this.tempControl, true);
   }
@@ -215,6 +297,7 @@ export class EditorRecorridosComponent implements OnInit {
     this.sharedData.confirmaBorrado(control.tipo);
   }
 
+  /* Devuelve una lista con los nombres de los recorridos */
   getNombresRecorridos() {
     return this.nombresRecorridos;
   }

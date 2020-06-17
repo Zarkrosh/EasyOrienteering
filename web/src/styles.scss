@@ -22,7 +22,13 @@ alert {
     border-color: $color-orientacion;
 }
 .btn-primary:hover {
+    background-color: $color-orientacion-light;
+}
+.btn-primary:not(:disabled):active {
     background-color: $color-orientacion-dark;
+}
+.btn-primary:focus {
+    box-shadow: 0 0 0 0.2rem rgba($color-orientacion, 0.5);
 }
 
 #footer-web {
