@@ -1,4 +1,4 @@
-package com.hergomsoft.EasyOrienteeringAPI.models;
+package com.hergomsoft.easyoapi.models;
 
 public class Registro {
     private Control control;

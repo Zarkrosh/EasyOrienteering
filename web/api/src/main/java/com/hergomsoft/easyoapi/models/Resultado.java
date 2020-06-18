@@ -1,4 +1,4 @@
-package com.hergomsoft.EasyOrienteeringAPI.models;
+package com.hergomsoft.easyoapi.models;
 
 import java.util.Date;
 import java.util.List;
