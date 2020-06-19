@@ -10,6 +10,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Email;
 
 @Entity
 @Table(	name = "usuarios", 
@@ -26,10 +27,11 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "NOMBRE", length = MLEN_NOMBRE, nullable = false)
+    @Column(name = "NOMBRE", length = MLEN_NOMBRE, nullable = false, unique = true)
     private String nombre;
     
-    @Column(name = "EMAIL", length = MLEN_EMAIL, nullable = false)
+    @Email
+    @Column(name = "EMAIL", length = MLEN_EMAIL, nullable = false, unique = true)
     private String email;
     
     @Temporal(TemporalType.DATE)
