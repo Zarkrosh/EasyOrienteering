@@ -1,7 +1,7 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { AlertService } from '../../alert';
 import { SharedEditorService } from '../shared-editor.service';
-import { Control, Recorrido, Coordenadas } from 'src/app/shared/app.model';
+import { Control, Recorrido, Coordenadas, AppSettings, Carrera } from 'src/app/shared/app.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 declare var $: any; // JQuery
@@ -30,6 +30,7 @@ export class EditorRecorridosComponent implements OnInit {
   @ViewChild('modalControl', {static: true}) modalControl: ElementRef<NgbModal>;
   @ViewChild('modalRecorrido', {static: true}) modalRecorrido: ElementRef<NgbModal>;
   
+  carrera: Carrera;
   recorridos: Map<string, Recorrido>;
   recorridoActual: string;
   nombresRecorridos: string[];
@@ -57,10 +58,7 @@ export class EditorRecorridosComponent implements OnInit {
     $("#wrapper").height(wHeight - offset - 20);
 
     // Inicia el modelo
-    this.nombresRecorridos = [];
-    this.recorridos = new Map();
-    this.controles = new Map();
-    this.recorridoActual = null;
+    this.cargarCarrera();
 
     // Vista
     this.editandoNombreRecorrido = false;
@@ -121,9 +119,40 @@ export class EditorRecorridosComponent implements OnInit {
     });
   }
 
-  /* Finaliza la pantalla de 
-  guardarRecorridos() {
+  /**
+   * Carga los controles y recorridos de la carrera del almacenamiento local.
+   */
+  cargarCarrera() {
+    let jCarrera = localStorage.getItem(AppSettings.LOCAL_STORAGE_CARRERA);
+    // TODO Manejar posible excepción
+    this.carrera = JSON.parse(jCarrera) as Carrera;
 
+    this.recorridos = new Map();
+    this.controles = new Map();
+    this.nombresRecorridos = [];
+    this.recorridoActual = null;
+
+    if(this.carrera) {
+      // Genera mapas de controles y recorridos
+      this.carrera.recorridos.forEach((recorrido, indice, array) => {
+        this.recorridos.set(recorrido.nombre, recorrido);
+        this.nombresRecorridos.push(recorrido.nombre);
+      });
+      this.carrera.controles.forEach((control, indice, array) => {
+        this.controles.set(control.codigo, control);
+      });
+    } else {
+      this.alertService.error("Error al cargar los datos de la carrera");
+    }
+  }
+
+  /* Finaliza la pantalla de edición de recorridos */
+  guardarRecorridos() {
+    // TODO
+    // Elimina borrador (esto debería hacerse tras recibir confirmación de creación del servidor)
+    this.guardaBorrador();
+    this.alertService.success("Recorridos guardados");
+    //localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA); 
   }
 
   /**
@@ -348,6 +377,17 @@ export class EditorRecorridosComponent implements OnInit {
     */
 
     return true;
+  }
+  
+  /**
+   * Guarda el borrador actual de la carrera en el almacenamiento local.
+   */
+  guardaBorrador() {
+    let lControles = Array.from(this.controles.values());
+    let lRecorridos = Array.from(this.recorridos.values());
+    this.carrera.controles = lControles;
+    this.carrera.recorridos = lRecorridos;
+    localStorage.setItem(AppSettings.LOCAL_STORAGE_CARRERA, JSON.stringify(this.carrera));
   }
 
 }

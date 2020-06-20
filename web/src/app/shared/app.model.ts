@@ -1,8 +1,35 @@
+export class AppSettings {
+    public static readonly LOCAL_STORAGE_CARRERA = "carrera";
+}
+
 export class Usuario {
     id: number;
     username: string;
     email: string;
     fecharegistro: Date;
+}
+
+export class Carrera {
+    // Tipos de carrera
+    public static readonly EVENTO = 0; 
+    public static readonly CIRCUITO_PERMANENTE = 1; 
+    
+    nombre: string;
+    recorridos: Recorrido[];
+    controles: Control[];
+    tipo: number;
+    creada: boolean; // True si la carrera existe en el sistema
+                     // False cuando se está creando
+    
+    constructor(nombre: string, recorridos: Recorrido[], controles: Control[],
+                tipo: number, creada: boolean) {
+        this.nombre = nombre;
+        this.recorridos = recorridos;
+        this.controles = controles;
+        this.tipo = tipo;
+        this.creada = creada;
+    }
+
 }
 
 export class Control {
