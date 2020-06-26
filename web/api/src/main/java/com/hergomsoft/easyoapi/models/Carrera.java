@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "carreras")
@@ -23,7 +25,7 @@ public class Carrera {
     public enum MODALIDAD {LINEA, SCORE};
    
     @Id
-    @Column(name = "ID")
+    @Column(name = "ID", columnDefinition = "serial")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
@@ -31,24 +33,24 @@ public class Carrera {
     private String nombre;
     
     @Enumerated(EnumType.STRING)
+    @Type(type = "com.hergomsoft.easyoapi.models.EnumTypesPostgres")
     @Column(name = "TIPO")
     private TIPO tipo;
     
     @Enumerated(EnumType.STRING)
+    @Type(type = "com.hergomsoft.easyoapi.models.EnumTypesPostgres")
     @Column(name = "MODALIDAD")
     private MODALIDAD modalidad;
     
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false)
     private Usuario organizador;
     
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name="CARRERA_ID", referencedColumnName="ID")
     private List<Recorrido> recorridos;
     
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name="CARRERA_ID", referencedColumnName="ID")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "carrera")
     private List<Control> controles;
-    
     
     // PENDIENTES
     //private List<Resultado> resultados;
