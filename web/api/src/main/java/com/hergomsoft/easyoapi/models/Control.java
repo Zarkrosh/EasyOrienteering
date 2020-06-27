@@ -1,10 +1,12 @@
 package com.hergomsoft.easyoapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -27,7 +29,7 @@ public class Control {
     private TIPO tipo;
     
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name="CARRERA_ID")
     private Carrera carrera;
 
@@ -62,7 +64,5 @@ public class Control {
     public void setCarrera(Carrera carrera) {
         this.carrera = carrera;
     }
-
-    
     
 }

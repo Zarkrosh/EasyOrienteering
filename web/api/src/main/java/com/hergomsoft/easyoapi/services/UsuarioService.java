@@ -24,7 +24,7 @@ public class UsuarioService implements IUsuarioService {
             Optional<Usuario> res = repoUsuarios.findById(id);
             return (res.isPresent()) ? res.get() : null;
         } catch(Exception e) {
-            System.out.println("[!] Error al obtener la usuario con id " + id);
+            System.out.println("[!] Error al obtener el usuario con id " + id);
             return null;
         }
     }
@@ -33,7 +33,7 @@ public class UsuarioService implements IUsuarioService {
     public Usuario saveUsuario(Usuario usuario) {
         if(usuario != null) return repoUsuarios.save(usuario);
         else {
-            throw new IllegalArgumentException("La usuario a guardar no puede ser null");
+            throw new IllegalArgumentException("El usuario a guardar no puede ser null");
         }
     }
     
