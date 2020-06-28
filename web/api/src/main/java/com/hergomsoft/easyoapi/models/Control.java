@@ -23,9 +23,9 @@ public class Control {
     @Column(name = "CODIGO")
     private String codigo;
     
-    @Enumerated(EnumType.STRING)
     @Type(type = "com.hergomsoft.easyoapi.models.EnumTypesPostgres")
     @Column(name = "TIPO")
+    @Enumerated(EnumType.STRING)
     private TIPO tipo;
     
     @JsonIgnore

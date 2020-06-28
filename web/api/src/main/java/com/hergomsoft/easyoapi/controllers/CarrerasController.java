@@ -55,10 +55,14 @@ public class CarrerasController {
         Usuario org = usuariosService.getUsuario(1L); // Usuario de prueba
         carrera.setOrganizador(org);
         // TODO Comprobar datos válidos
+        
+        // Crea la carrera
         Carrera guardada = carrerasService.saveCarrera(carrera);
+        
+        // Responde con la ruta de la nueva carrera
+        // TODO: No funca
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
             .buildAndExpand(guardada.getId()).toUri();
-        
         return ResponseEntity.created(location).build();
     }
     
@@ -79,4 +83,5 @@ public class CarrerasController {
     public void borrarCarrera(@PathVariable long id) {
         carrerasService.deleteCarrera(id);
     }
+    
 }

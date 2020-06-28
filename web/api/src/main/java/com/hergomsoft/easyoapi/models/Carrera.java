@@ -49,7 +49,9 @@ public class Carrera {
     @JoinColumn(name="CARRERA_ID", referencedColumnName="ID")
     private List<Recorrido> recorridos;
     
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "carrera")
+    // No se utiliza cascada porque da error debido a la clave foránea del ID de carrera
+    // usado como clave primaria conjunta
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "carrera")
     private List<Control> controles;
     
     // PENDIENTES

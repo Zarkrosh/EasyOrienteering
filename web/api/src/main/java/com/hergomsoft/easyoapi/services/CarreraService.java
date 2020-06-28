@@ -1,6 +1,7 @@
 package com.hergomsoft.easyoapi.services;
 
 import com.hergomsoft.easyoapi.models.Carrera;
+import com.hergomsoft.easyoapi.models.Control;
 import com.hergomsoft.easyoapi.repository.CarreraRepository;
 import java.util.List;
 import java.util.Optional;
@@ -31,8 +32,19 @@ public class CarreraService implements ICarreraService {
 
     @Override
     public Carrera saveCarrera(Carrera carrera) {
-        if(carrera != null) return repoCarrera.save(carrera);
-        else {
+        Carrera res = null;
+        if(carrera != null) {
+            // Primero guarda la carrera general
+            res = repoCarrera.save(carrera);
+            // Luego guarda los controles que no son guardados debido al problema
+            // asociado al uso de la clave foránea del ID de la carrera.
+            for(Control c : carrera.getControles()) {
+                repoCarrera.insertaControl(c.getCodigo(), res.getId(), c.getTipo().name());
+            }
+            res.setControles(carrera.getControles());
+            
+            return res;
+        } else {
             throw new IllegalArgumentException("La carrera a guardar no puede ser null");
         }
     }
