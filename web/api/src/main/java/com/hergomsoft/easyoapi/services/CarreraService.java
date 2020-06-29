@@ -31,19 +31,30 @@ public class CarreraService implements ICarreraService {
     }
 
     @Override
-    public Carrera saveCarrera(Carrera carrera) {
-        Carrera res = null;
+    public Carrera newCarrera(Carrera carrera) {
         if(carrera != null) {
-            // Primero guarda la carrera general
-            res = repoCarrera.save(carrera);
-            // Luego guarda los controles que no son guardados debido al problema
-            // asociado al uso de la clave foránea del ID de la carrera.
-            for(Control c : carrera.getControles()) {
-                repoCarrera.insertaControl(c.getCodigo(), res.getId(), c.getTipo().name());
+            return guardaCarrera(carrera);
+        } else {
+            throw new IllegalArgumentException("La carrera a guardar no puede ser null");
+        }
+    }
+
+    @Override
+    public void editCarrera(Carrera carrera) {
+        if(carrera != null && carrera.getId() != null) {
+            Carrera prev = getCarrera(carrera.getId());
+            if(prev != null) {
+                // Comprueba datos válidos
+                // TODO
+                
+                // Borra la carrera anterior y sus datos asociados
+                repoCarrera.deleteById(carrera.getId());
+                // TODO: analizar optimización de destrucción de los recorridos
+                // Guarda la carrera actualizada
+                guardaCarrera(carrera);
+            } else {
+                // No existe ninguna carrera con ese ID
             }
-            res.setControles(carrera.getControles());
-            
-            return res;
         } else {
             throw new IllegalArgumentException("La carrera a guardar no puede ser null");
         }
@@ -67,6 +78,19 @@ public class CarreraService implements ICarreraService {
     @Override
     public boolean existeCarrera(long id) {
         return repoCarrera.existsById(id);
+    }
+    
+    private Carrera guardaCarrera(Carrera carrera) {
+        // Primero guarda la carrera general
+        Carrera res = repoCarrera.save(carrera);
+        // Luego guarda los controles que no son guardados debido al problema
+        // asociado al uso de la clave foránea del ID de la carrera.
+        for(Control c : carrera.getControles()) {
+            repoCarrera.insertaControl(c.getCodigo(), res.getId(), c.getTipo().name());
+        }
+        res.setControles(carrera.getControles());
+        
+        return res;
     }
     
 }

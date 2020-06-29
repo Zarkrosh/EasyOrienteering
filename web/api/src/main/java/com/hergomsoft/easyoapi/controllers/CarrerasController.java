@@ -57,7 +57,7 @@ public class CarrerasController {
         // TODO Comprobar datos válidos
         
         // Crea la carrera
-        Carrera guardada = carrerasService.saveCarrera(carrera);
+        Carrera guardada = carrerasService.newCarrera(carrera);
         
         // Responde con la ruta de la nueva carrera
         // TODO: No funca
@@ -69,13 +69,13 @@ public class CarrerasController {
     @PutMapping("/{id}")
     public ResponseEntity<Object> editarCarrera(@RequestBody Carrera carrera, @PathVariable long id) {
         Carrera res = carrerasService.getCarrera(id);
-        if(res != null) {
+        if(res == null) {
             return ResponseEntity.notFound().build();
         }
 
         // TODO Comprobar datos válidos
         carrera.setId(id);
-        carrerasService.saveCarrera(carrera);
+        carrerasService.editCarrera(carrera);
         return ResponseEntity.noContent().build();
     }
     

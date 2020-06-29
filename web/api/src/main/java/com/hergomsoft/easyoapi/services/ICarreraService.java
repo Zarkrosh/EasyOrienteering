@@ -18,11 +18,17 @@ public interface ICarreraService {
     Carrera getCarrera(long id);
     
     /**
-     * Guarda la carrera en la base de datos.
-     * @param carrera Carrera a guardar
-     * @return Carrera guardada
+     * Crea una nueva carrera en la base de datos.
+     * @param carrera Carrera a crear
+     * @return Carrera creada
      */
-    Carrera saveCarrera(Carrera carrera);
+    Carrera newCarrera(Carrera carrera);
+    
+    /**
+     * Actualiza los datos de una carrera en la base de datos.
+     * @param carrera Carrera a editar
+     */
+    void editCarrera(Carrera carrera);
     
     /**
      * Borra la carrera especificada de la base de datos.
