@@ -1,6 +1,7 @@
 package com.hergomsoft.easyoapi.models;
 
 import java.util.List;
+import java.util.Map;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import org.hibernate.annotations.Type;
@@ -28,6 +30,9 @@ public class Carrera {
     @Column(name = "ID", columnDefinition = "serial")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @Column(name = "SECRET")
+    private String secret;
     
     @Column(name = "NOMBRE")
     private String nombre;
@@ -52,14 +57,16 @@ public class Carrera {
     // No se utiliza cascada porque da error debido a la clave foránea del ID de carrera
     // usado como clave primaria conjunta
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "carrera")
-    private List<Control> controles;
+    @MapKey(name = "codigo")
+    private Map<String, Control> controles;
     
     // PENDIENTES
     //private List<Resultado> resultados;
 
     public Carrera() {}
 
-    public Carrera(String nombre, TIPO tipo, MODALIDAD modalidad, Usuario organizador, List<Recorrido> recorridos, List<Control> controles) {
+    public Carrera(String secret, String nombre, TIPO tipo, MODALIDAD modalidad, Usuario organizador, List<Recorrido> recorridos, Map<String, Control> controles) {
+        this.secret = secret;
         this.nombre = nombre;
         this.tipo = tipo;
         this.modalidad = modalidad;
@@ -74,6 +81,14 @@ public class Carrera {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
 
     public String getNombre() {
@@ -116,13 +131,15 @@ public class Carrera {
         this.recorridos = recorridos;
     }
 
-    public List<Control> getControles() {
+    public Map<String, Control> getControles() {
         return controles;
     }
 
-    public void setControles(List<Control> controles) {
+    public void setControles(Map<String, Control> controles) {
         this.controles = controles;
     }
+
+    
     
 }
 
