@@ -2,11 +2,15 @@ package com.hergomsoft.easyoapi.controllers;
 
 
 import com.hergomsoft.easyoapi.models.Carrera;
+import com.hergomsoft.easyoapi.models.Control;
+import com.hergomsoft.easyoapi.models.PeticionRegistro;
 import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.services.CarreraService;
 import com.hergomsoft.easyoapi.services.UsuarioService;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -82,6 +86,14 @@ public class CarrerasController {
     @DeleteMapping("/{id}")
     public void borrarCarrera(@PathVariable long id) {
         carrerasService.deleteCarrera(id);
+    }
+    
+    @GetMapping("/{id}/secretos")
+    public Map<String, String> getSecretosControlesCarrera(@PathVariable long id) {
+        // Solo es accesible por el organizador de la carrera
+        // TODO 
+        
+        return carrerasService.getSecretosControles(id);
     }
     
 }
