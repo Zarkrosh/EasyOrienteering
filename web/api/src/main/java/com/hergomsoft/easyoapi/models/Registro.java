@@ -25,9 +25,10 @@ public class Registro {
     private Usuario corredor;
     
     @ManyToOne(optional = false)
-    private Recorrido recorrido;
+    private Control control;
     
-    private String codigoControl;
+    @ManyToOne(optional = false)
+    private Recorrido recorrido;
     
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -37,10 +38,10 @@ public class Registro {
     public Registro() {
     }
 
-    public Registro(Usuario corredor, Recorrido recorrido, String codigoControl, Date fecha) {
+    public Registro(Usuario corredor, Control control, Recorrido recorrido, Date fecha) {
         this.corredor = corredor;
+        this.control = control;
         this.recorrido = recorrido;
-        this.codigoControl = codigoControl;
         this.fecha = fecha;
     }
 
@@ -60,20 +61,20 @@ public class Registro {
         this.corredor = corredor;
     }
 
+    public Control getControl() {
+        return control;
+    }
+
+    public void setControl(Control control) {
+        this.control = control;
+    }
+
     public Recorrido getRecorrido() {
         return recorrido;
     }
 
     public void setRecorrido(Recorrido recorrido) {
         this.recorrido = recorrido;
-    }
-
-    public String getCodigoControl() {
-        return codigoControl;
-    }
-
-    public void setCodigoControl(String codigoControl) {
-        this.codigoControl = codigoControl;
     }
 
     public Date getFecha() {

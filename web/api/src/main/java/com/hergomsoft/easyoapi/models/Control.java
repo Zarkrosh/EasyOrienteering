@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -20,6 +22,10 @@ public class Control {
     public enum TIPO {SALIDA, CONTROL, META};
     
     @Id
+    @Column(name = "ID", columnDefinition = "serial")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
     @Column(name = "CODIGO")
     private String codigo;
     
@@ -39,6 +45,14 @@ public class Control {
         this.codigo = codigo;
         this.tipo = tipo;
         this.carrera = carrera;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getCodigo() {
@@ -63,6 +77,11 @@ public class Control {
 
     public void setCarrera(Carrera carrera) {
         this.carrera = carrera;
+    }
+    
+    @Override
+    public String toString() {
+        return "Control: " + codigo + " " + tipo + " (" + id + ")";
     }
     
 }
