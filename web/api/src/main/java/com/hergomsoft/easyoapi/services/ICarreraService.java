@@ -53,17 +53,28 @@ public interface ICarreraService {
     boolean existeCarrera(long id);
     
     /**
-     * Devuelve un mapa de asociaciones de los controles de una carrera y sus secretos.
-     * @param id ID de la carrera
-     * @return Secretos de los controles de la carrera
-     */
-    Map<String, String> getSecretosControles(long id);
-    
-    /**
      * Devuelve true si el secreto proporcionado coincide con el calculado para el control.
      * @param secreto Secreto proporcionado
      * @param control Control de una carrera
      * @return True si los secretos coinciden, false si no
      */
     boolean checkSecretoControl(String secreto, Control control);
+    
+    /**
+     * Devuelve un mapa con los secretos de los controles de una casrrera, los cuales 
+     * dependen del secreto de la carrera a la que pertenece. Su generación es el 
+     * MD5 de la concatenación del código de control con el secreto de la carrera.
+     * @param carrera Carrera de la que obtener los secretos
+     * @return Mapa de secretos
+     */
+    Map<String, String> getSecretosCarrera(Carrera carrera);
+    
+    /**
+     * Devuelve el secreto de un control, el cual depende del secreto de la carrera
+     * a la que pertenece. Su generación es el MD5 de la concatenación del código de
+     * control con el secreto de la carrera.
+     * @param control Control del cual obtener el secreto
+     * @return Secreto del control
+     */
+    String getSecretoControl(Control control);
 }

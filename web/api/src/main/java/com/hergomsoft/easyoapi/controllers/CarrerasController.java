@@ -9,6 +9,7 @@ import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.services.CarreraService;
 import com.hergomsoft.easyoapi.services.UsuarioService;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
@@ -47,7 +48,7 @@ public class CarrerasController {
         if(res == null) {
             // No existe -> 404
             throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "No existe la carrera que quieres obtener");
+                HttpStatus.NOT_FOUND, "No existe la carrera con ese ID");
         } else {
             return res;
         }
@@ -94,7 +95,17 @@ public class CarrerasController {
         // Solo es accesible por el organizador de la carrera
         // TODO 
         
-        return carrerasService.getSecretosControles(id);
+        Map<String, String> res = new HashMap<>();
+        Carrera carrera = carrerasService.getCarrera(id);
+        if(carrera != null) {
+            res = carrerasService.getSecretosCarrera(carrera);
+        } else {
+            // No existe -> 404
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "No existe la carrera con ese ID");
+        }
+        
+        return res;
     }
     
 }

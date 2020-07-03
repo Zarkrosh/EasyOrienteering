@@ -1,5 +1,6 @@
 package com.hergomsoft.easyoapi.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,6 +35,10 @@ public class Usuario {
     @Column(name = "EMAIL", length = MLEN_EMAIL, nullable = false, unique = true)
     private String email;
     
+    @JsonIgnore
+    @Column(name = "PASSWORD")
+    private String password;
+    
     @Temporal(TemporalType.DATE)
     @Column(name = "FECHA_REGISTRO", nullable = false)
     private Date fechaRegistro;
@@ -43,6 +48,7 @@ public class Usuario {
     public Usuario(String nombre, String email, String password, Date fechaRegistro) {
         this.nombre = nombre;
         this.email = email;
+        this.password = password;
         this.fechaRegistro = fechaRegistro;
     }
 
@@ -68,6 +74,14 @@ public class Usuario {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Date getFechaRegistro() {

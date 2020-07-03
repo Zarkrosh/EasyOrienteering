@@ -35,8 +35,9 @@ public class Recorrido {
 
     public Recorrido() {}
 
-    public Recorrido(String nombre) {
+    public Recorrido(String nombre, List<String> trazado) {
         this.nombre = nombre;
+        this.trazado = trazado;
     }
 
     public Long getId() {

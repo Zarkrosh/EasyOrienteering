@@ -96,25 +96,21 @@ public class CarreraService implements ICarreraService {
     }
     
     @Override
-    public Map<String, String> getSecretosControles(long id) {
+    public boolean checkSecretoControl(String secreto, Control control) {
+        return secreto.contentEquals(getSecretoControl(control));
+    }
+    
+    @Override
+    public Map<String, String> getSecretosCarrera(Carrera carrera) {
         Map<String, String> res = new HashMap<>();
-        Carrera carrera = getCarrera(id);
-        if(carrera != null) {
-            // Itera por los controles calculando su secreto
-            for(Control control : carrera.getControles().values()) {
-                String secreto = getSecretoControl(control);
-                res.put(control.getCodigo(), secreto);
-            }
-        } else {
-            throw new IllegalArgumentException("No existe la carrera con el ID " + id);
+        
+        // Itera por los controles calculando su secreto
+        for(Control control : carrera.getControles().values()) {
+            String secreto = getSecretoControl(control);
+            res.put(control.getCodigo(), secreto);
         }
         
         return res;
-    }
-
-    @Override
-    public boolean checkSecretoControl(String secreto, Control control) {
-        return secreto.contentEquals(getSecretoControl(control));
     }
     
     private Carrera guardaCarrera(Carrera carrera) {
@@ -130,14 +126,8 @@ public class CarreraService implements ICarreraService {
         return res;
     }
     
-    /**
-     * Devuelve el secreto de un control, el cual depende del secreto de la carrera
-     * a la que pertenece. Su generación es el MD5 de la concatenación del código de
-     * control con el secreto de la carrera.
-     * @param control Control del cual obtener el secreto
-     * @return Secreto del control
-     */
-    private String getSecretoControl(Control control) {
+    @Override
+    public String getSecretoControl(Control control) {
         return md5(control.getCodigo() + control.getCarrera().getSecret());
     }
     
