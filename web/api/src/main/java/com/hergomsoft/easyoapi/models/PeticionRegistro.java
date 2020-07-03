@@ -7,10 +7,13 @@ public class PeticionRegistro {
     private String codigo; // Código del control
     @NotNull
     private String secreto; // Secreto del control
+    
+    private Long idRecorrido;
 
-    public PeticionRegistro(String codigoControl, String secretControl) {
-        this.codigo = codigoControl;
-        this.secreto = secretControl;
+    public PeticionRegistro(String codigo, String secreto, Long idRecorrido) {
+        this.codigo = codigo;
+        this.secreto = secreto;
+        this.idRecorrido = idRecorrido;
     }
 
     public String getCodigo() {
@@ -28,5 +31,12 @@ public class PeticionRegistro {
     public void setSecreto(String secreto) {
         this.secreto = secreto;
     }
-    
+
+    public Long getIdRecorrido() {
+        return idRecorrido;
+    }
+
+    public void setIdRecorrido(Long idRecorrido) {
+        this.idRecorrido = idRecorrido;
+    }
 }

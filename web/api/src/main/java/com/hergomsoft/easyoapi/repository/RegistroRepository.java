@@ -1,6 +1,5 @@
 package com.hergomsoft.easyoapi.repository;
 
-import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Registro;
 import java.util.List;
 import java.util.Optional;
@@ -24,16 +23,17 @@ public interface RegistroRepository extends JpaRepository<Registro, Long> {
     
     
     /**
-     * Devuelve el identificador del siguiente control a registrar en un recorrido 
+     * Devuelve el código del siguiente control a registrar en un recorrido 
      * por parte de un corredor. No devuelve nada si no le quedan controles pendientes. 
      * @param idCorredor ID del corredor
      * @param idRecorrido ID del recorrido
-     * @return ID del siguiente control, o vacío
+     * @return Código del siguiente control, o vacío
      */
-    @Query(value = "SELECT cr.control_id FROM registros AS r RIGHT OUTER JOIN controles_recorrido AS cr ON (r.control_id = cr.control_id "
-        + "AND r.recorrido_id = cr.recorrido_id AND r.corredor_id = :idCorredor) WHERE cr.recorrido_id = :idRecorrido AND fecha IS NULL ORDER BY orden ASC LIMIT 1", 
+    @Query(value = "SELECT cr.control_codigo FROM registros AS r INNER JOIN controles AS c ON (r.control_id = c.id AND r.corredor_id = :idCorredor) "
+            + "RIGHT OUTER JOIN controles_recorrido AS cr ON (c.codigo = cr.control_codigo AND r.recorrido_id = cr.recorrido_id) "
+            + "WHERE cr.recorrido_id = :idRecorrido AND fecha IS NULL ORDER BY orden ASC LIMIT 1", 
         nativeQuery = true)
-    public Optional<Long> getIDSiguienteControlRecorrido(@Param("idCorredor") long idCorredor, @Param("idRecorrido") long idRecorrido);
+    public Optional<String> getCodigoSiguienteControlRecorrido(@Param("idCorredor") long idCorredor, @Param("idRecorrido") long idRecorrido);
     
     
     /**
@@ -45,4 +45,15 @@ public interface RegistroRepository extends JpaRepository<Registro, Long> {
     @Query(value = "SELECT control_id FROM registros WHERE corredor_id = :idCorredor AND recorrido_id = :idRecorrido ORDER BY fecha ASC", 
         nativeQuery = true)
     public List<Long> getIDControlesRegistradosRecorrido(@Param("idCorredor") long idCorredor, @Param("idRecorrido") long idRecorrido);
+    
+    
+    /**
+     * Devuelve true si un corredor tiene algún registro en un recorrido, false si no.
+     * @param idCorredor ID del usuario corredor
+     * @param idRecorrido ID del recorrido
+     * @return True si hay registros, false si no
+     */
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END FROM registros WHERE corredor_id = :idCorredor AND recorrido_id = :idRecorrido", 
+        nativeQuery = true)
+    public boolean haCorridoRecorrido(@Param("idCorredor") long idCorredor, @Param("idRecorrido") long idRecorrido);
 }

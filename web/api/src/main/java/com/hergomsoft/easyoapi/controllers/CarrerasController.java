@@ -4,6 +4,7 @@ package com.hergomsoft.easyoapi.controllers;
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Control;
 import com.hergomsoft.easyoapi.models.PeticionRegistro;
+import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.services.CarreraService;
 import com.hergomsoft.easyoapi.services.UsuarioService;
@@ -56,12 +57,12 @@ public class CarrerasController {
     public ResponseEntity<Object> nuevaCarrera(@RequestBody Carrera carrera) {
         // El creador de la carrera es el usuario que realiza la petición
         // TODO
-        Usuario org = usuariosService.getUsuario(1L); // Usuario de prueba
+        Usuario org = usuariosService.getUsuario(2L); // Usuario de prueba
         carrera.setOrganizador(org);
         // TODO Comprobar datos válidos
         
         // Crea la carrera
-        Carrera guardada = carrerasService.newCarrera(carrera);
+        Carrera guardada = carrerasService.saveCarrera(carrera);
         
         // Responde con la ruta de la nueva carrera
         // TODO: No funca

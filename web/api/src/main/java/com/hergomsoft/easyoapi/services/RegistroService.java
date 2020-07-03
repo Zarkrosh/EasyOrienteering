@@ -4,7 +4,6 @@ import com.hergomsoft.easyoapi.models.Control;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Registro;
 import com.hergomsoft.easyoapi.models.Usuario;
-import com.hergomsoft.easyoapi.repository.ControlRepository;
 import com.hergomsoft.easyoapi.repository.RecorridoRepository;
 import com.hergomsoft.easyoapi.repository.RegistroRepository;
 import java.util.List;
@@ -21,8 +20,6 @@ public class RegistroService implements IRegistroService {
     @Autowired
     private RecorridoRepository repoRecorrido;
 
-    @Autowired
-    private ControlRepository repoControl;
     
     @Override
     public List<Registro> findAll() {
@@ -52,23 +49,22 @@ public class RegistroService implements IRegistroService {
     }
     
     @Override
-    public Control getSiguienteControlRecorrido(Usuario corredor, Recorrido recorrido) {
+    public String getCodigoSiguienteControlRecorrido(Usuario corredor, Recorrido recorrido) {
         Control res = null;
         
-        Optional<Long> idControl = repoRegistro.getIDSiguienteControlRecorrido(corredor.getId(), recorrido.getId());
-        if(idControl.isPresent()) {
-            Optional<Control> opt = repoControl.findById(idControl.get());
-            res = (opt.isPresent()) ? opt.get() : null;
-            // ¿Lanzar excepción?
-        }
-
-        return res;
+        Optional<String> idControl = repoRegistro.getCodigoSiguienteControlRecorrido(corredor.getId(), recorrido.getId());
+        return (idControl.isPresent()) ? idControl.get() : null;
     }
     
     @Override
     public boolean haRegistradoControl(Usuario corredor, Control control, Recorrido recorrido) {
         List<Long> idControles = repoRegistro.getIDControlesRegistradosRecorrido(corredor.getId(),recorrido.getId());
         return idControles.contains(control.getId());
+    }
+    
+    @Override
+    public boolean haCorridoRecorrido(Usuario corredor, Recorrido recorrido) {
+        return repoRegistro.haCorridoRecorrido(corredor.getId(), recorrido.getId());
     }
 
 }

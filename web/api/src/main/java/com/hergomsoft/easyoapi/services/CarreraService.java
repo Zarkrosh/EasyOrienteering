@@ -41,7 +41,7 @@ public class CarreraService implements ICarreraService {
     }
 
     @Override
-    public Carrera newCarrera(Carrera carrera) {
+    public Carrera saveCarrera(Carrera carrera) {
         if(carrera != null) {
             // Genera el secret para la carrera mediante el hash MD5 de la concatenación
             // del secret del servidor con una cadena aleatoria generada de su mismo largo.

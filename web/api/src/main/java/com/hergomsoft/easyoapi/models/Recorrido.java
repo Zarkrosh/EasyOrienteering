@@ -1,7 +1,6 @@
 package com.hergomsoft.easyoapi.models;
 
 import java.util.List;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -9,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
@@ -26,11 +26,12 @@ public class Recorrido {
     private String nombre;
     
     @ElementCollection
-    @CollectionTable(name = "CONTROLES_RECORRIDO", 
-        joinColumns = @JoinColumn(name = "RECORRIDO_ID"))
+    @JoinTable(name = "CONTROLES_RECORRIDO", 
+        joinColumns = @JoinColumn(name = "RECORRIDO_ID")
+    )
     @OrderColumn(name = "ORDEN")
-    @Column(name = "CODIGO_CONTROL")
-    private List<String> controles; // Salida - Controles intermedios* - Meta
+    @Column(name = "CONTROL_CODIGO")
+    private List<String> trazado; // Salida - Controles intermedios* - Meta
 
     public Recorrido() {}
 
@@ -54,12 +55,12 @@ public class Recorrido {
         this.nombre = nombre;
     }
 
-    public List<String> getControles() {
-        return controles;
+    public List<String> getTrazado() {
+        return trazado;
     }
 
-    public void setControles(List<String> controles) {
-        this.controles = controles;
+    public void setTrazado(List<String> trazado) {
+        this.trazado = trazado;
     }
 
 }

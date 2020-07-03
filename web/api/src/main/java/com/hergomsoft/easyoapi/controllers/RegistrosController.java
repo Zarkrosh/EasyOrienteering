@@ -64,15 +64,37 @@ public class RegistrosController {
             if(control != null) {
                 // Obtiene el usuario corredor
                 // TODO: extraer del método de autenticación
-                Usuario corredor = usuariosService.getUsuario(1); // TEST
+                Usuario corredor = usuariosService.getUsuario(2); // TEST
                 Recorrido recorrido = registrosService.getRecorridoPendiente(corredor);
                 if(recorrido == null) {
-                    // El usuario no ha comenzado aún la carrera
+                    // El usuario no tiene ningún recorrido pendiente
                     // Comprueba que el control es una salida
                     if(control.getTipo() != Control.TIPO.SALIDA) {
                         // Control inválido -> 422 (Unprocessable Entity)
                         throw new ResponseStatusException(
                             HttpStatus.UNPROCESSABLE_ENTITY, "Debe escanear una salida primero");
+                    }
+                    
+                    // Comprueba que se indica recorrido
+                    if(peticion.getIdRecorrido() != null) {
+                       // Comprueba que el control pertenece al recorrido indicado
+                       recorrido = carrera.getRecorridoPorID(peticion.getIdRecorrido());
+                       if(recorrido == null) {
+                           // El recorrido no pertenece a esa carrera -> 422 (Unprocessable Entity)
+                            throw new ResponseStatusException(
+                                HttpStatus.UNPROCESSABLE_ENTITY, "El recorrido indicado no pertenece a la carrera");
+                       } else {
+                           // Comprueba que no ha comenzado dicho recorrido ya 
+                           if(registrosService.haCorridoRecorrido(corredor, recorrido)) {
+                               // Ya ha empezado el recorrido -> 422 (Unprocessable Entity)
+                                throw new ResponseStatusException(
+                                    HttpStatus.UNPROCESSABLE_ENTITY, "Ya ha corrido este recorrido");
+                           }
+                       }
+                    } else {
+                        // No se indica recorrido a empezar -> 422 (Unprocessable Entity)
+                        throw new ResponseStatusException(
+                            HttpStatus.UNPROCESSABLE_ENTITY, "Debe indicar recorrido");
                     }
                 } else {
                     // Corredor realizando recorrido
@@ -82,9 +104,9 @@ public class RegistrosController {
                             // Control válido, comprueba si el registro es válido
                             if(carrera.getModalidad() == Carrera.MODALIDAD.LINEA) {
                                 // Comprueba si el control registrado es el siguiente que le toca
-                                Control siguiente = registrosService.getSiguienteControlRecorrido(corredor, recorrido);
+                                String siguiente = registrosService.getCodigoSiguienteControlRecorrido(corredor, recorrido);
                                 if(siguiente != null) {
-                                    if(!siguiente.equals(control)) {
+                                    if(!siguiente.equals(control.getCodigo())) {
                                         // Registro inválido
                                         throw new ResponseStatusException(
                                             HttpStatus.UNPROCESSABLE_ENTITY, "Este no es el control que buscas");
@@ -93,7 +115,7 @@ public class RegistrosController {
                                     // Ya ha finalizado el recorrido
                                     // Esto no debería ocurrir debido a que no estaría pendiente el recorrido
                                     throw new ResponseStatusException(
-                                        HttpStatus.UNPROCESSABLE_ENTITY, "Recorrido ya finalizado");
+                                        HttpStatus.UNPROCESSABLE_ENTITY, "No quedan más controles por registrar");
                                 }
                             } else {
                                 // SCORE
@@ -107,7 +129,7 @@ public class RegistrosController {
                         } else {
                             // Control inválido -> 422 (Unprocessable Entity)
                             throw new ResponseStatusException(
-                                HttpStatus.UNPROCESSABLE_ENTITY, "El secreto no es correcto.");
+                                HttpStatus.UNPROCESSABLE_ENTITY, "El secreto no es correcto");
                         }
                     } else {
                         // El usuario no está corriendo esta carrera -> 422
@@ -126,17 +148,17 @@ public class RegistrosController {
                 if(resultado == null) {
                     // No se pudo crear el registro -> 500
                     throw new ResponseStatusException(
-                        HttpStatus.INTERNAL_SERVER_ERROR, "Error al crear el registro.");
+                        HttpStatus.INTERNAL_SERVER_ERROR, "Error al crear el registro");
                 }
             } else {
                 // No existe el control -> 422 (Unprocessable Entity)
                 throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY, "El código de control no se corresponde con ningún control de la carrera.");
+                    HttpStatus.UNPROCESSABLE_ENTITY, "El código de control no se corresponde con ningún control de la carrera");
             }
         } else {
             // No existe la carrera -> 404
             throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "No existe la carrera.");
+                HttpStatus.NOT_FOUND, "No existe la carrera");
         }
         
         return resultado;

@@ -24,7 +24,7 @@ public interface ICarreraService {
      * @param carrera Carrera a crear
      * @return Carrera creada
      */
-    Carrera newCarrera(Carrera carrera);
+    Carrera saveCarrera(Carrera carrera);
     
     /**
      * Actualiza los datos de una carrera en la base de datos.

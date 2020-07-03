@@ -1,5 +1,6 @@
 package com.hergomsoft.easyoapi.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +17,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @Table(name = "registros")
 public class Registro {
     
+    @JsonIgnore
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

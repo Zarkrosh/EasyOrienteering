@@ -1,5 +1,6 @@
 package com.hergomsoft.easyoapi.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.CascadeType;
@@ -31,6 +32,7 @@ public class Carrera {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @JsonIgnore
     @Column(name = "SECRET")
     private String secret;
     
@@ -140,6 +142,23 @@ public class Carrera {
     }
 
     
+    /**
+     * Devuelve el recorrido de la carrera con el ID especificado. Devuelve null,
+     * si no contiene ninguno con dicho ID.
+     * @param id ID del recorrido
+     * @return Recorrido o null
+     */
+    public Recorrido getRecorridoPorID(long id) {
+        Recorrido res = null;
+        
+        int i = 0;
+        while(res == null && i < recorridos.size()) {
+            if(recorridos.get(i).getId() == id) res = recorridos.get(i);
+            i++;
+        }
+        
+        return res;
+    }
     
 }
 
