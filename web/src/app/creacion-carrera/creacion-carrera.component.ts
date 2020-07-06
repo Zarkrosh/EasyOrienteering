@@ -1,7 +1,8 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { AppSettings, Carrera } from '../shared/app.model';
+import { AppSettings, Carrera, Control } from '../shared/app.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-creacion-carrera',
@@ -17,13 +18,16 @@ export class CreacionCarreraComponent implements OnInit {
   
 
   constructor(private formBuilder: FormBuilder,
-    private modalService: NgbModal) { }
+    private modalService: NgbModal,
+    private route: ActivatedRoute,
+    private router: Router) { }
 
   ngOnInit() {
     this.carreraForm = this.formBuilder.group({
-      tipo: ['', Validators.required],
-      modalidad: ['', Validators.required],
-      cronometraje: ['', Validators.required]
+      nombre: ['Carrera popular', Validators.required],
+      tipo: ['EVENTO', Validators.required],
+      modalidad: ['LINEA', Validators.required]
+      //cronometraje: ['QR', Validators.required]
     });
 
     // Comprueba si hay algún borrador de carrera en el almacenamiento local
@@ -32,17 +36,23 @@ export class CreacionCarreraComponent implements OnInit {
       // TODO Añadir detalles del borrador en el diálogo
       this.modalService.open(this.modalBorrador, {centered: true, size: 'lg'});
     } else {
-      // Crea una nueva carrera
+      // Crea una nueva carrera: de momento no
       this.nuevaCarreraVacia();
     }
+
+    
   }
+
+  // Para acceder más comodo a los campos del formulario
+  get f() { return this.carreraForm.controls; }
 
   /**
    * Genera una nueva carrera vacía.
    */
   nuevaCarreraVacia() {
-    this.carrera = new Carrera("", [], [], Carrera.EVENTO, false);
-    this.guardaBorrador();
+    localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA);
+    //this.carrera = new Carrera("", [], [], Carrera.TIPO_EVENTO, Carrera.MOD_TRAZADO, false);
+    //this.guardaBorrador();
   }
 
   /**
@@ -67,6 +77,22 @@ export class CreacionCarreraComponent implements OnInit {
    */
   guardaBorrador() {
     localStorage.setItem(AppSettings.LOCAL_STORAGE_CARRERA, JSON.stringify(this.carrera));
+  }
+
+
+  nuevaCarreraDesdeDatos() {
+    this.carrera = new Carrera(this.f.nombre.value, [], new Map<string, Control>(), this.f.tipo.value, this.f.modalidad.value, false);
+    this.guardaBorrador();
+  }
+
+  clickRecorridos() {
+    if(this.carreraForm.valid) {
+      // TODO Comprobar valores correctos
+      this.nuevaCarreraDesdeDatos();
+      this.router.navigate(['recorridos'], {relativeTo: this.route});
+    } else {
+      // TODO
+    }
   }
 
 }

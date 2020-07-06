@@ -7,6 +7,7 @@ import { RegistroComponent } from './auth/registro/registro.component';
 import { OlvidoComponent } from './auth/olvido/olvido.component';
 import { CreacionCarreraComponent } from './creacion-carrera/creacion-carrera.component';
 import { EditorRecorridosComponent } from './editor/editor-recorridos/editor-recorridos.component';
+import { VistaCarreraComponent } from './vista-carrera/vista-carrera.component';
 
 
 const routes: Routes = [
@@ -15,8 +16,9 @@ const routes: Routes = [
   {path: 'registro', component: RegistroComponent},
   {path: 'olvido', component: OlvidoComponent},
   {path: 'perfil', component: PerfilComponent},
+  {path: 'carreras/:id', component: VistaCarreraComponent},
   {path: 'carreras/crear', component: CreacionCarreraComponent},
-  {path: 'carreras/crear/recorridos', component: EditorRecorridosComponent}
+  {path: 'carreras/crear/recorridos', component: EditorRecorridosComponent},
 ];
 
 @NgModule({

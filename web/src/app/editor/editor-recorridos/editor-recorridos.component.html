@@ -40,9 +40,9 @@
             <table id="descripcion-controles">
                 <tbody>
                     <ng-container *ngIf="recorridoActual !== null">
-                        <tr *ngFor="let c of recorridos.get(recorridoActual).idControles; let i = index"
+                        <tr *ngFor="let c of recorridos.get(recorridoActual).trazado; let i = index"
                             class="entrada-descripcion">{{i}} - {{c}}</tr>
-                        <span *ngIf="recorridos.get(recorridoActual).idControles.length === 0">Sin controles</span>
+                        <span *ngIf="recorridos.get(recorridoActual).trazado.length === 0">Sin controles</span>
                     </ng-container>
                 </tbody>
             </table>

@@ -16,6 +16,8 @@ import { EditorRecorridosComponent } from './editor/editor-recorridos/editor-rec
 import { EditorTrazadoComponent } from './editor/editor-trazado/editor-trazado.component';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { ConfiguradorControlesComponent } from './configurador-controles/configurador-controles.component';
+import { VistaCarreraComponent } from './vista-carrera/vista-carrera.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +30,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     CreacionCarreraComponent,
     EditorRecorridosComponent,
     EditorTrazadoComponent
+    ConfiguradorControlesComponent,
   ],
   imports: [
     BrowserModule,

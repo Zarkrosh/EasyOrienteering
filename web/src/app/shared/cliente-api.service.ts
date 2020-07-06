@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Carrera } from './app.model';
 
 @Injectable({
   providedIn: 'root'
@@ -8,9 +9,11 @@ import { Observable } from 'rxjs';
 export class ClienteApiService {
   // URL base de la API
   private static readonly BASE_URL = '/api/';
+  private static readonly BASE_CARRERAS = 'carreras/';
   // Autenticación
   private static readonly API_LOGIN = 'login/';
   private static readonly API_REGISTRO = 'registro/';
+  
 
   // Parámetros de la API
   private static readonly PAR_NOMBRE = 'nombre';
@@ -60,6 +63,27 @@ export class ClienteApiService {
     const cabeceras = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(url, datos, {observe: 'response', headers: cabeceras});
   }
+
+
+  /******************* CARRERAS *******************/
+
+  getCarrera(idCarrera: number) {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + idCarrera;
+    return this.http.get<Carrera>(url, {observe: 'response'});
+  }
+
+  crearCarrera(carrera: Carrera) {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS;
+    // Cabeceras
+    const cabeceras = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(url, carrera, {observe: 'response', headers: cabeceras});
+  }
+
+  getSecretosControlesCarrera(idCarrera: number) {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + idCarrera + '/secretos';
+    return this.http.get<any>(url, {observe: 'response'});
+  }
+
 
 
 }

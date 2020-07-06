@@ -21,7 +21,7 @@ export class SharedEditorService {
   private _controlBorrado = new BehaviorSubject<Control>(null);
   controlBorrado = this._controlBorrado.asObservable();
   // Confirmación de control borrado
-  private _controlBorradoConf = new BehaviorSubject<number>(null);
+  private _controlBorradoConf = new BehaviorSubject<string>(null);
   controlBorradoConf = this._controlBorradoConf.asObservable();
 
   constructor() { }

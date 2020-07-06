@@ -1,6 +1,11 @@
 @import "../../styles.scss";
 
 .formHeader {
+    margin: 40px 0;
+    text-align: center;
+}
+
+#carreraForm {
     text-align: center;
 }
 
@@ -19,4 +24,31 @@
 .selector-opcion:hover {
     background-color: $color-orientacion;
     color: white;
+}
+
+.btn-siguiente {
+    display: inline-flex;
+    margin-top: 20px;
+    padding: 10px 50px;
+    border: 2px solid black;
+    border-radius: 15px;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-decoration: none;
+    color: black;
+    background-color: $color-orientacion;
+    transition: .3s all;
+}
+
+.btn-siguiente:hover {
+    background-color: $color-orientacion-light;
+    cursor: pointer;
+}
+
+#nombre {
+    display: inline;
+    max-width: 400px;
+    margin-bottom: 40px;
+    font-size: large;
+    text-align: center;
 }

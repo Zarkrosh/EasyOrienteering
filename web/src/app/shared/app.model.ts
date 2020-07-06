@@ -11,22 +11,28 @@ export class Usuario {
 
 export class Carrera {
     // Tipos de carrera
-    public static readonly EVENTO = 0; 
-    public static readonly CIRCUITO_PERMANENTE = 1; 
+    public static readonly TIPO_EVENTO = "EVENTO"; 
+    public static readonly TIPO_CIRCUITO = "CIRCUITO"; 
+    // Modalidades
+    public static readonly MOD_TRAZADO = "LINEA"; 
+    public static readonly MOD_SCORE = "SCORE"; 
     
+    id: number;
     nombre: string;
     recorridos: Recorrido[];
-    controles: Control[];
-    tipo: number;
+    controles: Map<any, any>;
+    tipo: string;
+    modalidad: string;
     creada: boolean; // True si la carrera existe en el sistema
                      // False cuando se está creando
     
-    constructor(nombre: string, recorridos: Recorrido[], controles: Control[],
-                tipo: number, creada: boolean) {
+    constructor(nombre: string, recorridos: Recorrido[], controles: Map<any, any>,
+                tipo: string, modalidad: string, creada: boolean) {
         this.nombre = nombre;
         this.recorridos = recorridos;
         this.controles = controles;
         this.tipo = tipo;
+        this.modalidad = modalidad;
         this.creada = creada;
     }
 
@@ -34,15 +40,15 @@ export class Carrera {
 
 export class Control {
     // Tipos de puntos
-    public static readonly SALIDA = 0;
-    public static readonly CONTROL = 1;
-    public static readonly META = 2;
+    public static readonly TIPO_SALIDA = "SALIDA";
+    public static readonly TIPO_CONTROL = "CONTROL";
+    public static readonly TIPO_META = "META";
 
     codigo: string;
-    tipo: number;
+    tipo: string;
     coords: Coordenadas;
 
-    constructor(tipo, coords) {
+    constructor(tipo: string, coords: Coordenadas) {
         this.codigo = null;
         this.tipo = tipo;
         this.coords = coords;
@@ -51,11 +57,11 @@ export class Control {
 
 export class Recorrido {
     nombre: string;
-    idControles: string[];
+    trazado: string[];
 
     constructor(nombre: string) {
         this.nombre = nombre;
-        this.idControles = []
+        this.trazado = []
     }
 }
 

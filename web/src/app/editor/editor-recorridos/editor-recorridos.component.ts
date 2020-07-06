@@ -3,6 +3,9 @@ import { AlertService } from '../../alert';
 import { SharedEditorService } from '../shared-editor.service';
 import { Control, Recorrido, Coordenadas, AppSettings, Carrera } from 'src/app/shared/app.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { IfStmt } from '@angular/compiler';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ClienteApiService } from 'src/app/shared/cliente-api.service';
 
 declare var $: any; // JQuery
 
@@ -47,11 +50,26 @@ export class EditorRecorridosComponent implements OnInit {
     keepAfterRouteChange: false
   };
 
+  // TODO
+  //   Mensaje de confirmación de abandono de página para prevenir perder los datos
+
+
   constructor(private sharedData: SharedEditorService,
     protected alertService: AlertService,
-    private modalService: NgbModal) { }
+    private modalService: NgbModal,
+    private router: Router,
+    private route: ActivatedRoute,
+    private clienteApi: ClienteApiService) { }
 
   ngOnInit() {
+    this.recorridos = new Map<string, Recorrido>();
+    this.recorridoActual = null;
+
+    if(localStorage.getItem(AppSettings.LOCAL_STORAGE_CARRERA) == null) {
+      this.router.navigate(['carreras', 'crear']);
+      return;
+    }
+
     // Chapucilla que funciona de momento para completar pantalla
     var wHeight = $(window).height();
     var offset = $("#wrapper").offset().top;
@@ -74,7 +92,7 @@ export class EditorRecorridosComponent implements OnInit {
 
         // Lo añade al recorrido actualmente seleccionado (si lo hay)
         if(this.recorridoActual !== null) {
-          this.recorridos.get(this.recorridoActual).idControles.push(codigo);
+          this.recorridos.get(this.recorridoActual).trazado.push(codigo);
           // Actualiza el recorrido
           this.sharedData.actualizaRecorrido(this.recorridos.get(this.recorridoActual));
         }
@@ -89,8 +107,8 @@ export class EditorRecorridosComponent implements OnInit {
         // Itera sobre el resto de recorridos para ver si está en ellos el control
         for(let [nombre, recorrido] of this.recorridos) {
           if(nombre != this.recorridoActual) {
-            for(var i = 0; i < recorrido.idControles.length && sinUsar; i++) {
-              if(recorrido.idControles[i] === control.codigo) {
+            for(var i = 0; i < recorrido.trazado.length && sinUsar; i++) {
+              if(recorrido.trazado[i] === control.codigo) {
                 sinUsar = false;
               }
             }
@@ -127,8 +145,8 @@ export class EditorRecorridosComponent implements OnInit {
     // TODO Manejar posible excepción
     this.carrera = JSON.parse(jCarrera) as Carrera;
 
-    this.recorridos = new Map();
-    this.controles = new Map();
+    this.recorridos = new Map<string, Recorrido>();
+    this.controles = new Map<string, Control>();
     this.nombresRecorridos = [];
     this.recorridoActual = null;
 
@@ -138,9 +156,7 @@ export class EditorRecorridosComponent implements OnInit {
         this.recorridos.set(recorrido.nombre, recorrido);
         this.nombresRecorridos.push(recorrido.nombre);
       });
-      this.carrera.controles.forEach((control, indice, array) => {
-        this.controles.set(control.codigo, control);
-      });
+      this.controles = new Map(Object.entries(this.carrera.controles));
     } else {
       this.alertService.error("Error al cargar los datos de la carrera");
     }
@@ -312,15 +328,15 @@ export class EditorRecorridosComponent implements OnInit {
     if(borradoGeneral) {
       // Borra el control de todos los recorridos
       this.recorridos.forEach((value, key, map) => {
-        var index = value.idControles.indexOf(control.codigo);
-        if(index !== -1) value.idControles.splice(index, 1);
+        var index = value.trazado.indexOf(control.codigo);
+        if(index !== -1) value.trazado.splice(index, 1);
       });
       // Borra de la lista general de controles
       this.controles.delete(control.codigo);
     } else {
       // Lo elimina solo del recorrido actual
-      var index = this.recorridos.get(this.recorridoActual).idControles.indexOf(control.codigo);
-      this.recorridos.get(this.recorridoActual).idControles.splice(index, 1);
+      var index = this.recorridos.get(this.recorridoActual).trazado.indexOf(control.codigo);
+      this.recorridos.get(this.recorridoActual).trazado.splice(index, 1);
     }
 
     this.sharedData.confirmaBorrado(control.tipo);
@@ -335,24 +351,24 @@ export class EditorRecorridosComponent implements OnInit {
    * Devuelve el siguiente código de control libre, dependiendo del tipo.
    * @param tipo Tipo de control
    */
-  pullCodigoControl(tipo: number) {
+  pullCodigoControl(tipo: String) {
     var codigo = null, aux;
     switch(tipo) {
-        case Control.SALIDA:
+        case Control.TIPO_SALIDA:
           aux = this.START_MIN_CODE;
           while(codigo === null) {
             if(!this.controles.has(this.START_PRECODE + aux)) codigo = this.START_PRECODE + aux;
             aux++;
           }
           break;
-        case Control.CONTROL:
+        case Control.TIPO_CONTROL:
           aux = this.CONTROL_MIN_CODE;
           while(codigo === null) {
             if(!this.controles.has(this.CONTROL_PRECODE + aux)) codigo = this.CONTROL_PRECODE + aux;
             aux++;
           }
           break;
-        case Control.META:
+        case Control.TIPO_META:
           aux = this.FINISH_MIN_CODE;
           while(codigo === null) {
             if(!this.controles.has(this.FINISH_PRECODE + aux)) codigo = this.FINISH_PRECODE + aux;
@@ -383,11 +399,34 @@ export class EditorRecorridosComponent implements OnInit {
    * Guarda el borrador actual de la carrera en el almacenamiento local.
    */
   guardaBorrador() {
-    let lControles = Array.from(this.controles.values());
     let lRecorridos = Array.from(this.recorridos.values());
-    this.carrera.controles = lControles;
     this.carrera.recorridos = lRecorridos;
+
+    //this.carrera.controles = this.controles; // No serializa bien
+    let jControles = {};
+    for(let k of this.controles.keys()) {
+      jControles[k] = this.controles.get(k);
+    }
+    this.carrera.controles = jControles as Map<any, any>;
     localStorage.setItem(AppSettings.LOCAL_STORAGE_CARRERA, JSON.stringify(this.carrera));
+
+    // TEST
+    this.clienteApi.crearCarrera(this.carrera).subscribe(
+      resp => {
+        if(resp.status == 201) {
+          // Carrera creada
+          localStorage.setItem(AppSettings.LOCAL_STORAGE_CARRERA, resp.body);
+          this.alertService.success("Carrera creada con éxito");
+          this.router.navigate(['../controles'], {relativeTo: this.route});
+        } else {
+          // Error
+          this.alertService.error("No se pudo crear la carrera");
+        }
+      },
+      err => {
+        this.alertService.error("Error al crear la carrera: " + err);
+      }
+    );
   }
 
 }

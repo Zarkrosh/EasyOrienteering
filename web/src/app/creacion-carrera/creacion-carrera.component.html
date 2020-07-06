@@ -1,30 +1,34 @@
 <div class="container">
     <h1 class="formHeader">Crear carrera</h1>
     <form id="carreraForm" [formGroup]="carreraForm" (ngSubmit)="onSubmit()">
+        <h2>Nombre</h2>
+        <input id="nombre" type="text " formControlName="nombre" class="form-control">
+        
         <h2>Tipo de carrera</h2>
         <div class="form-group">
             <label class="selector-opcion">
-                <input type="radio" formControlName="tipo" name="tipo" value="circuito" class="form-control" required/>
-                <span>Circuito</span>
+                <input type="radio" formControlName="tipo" name="tipo" value="EVENTO" class="form-control" required />
+                <span>Evento</span>
             </label>
             <label class="selector-opcion">
-                <input type="radio" formControlName="tipo" name="tipo" value="evento" class="form-control"/>
-                <span>Evento</span>
+                <input type="radio" formControlName="tipo" name="tipo" value="CIRCUITO" class="form-control"/>
+                <span>Circuito</span>
             </label>
         </div>
 
         <h2>Modalidad</h2>
         <div class="form-group">
             <label class="selector-opcion">
-                <input type="radio" formControlName="modalidad" name="modalidad" value="trazado" class="form-control" required/>
+                <input type="radio" formControlName="modalidad" name="modalidad" value="LINEA" class="form-control" required/>
                 <span>Trazado</span>
             </label>
             <label class="selector-opcion">
-                <input type="radio" formControlName="modalidad" name="modalidad" value="score" class="form-control"/>
+                <input type="radio" formControlName="modalidad" name="modalidad" value="SCORE" class="form-control"/>
                 <span>Score</span>
             </label>
         </div>
 
+        <!--
         <h2>Tipo de cronometraje</h2>
         <div class="form-group">
             <label class="selector-opcion">
@@ -36,6 +40,7 @@
                 <span>GPS (aún no)</span>
             </label>
         </div>
+        -->
 
         <!-- TODO: ¿Simbología personalizada?, ¿modo de mapa? (ambos?) -->
 
@@ -52,12 +57,7 @@
             </label>
         </div> -->
 
-        <h2>Recorridos</h2>
-        <h4>¿Cómo se van a generar los recorridos?</h4>
-        <div class="form-group">
-            <a class="selector-opcion" routerLink='recorridos'>Trazar aquí</a>
-            <a class="selector-opcion" routerLink='recorridos'>Importar desde PurplePen</a>
-        </div>
+        <div class="btn-siguiente" (click)="clickRecorridos()">Recorridos</div>
 
     </form>
 </div>
