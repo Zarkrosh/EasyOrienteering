@@ -1,1 +1,3 @@
-# Gitignore general
+# RAMA WEB: ignorar los cambios de las otras ramas
+android/
+web/api/nbactions.xml

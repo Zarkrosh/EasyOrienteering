@@ -1,0 +1,96 @@
+@import "../../../styles.scss";
+
+/* DEBUG PURPOSES */
+#debug-info {
+    position: absolute;
+    width: 90%;
+    display: inline-flex;
+    background-color: gainsboro;
+    padding: 10px;
+    z-index: 15;
+}
+#debug-info span {
+    margin-right: 20px;
+}
+
+
+
+#vista-mapa {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: none;
+    overflow: hidden;
+    z-index: 0;
+    border: 2px solid black;
+    border-radius: 20px;
+}
+
+#mensaje-falta-mapa {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: gainsboro;
+    text-align: center;
+    z-index: 10;
+    cursor: auto;
+}
+#mensaje-falta-mapa span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: black;
+    font-weight: bold;
+    font-size: 2em;
+}
+
+/*********** LIENZOS ***********/
+#vista-mapa canvas {
+    position: absolute;
+}
+#canvas-mapa {
+    z-index: 1;
+}
+#canvas-trazado {
+    z-index: 2;
+}
+#canvas-marcador {
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+}
+
+/*********** SELECTORES DE TIPO DE CONTROL ***********/
+#selector-tipo {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    z-index: 4;
+}
+#selector-tipo > * {
+    display: block;
+}
+.tipo-punto {
+    margin-bottom: 5px;
+    border: 1px solid black;
+    border-radius: 2px;
+    padding: 5px;
+    background: white;
+}
+.tipo-punto.tipo-seleccionado {
+    background: greenyellow !important;
+}
+.tipo-punto:hover {
+    background: gainsboro;
+    cursor: pointer;
+}
+
+
+
+
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/

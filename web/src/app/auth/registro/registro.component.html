@@ -1,0 +1,39 @@
+<div *ngIf="!registrado" class="container registroWrapper">
+    <h2 class="formHeader">Registro</h2>
+    <form id="registroForm" [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+        <!-- TODO: Conectar con Google (...) -->
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="text" formControlName="email" class="form-control" required/>
+        </div>
+        <div class="form-group">
+            <label for="username">Nombre (este será tu nombre público)</label>
+            <input type="text" formControlName="usuario" class="form-control" required/>
+        </div>
+        <!-- TODO: Indicador de nombre de usuario inválido/existente -->
+
+        <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input id="inpPass" type="password" formControlName="password" class="form-control" required/>
+        </div>
+        <div class="form-group">
+            <label for="passwordConf">Contraseña (confirmación)</label>
+            <input id="inpPass" type="password" formControlName="passwordConf" class="form-control" required/>
+        </div>
+
+        <!-- TODO: Checkbox de políticas (con enlace) -->
+
+        <div class="form-group text-center">
+            <button [disabled]="cargando" class="btn btn-primary">
+                <span *ngIf="cargando" class="spinner-border spinner-border-sm mr-1"></span>
+                Registrar cuenta
+            </button>
+        </div>
+    </form>
+</div>
+<div *ngIf="registrado" class="container registroWrapper confirmacion">
+    <h1>Cuenta registrada</h1>
+    <i class="fa fa-check-circle simboloConfirmacion"></i>
+    <p>Recibirás un correo en el email que has indicado con un enlace para activar tu cuenta. Simplemente haz click en él y nada más</p>
+</div>

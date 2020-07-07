@@ -1,0 +1,11 @@
+<div id="wrap-vista-carrera">
+    <h1>Vista carrera</h1>
+
+    <h2>Lista de controles</h2>
+    <div id="lista-controles">
+        <div class="control" *ngFor="let control of controles">{{control.codigo}}
+            <div [attr.id]="'QR-' + control.codigo" class="qr-control"></div>
+        </div>
+    </div>
+    
+</div>
