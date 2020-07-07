@@ -45,7 +45,7 @@ export class VistaCarreraComponent implements OnInit {
               this.controles.push(control[1]);
             }
 
-            // Como existe la carrera, obtiene los secretos también
+            // DEBUG: muestra los controles QR
             this.clienteApi.getSecretosControlesCarrera(idCarrera).subscribe(
               resp => {
                 if(resp.status == 200) {

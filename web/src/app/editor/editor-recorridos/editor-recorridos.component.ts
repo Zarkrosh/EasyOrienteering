@@ -65,18 +65,22 @@ export class EditorRecorridosComponent implements OnInit {
     this.recorridos = new Map<string, Recorrido>();
     this.recorridoActual = null;
 
-    if(localStorage.getItem(AppSettings.LOCAL_STORAGE_CARRERA) == null) {
+    try {
+      // Inicia el modelo
+      this.cargarCarrera();
+    } catch (e) {
+      // Error al cargar la carrera, borra y redirige a la creación
+      localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA);
       this.router.navigate(['carreras', 'crear']);
       return;
     }
 
+    
     // Chapucilla que funciona de momento para completar pantalla
     var wHeight = $(window).height();
     var offset = $("#wrapper").offset().top;
     $("#wrapper").height(wHeight - offset - 20);
 
-    // Inicia el modelo
-    this.cargarCarrera();
 
     // Vista
     this.editandoNombreRecorrido = false;
@@ -142,7 +146,6 @@ export class EditorRecorridosComponent implements OnInit {
    */
   cargarCarrera() {
     let jCarrera = localStorage.getItem(AppSettings.LOCAL_STORAGE_CARRERA);
-    // TODO Manejar posible excepción
     this.carrera = JSON.parse(jCarrera) as Carrera;
 
     this.recorridos = new Map<string, Recorrido>();
@@ -158,8 +161,11 @@ export class EditorRecorridosComponent implements OnInit {
       });
       this.controles = new Map(Object.entries(this.carrera.controles));
     } else {
-      this.alertService.error("Error al cargar los datos de la carrera");
+      throw "Error al cargar la carrera";
     }
+
+    // Actualiza el modelo compartido con el editor de trazados
+    this.sharedData.actualizaControles(this.controles);
   }
 
   /* Finaliza la pantalla de edición de recorridos */
@@ -402,7 +408,6 @@ export class EditorRecorridosComponent implements OnInit {
     let lRecorridos = Array.from(this.recorridos.values());
     this.carrera.recorridos = lRecorridos;
 
-    //this.carrera.controles = this.controles; // No serializa bien
     let jControles = {};
     for(let k of this.controles.keys()) {
       jControles[k] = this.controles.get(k);
@@ -415,9 +420,9 @@ export class EditorRecorridosComponent implements OnInit {
       resp => {
         if(resp.status == 201) {
           // Carrera creada
-          localStorage.setItem(AppSettings.LOCAL_STORAGE_CARRERA, resp.body);
+          localStorage.setItem(AppSettings.LOCAL_STORAGE_CARRERA, JSON.stringify(resp.body));
           this.alertService.success("Carrera creada con éxito");
-          this.router.navigate(['../controles'], {relativeTo: this.route});
+          this.router.navigate(['carreras', resp.body.id]);
         } else {
           // Error
           this.alertService.error("No se pudo crear la carrera");

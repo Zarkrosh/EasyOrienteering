@@ -52,13 +52,13 @@ public class Carrera {
     @ManyToOne(optional = false)
     private Usuario organizador;
     
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name="CARRERA_ID", referencedColumnName="ID")
     private List<Recorrido> recorridos;
     
     // No se utiliza cascada porque da error debido a la clave foránea del ID de carrera
     // usado como clave primaria conjunta
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "carrera")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "carrera")
     @MapKey(name = "codigo")
     private Map<String, Control> controles;
     

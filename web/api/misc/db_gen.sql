@@ -67,6 +67,7 @@ ALTER SEQUENCE carreras_id_seq restart with 3;   -- Debido a las inserciones de 
 ALTER SEQUENCE controles_id_seq restart with 15; -- Debido a las inserciones de prueba
 INSERT INTO USUARIOS(ID, NOMBRE, EMAIL, PASSWORD, FECHA_REGISTRO) VALUES (1, 'Pepito Pérez', 'pepito@test.com', '<redacted>', '2020-06-18');
 INSERT INTO USUARIOS(ID, NOMBRE, EMAIL, PASSWORD, FECHA_REGISTRO) VALUES (2, 'Juanito Juárez', 'juanito@test.com', '<redacted>', '2020-06-20');
+INSERT INTO USUARIOS(ID, NOMBRE, EMAIL, PASSWORD, FECHA_REGISTRO) VALUES (3, 'Fernandito Fernández', 'fernandito@test.com', '<redacted>', '2020-07-06');
 
 INSERT INTO CARRERAS(ID, SECRET, NOMBRE, TIPO, MODALIDAD, ORGANIZADOR_ID) VALUES (1, 'not-a-real-secret', 'Prueba de carrera', 'EVENTO', 'LINEA', 1);
 INSERT INTO CARRERAS(ID, SECRET, NOMBRE, TIPO, MODALIDAD, ORGANIZADOR_ID) VALUES (2, 'not-a-real-secret', 'Otra carrera', 'EVENTO', 'SCORE', 1);

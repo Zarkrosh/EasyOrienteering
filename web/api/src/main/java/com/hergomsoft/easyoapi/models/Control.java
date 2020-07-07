@@ -21,6 +21,7 @@ public class Control {
     
     public enum TIPO {SALIDA, CONTROL, META};
     
+    @JsonIgnore
     @Id
     @Column(name = "ID", columnDefinition = "serial")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

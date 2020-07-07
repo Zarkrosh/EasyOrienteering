@@ -900,7 +900,6 @@ export class EditorTrazadoComponent implements OnInit {
     this.imgMapa.onload = (() => {
       this.setZoom(0, new Coordenadas(0,0), 0);
       this.actualizaLimites();
-      //updateRecorrido();
 
       //this.offsetX = -(this.imgMapa.width / 2);
       //this.offsetY = -(this.imgMapa.height / 2);
@@ -911,6 +910,7 @@ export class EditorTrazadoComponent implements OnInit {
       // TEST
       this.setupCanvas(true);
       this.redibujaMapa();
+      this.redibujaTrazado();
     });
 
     this.imgMapa.src = "assets/img/sample-map.jpg";

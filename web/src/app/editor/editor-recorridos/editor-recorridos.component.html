@@ -1,18 +1,7 @@
-<!--
-<div id="barra-superior">
-    
-
-    
-    <label for="input-escala">Escala:</label>
-    <input id="input-escala" type="text" disabled>
-    
-</div>
--->
-
 <div id="wrapper">
     <div id="wrapper-trazador">
+        <!-- Pestañas de recorridos -->
         <ul id="tabs-recorridos" class="nav nav-tabs">
-            <!-- PRUEBAS-->
             <li [class.tab-seleccionada]="recorridoActual === null" (click)="todosLosControles()" class="noselect"><span>Todos los controles</span></li>
             <li *ngFor="let nombre of getNombresRecorridos()" (click)="seleccionaRecorrido(nombre)" 
                 [class.tab-seleccionada]="nombre === recorridoActual" class="noselect"><span >{{nombre}}</span></li>

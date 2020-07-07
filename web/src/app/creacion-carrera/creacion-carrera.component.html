@@ -6,36 +6,44 @@
         
         <h2>Tipo de carrera</h2>
         <div class="form-group">
-            <label class="selector-opcion">
-                <input type="radio" formControlName="tipo" name="tipo" value="EVENTO" class="form-control" required />
-                <span>Evento</span>
+            <label>
+                <input type="radio" formControlName="tipo" name="tipo" value="EVENTO" class="form-control selector-opcion" required />
+                <div class="selector-opcion-cont noselect">
+                    <span>Evento</span>
+                </div>
             </label>
-            <label class="selector-opcion">
-                <input type="radio" formControlName="tipo" name="tipo" value="CIRCUITO" class="form-control"/>
-                <span>Circuito</span>
+            <label>
+                <input type="radio" formControlName="tipo" name="tipo" value="CIRCUITO" class="form-control selector-opcion"/>
+                <div class="selector-opcion-cont noselect">
+                    <span>Circuito</span>
+                </div>
             </label>
         </div>
 
         <h2>Modalidad</h2>
         <div class="form-group">
-            <label class="selector-opcion">
-                <input type="radio" formControlName="modalidad" name="modalidad" value="LINEA" class="form-control" required/>
-                <span>Trazado</span>
+            <label>
+                <input type="radio" formControlName="modalidad" name="modalidad" value="LINEA" class="form-control selector-opcion" required/>
+                <div class="selector-opcion-cont noselect">
+                    <span>Trazado</span>
+                </div>
             </label>
-            <label class="selector-opcion">
-                <input type="radio" formControlName="modalidad" name="modalidad" value="SCORE" class="form-control"/>
-                <span>Score</span>
+            <label>
+                <input type="radio" formControlName="modalidad" name="modalidad" value="SCORE" class="form-control selector-opcion"/>
+                <div class="selector-opcion-cont noselect">
+                    <span>Score</span>
+                </div>
             </label>
         </div>
 
         <!--
         <h2>Tipo de cronometraje</h2>
         <div class="form-group">
-            <label class="selector-opcion">
+            <label>
                 <input type="radio" formControlName="cronometraje" name="cronometraje" value="QR" class="form-control" required/>
                 <span>QR</span>
             </label>
-            <label class="selector-opcion">
+            <label>
                 <input type="radio" formControlName="cronometraje" name="cronometraje" value="GPS" class="form-control" disabled/>
                 <span>GPS (aún no)</span>
             </label>
@@ -47,11 +55,11 @@
         <!-- Solo en mapas georeferenciados 
         <h2>Modo ayuda</h2>
         <div class="form-group">
-            <label class="selector-opcion">
+            <label>
                 <input type="radio" formControlName="modoayuda" name="modoayuda" value="permitir" class="form-control" required/>
                 <span>Permitir</span>
             </label>
-            <label class="selector-opcion">
+            <label>
                 <input type="radio" formControlName="modoayuda" name="modoayuda" value="nopermitir" class="form-control" disabled/>
                 <span>No permitir</span>
             </label>

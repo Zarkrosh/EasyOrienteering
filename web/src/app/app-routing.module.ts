@@ -16,9 +16,9 @@ const routes: Routes = [
   {path: 'registro', component: RegistroComponent},
   {path: 'olvido', component: OlvidoComponent},
   {path: 'perfil', component: PerfilComponent},
-  {path: 'carreras/:id', component: VistaCarreraComponent},
   {path: 'carreras/crear', component: CreacionCarreraComponent},
   {path: 'carreras/crear/recorridos', component: EditorRecorridosComponent},
+  {path: 'carreras/:id', component: VistaCarreraComponent}
 ];
 
 @NgModule({

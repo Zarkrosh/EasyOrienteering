@@ -14,9 +14,7 @@ import { OlvidoComponent } from './auth/olvido/olvido.component';
 import { CreacionCarreraComponent } from './creacion-carrera/creacion-carrera.component';
 import { EditorRecorridosComponent } from './editor/editor-recorridos/editor-recorridos.component';
 import { EditorTrazadoComponent } from './editor/editor-trazado/editor-trazado.component';
-
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import { ConfiguradorControlesComponent } from './configurador-controles/configurador-controles.component';
 import { VistaCarreraComponent } from './vista-carrera/vista-carrera.component';
 
 @NgModule({
@@ -29,8 +27,8 @@ import { VistaCarreraComponent } from './vista-carrera/vista-carrera.component';
     OlvidoComponent,
     CreacionCarreraComponent,
     EditorRecorridosComponent,
-    EditorTrazadoComponent
-    ConfiguradorControlesComponent,
+    EditorTrazadoComponent,
+    VistaCarreraComponent
   ],
   imports: [
     BrowserModule,
