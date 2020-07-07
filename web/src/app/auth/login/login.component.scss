@@ -1,0 +1,41 @@
+@import "../../../styles.scss";
+
+#loginWrapper {
+    width: 20%;
+    min-width: 400px;
+    margin-top: 40px;
+    border: 2px solid #000000;
+    border-radius: 20px;
+    padding: 0;
+}
+
+.formHeader {
+    width: 100%;
+    margin: 0;
+    margin-top: 20px;
+    border-radius: 20px 20px 0 0;
+    padding: 10px 0;
+    text-align: center;
+}
+
+label {
+    margin-left: 10px;
+}
+
+#loginForm {
+    margin: 20px;
+}
+
+.btn-primary {
+    margin-top: 20px;
+    background-color: $color-orientacion;
+    font-weight: bold;
+    font-size: x-large;
+    transition: .3s;
+    border: 2px solid black;
+}
+
+.btn-primary:hover {
+    background-color: white;
+    color: $color-orientacion;
+}

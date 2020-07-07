@@ -1,0 +1,235 @@
+@import "../../../styles.scss";
+
+/*********** LAYOUT GENERAL ***********/
+#wrapper {
+    width: 100%;
+    height: 100%;
+    margin-top: 20px;
+    display: inline-flex;
+    padding: 0 15px;
+}
+
+#wrapper-trazador {
+    flex-grow: 1;
+    min-width: 600px;
+    min-height: 600px;
+    margin-right: 50px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#trazador {
+    flex-grow: 1;
+}
+
+#barra-lateral {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+}
+
+/*********** LISTA DE RECORRIDOS (TABS) ***********/
+#tabs-recorridos {
+    margin-left: 20px;
+}
+#tabs-recorridos li {
+    float: left;
+    margin: 0 .5em 0 0;
+    cursor: pointer;
+}
+#tabs-recorridos span {
+    position: relative;
+    background: $color-orientacion;
+    padding: .7em 1.5em;
+    float: left;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    text-shadow: 0 1px 0 rgba(255,255,255,.8);
+    border-radius: 5px 0 0 0;
+    box-shadow: 0 2px 2px rgba(0,0,0,.4);
+}
+#tabs-recorridos span:hover,
+#tabs-recorridos span:hover::after,
+#tabs-recorridos span:focus,
+#tabs-recorridos span:focus::after {
+  background: #fff;
+}
+#tabs-recorridos span:focus {
+    outline: 0;
+}
+#tabs-recorridos span::after {
+    content:'';
+    position:absolute;
+    z-index: 1;
+    top: 0;
+    right: -.5em;
+    bottom: 0;
+    width: 1em;
+    background: $color-orientacion;
+    box-shadow: 2px 2px 2px rgba(0,0,0,.4);
+    transform: skew(10deg);
+    border-radius: 0 5px 0 0;
+}
+#tabs-recorridos #current span,
+#tabs-recorridos #current span::after {
+    background: red;
+    z-index: 3;
+}
+.tab-seleccionada {
+    background-color: $color-orientacion-dark !important;
+    /*
+    background: #fff;
+    padding: 2em;
+    height: 220px;*/
+    position: relative;
+    z-index: 2;
+    border-radius: 0 5px 5px 5px;
+    box-shadow: 0 -2px 3px -2px rgba(0, 0, 0, .5);
+    cursor: auto !important;
+}
+.tab-seleccionada::after {
+    background-color: $color-orientacion-dark !important;
+}
+#btn-nuevo-recorrido {
+    color: $color-orientacion;
+}
+#btn-nuevo-recorrido .fa {
+    transition: all .3s ease-out;
+}
+#btn-nuevo-recorrido:hover .fa {
+    transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+}
+
+
+/*********** DETALLES RECORRIDO ***********/
+#detalles-recorrido {
+    flex-grow: 1;
+    margin-bottom: 20px;
+    border: 2px solid black;
+}
+
+#acciones-recorrido {
+    display: inline-flex;
+    border-bottom: 2px solid black;
+}
+#acciones-recorrido button {
+    width: 15%;
+    font-size: 1.5em;
+}
+#acciones-recorrido button:focus {
+    box-shadow: none;
+    //color: $color-orientacion-dark;
+    // Al soltar no se quita el color
+}
+#acciones-recorrido .fa {
+    transition: all .3s ease-out;
+}
+
+#btn-editar-nombre-recorrido {
+    color: dodgerblue;
+}
+#btn-editar-nombre-recorrido:hover .fa {
+    transform: scale(1.2);
+    -webkit-transform: scale(1.2);
+}
+
+#nombre-recorrido {
+    width: 70%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.5em;
+    border: 2px solid black;
+    border-top: none;
+    border-bottom: none;
+}
+#nombre-recorrido[readonly] {
+    color: inherit;
+    background: transparent;
+    border: none !important;
+    cursor: default;
+}
+
+#btn-borrar-recorrido {
+    color: red;
+}
+#btn-borrar-recorrido:hover .fa {
+    transform: scale(1.2);
+    -webkit-transform: scale(1.2);
+}
+
+#descripcion-controles {
+    overflow-y: scroll;
+}
+.entrada-descripcion {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+// TEST
+#detalles-recorrido table {
+    width: 100%;
+    text-align: center;
+}
+
+/*********** BOTÓN IMPORTAR PURPLE PEN ***********/
+#label-importar-purplepen {
+    background-color: purple;
+    border-color: purple;
+    padding: 10px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif, fontawesome;
+    font-weight: bold;
+    cursor: pointer;
+}
+#label-importar-purplepen:before {
+    margin-right: 10px;
+    content: "\f07c";
+}
+
+/*********** BOTÓN SELECCIONAR MAPA BASE ***********/
+#label-seleccionar-mapa {
+    background-color: limegreen;
+    border-color: limegreen;
+    padding: 10px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif, fontawesome;
+    font-weight: bold;
+    cursor: pointer;
+}
+#label-seleccionar-mapa:before {
+    margin-right: 10px;
+    content: "\f279";
+}
+
+/* Oculta la parte fea del input file */
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+.inputfile + label * {
+	pointer-events: none;
+}
+
+/*********** BOTÓN GUARDAR RECORRIDOS ***********/
+#btn-guardar {
+    width: 50%;
+    margin: 15px auto;
+    font-size: large;
+    font-weight: bold;
+}
+
+
+
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/

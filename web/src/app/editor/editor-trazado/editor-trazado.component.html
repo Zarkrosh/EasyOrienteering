@@ -1,0 +1,29 @@
+<div #vistaMapa id="vista-mapa" (window:resize)="onResize($event)">
+    <canvas #canvasMapa id="canvas-mapa">Necesitas utilizar un explorador más moderno</canvas>
+    <canvas #canvasTrazado id="canvas-trazado"></canvas>
+    <canvas #canvasMarcador id="canvas-marcador"
+        (mousedown)="mouseDownMarcador($event)" (mouseup)="mouseUpMarcador($event)"
+        (mousemove)="mouseMoveMarcador($event)" (mouseleave)="mouseLeaveMarcador($event)"
+        (wheel)="wheelMarcador($event)"></canvas>
+
+    <div *ngIf="!imgMapa" id="mensaje-falta-mapa"><span class="noselect">Selecciona un mapa base</span></div>
+
+    <div id="debug-info" *ngIf="DEBUG_VISUAL">
+        <span><b>Clicking</b>: {{clicking}}</span>
+        <span><b>Mov. mapa</b>: {{moviendoMapa}}</span>
+        <span><b>Mov. control</b>: {{moviendoControl}}</span>
+        <span><b>Off. X</b>: {{offsetX}}</span>
+        <span><b>Off. Y</b>: {{offsetY}}</span>
+        <span><b>Map X</b>: {{mapX}}</span>
+        <span><b>Map Y</b>: {{mapY}}</span>
+        <span><b>Canv. X</b>: {{canvX}}</span>
+        <span><b>Canv. Y</b>: {{canvY}}</span>
+    </div>
+
+
+    <div id="selector-tipo">
+        <img id="tipo-salida" src="assets/img/salida.png" class="tipo-punto tipo-seleccionado" alt="Salida" (click)="startSelected()" />
+        <img id="tipo-control" src="assets/img/control.png" class="tipo-punto" alt="Control" (click)="controlSelected()" />
+        <img id="tipo-meta" src="assets/img/meta.png" class="tipo-punto" alt="Meta" (click)="finishSelected()" />
+    </div>
+</div>
