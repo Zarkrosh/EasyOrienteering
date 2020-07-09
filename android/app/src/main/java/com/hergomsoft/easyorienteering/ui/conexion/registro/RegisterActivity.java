@@ -21,9 +21,9 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.model.ConexionState;
-import com.hergomsoft.easyorienteering.ui.BackableActivity;
-import com.hergomsoft.easyorienteering.ui.VisualUtils;
+import com.hergomsoft.easyorienteering.data.model.ConexionState;
+import com.hergomsoft.easyorienteering.util.BackableActivity;
+import com.hergomsoft.easyorienteering.util.VisualUtils;
 import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
 
 public class RegisterActivity extends BackableActivity {

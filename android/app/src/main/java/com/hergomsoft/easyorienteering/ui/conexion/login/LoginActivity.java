@@ -21,12 +21,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.model.ConexionState;
-import com.hergomsoft.easyorienteering.ui.BackableActivity;
-import com.hergomsoft.easyorienteering.ui.VisualUtils;
+import com.hergomsoft.easyorienteering.data.model.ConexionState;
+import com.hergomsoft.easyorienteering.util.BackableActivity;
+import com.hergomsoft.easyorienteering.util.VisualUtils;
 import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
 
 public class LoginActivity extends BackableActivity {
@@ -68,17 +67,17 @@ public class LoginActivity extends BackableActivity {
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override
             public void onChanged(@Nullable LoginFormState loginFormState) {
-            if (loginFormState == null) {
-                return;
-            }
+                if (loginFormState == null) {
+                    return;
+                }
 
-            btnConectar.setEnabled(loginFormState.isDataValid());
-            if (loginFormState.getUsernameError() != null) {
-                inputEmailNombre.setError(getString(loginFormState.getUsernameError()));
-            }
-            if (loginFormState.getPasswordError() != null) {
-                inputPassword.setError(getString(loginFormState.getPasswordError()));
-            }
+                btnConectar.setEnabled(loginFormState.isDataValid());
+                if (loginFormState.getUsernameError() != null) {
+                    inputEmailNombre.setError(getString(loginFormState.getUsernameError()));
+                }
+                if (loginFormState.getPasswordError() != null) {
+                    inputPassword.setError(getString(loginFormState.getPasswordError()));
+                }
             }
         });
 

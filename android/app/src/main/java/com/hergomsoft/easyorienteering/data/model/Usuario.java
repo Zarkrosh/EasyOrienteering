@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.model;
+package com.hergomsoft.easyorienteering.data.model;
 
 public class Usuario {
 

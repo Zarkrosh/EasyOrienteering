@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.ui;
+package com.hergomsoft.easyorienteering.util;
 
 import androidx.appcompat.app.AppCompatActivity;
 

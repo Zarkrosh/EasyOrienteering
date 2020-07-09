@@ -6,8 +6,8 @@ import android.os.Bundle;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.data.adapters.PoliticasPagerAdapter;
-import com.hergomsoft.easyorienteering.ui.BackableActivity;
+import com.hergomsoft.easyorienteering.adapters.PoliticasPagerAdapter;
+import com.hergomsoft.easyorienteering.util.BackableActivity;
 
 public class PoliticasActivity extends BackableActivity {
 

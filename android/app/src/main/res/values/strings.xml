@@ -8,6 +8,11 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
+    <!-- Permisos -->
+    <string name="permiso_requerido">Se requiere este permiso para el funcionamiento de la aplicación</string>
+    <string name="permiso_necesario">Permiso necesario</string>
+    <string name="permiso_camara">Se necesita acceso a la cámara</string>
+
     <!-- Resumen -->
     <string name="resumenTitulo">Resumen</string>
     <string name="resumenOmitir">OMITIR</string>

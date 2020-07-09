@@ -9,8 +9,8 @@ import android.widget.Button;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.data.adapters.ResumenPagerAdapter;
-import com.hergomsoft.easyorienteering.ui.BackableActivity;
+import com.hergomsoft.easyorienteering.adapters.ResumenPagerAdapter;
+import com.hergomsoft.easyorienteering.util.BackableActivity;
 import com.hergomsoft.easyorienteering.ui.conexion.ConexionActivity;
 
 public class ResumenActivity extends BackableActivity {

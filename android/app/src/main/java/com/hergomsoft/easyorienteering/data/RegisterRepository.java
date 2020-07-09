@@ -1,7 +1,7 @@
 package com.hergomsoft.easyorienteering.data;
 
-import com.hergomsoft.easyorienteering.model.LoginDataSource;
-import com.hergomsoft.easyorienteering.model.Result;
+import com.hergomsoft.easyorienteering.data.model.LoginDataSource;
+import com.hergomsoft.easyorienteering.data.model.Result;
 
 public class RegisterRepository {
 

@@ -1,15 +1,15 @@
-package com.hergomsoft.easyorienteering.model.pagers;
+package com.hergomsoft.easyorienteering.data.model.pagers;
 
 import com.hergomsoft.easyorienteering.R;
 
-public enum ResumenPages {
-    EJEMPLO1(R.string.resumen_primera_titulo, R.layout.resumen_primera),
-    EJEMPLO2(R.string.resumen_segunda_titulo, R.layout.resumen_segunda);
+public enum PoliticasPages {
+    POLITICA(R.string.politicas_politica_corto, R.layout.politica_datos),
+    CONDICIONES(R.string.politicas_condiciones_corto, R.layout.condiciones_uso);
 
     private int mTitleResId;
     private int mLayoutResId;
 
-    ResumenPages(int titleResId, int layoutResId) {
+    PoliticasPages(int titleResId, int layoutResId) {
         mTitleResId = titleResId;
         mLayoutResId = layoutResId;
     }

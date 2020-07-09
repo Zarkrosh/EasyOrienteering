@@ -16,8 +16,8 @@ import androidx.core.content.ContextCompat;
 
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.util.Utils;
-import com.hergomsoft.easyorienteering.ui.BackableActivity;
-import com.hergomsoft.easyorienteering.ui.VisualUtils;
+import com.hergomsoft.easyorienteering.util.BackableActivity;
+import com.hergomsoft.easyorienteering.util.VisualUtils;
 
 public class OlvidoActivity extends BackableActivity {
 
