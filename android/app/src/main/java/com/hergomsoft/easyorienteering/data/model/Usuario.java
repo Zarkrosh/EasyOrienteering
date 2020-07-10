@@ -1,19 +1,28 @@
 package com.hergomsoft.easyorienteering.data.model;
 
+import com.google.gson.annotations.Expose;
+
+import java.util.Date;
+
 public class Usuario {
 
-    private String email;
+    @Expose
     private String nombre;
+    @Expose
+    private String email;
+    @Expose
+    private Date fechaRegistro;
 
-    public Usuario(String email, String nombre) {
-        this.email = email;
-        this.nombre = nombre;
+    public String getNombre() {
+        return nombre;
     }
 
     public String getEmail() {
         return email;
     }
-    public String getNombre() {
-        return nombre;
+
+    public Date getFechaRegistro() {
+        return fechaRegistro;
     }
+
 }

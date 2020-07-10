@@ -5,11 +5,9 @@ import androidx.lifecycle.Observer;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,8 +17,7 @@ import com.google.gson.GsonBuilder;
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.repositories.CarreraRepository;
-import com.hergomsoft.easyorienteering.ui.scan.ScanActivity;
-import com.hergomsoft.easyorienteering.ui.splash.SplashActivity;
+import com.hergomsoft.easyorienteering.ui.scan_inicial.ScanInicialActivity;
 import com.hergomsoft.easyorienteering.util.CircleTransform;
 import com.squareup.picasso.Picasso;
 
@@ -29,6 +26,9 @@ public class HomeActivity extends AppCompatActivity {
     private LinearLayout layoutPerfil;
     private TextView textUsername;
     private ImageButton btnPerfil;
+    private Button btnMisCarreras;
+    private Button btnExplorar;
+    private Button btnUnirme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +39,16 @@ public class HomeActivity extends AppCompatActivity {
         layoutPerfil = findViewById(R.id.home_layoutPerfil);
         textUsername = findViewById(R.id.home_textUsername);
         btnPerfil = findViewById(R.id.home_btnPerfil);
+        btnMisCarreras = findViewById(R.id.btnMisCarreras);
+        btnExplorar = findViewById(R.id.btnExplorar);
+        btnUnirme = findViewById(R.id.btnUnirme);
 
-        // TEST
-        final TextView respCarrera = findViewById(R.id.respCarrera);
-        Button btnScan = findViewById(R.id.btnScan);
-        Button btnReq = findViewById(R.id.btnReq);
-        CarreraRepository repository = new CarreraRepository();
+        // Comprueba si está en una carrera pendiente
+        // TODO Si lo está, inicia la actividad de carrera
 
-        // Nombre de usuario
+
+        // Carga datos del usuario
+        // TODO
         textUsername.setText("Nombre Usuario");
         // Carga imagen circular
         Picasso.with(this).load(R.drawable.sample_user).transform(new CircleTransform()).into(btnPerfil);
@@ -59,30 +61,37 @@ public class HomeActivity extends AppCompatActivity {
                 // TODO
             }
         });
-
-        btnScan.setOnClickListener(new View.OnClickListener() {
+        btnPerfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, ScanActivity.class));
+                Toast.makeText(HomeActivity.this, "[TODO] Pantalla de perfil", Toast.LENGTH_SHORT).show();
+                // TODO
             }
         });
 
-        btnReq.setOnClickListener(new View.OnClickListener() {
+        // Al pulsar el botón, se muestra la lista de carreras en las que ha participado el usuario
+        btnMisCarreras.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                repository.buscaCarreraPorId(1);
+                // TODO
+                Toast.makeText(HomeActivity.this, "TODO Mis carreras", Toast.LENGTH_SHORT).show();
             }
         });
 
-        repository.getCarreraResponse().observe(this, new Observer<Carrera>() {
+        // Al pulsar el botón, se muestra una pantalla de exploración de circuitos y carreras
+        btnExplorar.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onChanged(Carrera carrera) {
-                if(carrera != null) {
-                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                    respCarrera.setText(gson.toJson(carrera));
-                } else {
-                    respCarrera.setText("Error");
-                }
+            public void onClick(View v) {
+                // TODO
+                Toast.makeText(HomeActivity.this, "TODO Explorar", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Al pulsar el botón, se muestra una pantalla de escaneo de QR de comienzo de recorrido
+        btnUnirme.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this, ScanInicialActivity.class));
             }
         });
 

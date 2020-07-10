@@ -8,6 +8,9 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
+    <!-- Comunes -->
+    <string name="error">Error</string>
+
     <!-- Permisos -->
     <string name="permiso_requerido">Se requiere este permiso para el funcionamiento de la aplicación</string>
     <string name="permiso_necesario">Permiso necesario</string>
@@ -73,5 +76,19 @@
     <string name="olvido_enviar">ENVIAR</string>
     <string name="olvido_listo">Listo. Recibirás un correo si existe el usuario con el email o nombre introducido</string>
     <string name="olvido_error">Ocurrió un error. Comprueba tu conexión e inténtalo de nuevo</string>
+
+    <!-- Pantalla principal -->
+    <string name="home_mis_carreras">Mis carreras</string>
+    <string name="home_explorar">Explorar</string>
+    <string name="home_unirme">Unirme a evento</string>
+
+    <!-- Pantalla de escaneo inicial -->
+    <string name="inicial_error_es_control">Has escaneado un control, debes escanear un triángulo de salida</string>
+    <string name="inicial_error_es_meta">Has escaneado una meta, debes escanear un triángulo de salida</string>
+    <string name="inicial_error_es_desconocido">Este QR no pertenece a esta aplicación</string>
+    <string name="inicial_error_ya_corrido">Ya has corrido este recorrido</string>
+    <string name="inicial_error_inesperado">Ha ocurrido un error inesperado. Vuélvelo a intentar de nuevo</string>
+    <string name="inicial_conf_titulo">Inicio de recorrido</string>
+    <string name="inicial_conf_mensaje">En cuanto aceptes comenzará a contar el tiempo y se te mostrará el mapa</string>
 
 </resources>

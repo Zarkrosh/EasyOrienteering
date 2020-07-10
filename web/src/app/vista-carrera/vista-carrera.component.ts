@@ -42,7 +42,14 @@ export class VistaCarreraComponent implements OnInit {
             this.carrera = resp.body;
             this.controles = [];
             for(let control of Object.entries(this.carrera.controles)) {
-              this.controles.push(control[1]);
+              if(control[1].tipo != Control.TIPO_SALIDA) this.controles.push(control[1]);
+            }
+
+            // Triángulos de recorridos
+            for(let recorrido of this.carrera.recorridos) {
+              if(recorrido.trazado.length > 0) {
+                this.controles.push(new Control(recorrido.nombre, null, null));
+              }
             }
 
             // DEBUG: muestra los controles QR
@@ -53,14 +60,35 @@ export class VistaCarreraComponent implements OnInit {
                   this.secretos = new Map(Object.entries(resp.body));
 
                   for(let control of this.controles) {
-                    let options = {
-                      text: control.codigo + "-" + this.secretos.get(control.codigo),
-                      width: 200,
-                      height: 200,
-                      quietZone: 20,
-                      quietZoneColor: 'transparent',
+                    if(control.tipo !== Control.TIPO_SALIDA && control.tipo) {
+                      let options = {
+                        text: control.codigo + "-" + this.secretos.get(control.codigo),
+                        width: 200,
+                        height: 200,
+                        quietZone: 20,
+                        quietZoneColor: 'transparent',
+                      }
+                      
+                      new QRCode(document.getElementById("QR-" + control.codigo), options);
                     }
-                    new QRCode(document.getElementById("QR-" + control.codigo), options);
+                  }
+
+                  for(let recorrido of this.carrera.recorridos) {
+                    if(recorrido.trazado.length > 0) {
+                      let codigoTriangulo = recorrido.trazado[0];
+                      let secretoTriangulo = this.secretos.get(codigoTriangulo);
+                      if(secretoTriangulo) {
+                        let options = {
+                          text: codigoTriangulo + "-" + this.carrera.id + "-" + recorrido.id + "-" + secretoTriangulo,
+                          width: 200,
+                          height: 200,
+                          quietZone: 20,
+                          quietZoneColor: 'transparent',
+                        }
+                        
+                        new QRCode(document.getElementById("QR-" + recorrido.nombre), options);
+                      }
+                    }
                   }
                 }
               }, err => {

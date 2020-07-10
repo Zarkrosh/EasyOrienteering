@@ -23,6 +23,7 @@ public class Usuario {
     public static final int MLEN_NOMBRE = 20;
     public static final int MLEN_EMAIL = 50;
    
+    @JsonIgnore
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

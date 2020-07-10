@@ -48,14 +48,15 @@ export class Control {
     tipo: string;
     coords: Coordenadas;
 
-    constructor(tipo: string, coords: Coordenadas) {
-        this.codigo = null;
+    constructor(codigo: string, tipo: string, coords: Coordenadas) {
+        this.codigo = codigo;
         this.tipo = tipo;
         this.coords = coords;
     }
 }
 
 export class Recorrido {
+    id: Number;
     nombre: string;
     trazado: string[];
 

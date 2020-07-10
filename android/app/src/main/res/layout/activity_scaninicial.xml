@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true"
-    tools:context=".ui.scan.ScanActivity">
+    tools:context=".ui.scan_inicial.ScanInicialActivity">
 
     <SurfaceView android:id="@+id/cameraView"
         android:layout_width="match_parent"
@@ -13,7 +13,6 @@
     </SurfaceView>
 
     <TextView
-        android:id="@+id/mensajeScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"

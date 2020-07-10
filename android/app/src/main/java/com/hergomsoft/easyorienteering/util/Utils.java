@@ -8,7 +8,7 @@ public final class Utils {
     public static final String REGEX_USERNAME = "^[a-zA-Z0-9_ ]+$";
     // https://emailregex.com/ (RFC 5322 Official Standard)
     public static final String REGEX_EMAIL = "^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])$";
-    public static final String REGEX_SCAN_TRIANGULO = "^S\\d+-[0-9a-zA-Z]+$";
+    public static final String REGEX_SCAN_TRIANGULO = "^S\\d+-\\d+-\\d+-[0-9a-zA-Z]+$"; // CODIGO-IDCARRERA-IDRECORRIDO-SECRETO
     public static final String REGEX_SCAN_CONTROL = "^\\d+-[0-9a-zA-Z]+$";
     public static final String REGEX_SCAN_META = "^M\\d+-[0-9a-zA-Z]+$";
 
@@ -40,5 +40,25 @@ public final class Utils {
     // Comprueba si el escaneo de un control se corresponde con el de un meta
     public static boolean esEscaneoMeta(String escaneado) {
         return escaneado != null && escaneado.trim().matches(REGEX_SCAN_META);
+    }
+
+    /**
+     * Devuelve el identificador del triángulo de salida de un recorrido.
+     * @param escaneado Texto escaneado del triángulo
+     * @return ID del recorrido
+     */
+    public static long getIdentificadorCarreraEscaneado(String escaneado) {
+        // Según REGEX_SCAN_TRIANGULO el ID de la carrera es el segundo elemento delimitado por "-"
+        return Long.parseLong(escaneado.split("-")[1]);
+    }
+
+    /**
+     * Devuelve el identificador del triángulo de salida de un recorrido.
+     * @param escaneado Texto escaneado del triángulo
+     * @return ID del recorrido
+     */
+    public static long getIdentificadorRecorridoEscaneado(String escaneado) {
+        // Según REGEX_SCAN_TRIANGULO el ID del recorrido es el tercer elemento delimitado por "-"
+        return Long.parseLong(escaneado.split("-")[2]);
     }
 }

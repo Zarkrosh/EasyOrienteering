@@ -25,12 +25,11 @@ import android.widget.TextView;
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.model.ConexionState;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
+import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.VisualUtils;
 import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
 
 public class LoginActivity extends BackableActivity {
-
-    public final static String ARG_EMAIL_NOMBRE = "ARG_EMAIL_NOMBRE";
 
     private EditText inputEmailNombre;
     private EditText inputPassword;
@@ -159,7 +158,7 @@ public class LoginActivity extends BackableActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, OlvidoActivity.class);
-                intent.putExtra(ARG_EMAIL_NOMBRE, inputEmailNombre.getText().toString().trim());
+                intent.putExtra(Constants.EXTRA_EMAIL_NOMBRE, inputEmailNombre.getText().toString().trim());
                 startActivity(intent);
             }
         });

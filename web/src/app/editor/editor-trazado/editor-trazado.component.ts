@@ -336,7 +336,7 @@ export class EditorTrazadoComponent implements OnInit {
           this.recorridoActual.trazado.push(this.ID_CONTROL_MARCADO);
         } else {
           // Nuevo control (ya sea en un recorrido o en general)
-          this.sharedData.anadirControl(new Control(this.MARKER_STATE, rCoords));
+          this.sharedData.anadirControl(new Control(null, this.MARKER_STATE, rCoords));
         }
 
         if(this.MARKER_STATE === Control.TIPO_SALIDA) {

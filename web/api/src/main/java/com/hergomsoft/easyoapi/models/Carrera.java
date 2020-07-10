@@ -52,7 +52,7 @@ public class Carrera {
     @ManyToOne(optional = false)
     private Usuario organizador;
     
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name="CARRERA_ID", referencedColumnName="ID")
     private List<Recorrido> recorridos;
     
