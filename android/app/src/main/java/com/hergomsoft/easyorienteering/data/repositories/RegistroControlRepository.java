@@ -35,7 +35,7 @@ public class RegistroControlRepository {
                 .create(ApiClient.class);
     }
 
-    public void registraControl(String codigo, String secreto, long idCarrera, long idRecorrido) {
+    public void registraControl(String codigo, long idCarrera, long idRecorrido,  String secreto) {
         RegistroRequest request = new RegistroRequest(codigo, secreto, Constants.ID_USUARIO_PRUEBA, idRecorrido);
         apiClient.registraControl(idCarrera, request).enqueue(new Callback<RegistroControl>() {
             @Override

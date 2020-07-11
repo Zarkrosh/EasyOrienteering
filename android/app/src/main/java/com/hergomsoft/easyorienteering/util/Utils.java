@@ -1,5 +1,7 @@
 package com.hergomsoft.easyorienteering.util;
 
+import android.util.Log;
+
 public final class Utils {
 
     public static final int MIN_PASSWORD_LENGTH = 8;
@@ -43,22 +45,57 @@ public final class Utils {
     }
 
     /**
-     * Devuelve el identificador del triángulo de salida de un recorrido.
-     * @param escaneado Texto escaneado del triángulo
-     * @return ID del recorrido
+     * Devuelve el código del control escaneado.
+     * @param escaneado Texto escaneado del control
+     * @return Código del control
      */
-    public static long getIdentificadorCarreraEscaneado(String escaneado) {
-        // Según REGEX_SCAN_TRIANGULO el ID de la carrera es el segundo elemento delimitado por "-"
-        return Long.parseLong(escaneado.split("-")[1]);
+    public static String getCodigoControlEscaneado(String escaneado) {
+        // En todos los tipos es el primer elemento separado por "-".
+        return escaneado.split("-")[0];
     }
 
     /**
-     * Devuelve el identificador del triángulo de salida de un recorrido.
+     * Devuelve el identificador del triángulo de salida de un recorrido, o null si hay algún error.
      * @param escaneado Texto escaneado del triángulo
-     * @return ID del recorrido
+     * @return ID del recorrido o null
      */
-    public static long getIdentificadorRecorridoEscaneado(String escaneado) {
+    public static Long getIdentificadorCarreraEscaneado(String escaneado) {
+        // Según REGEX_SCAN_TRIANGULO el ID de la carrera es el segundo elemento delimitado por "-"
+        Long res = null;
+        try {
+            res = Long.parseLong(escaneado.split("-")[1]);
+        } catch(Exception e) {
+            Log.d("EASYO", "Error al procesar el identificador de la carrera: " + escaneado);
+        }
+
+        return res;
+    }
+
+    /**
+     * Devuelve el identificador del triángulo de salida de un recorrido, o null si hay algún error.
+     * @param escaneado Texto escaneado del triángulo
+     * @return ID del recorrido o null
+     */
+    public static Long getIdentificadorRecorridoEscaneado(String escaneado) {
         // Según REGEX_SCAN_TRIANGULO el ID del recorrido es el tercer elemento delimitado por "-"
-        return Long.parseLong(escaneado.split("-")[2]);
+        Long res = null;
+        try {
+            res = Long.parseLong(escaneado.split("-")[2]);
+        } catch(Exception e) {
+            Log.d("EASYO", "Error al procesar el identificador del recorrido: " + escaneado);
+        }
+
+        return res;
+    }
+
+    /**
+     * Devuelve el secreto del control escaneado.
+     * @param escaneado Texto escaneado del control
+     * @return Secreto del control
+     */
+    public static String getSecretoControlEscaneado(String escaneado) {
+        // En todos los tipos es el último elemento separado por "-".
+        String[] campos = escaneado.split("-");
+        return campos[campos.length - 1];
     }
 }

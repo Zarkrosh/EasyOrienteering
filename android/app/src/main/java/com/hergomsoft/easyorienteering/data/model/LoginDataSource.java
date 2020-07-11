@@ -1,6 +1,7 @@
 package com.hergomsoft.easyorienteering.data.model;
 
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Class that handles authentication w/ login credentials and retrieves user information.
@@ -11,7 +12,7 @@ public class LoginDataSource {
         try {
             // TODO: handle loggedInUser authentication
             if(username.contentEquals("admin") && password.contentEquals("12341234")) {
-                Usuario usuario = new Usuario(java.util.UUID.randomUUID().toString(),"Jane Doe");
+                Usuario usuario = new Usuario("Jane Doe", "jane@test.com", new Date());
                 return new Result.Success<>(usuario);
             } else {
                 return new Result.Error(new IllegalAccessException("No autorizado"));

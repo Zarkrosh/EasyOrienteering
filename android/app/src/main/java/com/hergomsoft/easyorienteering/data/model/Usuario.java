@@ -25,4 +25,9 @@ public class Usuario {
         return fechaRegistro;
     }
 
+    public Usuario(String nombre, String email, Date fechaRegistro) {
+        this.nombre = nombre;
+        this.email = email;
+        this.fechaRegistro = fechaRegistro;
+    }
 }

@@ -29,20 +29,13 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.model.pagers.RegistroControl;
 import com.hergomsoft.easyorienteering.data.repositories.RegistroControlRepository;
-import com.hergomsoft.easyorienteering.ui.conexion.login.LoginActivity;
-import com.hergomsoft.easyorienteering.ui.conexion.login.OlvidoActivity;
-import com.hergomsoft.easyorienteering.util.Constants;
+import com.hergomsoft.easyorienteering.ui.carrera.CarreraActivity;
 import com.hergomsoft.easyorienteering.util.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static android.Manifest.permission.CAMERA;
-
 public class ScanInicialActivity extends AppCompatActivity {
-
-    // Permisos que utiliza la actividad
-    private String[] permisosNecesarios = new String[]{ CAMERA };
 
     // Escáner QR
     BarcodeDetector barcodeDetector;
@@ -52,9 +45,7 @@ public class ScanInicialActivity extends AppCompatActivity {
     AlertDialog dialogErrorScan;
     AlertDialog dialogConfirmacion;
 
-    RegistroControlRepository registroRepository;
-    long idRecorridoEscaneado;
-    LiveData<RegistroControl> peticionRegistro;
+    ScanInicialViewModel viewModel;
 
     Toast toastPermisos;
 
@@ -66,11 +57,10 @@ public class ScanInicialActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scaninicial);
 
+        viewModel = new ScanInicialViewModel(new RegistroControlRepository());
+
         cameraView = findViewById(R.id.cameraView);
         cameraView.setVisibility(View.GONE); // Evita error por petición de permisos
-
-        idRecorridoEscaneado = -1;
-        registroRepository = new RegistroControlRepository();
 
         barcodeDetector = new BarcodeDetector.Builder(this)
                 .setBarcodeFormats(Barcode.QR_CODE).build();
@@ -100,6 +90,16 @@ public class ScanInicialActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("MissingPermission")
+    private void iniciaCapturaCamara() {
+        try {
+            cameraSource.start(cameraView.getHolder());
+        } catch (IOException e) {
+            Toast.makeText(ScanInicialActivity.this, "Error al reanudar la captura de la cámara", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    }
+
     private void setupScanner() {
         // Diálogo de error de escaneo
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
@@ -111,49 +111,46 @@ public class ScanInicialActivity extends AppCompatActivity {
             }
         });
         alertBuilder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @SuppressLint("MissingPermission")
             @Override
-            public void onDismiss(DialogInterface dialog) {
-                try {
-                    cameraSource.start(cameraView.getHolder());
-                } catch (IOException e) {
-                    Toast.makeText(ScanInicialActivity.this, "Error al reanudar la captura de la cámara", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            }
+            public void onDismiss(DialogInterface dialog) { iniciaCapturaCamara(); }
         });
         dialogErrorScan = alertBuilder.create();
 
         // Diálogo de confirmación de inicio de recorrido
         alertBuilder = new AlertDialog.Builder(this);
-        alertBuilder.setCancelable(true);
+        alertBuilder.setCancelable(false);
         alertBuilder.setTitle(R.string.inicial_conf_titulo);
         alertBuilder.setMessage(R.string.inicial_conf_mensaje);
         alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 // Nueva carrera, envía petición de inicio
-                //registroRepository.registraControl(codigo, secreto, idCarrera, idRecorridoEscaneado);
+                viewModel.confirmaInicioRecorrido();
             }
         });
         alertBuilder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // No desea empezar nueva carrera, vuelve a la pantalla principal
-                finish();
+                // No desea empezar nueva carrera, vuelve a escanear
+                dialog.dismiss();
             }
+        });
+        alertBuilder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) { iniciaCapturaCamara(); }
         });
         dialogConfirmacion = alertBuilder.create();
 
         // Respuesta de registro de inicio
-        peticionRegistro = new MutableLiveData<>();
-        peticionRegistro.observe(this, new Observer<RegistroControl>() {
+        viewModel.getResultadoConfirmacion().observe(this, new Observer<RegistroControl>() {
             @Override
             public void onChanged(RegistroControl registroControl) {
                 // Comprueba error
                 // TODO
 
+                // No hacer que reinicie la cámara al aceptar
+
                 // Si no hay error lanza la actividad de Carrera
-                //startActivity(new Intent(ScanInicialActivity.this, OlvidoActivity.class));
+                startActivity(new Intent(ScanInicialActivity.this, CarreraActivity.class));
 
                 // Si hay algún error, muestra el diálogo con el mensaje correspondiente
                 // TODO
@@ -164,14 +161,9 @@ public class ScanInicialActivity extends AppCompatActivity {
         // Callback de la vista de la cámara
         cameraView.setVisibility(View.VISIBLE);
         cameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @SuppressWarnings("MissingPermission")
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                try {
-                    cameraSource.start(cameraView.getHolder());
-                } catch (IOException ie) {
-                    Log.e("[!] Camera source", ie.getMessage());
-                }
+                iniciaCapturaCamara();
             }
 
             @Override
@@ -194,31 +186,27 @@ public class ScanInicialActivity extends AppCompatActivity {
 
                 if (barcodes.size() > 0) {
                     String escaneado = barcodes.valueAt(0).displayValue;
-                    contadorEscaneos.postValue(contadorEscaneos.getValue() + 1);
+                    contadorEscaneos.postValue(contadorEscaneos.getValue() + 1); // TEST
 
                     // Comprueba si está corriendo una carrera (de forma local)
                     // TODO
                     boolean corriendo = false;
                     if(corriendo) {
                         // Ya está corriendo una carrera -> redirige a la actividad de carrera
-                        // TODO
+                        Toast.makeText(ScanInicialActivity.this, "Tienes un recorrido pendiente de acabar (dar datos)", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(ScanInicialActivity.this, CarreraActivity.class));
                     } else {
                         // Si no tiene ninguna carrera activa, comprueba que se trata de un triángulo
                         if(Utils.esEscaneoTriangulo(escaneado)) {
                             // Ha escaneado un triángulo: válido.
-                            // Comprueba si ya ha corrido este recorrido (local)
+                            // Comprueba si ya ha corrido este recorrido (de forma local)
+                            // TODO
                             boolean yaCorrido = false;
                             if(yaCorrido) {
                                 muestraDialogoErrorScan(getResources().getString(R.string.inicial_error_ya_corrido));
                             } else {
                                 // Muestra confirmación de inicio de recorrido
-                                try {
-                                    // Obtiene el identificador del recorrido
-                                    long idRecorrido = Utils.getIdentificadorRecorridoEscaneado(escaneado);
-                                    muestraConfirmacionInicioRecorrido(idRecorrido);
-                                } catch(Exception e) {
-                                    muestraDialogoErrorScan(getResources().getString(R.string.inicial_error_inesperado));
-                                }
+                                muestraConfirmacionInicioRecorrido(escaneado);
                             }
                         } else if(Utils.esEscaneoControl(escaneado)) {
                             // Ha escaneado un control
@@ -308,22 +296,25 @@ public class ScanInicialActivity extends AppCompatActivity {
     /**
      * Muestra un diálogo de confirmación de inicio de recorrido. Si lo acepta, envía la petición
      * al servidor. Si no, vuelve a la pantalla principal.
-     * @param idRecorrido ID del recorrido a iniciar
+     * @param escaneado Datos del triángulo escaneado
      */
-    private void muestraConfirmacionInicioRecorrido(long idRecorrido) {
-        idRecorridoEscaneado = idRecorrido;
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if(!dialogConfirmacion.isShowing()) {
-                    // Pausa la captura de la cámara
-                    cameraSource.stop();
-                    // Muestra el diálogo
-                    dialogConfirmacion.show();
+    private void muestraConfirmacionInicioRecorrido(String escaneado) {
+        if(viewModel.actualizaDatosEscaneado(escaneado)) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(!dialogConfirmacion.isShowing()) {
+                        // Pausa la captura de la cámara
+                        cameraSource.stop();
+                        // Muestra el diálogo
+                        dialogConfirmacion.show();
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            // Los datos no son correctos por algún motivo
+            muestraDialogoErrorScan(getResources().getString(R.string.inicial_error_inesperado));
+        }
     }
 
     /**
@@ -334,7 +325,7 @@ public class ScanInicialActivity extends AppCompatActivity {
     private boolean compruebaPermisos() {
         // Comprueba qué permisos faltan por permitir
         ArrayList<String> noPermitidos = new ArrayList<>();
-        for(String permiso : permisosNecesarios)
+        for(String permiso : viewModel.getPermisosNecesarios())
             if (ContextCompat.checkSelfPermission(this, permiso) != PackageManager.PERMISSION_GRANTED)
                 noPermitidos.add(permiso);
 
@@ -347,9 +338,9 @@ public class ScanInicialActivity extends AppCompatActivity {
             }
 
             if (shouldShowAlert) {
-                showPermissionAlert(noPermitidos.toArray(new String[0]));
+                muestraDialogoPermisos(noPermitidos.toArray(new String[0]));
             } else {
-                requestPermissions(noPermitidos.toArray(new String[0]));
+                pidePermisos(noPermitidos.toArray(new String[0]));
             }
 
             return false;
@@ -362,14 +353,14 @@ public class ScanInicialActivity extends AppCompatActivity {
      * Muestra un diálogo de petición de permisos.
      * @param permissions Permisos
      */
-    private void showPermissionAlert(final String[] permissions) {
+    private void muestraDialogoPermisos(final String[] permissions) {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setCancelable(true);
         alertBuilder.setTitle(R.string.permiso_necesario);
         alertBuilder.setMessage(R.string.permiso_camara);
         alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                requestPermissions(permissions);
+                pidePermisos(permissions);
             }
         });
 
@@ -381,7 +372,7 @@ public class ScanInicialActivity extends AppCompatActivity {
      * Realiza la petición de los permisos especificados.
      * @param permissions Permisos
      */
-    private void requestPermissions(String[] permissions) {
+    private void pidePermisos(String[] permissions) {
         ActivityCompat.requestPermissions(this, permissions, 1001);
     }
 
