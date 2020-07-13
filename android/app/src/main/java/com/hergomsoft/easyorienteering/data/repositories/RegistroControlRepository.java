@@ -15,14 +15,17 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.HTTP;
 
 public class RegistroControlRepository {
 
     private ApiClient apiClient;
     private MutableLiveData<RegistroControl> registroResponse;
+    private MutableLiveData<String> registroResponseError;
 
     public RegistroControlRepository() {
         registroResponse = new MutableLiveData<>();
+        registroResponseError = new MutableLiveData<>();
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -40,14 +43,23 @@ public class RegistroControlRepository {
         apiClient.registraControl(idCarrera, request).enqueue(new Callback<RegistroControl>() {
             @Override
             public void onResponse(Call<RegistroControl> call, Response<RegistroControl> response) {
-                if(response.body() != null) {
+                if(response.isSuccessful()) {
                     registroResponse.postValue(response.body());
+                } else if(response.code() == 422) {
+                    // Error lanzado en caso de algún error. Contiene un código de error
+                    registroResponseError.postValue(response.message());
+                } else if(response.code() == 404) {
+                    // No existe la carrera con el ID indicado
+                    registroResponseError.postValue("No existe la carrera con el ID indicado");
+                } else {
+                    // Error desconocido
+                    registroResponseError.postValue("Error inesperado");
                 }
             }
 
             @Override
             public void onFailure(Call<RegistroControl> call, Throwable t) {
-                // TODO Manejar error de código 422
+                // TODO Manejar algún error en concreto (sin internet, etc)
                 registroResponse.postValue(null);
             }
         });
@@ -55,5 +67,9 @@ public class RegistroControlRepository {
 
     public LiveData<RegistroControl> getRegistroResponse() {
         return registroResponse;
+    }
+
+    public MutableLiveData<String> getRegistroResponseError() {
+        return registroResponseError;
     }
 }

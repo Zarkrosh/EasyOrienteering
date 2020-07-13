@@ -16,7 +16,7 @@ public interface ApiClient {
     @GET("carreras/{id}")
     Call<Carrera> getCarrera(@Path("id") long idCarrera);
 
-    @POST("/registros/{id}")
+    @POST("registros/{id}")
     Call<RegistroControl> registraControl(@Path("id") long idCarrera, @Body RegistroRequest registro);
 
 }

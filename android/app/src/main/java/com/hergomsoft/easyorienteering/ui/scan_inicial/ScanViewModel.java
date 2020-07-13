@@ -11,7 +11,7 @@ import com.hergomsoft.easyorienteering.util.Utils;
 
 import static android.Manifest.permission.CAMERA;
 
-public class ScanInicialViewModel extends ViewModel {
+public class ScanViewModel extends ViewModel {
 
     // Permisos que utiliza la actividad
     private String[] permisosNecesarios = new String[]{ CAMERA };
@@ -25,14 +25,27 @@ public class ScanInicialViewModel extends ViewModel {
     private RegistroControlRepository registroRepository;
 
     private LiveData<RegistroControl> peticionConfirmacion;
+    private LiveData<String> peticionConfirmacionError;
 
-    public ScanInicialViewModel(RegistroControlRepository registroRepository) {
-        this.registroRepository = registroRepository;
-        peticionConfirmacion = this.registroRepository.getRegistroResponse();
+    private MutableLiveData<Boolean> pantallaEscaneo;
+
+    public ScanViewModel() {
+        super();
+        registroRepository = new RegistroControlRepository();
+        peticionConfirmacion = registroRepository.getRegistroResponse();
+        peticionConfirmacionError = registroRepository.getRegistroResponseError();
+        pantallaEscaneo = new MutableLiveData<>(false);
     }
 
     public LiveData<RegistroControl> getResultadoConfirmacion() {
         return peticionConfirmacion;
+    }
+    public LiveData<String> getResultadoConfirmacionError() { return peticionConfirmacionError; }
+
+    public LiveData<Boolean> getAlternadoVistas() { return pantallaEscaneo; }
+
+    public void alternarVistas() {
+        pantallaEscaneo.postValue(!pantallaEscaneo.getValue());
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.hergomsoft.easyorienteering.ui.home;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,12 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.data.model.Carrera;
-import com.hergomsoft.easyorienteering.data.repositories.CarreraRepository;
-import com.hergomsoft.easyorienteering.ui.scan_inicial.ScanInicialActivity;
+import com.hergomsoft.easyorienteering.ui.scan_inicial.ScanActivity;
 import com.hergomsoft.easyorienteering.util.CircleTransform;
 import com.squareup.picasso.Picasso;
 
@@ -91,7 +86,7 @@ public class HomeActivity extends AppCompatActivity {
         btnUnirme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, ScanInicialActivity.class));
+                startActivity(new Intent(HomeActivity.this, ScanActivity.class));
             }
         });
 
