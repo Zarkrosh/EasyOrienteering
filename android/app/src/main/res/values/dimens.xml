@@ -31,4 +31,8 @@
     <dimen name="altoBotonesPoliticas">60dp</dimen>
 
 
+    <!-- Vista escaneo/mapa -->
+    <dimen name="tamBotonSwitch">80dp</dimen>
+
+
 </resources>

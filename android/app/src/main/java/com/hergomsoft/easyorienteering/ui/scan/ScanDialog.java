@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.ui.scan_inicial;
+package com.hergomsoft.easyorienteering.ui.scan;
 
 import android.app.AlertDialog;
 import android.content.Context;

@@ -1,8 +1,7 @@
-package com.hergomsoft.easyorienteering.ui.scan_inicial;
+package com.hergomsoft.easyorienteering.ui.scan;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.hergomsoft.easyorienteering.data.model.pagers.RegistroControl;
@@ -16,6 +15,10 @@ public class ScanViewModel extends ViewModel {
     // Permisos que utiliza la actividad
     private String[] permisosNecesarios = new String[]{ CAMERA };
 
+    // Modos de las vistas
+    public static final int MODO_INICIO_RECORRIDO = 0;
+    public static final int MODO_CARRERA = 1;
+
     // Datos de triángulo escaneado
     private String codigo;
     private Long idCarrera;
@@ -24,28 +27,39 @@ public class ScanViewModel extends ViewModel {
 
     private RegistroControlRepository registroRepository;
 
-    private LiveData<RegistroControl> peticionConfirmacion;
-    private LiveData<String> peticionConfirmacionError;
+    private LiveData<RegistroControl> peticionRegistro;
+    private LiveData<String> peticionRegistroError;
 
     private MutableLiveData<Boolean> pantallaEscaneo;
+
+    private MutableLiveData<Integer> modoVista;
 
     public ScanViewModel() {
         super();
         registroRepository = new RegistroControlRepository();
-        peticionConfirmacion = registroRepository.getRegistroResponse();
-        peticionConfirmacionError = registroRepository.getRegistroResponseError();
-        pantallaEscaneo = new MutableLiveData<>(false);
+        peticionRegistro = registroRepository.getRegistroResponse();
+        peticionRegistroError = registroRepository.getRegistroResponseError();
+        pantallaEscaneo = new MutableLiveData<>(true);
+        modoVista = new MutableLiveData<>(MODO_INICIO_RECORRIDO);
     }
 
-    public LiveData<RegistroControl> getResultadoConfirmacion() {
-        return peticionConfirmacion;
+    public LiveData<RegistroControl> getResultadoRegistro() {
+        return peticionRegistro;
     }
-    public LiveData<String> getResultadoConfirmacionError() { return peticionConfirmacionError; }
+    public LiveData<String> getResultadoRegistroError() { return peticionRegistroError; }
 
     public LiveData<Boolean> getAlternadoVistas() { return pantallaEscaneo; }
+    public LiveData<Integer> getModoVista() { return modoVista; }
 
     public void alternarVistas() {
         pantallaEscaneo.postValue(!pantallaEscaneo.getValue());
+    }
+
+    public void pasaAModoCarrera() { modoVista.postValue(MODO_CARRERA); }
+
+    public void registraControl(String escaneado) {
+        actualizaDatosEscaneado(escaneado);
+        registroRepository.registraControl(codigo, idCarrera, idRecorrido, secreto);
     }
 
     /**

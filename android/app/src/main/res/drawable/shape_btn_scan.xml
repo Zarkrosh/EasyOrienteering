@@ -2,8 +2,8 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="oval">
-            <size android:width="90dp"
-                android:height="90dp"/>
+            <size android:width="@dimen/tamBotonSwitch"
+                android:height="@dimen/tamBotonSwitch"/>
             <solid android:color="@color/colorPrimary"/>
         </shape>
     </item>

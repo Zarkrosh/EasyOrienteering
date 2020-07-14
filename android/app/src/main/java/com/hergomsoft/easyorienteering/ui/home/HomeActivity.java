@@ -12,7 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.ui.scan_inicial.ScanActivity;
+import com.hergomsoft.easyorienteering.ui.scan.ScanActivity;
 import com.hergomsoft.easyorienteering.util.CircleTransform;
 import com.squareup.picasso.Picasso;
 
@@ -40,6 +40,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // Comprueba si está en una carrera pendiente
         // TODO Si lo está, inicia la actividad de carrera
+
 
 
         // Carga datos del usuario

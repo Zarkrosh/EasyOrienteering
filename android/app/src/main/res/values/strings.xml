@@ -87,6 +87,7 @@
     <string name="scan_error_es_meta">Has escaneado una meta, debes escanear un triángulo de salida</string>
     <string name="scan_error_es_desconocido">Este QR no pertenece a esta aplicación</string>
     <string name="scan_error_ya_corrido">Ya has corrido este recorrido</string>
+    <string name="scan_error_ya_registrado">Ya has registrado este control</string>
     <string name="scan_error_inesperado">Ha ocurrido un error inesperado. Vuélvelo a intentar de nuevo</string>
     <string name="scan_conf_titulo">Inicio de recorrido</string>
     <string name="scan_conf_mensaje">En cuanto aceptes comenzará a contar el tiempo y se te mostrará el mapa</string>

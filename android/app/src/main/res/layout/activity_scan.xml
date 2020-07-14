@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.scan_inicial.ScanActivity"
+    tools:context=".ui.scan.ScanActivity"
     android:keepScreenOn="true">
 
     <!-- Intercambiador entre la vista de escaneo y de mapa -->
@@ -15,11 +15,13 @@
 
         <!-- Vista de mapa -->
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/scan_cl_vista_mapa"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
 
             <TextView
+                android:id="@+id/textView11"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -30,6 +32,11 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
 
+            <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+                android:id="@+id/scan_vista_mapa"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -76,16 +83,19 @@
     </ViewSwitcher>
 
     <!-- Boton de alternado entre las vistas -->
-    <Button
+    <ImageButton
         android:id="@+id/scan_btn_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/tamBotonSwitch"
+        android:layout_height="@dimen/tamBotonSwitch"
         android:layout_marginBottom="20dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/shape_btn_scan"
-        android:text="SCAN"
+        android:padding="15dp"
+        android:src="@drawable/qr_icon"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
         android:textColor="@android:color/white"
-        android:textSize="22sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

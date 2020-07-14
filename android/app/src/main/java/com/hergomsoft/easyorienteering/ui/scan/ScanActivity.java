@@ -1,4 +1,21 @@
-package com.hergomsoft.easyorienteering.ui.scan_inicial;
+package com.hergomsoft.easyorienteering.ui.scan;
+
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.media.SoundPool;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.SparseArray;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -9,46 +26,19 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.annotation.SuppressLint;
-import android.content.ContentResolver;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.AudioManager;
-import android.media.SoundPool;
-import android.net.Uri;
-import android.opengl.GLES10;
-import android.os.Bundle;
-import android.os.Handler;
-import android.util.SparseArray;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ViewSwitcher;
-
-import com.github.chrisbanes.photoview.PhotoView;
-import com.github.piasy.biv.BigImageViewer;
-import com.github.piasy.biv.loader.fresco.FrescoImageLoader;
-import com.github.piasy.biv.view.BigImageView;
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.hergomsoft.easyorienteering.R;
+import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.pagers.RegistroControl;
 import com.hergomsoft.easyorienteering.util.Utils;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.microedition.khronos.opengles.GL10;
 
 public class ScanActivity extends AppCompatActivity {
 
@@ -69,15 +59,13 @@ public class ScanActivity extends AppCompatActivity {
     private int beepSound;
 
     // Botones
-    private Button btnSwitch;
+    private ImageButton btnSwitch;
 
     // Texto
     private TextView mensajeScan;
 
-    // Mapa
-    private PhotoView vistaMapa;
-    //private BigImageView vistaMapa;
-
+    // Vista del mapa
+    private SubsamplingScaleImageView vistaMapa;
 
     private ScanViewModel viewModel;
     private String ultimoEscaneado;
@@ -89,10 +77,10 @@ public class ScanActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
-
-        //BigImageViewer.initialize(FrescoImageLoader.with(ScanActivity.this));
         setContentView(R.layout.activity_scan);
+        getSupportActionBar().hide();
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         viewModel = new ViewModelProvider(this).get(ScanViewModel.class);
 
@@ -104,13 +92,10 @@ public class ScanActivity extends AppCompatActivity {
         vistaMapa = findViewById(R.id.scan_vista_mapa);
 
         cameraView.setVisibility(View.GONE); // Evita error por petición de permisos
+        // Diálogo de estado de la petición
+        dialogPeticion = new ScanDialog(ScanActivity.this);
 
         // TEST
-
-        // or load with glide
-        //BigImageViewer.initialize(GlideImageLoader.with(appContext));
-
-
         contadorEscaneos = new MutableLiveData<>(0);
         TextView testContador = findViewById(R.id.testContador);
         contadorEscaneos.observe(this, new Observer<Integer>() {
@@ -119,27 +104,9 @@ public class ScanActivity extends AppCompatActivity {
                 testContador.setText("" + integer);
             }
         });
+        vistaMapa.setImage(ImageSource.resource(R.drawable.sample_map));
 
 
-        int[] maxTextureSize = new int[1];
-        GLES10.glGetIntegerv(GL10.GL_MAX_TEXTURE_SIZE, maxTextureSize, 0);
-        Bitmap d = BitmapFactory.decodeResource(getResources(), R.drawable.sample_map);
-        int nh = (int) ( d.getHeight() * (maxTextureSize[0] / (float) d.getWidth()) );
-        Bitmap scaled = Bitmap.createScaledBitmap(d, maxTextureSize[0], nh, true);
-        //vistaMapa.setImageBitmap(scaled);
-
-
-        Resources resources = getResources();
-        int resourceId = R.drawable.sample_map;
-        Uri uri = new Uri.Builder()
-                .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-                .authority(resources.getResourcePackageName(resourceId))
-                .appendPath(resources.getResourceTypeName(resourceId))
-                .appendPath(resources.getResourceEntryName(resourceId))
-                .build();
-
-        //vistaMapa.showImage(Uri.parse("https://www.mvoc.routegadget.co.uk/kartat/69.jpg"));
-        Picasso.with(this).load(R.drawable.sample_map).resize(maxTextureSize[0], nh).into(vistaMapa);
 
         // Comprueba permisos
         if (compruebaPermisos()) {
@@ -168,25 +135,68 @@ public class ScanActivity extends AppCompatActivity {
         setupDetectorQR();          // Inicia el detector de QR
         setupCamara();              // Inicia los elementos de la cámara
         setupBotones();             // Eventos de botones
+        setupObservadores();        // Observadores del ViewModel
+    }
 
-        // Diálogo de estado de la petición
-        dialogPeticion = new ScanDialog(ScanActivity.this);
+    /**
+     * Configura los observadores del ViewModel para realizar los cambios en la vista.
+     */
+    private void setupObservadores() {
         // Respuesta de registro de inicio
-        viewModel.getResultadoConfirmacion().observe(this, new Observer<RegistroControl>() {
+        viewModel.getResultadoRegistro().observe(this, new Observer<RegistroControl>() {
             @Override
             public void onChanged(RegistroControl registroControl) {
-                // Guarda el registro y marca la carrera como pendiente
-                // TODO
-
-                // Lanza la actividad de carrera
-                //startActivity(new Intent(ScanActivity.this, CarreraActivity.class));
+                String tipo = registroControl.getControl().getTipo();
+                if(tipo.contentEquals("SALIDA")) {
+                    // Obtiene los datos de la carrera
+                    dialogPeticion.muestraMensajeCargandoDatosCarrera();
+                    // TODO
+                    dialogPeticion.dismiss();
+                    // Cambia el tipo de vista a modo carrera
+                    viewModel.pasaAModoCarrera();
+                    Toast.makeText(ScanActivity.this, "Pasando a modo carrera", Toast.LENGTH_SHORT).show();
+                    // ...
+                    animacionRegistroControl();
+                } else if(tipo.contentEquals("CONTROL")) {
+                    // Actualiza siguiente control (línea)
+                    // TODO
+                    animacionRegistroControl();
+                    Toast.makeText(ScanActivity.this, "Registrado control " + registroControl.getControl().getCodigo(), Toast.LENGTH_SHORT).show();
+                } else if(tipo.contentEquals("META")) {
+                    // Finaliza la carrera y muestra los resultados
+                    // TODO
+                    animacionRegistroControl();
+                    Toast.makeText(ScanActivity.this, "Carrera finalizada", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    // Error inesperado
+                    muestraDialogoErrorScan("Error inesperado, el tipo de control es incorrecto: " + tipo);
+                }
             }
         });
         // Error en la petición de registro
-        viewModel.getResultadoConfirmacionError().observe(this, new Observer<String>() {
+        viewModel.getResultadoRegistroError().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String error) {
                 dialogPeticion.muestraMensajeError(error);
+            }
+        });
+
+        // Elementos dependientes del modo de la vista
+        viewModel.getModoVista().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                switch(integer) {
+                    case ScanViewModel.MODO_INICIO_RECORRIDO:
+                        setupModoInicioRecorrido();
+                        break;
+                    case ScanViewModel.MODO_CARRERA:
+                        setupModoCarrera();
+                        break;
+                    default:
+                        muestraDialogoErrorScan("Error inesperado del modo de la vista");
+                        break;
+                }
             }
         });
 
@@ -203,23 +213,44 @@ public class ScanActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
-        mostrarVistaEscaneo();
+    private void animacionRegistroControl() {
+        // Animación visual
+        // TODO
+        // Reproduce sonido
+        soundPool.play(beepSound, 1, 1, 1, 0 ,1);
+    }
+
+    /**
+     * Configura los elementos de la vista para el modo de escaneo de inicio de recorrido.
+     * En este modo no hay vista del mapa ni botón que le permita alternar, entre otras cosas.
+     */
+    private void setupModoInicioRecorrido() {
+        btnSwitch.setVisibility(View.GONE);
+        mensajeScan.setText(R.string.scan_escanea_triangulo);
+    }
+
+    /**
+     * Configura los elementos de la vista para el modo de transcurso de carrera.
+     */
+    private void setupModoCarrera() {
+        btnSwitch.setVisibility(View.VISIBLE);
+        //mensajeScan.setText(R.string.scan_escanea_triangulo);
+        // TODO Mensaje personalizado dependiendo de si es score o en línea
     }
 
     private void mostrarVistaEscaneo() {
+        btnSwitch.setImageResource(R.drawable.map_icon);
         switcher.showNext();
-        btnSwitch.setText(getString(R.string.scan_btn_vista_mapa));
-        iniciaCapturaCamara();
+        //iniciaCapturaCamara();
     }
 
     private void mostrarVistaMapa() {
-        btnSwitch.setText(getString(R.string.scan_btn_vista_scan));
+        btnSwitch.setImageResource(R.drawable.qr_icon);
         switcher.showPrevious();
         cameraSource.stop();
     }
-
-
 
 
     /**
@@ -258,7 +289,6 @@ public class ScanActivity extends AppCompatActivity {
         cameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                // Se inicia la captura al mostrar la pantalla de escaneo
                 iniciaCapturaCamara();
             }
 
@@ -297,17 +327,14 @@ public class ScanActivity extends AppCompatActivity {
 
                         contadorEscaneos.postValue(contadorEscaneos.getValue() + 1); // TEST
 
-                        // Comprueba si está corriendo una carrera (de forma local)
+                        // Se asume que no tiene ninguna carrera pendiente
+                        // Obtiene los datos locales de la carrera y recorrido actuales
                         // TODO
-                        boolean corriendo = false;
-                        if (corriendo) {
-                            // Ya está corriendo una carrera -> redirige a la actividad de carrera
-                            Toast.makeText(ScanActivity.this, "Tienes un recorrido pendiente de acabar (dar datos)", Toast.LENGTH_SHORT).show();
-                            //startActivity(new Intent(ScanActivity.this, CarreraActivity.class));
-                        } else {
-                            // Si no tiene ninguna carrera activa, comprueba que se trata de un triángulo
+                        Carrera carrera = null;
+                        if(carrera == null) {
+                            // No está realizando ninguna carrera, solo puede escanear un triángulo
                             if (Utils.esEscaneoTriangulo(escaneado)) {
-                                // Ha escaneado un triángulo: válido.
+                                // Ha escaneado un triángulo
                                 // Comprueba si ya ha corrido este recorrido (de forma local)
                                 // TODO
                                 boolean yaCorrido = false;
@@ -327,56 +354,39 @@ public class ScanActivity extends AppCompatActivity {
                                 // Ha escaneado un QR ajeno a la aplicación
                                 muestraDialogoErrorScan(getResources().getString(R.string.scan_error_es_desconocido));
                             }
-                        }
-
-                        /*
-                        if(corriendo) {
-                            // Carrera activa, puede ser un control o una meta
-                            if(Utils.esEscaneoControl(escaneado) || Utils.esEscaneoMeta(escaneado)) {
-                                // ¿Carrera en línea o score?
-                                // TODO
-                                String tipo = "LINEA";
-                                if(tipo.contentEquals("LINEA")) {
-                                    // Carrera en línea, ¿es su siguiente control?
-                                    // TODO
-                                    String siguiente = "31";
-                                    String codigoControl = escaneado.split("-")[0];
-                                    if(!codigoControl.contentEquals(siguiente)) {
-                                        // Registro inválido
-                                        // TODO: "Este no es tu control"
-                                        Toast.makeText(ScanInicialActivity.this, "Este no es el control que buscas", Toast.LENGTH_SHORT).show();
-                                        return;
-                                    }
-                                } else {
-                                    // Carrera score, como puede ser un control o la meta, es válido
-                                }
-
-                                // Registra el control
-                                // TODO
-                            } else {
-                                // ¿Ha escaneado un triángulo?
-                                if(Utils.esEscaneoTriangulo(escaneado)) {
-                                    // Muestra mensaje de error
-                                    // TODO: "Has escaneado un triángulo, pero ya estás corriendo un recorrido"
-                                    Toast.makeText(ScanInicialActivity.this, "Has escaneado un triángulo, pero ya estás corriendo un recorrido", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    // Ha escaneado un QR ajeno a la aplicación
-                                    // TODO: "QR desconocido"
-                                    Toast.makeText(ScanInicialActivity.this, "QR desconocido", Toast.LENGTH_SHORT).show();
-                                }
-                            }
                         } else {
-                            // Si no tiene ninguna carrera activa, comprueba que se trata de un triángulo
-                            if(Utils.esEscaneoTriangulo(escaneado)) {
-                                // Registro válido. Obtiene información de la carrera
-                                // TODO
+                            // Está corriendo una carrera, obtiene cuál es su siguiente control
+                            // TODO
+                            String siguienteCodigoControl = "31"; // null si es score, codigo si es en línea
+
+                            if(siguienteCodigoControl == null) {
+                                // Carrera en score
+                                if(Utils.esEscaneoControl(escaneado) || Utils.esEscaneoMeta(escaneado)) {
+                                    // Comprueba que no ha registrado ya el control (de forma local)
+                                    // TODO
+                                    boolean yaRegistrado = false;
+                                    if(yaRegistrado) {
+                                        // En un score solo se puede registrar una vez un control
+                                        muestraDialogoErrorScan(getResources().getString(R.string.scan_error_ya_registrado));
+                                    } else {
+                                        // Registro válido
+                                        viewModel.registraControl(escaneado);
+                                    }
+                                } else if(Utils.esEscaneoTriangulo(escaneado)){
+                                    // Ha escaneado un triángulo mientras está en carrera
+                                    muestraDialogoErrorScan("Ya estás corriendo un recorrido");
+                                }
                             } else {
-                                // Ha escaneado un QR ajeno a la aplicación
-                                // TODO: "QR desconocido"
-                                Toast.makeText(ScanInicialActivity.this, "QR desconocido", Toast.LENGTH_SHORT).show();
+                                // Carrera en línea
+                                if(Utils.getCodigoControlEscaneado(escaneado).contentEquals(siguienteCodigoControl)) {
+                                    // El código coincide, registro válido
+                                    viewModel.registraControl(escaneado);
+                                } else {
+                                    // Ha escaneado otro control
+                                    muestraDialogoErrorScan("Este no es el control " + siguienteCodigoControl);
+                                }
                             }
                         }
-                        */
                     }
                 }
             }
@@ -421,6 +431,9 @@ public class ScanActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Configura el diálogo de confirmación de inicio de recorrido y sus eventos.
+     */
     private void setupDialogoConfirmacion() {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setCancelable(false);
