@@ -5,11 +5,12 @@ import com.hergomsoft.easyoapi.models.Control;
 import com.hergomsoft.easyoapi.models.PeticionRegistro;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Registro;
+import com.hergomsoft.easyoapi.models.RespuestaPendiente;
 import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.services.CarreraService;
 import com.hergomsoft.easyoapi.services.RegistroService;
 import com.hergomsoft.easyoapi.services.UsuarioService;
-import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,24 @@ public class RegistrosController {
     
     @Autowired
     private UsuarioService usuariosService;
+    
+    @GetMapping("/pendiente")
+    public RespuestaPendiente getDatosCarreraPendiente(HttpServletResponse response) {
+        RespuestaPendiente res = null;
+        
+        Usuario corredor = usuariosService.getUsuario(3); // TEST ANDROID
+        Recorrido recorrido = registrosService.getRecorridoPendiente(corredor);
+        if(recorrido != null) {
+            // Tiene un recorrido pendiente de acabar
+            Registro[] registros = registrosService.getRegistrosUsuarioRecorrido(corredor, recorrido);
+            res = new RespuestaPendiente(recorrido.getCarrera(), recorrido.getId(), registros);
+        } else {
+            // No tiene recorrido pendiente: 204 (No content)
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        }
+        
+        return res;
+    }
     
     // DEBUG //
     @GetMapping("/{id}")

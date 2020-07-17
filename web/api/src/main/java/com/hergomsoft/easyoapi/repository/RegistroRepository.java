@@ -56,4 +56,13 @@ public interface RegistroRepository extends JpaRepository<Registro, Long> {
     @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END FROM registros WHERE corredor_id = :idCorredor AND recorrido_id = :idRecorrido", 
         nativeQuery = true)
     public boolean haCorridoRecorrido(@Param("idCorredor") long idCorredor, @Param("idRecorrido") long idRecorrido);
+
+    /**
+     * Devuelve los registros de un corredor en un recorrido, ordenados de forma creciente en el tiempo.
+     * @param idCorredor ID del usuario corredor
+     * @param idRecorrido ID del recorrido
+     * @return Registros del usuario en el recorrido
+     */
+    @Query(value="SELECT * FROM REGISTROS WHERE corredor_id = :idCorredor AND recorrido_id = :idRecorrido", nativeQuery = true)
+    public Registro[] getRegistrosUsuarioRecorrido(Long idCorredor, long idRecorrido);
 }

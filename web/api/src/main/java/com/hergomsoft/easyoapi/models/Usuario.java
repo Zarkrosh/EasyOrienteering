@@ -19,7 +19,7 @@ import javax.validation.constraints.Email;
         @UniqueConstraint(columnNames = "nombre"),
         @UniqueConstraint(columnNames = "email") 
 })
-public class Usuario {
+public class Usuario implements IdEntity {
     public static final int MLEN_NOMBRE = 20;
     public static final int MLEN_EMAIL = 50;
    

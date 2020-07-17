@@ -17,7 +17,7 @@ import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "controles")
-public class Control {
+public class Control implements IdEntity {
     
     public enum TIPO {SALIDA, CONTROL, META};
     

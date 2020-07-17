@@ -2,19 +2,8 @@ package com.hergomsoft.easyoapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hergomsoft.easyoapi.models.Carrera;
-import com.hergomsoft.easyoapi.models.Control;
 import com.hergomsoft.easyoapi.models.PeticionRegistro;
-import com.hergomsoft.easyoapi.models.Recorrido;
-import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.services.CarreraService;
-import com.hergomsoft.easyoapi.services.RegistroService;
-import com.hergomsoft.easyoapi.services.UsuarioService;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;

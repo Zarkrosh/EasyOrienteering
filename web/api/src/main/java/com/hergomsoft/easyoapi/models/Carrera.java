@@ -1,6 +1,7 @@
 package com.hergomsoft.easyoapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.CascadeType;
@@ -21,7 +22,8 @@ import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "carreras")
-public class Carrera {
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class Carrera implements IdEntity {
     public static final int MLEN_NOMBRE = 50;
     
     public enum TIPO {EVENTO, CIRCUITO};
