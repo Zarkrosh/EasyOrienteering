@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel;
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.model.ConexionState;
 import com.hergomsoft.easyorienteering.data.model.Result;
-import com.hergomsoft.easyorienteering.data.RegisterRepository;
+import com.hergomsoft.easyorienteering.data.repositories.RegistroCuentaRepository;
 import com.hergomsoft.easyorienteering.util.Utils;
 
 public class RegisterViewModel extends ViewModel {
@@ -18,10 +18,10 @@ public class RegisterViewModel extends ViewModel {
 
     private MutableLiveData<RegisterFormState> registerFormState = new MutableLiveData<>();
     private MutableLiveData<ConexionState> registerState = new MutableLiveData<>();
-    private RegisterRepository registerRepository;
+    private RegistroCuentaRepository registroCuentaRepository;
 
-    RegisterViewModel(RegisterRepository registerRepository) {
-        this.registerRepository = registerRepository;
+    RegisterViewModel(RegistroCuentaRepository registroCuentaRepository) {
+        this.registroCuentaRepository = registroCuentaRepository;
     }
 
     LiveData<RegisterFormState> getRegisterFormState() {
@@ -37,7 +37,7 @@ public class RegisterViewModel extends ViewModel {
         registerState.setValue(state);
 
         // TODO Lanzar asíncronamente
-        final Result<Void> result = registerRepository.register(email, username, password);
+        final Result<Void> result = registroCuentaRepository.register(email, username, password);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

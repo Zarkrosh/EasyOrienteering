@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.data;
+package com.hergomsoft.easyorienteering.data.repositories;
 
 import com.hergomsoft.easyorienteering.data.model.LoginDataSource;
 import com.hergomsoft.easyorienteering.data.model.Result;

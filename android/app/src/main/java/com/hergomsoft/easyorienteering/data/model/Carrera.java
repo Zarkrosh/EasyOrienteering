@@ -7,6 +7,9 @@ import java.util.Map;
 public class Carrera {
 
     @Expose
+    private long id;
+
+    @Expose
     private String nombre;
 
     @Expose
@@ -20,6 +23,10 @@ public class Carrera {
 
     @Expose
     private Map<String, Control> controles;
+
+    public long getId() {
+        return id;
+    }
 
     public String getNombre() {
         return nombre;

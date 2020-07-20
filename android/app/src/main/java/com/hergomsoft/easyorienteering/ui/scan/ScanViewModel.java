@@ -1,16 +1,20 @@
 package com.hergomsoft.easyorienteering.ui.scan;
 
+import android.app.Application;
+
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
 import com.hergomsoft.easyorienteering.data.model.pagers.RegistroControl;
-import com.hergomsoft.easyorienteering.data.repositories.RegistroControlRepository;
+import com.hergomsoft.easyorienteering.data.repositories.RegistroRepository;
 import com.hergomsoft.easyorienteering.util.Utils;
 
 import static android.Manifest.permission.CAMERA;
 
-public class ScanViewModel extends ViewModel {
+public class ScanViewModel extends AndroidViewModel {
 
     // Permisos que utiliza la actividad
     private String[] permisosNecesarios = new String[]{ CAMERA };
@@ -25,8 +29,9 @@ public class ScanViewModel extends ViewModel {
     private Long idRecorrido;
     private String secreto;
 
-    private RegistroControlRepository registroRepository;
+    private RegistroRepository registroRepository;
 
+    private LiveData<Boolean> peticionPendiente;
     private LiveData<RegistroControl> peticionRegistro;
     private LiveData<String> peticionRegistroError;
 
@@ -34,20 +39,21 @@ public class ScanViewModel extends ViewModel {
 
     private MutableLiveData<Integer> modoVista;
 
-    public ScanViewModel() {
-        super();
-        registroRepository = new RegistroControlRepository();
+    public ScanViewModel(Application app) {
+        super(app);
+        registroRepository = new RegistroRepository();
+        peticionPendiente = registroRepository.getPendienteResponse();
         peticionRegistro = registroRepository.getRegistroResponse();
         peticionRegistroError = registroRepository.getRegistroResponseError();
         pantallaEscaneo = new MutableLiveData<>(true);
         modoVista = new MutableLiveData<>(MODO_INICIO_RECORRIDO);
     }
 
+    public LiveData<Boolean> carreraPendienteResponse() { return peticionPendiente; }
     public LiveData<RegistroControl> getResultadoRegistro() {
         return peticionRegistro;
     }
     public LiveData<String> getResultadoRegistroError() { return peticionRegistroError; }
-
     public LiveData<Boolean> getAlternadoVistas() { return pantallaEscaneo; }
     public LiveData<Integer> getModoVista() { return modoVista; }
 
@@ -63,7 +69,14 @@ public class ScanViewModel extends ViewModel {
     }
 
     /**
-     * Realiza una petición de confirmación de recorrido al servidor.
+     * Realiza una petición de comprobación de recorrido pendiente.
+     */
+    public void compruebaRecorridoPendiente() {
+        registroRepository.comprobarRecorridoPendiente(getApplication());
+    }
+
+    /**
+     * Realiza una petición de confirmación de recorrido.
      */
     public void confirmaInicioRecorrido() {
         registroRepository.registraControl(codigo, idCarrera, idRecorrido, secreto);

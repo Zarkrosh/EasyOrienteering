@@ -8,6 +8,11 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
+    <!-- Preferencias compartidas -->
+    <string name="sp_carrera_actual">sp_carrera_actual</string>
+    <string name="sp_carrera_actual_idcarrera">idcarrera</string>
+    <string name="sp_carrera_actual_idrecorrido">idrecorrido</string>
+
     <!-- Comunes -->
     <string name="error">Error</string>
 

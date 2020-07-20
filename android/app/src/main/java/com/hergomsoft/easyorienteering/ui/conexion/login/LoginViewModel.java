@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.hergomsoft.easyorienteering.data.LoginRepository;
+import com.hergomsoft.easyorienteering.data.repositories.LoginRepository;
 import com.hergomsoft.easyorienteering.data.model.ConexionState;
 import com.hergomsoft.easyorienteering.data.model.Result;
 import com.hergomsoft.easyorienteering.data.model.Usuario;

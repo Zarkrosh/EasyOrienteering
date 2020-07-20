@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.NonNull;
 
 import com.hergomsoft.easyorienteering.data.model.LoginDataSource;
-import com.hergomsoft.easyorienteering.data.LoginRepository;
+import com.hergomsoft.easyorienteering.data.repositories.LoginRepository;
 
 /**
  * ViewModel provider factory to instantiate LoginViewModel.

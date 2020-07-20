@@ -1,22 +1,22 @@
-package com.hergomsoft.easyorienteering.data;
+package com.hergomsoft.easyorienteering.data.repositories;
 
 import com.hergomsoft.easyorienteering.data.model.LoginDataSource;
 import com.hergomsoft.easyorienteering.data.model.Result;
 
-public class RegisterRepository {
+public class RegistroCuentaRepository {
 
-    private static volatile RegisterRepository instance;
+    private static volatile RegistroCuentaRepository instance;
 
     private LoginDataSource dataSource;
 
     // private constructor : singleton access
-    private RegisterRepository(LoginDataSource dataSource) {
+    private RegistroCuentaRepository(LoginDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public static RegisterRepository getInstance(LoginDataSource dataSource) {
+    public static RegistroCuentaRepository getInstance(LoginDataSource dataSource) {
         if (instance == null) {
-            instance = new RegisterRepository(dataSource);
+            instance = new RegistroCuentaRepository(dataSource);
         }
         return instance;
     }
