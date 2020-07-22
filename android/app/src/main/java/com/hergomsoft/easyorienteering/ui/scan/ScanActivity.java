@@ -34,7 +34,9 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
-import com.hergomsoft.easyorienteering.data.model.pagers.RegistroControl;
+import com.hergomsoft.easyorienteering.data.model.Control;
+import com.hergomsoft.easyorienteering.data.model.Recurso;
+import com.hergomsoft.easyorienteering.data.model.RegistroControl;
 import com.hergomsoft.easyorienteering.util.Utils;
 
 import java.io.IOException;
@@ -50,8 +52,9 @@ public class ScanActivity extends AppCompatActivity {
     private SurfaceView cameraView;
 
     // Diálogos
-    private AlertDialog dialogErrorScan;
+    private AlertDialog dialogErrorEscaneo;
     private AlertDialog dialogConfirmacion;
+    private AlertDialog dialogCarreraPendiente;
     private ScanDialog dialogPeticion;
 
     // Sonidos
@@ -82,7 +85,9 @@ public class ScanActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        viewModel = new ViewModelProvider(this).get(ScanViewModel.class);
+        viewModel = new ViewModelProvider(this,
+                new ScanViewModelFactory(getApplication()))
+                .get(ScanViewModel.class);
 
         // Enlaza vistas
         switcher = findViewById(R.id.scan_switcher);
@@ -130,55 +135,86 @@ public class ScanActivity extends AppCompatActivity {
      */
     private void iniciar() {
         setupDialogoErrorEscaneo(); // Diálogo de error
-        setupDialogoConfirmacion(); // Diálogo de confirmación de inicio de recorrido
+        setupDialogoConfirmacion(); // Diálogo de confirmación de inicio de recorridos
+        setupDialogoRecorridoPendiente(); // Diálogo de recorrido pendiente
         setupSonidos();             // Carga los sonidos utilizados
         setupDetectorQR();          // Inicia el detector de QR
         setupCamara();              // Inicia los elementos de la cámara
         setupBotones();             // Eventos de botones
         setupObservadores();        // Observadores del ViewModel
+
+        viewModel.compruebaRecorridoPendiente();
     }
 
     /**
      * Configura los observadores del ViewModel para realizar los cambios en la vista.
      */
     private void setupObservadores() {
-        // Respuesta de registro de inicio
-        viewModel.getResultadoRegistro().observe(this, new Observer<RegistroControl>() {
+        // Respuesta de registro
+        viewModel.getResultadoRegistro().observe(this, new Observer<Recurso<RegistroControl>>() {
             @Override
-            public void onChanged(RegistroControl registroControl) {
-                String tipo = registroControl.getControl().getTipo();
-                if(tipo.contentEquals("SALIDA")) {
-                    // Obtiene los datos de la carrera
-                    dialogPeticion.muestraMensajeCargandoDatosCarrera();
-                    // TODO
-                    dialogPeticion.dismiss();
-                    // Cambia el tipo de vista a modo carrera
-                    viewModel.pasaAModoCarrera();
-                    Toast.makeText(ScanActivity.this, "Pasando a modo carrera", Toast.LENGTH_SHORT).show();
-                    // ...
-                    animacionRegistroControl();
-                } else if(tipo.contentEquals("CONTROL")) {
-                    // Actualiza siguiente control (línea)
-                    // TODO
-                    animacionRegistroControl();
-                    Toast.makeText(ScanActivity.this, "Registrado control " + registroControl.getControl().getCodigo(), Toast.LENGTH_SHORT).show();
-                } else if(tipo.contentEquals("META")) {
-                    // Finaliza la carrera y muestra los resultados
-                    // TODO
-                    animacionRegistroControl();
-                    Toast.makeText(ScanActivity.this, "Carrera finalizada", Toast.LENGTH_SHORT).show();
-                    finish();
+            public void onChanged(Recurso<RegistroControl> registroControl) {
+                if(registroControl.esNulo()) {
+                    // Error al registrar
+                    dialogPeticion.muestraMensajeError(registroControl.getError());
                 } else {
-                    // Error inesperado
-                    muestraDialogoErrorScan("Error inesperado, el tipo de control es incorrecto: " + tipo);
+                    // Registro con éxito
+                    RegistroControl registro = registroControl.getRecurso();
+                    String tipo = registro.getControl().getTipo();
+                    if(tipo.contentEquals("SALIDA")) {
+                        // Obtiene los datos de la carrera
+                        dialogPeticion.muestraMensajeCargandoDatosCarrera();
+                        // TODO
+                        dialogPeticion.dismiss();
+                        // Cambia el tipo de vista a modo carrera
+                        viewModel.pasaAModoCarrera();
+                        Toast.makeText(ScanActivity.this, "Pasando a modo carrera", Toast.LENGTH_SHORT).show();
+                        // ...
+                        animacionRegistroControl();
+                    } else if(tipo.contentEquals("CONTROL")) {
+                        // Actualiza siguiente control (línea)
+                        // TODO
+                        animacionRegistroControl();
+                        Toast.makeText(ScanActivity.this, "Registrado control " + registro.getControl().getCodigo(), Toast.LENGTH_SHORT).show();
+                    } else if(tipo.contentEquals("META")) {
+                        // Finaliza la carrera y muestra los resultados
+                        // TODO
+                        animacionRegistroControl();
+                        Toast.makeText(ScanActivity.this, "Carrera finalizada", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        // Error inesperado
+                        muestraDialogoErrorEscaneo("Error inesperado, el tipo de control es incorrecto: " + tipo);
+                    }
                 }
             }
         });
-        // Error en la petición de registro
-        viewModel.getResultadoRegistroError().observe(this, new Observer<String>() {
+
+        // Cambio de control siguiente
+        viewModel.getSiguienteControl().observe(this, new Observer<Recurso<Control>>() {
             @Override
-            public void onChanged(String error) {
-                dialogPeticion.muestraMensajeError(error);
+            public void onChanged(Recurso<Control> controlRecurso) {
+                // TODO
+            }
+        });
+
+        // Respuesta de carrera pendiente
+        viewModel.getCarreraPendienteResponse().observe(this, new Observer<Recurso<Boolean>>() {
+            @Override
+            public void onChanged(Recurso<Boolean> respuesta) {
+                if(respuesta.esNulo()) {
+                    // Ha ocurrido un error
+                    muestraDialogoErrorEscaneo(respuesta.getError());
+                } else {
+                    Boolean res = respuesta.getRecurso();
+                    if(res == null) {
+                        // Error inesperado
+                        muestraDialogoErrorEscaneo("Error inesperado en la respuesta de carrera pendiente");
+                    } else if(res) {
+                        // Tiene una carrera pendiente
+                        muestraDialogoCarreraPendiente();
+                    }
+                }
             }
         });
 
@@ -194,7 +230,7 @@ public class ScanActivity extends AppCompatActivity {
                         setupModoCarrera();
                         break;
                     default:
-                        muestraDialogoErrorScan("Error inesperado del modo de la vista");
+                        muestraDialogoErrorEscaneo("Error inesperado del modo de la vista");
                         break;
                 }
             }
@@ -215,6 +251,9 @@ public class ScanActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Produce una animación visual y sonora que notifica al usuario del registro exitoso de un control.
+     */
     private void animacionRegistroControl() {
         // Animación visual
         // TODO
@@ -339,20 +378,20 @@ public class ScanActivity extends AppCompatActivity {
                                 // TODO
                                 boolean yaCorrido = false;
                                 if (yaCorrido) {
-                                    muestraDialogoErrorScan(getResources().getString(R.string.scan_error_ya_corrido));
+                                    muestraDialogoErrorEscaneo(getResources().getString(R.string.scan_error_ya_corrido));
                                 } else {
                                     // Muestra confirmación de inicio de recorrido
                                     muestraConfirmacionInicioRecorrido(escaneado);
                                 }
                             } else if (Utils.esEscaneoControl(escaneado)) {
                                 // Ha escaneado un control
-                                muestraDialogoErrorScan(getResources().getString(R.string.scan_error_es_control));
+                                muestraDialogoErrorEscaneo(getResources().getString(R.string.scan_error_es_control));
                             } else if (Utils.esEscaneoMeta(escaneado)) {
                                 // Ha escaneado una meta
-                                muestraDialogoErrorScan(getResources().getString(R.string.scan_error_es_meta));
+                                muestraDialogoErrorEscaneo(getResources().getString(R.string.scan_error_es_meta));
                             } else {
                                 // Ha escaneado un QR ajeno a la aplicación
-                                muestraDialogoErrorScan(getResources().getString(R.string.scan_error_es_desconocido));
+                                muestraDialogoErrorEscaneo(getResources().getString(R.string.scan_error_es_desconocido));
                             }
                         } else {
                             // Está corriendo una carrera, obtiene cuál es su siguiente control
@@ -367,14 +406,14 @@ public class ScanActivity extends AppCompatActivity {
                                     boolean yaRegistrado = false;
                                     if(yaRegistrado) {
                                         // En un score solo se puede registrar una vez un control
-                                        muestraDialogoErrorScan(getResources().getString(R.string.scan_error_ya_registrado));
+                                        muestraDialogoErrorEscaneo(getResources().getString(R.string.scan_error_ya_registrado));
                                     } else {
                                         // Registro válido
                                         viewModel.registraControl(escaneado);
                                     }
                                 } else if(Utils.esEscaneoTriangulo(escaneado)){
                                     // Ha escaneado un triángulo mientras está en carrera
-                                    muestraDialogoErrorScan("Ya estás corriendo un recorrido");
+                                    muestraDialogoErrorEscaneo("Ya estás corriendo un recorrido");
                                 }
                             } else {
                                 // Carrera en línea
@@ -383,7 +422,7 @@ public class ScanActivity extends AppCompatActivity {
                                     viewModel.registraControl(escaneado);
                                 } else {
                                     // Ha escaneado otro control
-                                    muestraDialogoErrorScan("Este no es el control " + siguienteCodigoControl);
+                                    muestraDialogoErrorEscaneo("Este no es el control " + siguienteCodigoControl);
                                 }
                             }
                         }
@@ -409,23 +448,23 @@ public class ScanActivity extends AppCompatActivity {
             @Override
             public void onDismiss(DialogInterface dialog) { iniciaCapturaCamara(); }
         });
-        dialogErrorScan = alertBuilder.create();
+        dialogErrorEscaneo = alertBuilder.create();
     }
 
     /**
      * Muestra un diálogo que indica un error al escanear el código QR.
      * @param mensaje Mensaje de error
      */
-    private void muestraDialogoErrorScan(String mensaje) {
+    private void muestraDialogoErrorEscaneo(String mensaje) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(!dialogErrorScan.isShowing()) {
+                if(!dialogErrorEscaneo.isShowing()) {
                     // Pausa la captura de la cámara
                     cameraSource.stop();
                     // Muestra el diálogo con el mensaje
-                    dialogErrorScan.setMessage(mensaje);
-                    dialogErrorScan.show();
+                    dialogErrorEscaneo.setMessage(mensaje);
+                    dialogErrorEscaneo.show();
                 }
             }
         });
@@ -494,8 +533,36 @@ public class ScanActivity extends AppCompatActivity {
             });
         } else {
             // Los datos no son correctos por algún motivo
-            muestraDialogoErrorScan(getResources().getString(R.string.scan_error_inesperado));
+            muestraDialogoErrorEscaneo(getResources().getString(R.string.scan_error_inesperado));
         }
+    }
+
+    /**
+     * Configura el diálogo de confirmación de inicio de recorrido y sus eventos.
+     */
+    private void setupDialogoRecorridoPendiente() {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setCancelable(false);
+        alertBuilder.setTitle(R.string.scan_pendiente_titulo);
+        alertBuilder.setMessage(R.string.scan_pendiente_mensaje);
+        alertBuilder.setPositiveButton(R.string.scan_pendiente_reanudar, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                // Reanuda la carrera
+                // TODO
+            }
+        });
+        alertBuilder.setNegativeButton(R.string.scan_pendiente_abandonar, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Abandona la carrera
+                viewModel.confirmaAbandonoRecorrido();
+            }
+        });
+        dialogCarreraPendiente = alertBuilder.create();
+    }
+
+    private void muestraDialogoCarreraPendiente() {
+        dialogCarreraPendiente.show();
     }
 
     /**

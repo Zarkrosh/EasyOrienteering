@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.data.model.pagers;
+package com.hergomsoft.easyorienteering.data.model;
 
 import com.google.gson.annotations.Expose;
 import com.hergomsoft.easyorienteering.data.model.Control;

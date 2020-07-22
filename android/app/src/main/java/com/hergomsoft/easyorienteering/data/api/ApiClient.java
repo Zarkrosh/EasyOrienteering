@@ -3,7 +3,7 @@ package com.hergomsoft.easyorienteering.data.api;
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroRequest;
 import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
-import com.hergomsoft.easyorienteering.data.model.pagers.RegistroControl;
+import com.hergomsoft.easyorienteering.data.model.RegistroControl;
 
 import retrofit2.Call;
 import retrofit2.http.Body;

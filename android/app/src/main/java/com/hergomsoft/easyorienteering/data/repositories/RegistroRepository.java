@@ -1,7 +1,9 @@
 package com.hergomsoft.easyorienteering.data.repositories;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -10,9 +12,11 @@ import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.api.ApiClient;
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroRequest;
 import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
-import com.hergomsoft.easyorienteering.data.model.Carrera;
+import com.hergomsoft.easyorienteering.data.db.RegistroDatabase;
+import com.hergomsoft.easyorienteering.data.db.dao.RegistroDAO;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
-import com.hergomsoft.easyorienteering.data.model.pagers.RegistroControl;
+import com.hergomsoft.easyorienteering.data.model.Registro;
+import com.hergomsoft.easyorienteering.data.model.RegistroControl;
 import com.hergomsoft.easyorienteering.util.Constants;
 
 import okhttp3.OkHttpClient;
@@ -21,18 +25,19 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.HTTP;
 
 public class RegistroRepository {
 
     private ApiClient apiClient;
-    private MutableLiveData<RegistroControl> registroResponse; // Respuesta de registro de control
-    private MutableLiveData<String> registroResponseError;     // Respuesta de registro de control (error)
+    private RegistroDAO registroDAO;
+
+    private MutableLiveData<Recurso<RegistroControl>> registroResponse; // Respuesta de registro de control
     private MutableLiveData<Recurso<Boolean>> comprobacionPendiente;    // Respuesta de comprobación de recorrido pendiente
 
-    public RegistroRepository() {
+    public RegistroRepository(Application application) {
+        registroDAO = RegistroDatabase.getDatabase(application).getRegistroDAO();
+
         registroResponse = new MutableLiveData<>();
-        registroResponseError = new MutableLiveData<>();
         comprobacionPendiente = new MutableLiveData<>();
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -59,18 +64,21 @@ public class RegistroRepository {
         apiClient.registraControl(idCarrera, request).enqueue(new Callback<RegistroControl>() {
             @Override
             public void onResponse(Call<RegistroControl> call, Response<RegistroControl> response) {
+                Recurso<RegistroControl> res = new Recurso();
                 if(response.isSuccessful()) {
-                    registroResponse.postValue(response.body());
+                    res.setRecurso(response.body());
                 } else if(response.code() == 422) {
                     // Error lanzado en caso de algún error. Contiene un código de error
-                    registroResponseError.postValue(response.message());
+                    res.setError(response.message());
                 } else if(response.code() == 404) {
                     // No existe la carrera con el ID indicado
-                    registroResponseError.postValue("No existe la carrera con el ID indicado");
+                    res.setError("No existe la carrera con el ID indicado");
                 } else {
                     // Error desconocido
-                    registroResponseError.postValue("Error inesperado");
+                    res.setError("Error inesperado");
                 }
+
+                registroResponse.postValue(res);
             }
 
             @Override
@@ -115,8 +123,8 @@ public class RegistroRepository {
                             editor.putLong(keyIDCarrera, resp.getCarrera().getId());
                             editor.putLong(keyIDRecorrido, resp.getIdRecorrido());
 
-                            // TODO BD Registros
-
+                            // Borra todos los registros anteriores e introduce los nuevos
+                            new insertRegistrosAT(registroDAO).execute(resp.getRegistros());
                             pendiente = true;
                         }
                     }
@@ -145,12 +153,23 @@ public class RegistroRepository {
     public LiveData<Recurso<Boolean>> getPendienteResponse() {
         return comprobacionPendiente;
     }
-
-    public LiveData<RegistroControl> getRegistroResponse() {
+    public LiveData<Recurso<RegistroControl>> getRegistroResponse() {
         return registroResponse;
     }
 
-    public MutableLiveData<String> getRegistroResponseError() {
-        return registroResponseError;
+
+    private static class insertRegistrosAT extends AsyncTask<Registro[], Void, Void> {
+        private RegistroDAO dao;
+        insertRegistrosAT(RegistroDAO dao) {
+            this.dao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final Registro[]... params) {
+            dao.deleteAll();
+            dao.add(params[0]);
+            return null;
+        }
     }
+
 }
