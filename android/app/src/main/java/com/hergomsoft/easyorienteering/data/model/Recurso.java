@@ -37,7 +37,7 @@ public class Recurso<T> {
         this.error = error;
     }
 
-    public boolean esNulo() {
+    public boolean hayError() {
         return recurso == null;
     }
 }

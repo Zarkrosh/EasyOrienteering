@@ -1,6 +1,7 @@
 package com.hergomsoft.easyorienteering.data.api;
 
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroRequest;
+import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.RegistroControl;
@@ -22,5 +23,8 @@ public interface ApiClient {
 
     @GET("registros/pendiente")
     Call<PendienteResponse> getPendiente();
+
+    @POST("registros/abandonar/{id}")
+    Call<AbandonoResponse> abandonaRecorrido(@Path("id") long idRecorrido);
 
 }

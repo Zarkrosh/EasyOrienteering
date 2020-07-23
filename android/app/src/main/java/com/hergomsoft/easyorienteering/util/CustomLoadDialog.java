@@ -27,7 +27,7 @@ public class CustomLoadDialog extends AlertDialog {
     private TextView mensaje;
     private TextView btnDismiss;
 
-    protected CustomLoadDialog(Context context) {
+    public CustomLoadDialog(Context context) {
         super(context);
     }
 
@@ -76,6 +76,24 @@ public class CustomLoadDialog extends AlertDialog {
         // Colores por defecto
         titulo.setTextColor(Color.BLACK);
         mensaje.setTextColor(Color.BLACK);
+    }
+
+    /**
+     * Muestra un mensaje indicando que se ha producido un error.
+     * @param tituloExito Titulo de error
+     * @param mensajeExito Mensaje de error
+     */
+    public void muestraMensajeExito(String tituloExito, String mensajeExito) {
+        show();
+        titulo.setText(tituloExito);
+        imagen.setImageDrawable(getContext().getResources().getDrawable(R.drawable.exito));
+        imagen.setVisibility(View.VISIBLE);
+        progress.setVisibility(View.INVISIBLE);
+        btnDismiss.setVisibility(View.VISIBLE);
+        setMensaje(mensajeExito);
+        // Colores de éxito
+        titulo.setTextColor(getContext().getResources().getColor(R.color.exito));
+        mensaje.setTextColor(getContext().getResources().getColor(R.color.exito));
     }
 
 

@@ -1,8 +1,8 @@
-package com.hergomsoft.easyoapi.models;
+package com.hergomsoft.easyoapi.models.requests;
 
 import javax.validation.constraints.NotNull;
 
-public class PeticionRegistro {
+public class RegistroRequest {
     
     // Códigos de error asociados a una petición de registro
     public static final String ERROR_NO_EXISTE_CONTROL  = "REG-0"; // El código de control no se corresponde con ningún control de la carrera
@@ -25,7 +25,7 @@ public class PeticionRegistro {
     
     private Long idRecorrido; // Solo se requiere su valor al iniciar un recorrido
 
-    public PeticionRegistro(String codigo, String secreto, Long idRecorrido, Long idCorredor) {
+    public RegistroRequest(String codigo, String secreto, Long idRecorrido, Long idCorredor) {
         this.codigo = codigo;
         this.secreto = secreto;
         this.idCorredor = idCorredor; // DEBUG

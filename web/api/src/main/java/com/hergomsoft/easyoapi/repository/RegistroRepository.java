@@ -3,7 +3,9 @@ package com.hergomsoft.easyoapi.repository;
 import com.hergomsoft.easyoapi.models.Registro;
 import java.util.List;
 import java.util.Optional;
+import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -63,6 +65,17 @@ public interface RegistroRepository extends JpaRepository<Registro, Long> {
      * @param idRecorrido ID del recorrido
      * @return Registros del usuario en el recorrido
      */
-    @Query(value="SELECT * FROM REGISTROS WHERE corredor_id = :idCorredor AND recorrido_id = :idRecorrido", nativeQuery = true)
-    public Registro[] getRegistrosUsuarioRecorrido(Long idCorredor, long idRecorrido);
+    @Query(value="SELECT * FROM registros WHERE corredor_id = :idCorredor AND recorrido_id = :idRecorrido", nativeQuery = true)
+    public Registro[] getRegistrosUsuarioRecorrido(@Param("idCorredor") long idCorredor, @Param("idRecorrido") long idRecorrido);
+    
+    /**
+     * Abandona un recorrido pendiente de un corredor.
+     * @param idCorredor ID del usuario corredor
+     * @param idRecorrido ID del recorrido
+     * @param idControlMeta ID del control de meta del recorrido
+     */
+    @Modifying
+    @Transactional
+    @Query(value="INSERT INTO REGISTROS(CORREDOR_ID, CONTROL_ID, RECORRIDO_ID, FECHA) VALUES (:idCorredor, :idControl, :idRecorrido, NULL)", nativeQuery = true)
+    public void abandonaRecorrido(@Param("idCorredor") long idCorredor, @Param("idRecorrido") long idRecorrido, @Param("idControl") long idControlMeta);
 }

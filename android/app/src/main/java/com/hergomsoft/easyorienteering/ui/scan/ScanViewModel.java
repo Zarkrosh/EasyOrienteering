@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.hergomsoft.easyorienteering.R;
+import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
 import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.RegistroControl;
@@ -28,8 +29,9 @@ public class ScanViewModel extends AndroidViewModel {
     // Estados de los diálogos
     public static final int ESTADO_OCULTO = 0;
     public static final int ESTADO_ERROR = 1;
-    public static final int ESTADO_CARGANDO = 2;
-    public static final int ESTADO_ELECCION_PENDIENTE = 3;
+    public static final int ESTADO_EXITO = 2;
+    public static final int ESTADO_CARGANDO = 3;
+    public static final int ESTADO_ELECCION_PENDIENTE = 4;
 
     private String tituloDialogo;
     private String mensajeDialogo;
@@ -45,6 +47,7 @@ public class ScanViewModel extends AndroidViewModel {
     private LiveData<Recurso<Boolean>> peticionPendiente;
     private LiveData<Recurso<RegistroControl>> peticionRegistro;
     private LiveData<Recurso<Control>> siguienteControl;
+    private LiveData<Recurso<AbandonoResponse>> abandonoResponse;
 
     private MutableLiveData<Integer> estadoDialogo;
     private MutableLiveData<Boolean> pantallaEscaneo;
@@ -55,6 +58,7 @@ public class ScanViewModel extends AndroidViewModel {
         registroRepository = new RegistroRepository(app);
         peticionPendiente = registroRepository.getPendienteResponse();
         peticionRegistro = registroRepository.getRegistroResponse();
+        abandonoResponse = registroRepository.getAbandonoResponse();
         estadoDialogo = new MutableLiveData<>(ESTADO_OCULTO);
         siguienteControl = new MutableLiveData<>();
         pantallaEscaneo = new MutableLiveData<>(true);
@@ -68,6 +72,9 @@ public class ScanViewModel extends AndroidViewModel {
     }
     public LiveData<Recurso<Control>> getSiguienteControl() {
         return siguienteControl;
+    }
+    public LiveData<Recurso<AbandonoResponse>> getAbandonoResponse() {
+        return abandonoResponse;
     }
     public LiveData<Integer> getEstadoDialogoCarga() { return estadoDialogo; }
     public LiveData<Boolean> getAlternadoVistas() { return pantallaEscaneo; }
@@ -84,6 +91,16 @@ public class ScanViewModel extends AndroidViewModel {
      */
     public void setEstadoDialogo(int estado) {
         estadoDialogo.postValue(estado);
+    }
+
+    /**
+     * Asigna el estado de éxito al diálogo de carga de la vista con el título y mensaje especificados.
+     * @param mensaje Mensaje de éxito
+     */
+    public void setEstadoDialogoExito(String titulo, String mensaje) {
+        estadoDialogo.postValue(ESTADO_EXITO);
+        tituloDialogo = titulo;
+        mensajeDialogo = mensaje;
     }
 
     /**
@@ -164,7 +181,12 @@ public class ScanViewModel extends AndroidViewModel {
         tituloDialogo = "";
         mensajeDialogo = getApplication().getString(R.string.scan_carga_abandono);
         estadoDialogo.postValue(ESTADO_CARGANDO);
-        // TODO
+
+        // Obtiene el ID del recorrido guardado en las preferencias
+        Application app = getApplication();
+        SharedPreferences prefs = app.getSharedPreferences(app.getString(R.string.sp_carrera_actual), Context.MODE_PRIVATE);
+        long idRecorrido = prefs.getLong(app.getString(R.string.sp_carrera_actual_idrecorrido), -1);
+        registroRepository.abandonaRecorrido(idRecorrido);
     }
 
     /**

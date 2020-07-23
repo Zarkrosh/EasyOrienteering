@@ -4,6 +4,7 @@ import com.hergomsoft.easyoapi.models.Control;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Registro;
 import com.hergomsoft.easyoapi.models.Usuario;
+import com.hergomsoft.easyoapi.utils.MessageException;
 import java.util.List;
 
 public interface IRegistroService {
@@ -61,4 +62,13 @@ public interface IRegistroService {
      * @return Registros del corredor en el recorrido
      */
     Registro[] getRegistrosUsuarioRecorrido(Usuario corredor, Recorrido recorrido);
+    
+    /**
+     * Abandona la realización de un recorrido por parte de un corredor que lo tenga
+     * pendiente de finalizar.
+     * @param corredor Corredor
+     * @param recorrido Recorrido
+     * @throws com.hergomsoft.easyoapi.utils.MessageException Si no se ha encontrado el control de meta.
+     */
+    void abandonaRecorrido(Usuario corredor, Recorrido recorrido) throws MessageException;
 }

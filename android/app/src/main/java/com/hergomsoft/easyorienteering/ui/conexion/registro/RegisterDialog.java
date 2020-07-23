@@ -68,7 +68,7 @@ public class RegisterDialog extends AlertDialog {
     public void muestraMensajeExito() {
         show();
         titulo.setText(R.string.registro_registrada);
-        imagen.setImageDrawable(getContext().getResources().getDrawable(R.drawable.success));
+        imagen.setImageDrawable(getContext().getResources().getDrawable(R.drawable.exito));
         imagen.setVisibility(View.VISIBLE);
         progress.setVisibility(View.INVISIBLE);
         setMensaje("");

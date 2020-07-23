@@ -11,7 +11,9 @@
     <!-- Preferencias compartidas -->
     <string name="sp_carrera_actual">sp_carrera_actual</string>
     <string name="sp_carrera_actual_idcarrera">idcarrera</string>
+    <string name="sp_carrera_actual_nombrecarrera">nombrecarrera</string>
     <string name="sp_carrera_actual_idrecorrido">idrecorrido</string>
+    <string name="sp_carrera_actual_nombrerecorrido">nombrerecorrido</string>
 
     <!-- Comunes -->
     <string name="error">Error</string>
@@ -99,7 +101,7 @@
     <string name="scan_conf_titulo">Inicio de recorrido</string>
     <string name="scan_conf_mensaje">En cuanto aceptes comenzará a contar el tiempo y se te mostrará el mapa</string>
     <string name="scan_pendiente_titulo">Tienes un recorrido pendiente</string>
-    <string name="scan_pendiente_mensaje">Aún no has acabado el recorrido X de la carrera Y. ¿Deseas reanudar o abandonar?</string>
+    <string name="scan_pendiente_mensaje">Aún no has acabado el recorrido <b>%1$s</b> de la carrera <b>%2$s</b>. ¿Deseas reanudar o abandonar?</string>
     <string name="scan_pendiente_reanudar">Reanudar</string>
     <string name="scan_pendiente_abandonar">Abandonar</string>
     <string name="scan_escanea_triangulo">Escanea un triángulo de salida</string>
@@ -110,6 +112,7 @@
     <string name="scan_carga_inicio">Iniciando recorrido…</string>
     <string name="scan_carga_carrera">Cargando datos de carrera…</string>
     <string name="scan_carga_abandono">Abandonando recorrido…</string>
+    <string name="scan_carga_abandonado">Recorrido abandonado</string>
 
 
 </resources>

@@ -6,6 +6,7 @@ import com.hergomsoft.easyoapi.models.Registro;
 import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.repository.RecorridoRepository;
 import com.hergomsoft.easyoapi.repository.RegistroRepository;
+import com.hergomsoft.easyoapi.utils.MessageException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,16 @@ public class RegistroService implements IRegistroService {
     @Override
     public Registro[] getRegistrosUsuarioRecorrido(Usuario corredor, Recorrido recorrido) {
         return repoRegistro.getRegistrosUsuarioRecorrido(corredor.getId(), recorrido.getId());
+    }
+    
+    @Override
+    public void abandonaRecorrido(Usuario corredor, Recorrido recorrido) throws MessageException {
+        Control meta = recorrido.getCarrera().getControles().get(recorrido.getTrazado().get(recorrido.getTrazado().size() - 1));
+        if(meta == null) {
+            throw new MessageException("Error al abandonar. No se ha encontrado la meta.");
+        }
+        
+        repoRegistro.abandonaRecorrido(corredor.getId(), recorrido.getId(), meta.getId());
     }
 
 }

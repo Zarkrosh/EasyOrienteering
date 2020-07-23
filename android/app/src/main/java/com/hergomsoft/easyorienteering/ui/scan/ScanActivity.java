@@ -1,12 +1,15 @@
 package com.hergomsoft.easyorienteering.ui.scan;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Html;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -33,6 +36,7 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.hergomsoft.easyorienteering.R;
+import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
@@ -53,7 +57,6 @@ public class ScanActivity extends AppCompatActivity {
     private SurfaceView cameraView;
 
     // Diálogos
-    private AlertDialog dialogErrorEscaneo;
     private AlertDialog dialogConfirmacion;
     private AlertDialog dialogRecorridoPendiente;
     private CustomLoadDialog dialogEscaneo;
@@ -160,6 +163,10 @@ public class ScanActivity extends AppCompatActivity {
                         dialogEscaneo.muestraMensajeError(viewModel.getTituloDialogo(),
                                                           viewModel.getMensajeDialogo());
                         break;
+                    case ScanViewModel.ESTADO_EXITO:
+                        dialogEscaneo.muestraMensajeExito(viewModel.getTituloDialogo(),
+                                                          viewModel.getMensajeDialogo());
+                        break;
                     case ScanViewModel.ESTADO_ELECCION_PENDIENTE:
                         dialogEscaneo.dismiss();
                         muestraDialogoRecorridoPendiente();
@@ -181,7 +188,7 @@ public class ScanActivity extends AppCompatActivity {
                     @Override
                     public void run() {
 
-                        if(respuesta.esNulo()) {
+                        if(respuesta.hayError()) {
                             // Ha ocurrido un error
                             viewModel.setEstadoDialogoError(getString(R.string.error), respuesta.getError());
                         } else {
@@ -192,6 +199,8 @@ public class ScanActivity extends AppCompatActivity {
                             } else if(res) {
                                 // Tiene una carrera pendiente
                                 viewModel.pideEleccionPendiente();
+                            } else {
+                                ocultaDialogoCarga();
                             }
                         }
 
@@ -205,7 +214,7 @@ public class ScanActivity extends AppCompatActivity {
         viewModel.getResultadoRegistro().observe(this, new Observer<Recurso<RegistroControl>>() {
             @Override
             public void onChanged(Recurso<RegistroControl> registroControl) {
-                if(registroControl.esNulo()) {
+                if(registroControl.hayError()) {
                     // Error al registrar
                     dialogEscaneo.muestraMensajeError(getString(R.string.registro_error), registroControl.getError());
                 } else {
@@ -237,6 +246,31 @@ public class ScanActivity extends AppCompatActivity {
                     } else {
                         // Error inesperado
                         viewModel.setEstadoDialogoError(getString(R.string.error_inesperado), "El tipo de control es incorrecto: " + tipo);
+                    }
+                }
+            }
+        });
+
+        // Respuesta de abandono de recorrido
+        viewModel.getAbandonoResponse().observe(this, new Observer<Recurso<AbandonoResponse>>() {
+            @Override
+            public void onChanged(Recurso<AbandonoResponse> response) {
+                if(response.hayError()) {
+                    viewModel.setEstadoDialogoError(getString(R.string.error), response.getError());
+                } else {
+                    AbandonoResponse r = response.getRecurso();
+                    if(r.isAbandonado()) {
+                        viewModel.setEstadoDialogoExito("", getString(R.string.scan_carga_abandonado));
+                        // Tras unos segundos, oculta el diálogo automáticamente
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                ocultaDialogoCarga();
+                            }
+                        }, 2000);
+                    } else {
+                        viewModel.setEstadoDialogoError(getString(R.string.error), r.getError());
                     }
                 }
             }
@@ -543,7 +577,7 @@ public class ScanActivity extends AppCompatActivity {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setCancelable(false);
         alertBuilder.setTitle(R.string.scan_pendiente_titulo);
-        alertBuilder.setMessage(R.string.scan_pendiente_mensaje);
+        // El mensaje se configura en la función de mostrado
         alertBuilder.setPositiveButton(R.string.scan_pendiente_reanudar, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 // Reanuda la carrera
@@ -578,7 +612,18 @@ public class ScanActivity extends AppCompatActivity {
      */
     private void muestraDialogoRecorridoPendiente() {
         ocultaDialogoCarga();
-        dialogRecorridoPendiente.show();
+        // Obtiene los datos de las preferencias
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.sp_carrera_actual), Context.MODE_PRIVATE);
+        String nombreRecorrido = sharedPref.getString(getString(R.string.sp_carrera_actual_nombrerecorrido), null);
+        String nombreCarrera = sharedPref.getString(getString(R.string.sp_carrera_actual_nombrecarrera), null);
+
+        if(nombreRecorrido == null || nombreCarrera == null) {
+            // ERROR
+            viewModel.setEstadoDialogoError(getString(R.string.error_inesperado), "El nombre de la carrera o el recorrido es nulo");
+        } else {
+            dialogRecorridoPendiente.setMessage(Html.fromHtml(getString(R.string.scan_pendiente_mensaje, nombreRecorrido, nombreCarrera)));
+            dialogRecorridoPendiente.show();
+        }
     }
 
     /**
