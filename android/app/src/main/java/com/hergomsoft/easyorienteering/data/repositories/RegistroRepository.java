@@ -19,6 +19,8 @@ import com.hergomsoft.easyorienteering.data.model.Registro;
 import com.hergomsoft.easyorienteering.data.model.RegistroControl;
 import com.hergomsoft.easyorienteering.util.Constants;
 
+import java.net.SocketTimeoutException;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -142,9 +144,14 @@ public class RegistroRepository {
 
             @Override
             public void onFailure(Call<PendienteResponse> call, Throwable t) {
-                // TODO Manejar algún error en concreto (sin internet, etc)
                 Recurso<Boolean> recurso = new Recurso<>();
-                recurso.setError("Error de conexión");
+                if(t.getCause() instanceof SocketTimeoutException) {
+                    recurso.setError("No se ha podido contactar con el servidor (tiempo expirado)");
+                } else {
+                    // TODO Manejar algún error en concreto (sin internet, etc)
+                    recurso.setError("Error de conexión desconocido");
+                }
+
                 comprobacionPendiente.postValue(recurso);
             }
         });

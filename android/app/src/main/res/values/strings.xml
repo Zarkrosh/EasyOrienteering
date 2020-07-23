@@ -15,6 +15,7 @@
 
     <!-- Comunes -->
     <string name="error">Error</string>
+    <string name="error_inesperado">Error inesperado</string>
 
     <!-- Permisos -->
     <string name="permiso_requerido">Se requiere este permiso para el funcionamiento de la aplicación</string>
@@ -93,6 +94,7 @@
     <string name="scan_error_es_desconocido">Este QR no pertenece a esta aplicación</string>
     <string name="scan_error_ya_corrido">Ya has corrido este recorrido</string>
     <string name="scan_error_ya_registrado">Ya has registrado este control</string>
+    <string name="scan_error_corriendo">Ya estás corriendo un recorrido</string>
     <string name="scan_error_inesperado">Ha ocurrido un error inesperado. Vuélvelo a intentar de nuevo</string>
     <string name="scan_conf_titulo">Inicio de recorrido</string>
     <string name="scan_conf_mensaje">En cuanto aceptes comenzará a contar el tiempo y se te mostrará el mapa</string>
@@ -103,5 +105,11 @@
     <string name="scan_escanea_triangulo">Escanea un triángulo de salida</string>
     <string name="scan_btn_vista_scan">SCAN</string>
     <string name="scan_btn_vista_mapa">MAPA</string>
+    <!-- Diálogo de carga -->
+    <string name="scan_carga_pendiente">Comprobando carrera pendiente…</string>
+    <string name="scan_carga_inicio">Iniciando recorrido…</string>
+    <string name="scan_carga_carrera">Cargando datos de carrera…</string>
+    <string name="scan_carga_abandono">Abandonando recorrido…</string>
+
 
 </resources>

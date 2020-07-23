@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.ui.scan;
+package com.hergomsoft.easyorienteering.util;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -17,9 +17,9 @@ import androidx.core.content.ContextCompat;
 import com.hergomsoft.easyorienteering.R;
 
 /**
- * Diálogo que muestra el estado y resultado de la petición de inicio de recorrido.
+ * Diálogo de uso general para estados de carga, éxito y error.
  */
-public class ScanDialog extends AlertDialog {
+public class CustomLoadDialog extends AlertDialog {
 
     private TextView titulo;
     private ImageView imagen;
@@ -27,7 +27,7 @@ public class ScanDialog extends AlertDialog {
     private TextView mensaje;
     private TextView btnDismiss;
 
-    protected ScanDialog(Context context) {
+    protected CustomLoadDialog(Context context) {
         super(context);
     }
 
@@ -62,30 +62,17 @@ public class ScanDialog extends AlertDialog {
     }
 
     /**
-     * Muestra el mensaje de estado "Registrando" con un indicador de carga.
+     * Muestra un mensaje indicando que se está realizando una operación de carga.
+     * @param tituloCarga Titulo de error
+     * @param mensajeCarga Mensaje de error
      */
-    public void muestraMensajeRegistrando() {
+    public void muestraMensajeCarga(String tituloCarga, String mensajeCarga) {
         show();
-        titulo.setText(R.string.registro_registrando);
+        titulo.setText(tituloCarga);
+        setMensaje(mensajeCarga);
         progress.setVisibility(View.VISIBLE);
         imagen.setVisibility(View.INVISIBLE);
         btnDismiss.setVisibility(View.INVISIBLE);
-        setMensaje("");
-        // Colores por defecto
-        titulo.setTextColor(Color.BLACK);
-        mensaje.setTextColor(Color.BLACK);
-    }
-
-    /**
-     * Muestra el mensaje de estado "Cargando datos de la carrera" con un indicador de carga.
-     */
-    public void muestraMensajeCargandoDatosCarrera() {
-        show();
-        titulo.setText(R.string.registro_registrando);
-        progress.setVisibility(View.VISIBLE);
-        imagen.setVisibility(View.INVISIBLE);
-        btnDismiss.setVisibility(View.INVISIBLE);
-        setMensaje("");
         // Colores por defecto
         titulo.setTextColor(Color.BLACK);
         mensaje.setTextColor(Color.BLACK);
@@ -94,20 +81,22 @@ public class ScanDialog extends AlertDialog {
 
     /**
      * Muestra un mensaje indicando que se ha producido un error.
-     * @param error Mensaje de error
+     * @param tituloError Titulo de error
+     * @param mensajeError Mensaje de error
      */
-    public void muestraMensajeError(String error) {
+    public void muestraMensajeError(String tituloError, String mensajeError) {
         show();
-        titulo.setText(R.string.registro_error);
+        titulo.setText(tituloError);
         imagen.setImageDrawable(getContext().getResources().getDrawable(R.drawable.error));
         imagen.setVisibility(View.VISIBLE);
         progress.setVisibility(View.INVISIBLE);
         btnDismiss.setVisibility(View.VISIBLE);
-        setMensaje(error);
+        setMensaje(mensajeError);
         // Colores de error
         titulo.setTextColor(getContext().getResources().getColor(R.color.error));
         mensaje.setTextColor(getContext().getResources().getColor(R.color.error));
     }
+
 
     /**
      * Asigna un valor al mensaje del diálogo. Si es un mensaje vacío, se oculta por completo
