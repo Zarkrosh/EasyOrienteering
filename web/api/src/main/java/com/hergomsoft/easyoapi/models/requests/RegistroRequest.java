@@ -7,9 +7,9 @@ public class RegistroRequest {
     // Códigos de error asociados a una petición de registro
     public static final String ERROR_NO_EXISTE_CONTROL  = "REG-0"; // El código de control no se corresponde con ningún control de la carrera
     public static final String ERROR_ESCANEA_SALIDA     = "REG-1"; // Debe escanear una salida primero
-    public static final String ERROR_SIN_RECORRIDO      = "REG-2"; // Debe indicar recorrido
-    public static final String ERROR_RECORRIDO_AJENO    = "REG-3"; // El recorrido indicado no pertenece a la carrera
-    public static final String ERROR_YA_CORRIDO         = "REG-4"; // El usuario ya ha corrido este recorrido
+    public static final String ERROR_RECORRIDO_AJENO    = "REG-2"; // El recorrido indicado no pertenece a la carrera
+    public static final String ERROR_YA_CORRIDO         = "REG-3"; // El usuario ya ha corrido este recorrido
+    public static final String ERROR_SALIDA_RECORRIDO   = "REG-4"; // El control de salida no es el inicial del recorrido
     public static final String ERROR_CONTROL_EQUIVOCADO = "REG-5"; // El control no es el siguiente en su recorrido
     public static final String ERROR_YA_ACABADO         = "REG-6"; // No quedan más controles por registrar
     public static final String ERROR_YA_REGISTRADO      = "REG-7"; // El usuario ya registrado el control (SCORE)
@@ -20,16 +20,10 @@ public class RegistroRequest {
     private String codigo; // Código del control
     @NotNull
     private String secreto; // Secreto del control
-    @NotNull
-    private Long idCorredor; // DEBUG: se extraerá del método de autenticación
-    
-    private Long idRecorrido; // Solo se requiere su valor al iniciar un recorrido
 
-    public RegistroRequest(String codigo, String secreto, Long idRecorrido, Long idCorredor) {
+    public RegistroRequest(String codigo, String secreto) {
         this.codigo = codigo;
         this.secreto = secreto;
-        this.idCorredor = idCorredor; // DEBUG
-        this.idRecorrido = idRecorrido;
     }
 
     public String getCodigo() {
@@ -46,21 +40,5 @@ public class RegistroRequest {
 
     public void setSecreto(String secreto) {
         this.secreto = secreto;
-    }
-
-    public Long getIdCorredor() {
-        return idCorredor;
-    }
-
-    public void setIdCorredor(Long idCorredor) {
-        this.idCorredor = idCorredor;
-    }
-
-    public Long getIdRecorrido() {
-        return idRecorrido;
-    }
-
-    public void setIdRecorrido(Long idRecorrido) {
-        this.idRecorrido = idRecorrido;
     }
 }

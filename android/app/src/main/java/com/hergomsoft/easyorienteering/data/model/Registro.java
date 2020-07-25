@@ -8,18 +8,18 @@ import com.hergomsoft.easyorienteering.util.DateConverter;
 
 import java.util.Date;
 
-@Entity
-@TypeConverters(DateConverter.class)
+//@Entity
+//@TypeConverters(DateConverter.class)
 public class Registro {
-    @PrimaryKey(autoGenerate = true)
+    //@PrimaryKey
     private int id;
-    private String control;
-    private int recorrido;
+    private Control control;
+    private Recorrido recorrido;
     private Date fecha;
 
-    public Registro(int recorrido, String control, Date fecha) {
-        this.recorrido = recorrido;
+    public Registro(Control control, Recorrido recorrido, Date fecha) {
         this.control = control;
+        this.recorrido = recorrido;
         this.fecha = fecha;
     }
 
@@ -31,20 +31,20 @@ public class Registro {
         this.id = id;
     }
 
-    public int getRecorrido() {
-        return recorrido;
-    }
-
-    public void setRecorrido(int recorrido) {
-        this.recorrido = recorrido;
-    }
-
-    public String getControl() {
+    public Control getControl() {
         return control;
     }
 
-    public void setControl(String control) {
+    public void setControl(Control control) {
         this.control = control;
+    }
+
+    public Recorrido getRecorrido() {
+        return recorrido;
+    }
+
+    public void setRecorrido(Recorrido recorrido) {
+        this.recorrido = recorrido;
     }
 
     public Date getFecha() {

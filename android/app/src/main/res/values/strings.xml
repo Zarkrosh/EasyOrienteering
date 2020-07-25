@@ -8,13 +8,6 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
-    <!-- Preferencias compartidas -->
-    <string name="sp_carrera_actual">sp_carrera_actual</string>
-    <string name="sp_carrera_actual_idcarrera">idcarrera</string>
-    <string name="sp_carrera_actual_nombrecarrera">nombrecarrera</string>
-    <string name="sp_carrera_actual_idrecorrido">idrecorrido</string>
-    <string name="sp_carrera_actual_nombrerecorrido">nombrerecorrido</string>
-
     <!-- Comunes -->
     <string name="error">Error</string>
     <string name="error_inesperado">Error inesperado</string>
@@ -110,9 +103,9 @@
     <!-- Diálogo de carga -->
     <string name="scan_carga_pendiente">Comprobando carrera pendiente…</string>
     <string name="scan_carga_inicio">Iniciando recorrido…</string>
-    <string name="scan_carga_carrera">Cargando datos de carrera…</string>
     <string name="scan_carga_abandono">Abandonando recorrido…</string>
     <string name="scan_carga_abandonado">Recorrido abandonado</string>
+    <string name="scan_carga_registrando">Registrando control…</string>
 
 
 </resources>

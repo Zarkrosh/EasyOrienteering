@@ -1,8 +1,6 @@
 package com.hergomsoft.easyorienteering.ui.scan;
 
 import android.app.Application;
-import android.content.Context;
-import android.content.SharedPreferences;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -10,9 +8,11 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
+import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Control;
+import com.hergomsoft.easyorienteering.data.model.Recorrido;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
-import com.hergomsoft.easyorienteering.data.model.RegistroControl;
+import com.hergomsoft.easyorienteering.data.model.Registro;
 import com.hergomsoft.easyorienteering.data.repositories.RegistroRepository;
 import com.hergomsoft.easyorienteering.util.Utils;
 
@@ -32,23 +32,25 @@ public class ScanViewModel extends AndroidViewModel {
     public static final int ESTADO_EXITO = 2;
     public static final int ESTADO_CARGANDO = 3;
     public static final int ESTADO_ELECCION_PENDIENTE = 4;
-
+    // Datos de los diálogos
     private String tituloDialogo;
     private String mensajeDialogo;
 
-    // Datos de triángulo escaneado
+    // Datos de control escaneado
     private String codigo;
     private Long idCarrera;
     private Long idRecorrido;
     private String secreto;
 
+    // Repositorios
     private RegistroRepository registroRepository;
 
+    // LiveDatas
     private LiveData<Recurso<Boolean>> peticionPendiente;
-    private LiveData<Recurso<RegistroControl>> peticionRegistro;
-    private LiveData<Recurso<Control>> siguienteControl;
+    private LiveData<Recurso<Registro>> registroResponse;
     private LiveData<Recurso<AbandonoResponse>> abandonoResponse;
-
+    // MutableLiveDatas
+    private MutableLiveData<Control> siguienteControl;
     private MutableLiveData<Integer> estadoDialogo;
     private MutableLiveData<Boolean> pantallaEscaneo;
     private MutableLiveData<Integer> modoVista;
@@ -57,7 +59,7 @@ public class ScanViewModel extends AndroidViewModel {
         super(app);
         registroRepository = new RegistroRepository(app);
         peticionPendiente = registroRepository.getPendienteResponse();
-        peticionRegistro = registroRepository.getRegistroResponse();
+        registroResponse = registroRepository.getRegistroResponse();
         abandonoResponse = registroRepository.getAbandonoResponse();
         estadoDialogo = new MutableLiveData<>(ESTADO_OCULTO);
         siguienteControl = new MutableLiveData<>();
@@ -67,11 +69,8 @@ public class ScanViewModel extends AndroidViewModel {
     }
 
     public LiveData<Recurso<Boolean>> getCarreraPendienteResponse() { return peticionPendiente; }
-    public LiveData<Recurso<RegistroControl>> getResultadoRegistro() {
-        return peticionRegistro;
-    }
-    public LiveData<Recurso<Control>> getSiguienteControl() {
-        return siguienteControl;
+    public LiveData<Recurso<Registro>> getRegistroResponse() {
+        return registroResponse;
     }
     public LiveData<Recurso<AbandonoResponse>> getAbandonoResponse() {
         return abandonoResponse;
@@ -79,6 +78,10 @@ public class ScanViewModel extends AndroidViewModel {
     public LiveData<Integer> getEstadoDialogoCarga() { return estadoDialogo; }
     public LiveData<Boolean> getAlternadoVistas() { return pantallaEscaneo; }
     public LiveData<Integer> getModoVista() { return modoVista; }
+
+    public Carrera getCarreraActual() { return registroRepository.getCarreraActual(); }
+    public Recorrido getRecorridoActual() { return registroRepository.getRecorridoActual(); }
+    public LiveData<Control> getSiguienteControl() { return registroRepository.getSiguienteControl(); }
 
     public void alternarVistas() {
         pantallaEscaneo.postValue(!pantallaEscaneo.getValue());
@@ -125,31 +128,6 @@ public class ScanViewModel extends AndroidViewModel {
     public String getTituloDialogo() { return tituloDialogo; }
 
     /**
-     * Realiza una petición de registro de control.
-     * @param escaneado Texto escaneado en el control
-     */
-    public void registraControl(String escaneado) {
-        if(idCarrera == null || idRecorrido == null) {
-            // Obtiene los datos desde preferencias compartidas
-            Context c = getApplication();
-            SharedPreferences sharedPref = c.getSharedPreferences(c.getString(R.string.sp_carrera_actual), Context.MODE_PRIVATE);
-            String keyIDCarrera = c.getString(R.string.sp_carrera_actual_idcarrera);
-            String keyIDRecorrido = c.getString(R.string.sp_carrera_actual_idrecorrido);
-            long idC = sharedPref.getLong(keyIDCarrera, -1);
-            long idR = sharedPref.getLong(keyIDRecorrido, -1);
-            if(idC == -1 || idR == -1) {
-                // Error
-                // TODO
-            } else {
-                idCarrera = idC;
-                idRecorrido = idR;
-            }
-        }
-
-        registroRepository.registraControl(codigo, idCarrera, idRecorrido, secreto);
-    }
-
-    /**
      * Realiza una petición de comprobación de recorrido pendiente.
      */
     public void compruebaRecorridoPendiente() {
@@ -171,7 +149,23 @@ public class ScanViewModel extends AndroidViewModel {
      * de salida del recorrido, si ha sido exitoso.
      */
     public void confirmaInicioRecorrido() {
-        registroRepository.registraControl(codigo, idCarrera, idRecorrido, secreto);
+        tituloDialogo = "";
+        mensajeDialogo = getApplication().getString(R.string.scan_carga_inicio);
+        estadoDialogo.postValue(ESTADO_CARGANDO);
+        registroRepository.iniciaRecorrido(codigo, idCarrera, idRecorrido, secreto);
+    }
+
+    /**
+     * Realiza una petición de registro de control.
+     * @param escaneado Texto escaneado en el control
+     */
+    public void registraControl(String escaneado) {
+        tituloDialogo = "";
+        mensajeDialogo = getApplication().getString(R.string.scan_carga_registrando);
+        estadoDialogo.postValue(ESTADO_CARGANDO);
+        codigo = Utils.getCodigoControlEscaneado(escaneado);
+        secreto = Utils.getSecretoControlEscaneado(escaneado);
+        registroRepository.registraControl(codigo, secreto);
     }
 
     /**
@@ -181,22 +175,7 @@ public class ScanViewModel extends AndroidViewModel {
         tituloDialogo = "";
         mensajeDialogo = getApplication().getString(R.string.scan_carga_abandono);
         estadoDialogo.postValue(ESTADO_CARGANDO);
-
-        // Obtiene el ID del recorrido guardado en las preferencias
-        Application app = getApplication();
-        SharedPreferences prefs = app.getSharedPreferences(app.getString(R.string.sp_carrera_actual), Context.MODE_PRIVATE);
-        long idRecorrido = prefs.getLong(app.getString(R.string.sp_carrera_actual_idrecorrido), -1);
-        registroRepository.abandonaRecorrido(idRecorrido);
-    }
-
-    /**
-     * Realiza una petición de carga de datos de la carrera actual.
-     */
-    public void cargaDatosCarrera() {
-        tituloDialogo = "";
-        mensajeDialogo = getApplication().getApplicationContext().getString(R.string.scan_carga_carrera);
-        estadoDialogo.postValue(ESTADO_CARGANDO);
-        //registroRepository.comprobarRecorridoPendiente(getApplication());
+        registroRepository.abandonaRecorrido();
     }
 
     /**
@@ -204,7 +183,7 @@ public class ScanViewModel extends AndroidViewModel {
      * @param escaneado Datos del triángulo escaneado
      * @return True si se han actualizado correctamente, false si ha ocurrido algún error
      */
-    public boolean actualizaDatosEscaneado(String escaneado) {
+    public boolean setDatosEscaneadoInicio(String escaneado) {
         codigo = Utils.getCodigoControlEscaneado(escaneado);
         idCarrera = Utils.getIdentificadorCarreraEscaneado(escaneado);
         idRecorrido = Utils.getIdentificadorRecorridoEscaneado(escaneado);

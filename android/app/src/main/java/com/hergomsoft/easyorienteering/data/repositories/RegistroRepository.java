@@ -12,16 +12,22 @@ import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.api.ApiClient;
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroRequest;
 import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.InicioResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
-import com.hergomsoft.easyorienteering.data.db.RegistroDatabase;
-import com.hergomsoft.easyorienteering.data.db.dao.RegistroDAO;
+import com.hergomsoft.easyorienteering.data.api.responses.RegistroResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
+import com.hergomsoft.easyorienteering.data.model.Control;
+import com.hergomsoft.easyorienteering.data.model.Recorrido;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Registro;
-import com.hergomsoft.easyorienteering.data.model.RegistroControl;
 import com.hergomsoft.easyorienteering.util.Constants;
 
+import org.json.JSONObject;
+
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -33,18 +39,30 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RegistroRepository {
 
     private ApiClient apiClient;
-    private RegistroDAO registroDAO;
+    //private RegistroDAO registroDAO;
+    //private ControlDAO controlDAO;
+    //private RecorridoDAO recorridoDAO;
 
-    private MutableLiveData<Recurso<RegistroControl>> registroResponse; // Respuesta de registro de control
-    private MutableLiveData<Recurso<Boolean>> comprobacionPendiente;    // Respuesta de comprobación de recorrido pendiente
-    private MutableLiveData<Recurso<AbandonoResponse>> abandonoResponse;    // Respuesta de comprobación de recorrido pendiente
+    // Datos de la carrera
+    private Carrera carreraActual;
+    private Recorrido recorridoActual;
+    private List<Registro> registroList;
+
+    private MutableLiveData<Recurso<Registro>> registroResponse;         // Respuesta de registro de control
+    private MutableLiveData<Recurso<Boolean>> comprobacionPendiente;     // Respuesta de comprobación de recorrido pendiente
+    private MutableLiveData<Recurso<AbandonoResponse>> abandonoResponse; // Respuesta de comprobación de recorrido pendiente
+    private MutableLiveData<Control> siguienteControl;
 
     public RegistroRepository(Application application) {
-        registroDAO = RegistroDatabase.getDatabase(application).getRegistroDAO();
+        //registroDAO = DatosDatabase.getDatabase(application).getRegistroDAO();
+        //controlDAO = DatosDatabase.getDatabase(application).getControlDAO();
+        //recorridoDAO = DatosDatabase.getDatabase(application).getRecorridoDAO();
 
         registroResponse = new MutableLiveData<>();
         comprobacionPendiente = new MutableLiveData<>();
         abandonoResponse = new MutableLiveData<>();
+        siguienteControl = new MutableLiveData<>();
+        registroList = new ArrayList<>();
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -58,39 +76,100 @@ public class RegistroRepository {
     }
 
     /**
-     * Registra un control en un recorrido. La respuesta puede tener código 422, en cuyo caso el
+     * Inicia el recorrido de una carrera. La respuesta puede tener código 422, en cuyo caso el
      * mensaje contiene un código de error preestablecido (ver documentación).
      * @param codigo Código del control
      * @param idCarrera ID de la carrera
      * @param idRecorrido ID del recorrido
      * @param secreto Secreto del control
      */
-    public void registraControl(String codigo, long idCarrera, long idRecorrido,  String secreto) {
-        RegistroRequest request = new RegistroRequest(codigo, secreto, Constants.ID_USUARIO_PRUEBA, idRecorrido);
-        apiClient.registraControl(idCarrera, request).enqueue(new Callback<RegistroControl>() {
+    public void iniciaRecorrido(String codigo, long idCarrera, long idRecorrido, String secreto) {
+        RegistroRequest request = new RegistroRequest(codigo, secreto);
+        apiClient.iniciaRecorrido(idCarrera, idRecorrido, request).enqueue(new Callback<InicioResponse>() {
             @Override
-            public void onResponse(Call<RegistroControl> call, Response<RegistroControl> response) {
-                Recurso<RegistroControl> res = new Recurso();
-                if(response.isSuccessful()) {
-                    res.setRecurso(response.body());
+            public void onResponse(Call<InicioResponse> call, Response<InicioResponse> response) {
+                Recurso<Registro> recurso = new Recurso();
+                if(response.isSuccessful() && response.body() != null) {
+                    InicioResponse ir = response.body();
+                    carreraActual = ir.getCarrera();
+                    recorridoActual = ir.getRecorrido();
+                    if(carreraActual == null || recorridoActual == null) {
+                        onFailure(call, new IllegalArgumentException("La carrera o el recorrido actuales son nulos"));
+                    }
+
+                    RegistroResponse regResp = ir.getRegistro();
+                    Control control = carreraActual.getControles().get(regResp.getControl());
+                    if(control == null) onFailure(call, new IllegalArgumentException("No se ha encontrado el control con código: " + regResp.getControl()));
+                    Registro registro = new Registro(control, recorridoActual, regResp.getFecha());
+                    recurso.setRecurso(registro);
+                    registraControlLocal(registro);
                 } else if(response.code() == 422) {
                     // Error lanzado en caso de algún error. Contiene un código de error
-                    res.setError(response.message());
+                    asignaCodigoError(recurso, response);
                 } else if(response.code() == 404) {
                     // No existe la carrera con el ID indicado
-                    res.setError("No existe la carrera con el ID indicado");
+                    recurso.setError("No existe la carrera con el ID indicado");
                 } else {
                     // Error desconocido
-                    res.setError("Error inesperado");
+                    recurso.setError("Código de respuesta inesperado: " + response.code());
                 }
 
-                registroResponse.postValue(res);
+                registroResponse.postValue(recurso);
             }
 
             @Override
-            public void onFailure(Call<RegistroControl> call, Throwable t) {
+            public void onFailure(Call<InicioResponse> call, Throwable t) {
                 // TODO Manejar algún error en concreto (sin internet, etc)
-                registroResponse.postValue(null);
+                Recurso<Registro> recurso = new Recurso<>();
+                recurso.setError(t.getMessage());
+                registroResponse.postValue(recurso);
+            }
+        });
+    }
+
+    /**
+     * Registra un control en un recorrido. La respuesta puede tener código 422, en cuyo caso el
+     * mensaje contiene un código de error preestablecido (ver documentación).
+     * @param codigo Código del control
+     * @param secreto Secreto del control
+     */
+    public void registraControl(String codigo, String secreto) {
+        RegistroRequest request = new RegistroRequest(codigo, secreto);
+        apiClient.registraControl(carreraActual.getId(), request).enqueue(new Callback<RegistroResponse>() {
+            @Override
+            public void onResponse(Call<RegistroResponse> call, Response<RegistroResponse> response) {
+                Recurso<Registro> recurso = new Recurso();
+                if(response.isSuccessful() && response.body() != null) {
+                    RegistroResponse resp = response.body();
+                    // Obtiene el control y el recorrido desde su código e ID
+                    //Control control = controlDAO.getByCodigo(resp.getControl());
+                    //Recorrido recorrido = recorridoDAO.getByID(resp.getRecorrido());
+                    Control control = carreraActual.getControles().get(resp.getControl());
+                    if(control == null) onFailure(call, new IllegalArgumentException("No se ha encontrado el control con código: " + resp.getControl()));
+
+                    Registro registro = new Registro(control, recorridoActual, resp.getFecha());
+                    recurso.setRecurso(registro);
+                    registraControlLocal(registro);
+                } else if(response.code() == 422) {
+                    // Error lanzado en caso de algún error. Contiene un código de error
+                    asignaCodigoError(recurso, response);
+                } else if(response.code() == 404) {
+                    // No existe la carrera con el ID indicado
+                    recurso.setError("No existe la carrera con el ID indicado");
+                } else {
+                    // Error desconocido
+                    recurso.setError("Código de respuesta inesperado: " + response.code());
+                }
+
+                registroResponse.postValue(recurso);
+            }
+
+            @Override
+            public void onFailure(Call<RegistroResponse> call, Throwable t) {
+                // TODO Manejar algún error en concreto (sin internet, etc)
+                Recurso<Registro> recurso = new Recurso<>();
+                recurso.setError(t.getMessage());
+                registroResponse.postValue(recurso);
             }
         });
     }
@@ -108,20 +187,10 @@ public class RegistroRepository {
                 Recurso<Boolean> resultado = new Recurso<>();
                 Boolean pendiente = null;
                 if(response.isSuccessful()) {
-                    SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.sp_carrera_actual), Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    String keyIDCarrera = context.getString(R.string.sp_carrera_actual_idcarrera);
-                    String keyIDRecorrido = context.getString(R.string.sp_carrera_actual_idrecorrido);
-                    String keyNombreCarrera = context.getString(R.string.sp_carrera_actual_nombrecarrera);
-                    String keyNombreRecorrido = context.getString(R.string.sp_carrera_actual_nombrerecorrido);
-
                     if(response.code() == 204) {
                         // No content: no tiene ninguna carrera pendiente
-                        // Borra datos locales anteriores
-                        editor.remove(keyIDCarrera);
-                        editor.remove(keyIDRecorrido);
-                        editor.remove(keyNombreCarrera);
-                        editor.remove(keyNombreRecorrido);
+                        carreraActual = null;
+                        recorridoActual = null;
                         pendiente = false;
                     } else {
                         PendienteResponse resp = response.body();
@@ -130,29 +199,28 @@ public class RegistroRepository {
                             // TODO
                             resultado.setError("Error. Respuesta del servidor inválida");
                         } else {
-                            Carrera carrera = resp.getCarrera();
-                            // Obtiene el nombre del recorrido
-                            String nombreRecorrido = null;
+                            carreraActual = resp.getCarrera();
+                            recorridoActual = null;
                             int i = 0;
-                            while(nombreRecorrido == null || i < carrera.getRecorridos().length) {
-                                if(carrera.getRecorridos()[i].getId() == resp.getIdRecorrido()) {
-                                    nombreRecorrido = carrera.getRecorridos()[i].getNombre();
+                            while(recorridoActual == null || i < carreraActual.getRecorridos().length) {
+                                if(carreraActual.getRecorridos()[i].getId() == resp.getIdRecorrido()) {
+                                    recorridoActual = carreraActual.getRecorridos()[i];
                                 }
                                 i++;
                             }
 
-                            editor.putLong(keyIDCarrera, carrera.getId());
-                            editor.putLong(keyIDRecorrido, resp.getIdRecorrido());
-                            editor.putString(keyNombreCarrera, carrera.getNombre());
-                            editor.putString(keyNombreRecorrido, nombreRecorrido);
-
                             // Borra todos los registros anteriores e introduce los nuevos
-                            new insertRegistrosAT(registroDAO).execute(resp.getRegistros());
+                            //new InsertRegistrosAT(registroDAO).execute(resp.getRegistros());
+                            registroList = new ArrayList<>();
+                            for(RegistroResponse rr : resp.getRegistros()) {
+                                Control control = carreraActual.getControles().get(rr.getControl());
+                                if(control == null) onFailure(call, new IllegalArgumentException("No se ha encontrado el control con código: " + rr.getControl()));
+                                registroList.add(new Registro(control, recorridoActual, rr.getFecha()));
+                            }
+                            actualizaSiguienteControl();
                             pendiente = true;
                         }
                     }
-
-                    editor.commit();
                 } else {
                     // Error desconocido
                     // TODO
@@ -178,8 +246,11 @@ public class RegistroRepository {
         });
     }
 
-    public void abandonaRecorrido(long idRecorrido) {
-        apiClient.abandonaRecorrido(idRecorrido).enqueue(new Callback<AbandonoResponse>() {
+    /**
+     * Realiza una petición de abandono de recorrido.
+     */
+    public void abandonaRecorrido() {
+        apiClient.abandonaRecorrido(recorridoActual.getId()).enqueue(new Callback<AbandonoResponse>() {
             @Override
             public void onResponse(Call<AbandonoResponse> call, Response<AbandonoResponse> response) {
                 Recurso<AbandonoResponse> recurso = new Recurso<>();
@@ -207,22 +278,78 @@ public class RegistroRepository {
     }
 
     public LiveData<Recurso<Boolean>> getPendienteResponse() { return comprobacionPendiente; }
-    public LiveData<Recurso<RegistroControl>> getRegistroResponse() { return registroResponse; }
+    public LiveData<Recurso<Registro>> getRegistroResponse() { return registroResponse; }
     public LiveData<Recurso<AbandonoResponse>> getAbandonoResponse() { return abandonoResponse; }
+    public LiveData<Control> getSiguienteControl() { return siguienteControl; }
+    public Carrera getCarreraActual() { return carreraActual; }
+    public Recorrido getRecorridoActual() { return recorridoActual; }
+
+    /**
+     * Obtiene el código de error del cuerpo del mensaje de la respuesta.
+     * @param recurso Recurso al que asignar el error
+     * @param response Respuesta con el error
+     */
+    private void asignaCodigoError(Recurso recurso, Response response) {
+        try {
+            JSONObject json = new JSONObject(response.errorBody().string());
+            recurso.setError(json.getString("message"));
+            // TODO Convertir a error legible por el usuario
+        } catch (Exception e) {
+            e.printStackTrace();
+            recurso.setError("Error inesperado al obtener el código de error");
+        }
+    }
+
+    private void registraControlLocal(Registro registro) {
+        registroList.add(registro);
+        actualizaSiguienteControl();
+    }
+
+    private void actualizaSiguienteControl() {
+        // Carga siguiente control
+        if(carreraActual.getModalidad().contentEquals("LINEA")) {
+            // LINEA
+            String[] trazado = recorridoActual.getTrazado();
+            if(registroList.size() < trazado.length) {
+                Control control = carreraActual.getControles().get(trazado[registroList.size()]);
+                siguienteControl.postValue(control);
+            }
+        }
+    }
+
+    /**
+     * Tarea asíncrona que guarda los datos de una carrera en la BD local.
+
+    private static class GuardaDatosCarrera extends AsyncTask<Carrera, Void, Void> {
+
+        GuardaDatosCarrera() {
+
+        }
+
+        @Override
+        protected Void doInBackground(final Carrera... params) {
+            Carrera carrera = params[0];
 
 
-    private static class insertRegistrosAT extends AsyncTask<Registro[], Void, Void> {
+            return null;
+        }
+    }*/
+
+    /**
+     * Tarea asíncrona que inserta los registros de una carrera pendiente.
+
+    private static class InsertRegistrosAT extends AsyncTask<Registro[], Void, Void> {
         private RegistroDAO dao;
-        insertRegistrosAT(RegistroDAO dao) {
+        InsertRegistrosAT(RegistroDAO dao) {
             this.dao = dao;
         }
 
         @Override
         protected Void doInBackground(final Registro[]... params) {
             dao.deleteAll();
-            dao.add(params[0]);
+            dao.insert(params[0]);
             return null;
         }
-    }
+    }*/
 
 }

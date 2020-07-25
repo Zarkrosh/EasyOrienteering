@@ -2,9 +2,10 @@ package com.hergomsoft.easyorienteering.data.api;
 
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroRequest;
 import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.InicioResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.RegistroResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
-import com.hergomsoft.easyorienteering.data.model.RegistroControl;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -19,12 +20,16 @@ public interface ApiClient {
     Call<Carrera> getCarrera(@Path("id") long idCarrera);
 
     @POST("registros/{id}")
-    Call<RegistroControl> registraControl(@Path("id") long idCarrera, @Body RegistroRequest registro);
+    Call<RegistroResponse> registraControl(@Path("id") long idCarrera, @Body RegistroRequest registro);
 
     @GET("registros/pendiente")
     Call<PendienteResponse> getPendiente();
 
-    @POST("registros/abandonar/{id}")
-    Call<AbandonoResponse> abandonaRecorrido(@Path("id") long idRecorrido);
+    @POST("registros/{idCarrera}/iniciar/{idRecorrido}")
+    Call<InicioResponse> iniciaRecorrido(@Path("idCarrera") long idCarrera,
+                 @Path("idRecorrido") long idRecorrido, @Body RegistroRequest registro);
+
+    @POST("registros/abandonar/{idRecorrido}")
+    Call<AbandonoResponse> abandonaRecorrido(@Path("idRecorrido") long idRecorrido);
 
 }

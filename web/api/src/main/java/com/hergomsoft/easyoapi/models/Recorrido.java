@@ -48,10 +48,12 @@ public class Recorrido implements IdEntity {
         this.trazado = trazado;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

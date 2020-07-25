@@ -46,17 +46,18 @@ public class Registro implements IdEntity {
     public Registro() {
     }
 
-    public Registro(Usuario corredor, Control control, Recorrido recorrido, Date fecha) {
+    public Registro(Usuario corredor, Control control, Recorrido recorrido) {
         this.corredor = corredor;
         this.control = control;
         this.recorrido = recorrido;
-        this.fecha = fecha;
     }
-
+    
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }
