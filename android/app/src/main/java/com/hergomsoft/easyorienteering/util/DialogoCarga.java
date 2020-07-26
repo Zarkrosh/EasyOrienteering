@@ -19,7 +19,7 @@ import com.hergomsoft.easyorienteering.R;
 /**
  * Diálogo de uso general para estados de carga, éxito y error.
  */
-public class CustomLoadDialog extends AlertDialog {
+public class DialogoCarga extends AlertDialog {
 
     private TextView titulo;
     private ImageView imagen;
@@ -27,7 +27,7 @@ public class CustomLoadDialog extends AlertDialog {
     private TextView mensaje;
     private TextView btnDismiss;
 
-    public CustomLoadDialog(Context context) {
+    public DialogoCarga(Context context) {
         super(context);
     }
 
@@ -68,11 +68,9 @@ public class CustomLoadDialog extends AlertDialog {
      */
     public void muestraMensajeCarga(String tituloCarga, String mensajeCarga) {
         show();
-        titulo.setText(tituloCarga);
+        setTitulo(tituloCarga);
         setMensaje(mensajeCarga);
-        progress.setVisibility(View.VISIBLE);
-        imagen.setVisibility(View.INVISIBLE);
-        btnDismiss.setVisibility(View.INVISIBLE);
+        configuraElementosSinError();
         // Colores por defecto
         titulo.setTextColor(Color.BLACK);
         mensaje.setTextColor(Color.BLACK);
@@ -85,11 +83,9 @@ public class CustomLoadDialog extends AlertDialog {
      */
     public void muestraMensajeExito(String tituloExito, String mensajeExito) {
         show();
-        titulo.setText(tituloExito);
+        setTitulo(tituloExito);
         imagen.setImageDrawable(getContext().getResources().getDrawable(R.drawable.exito));
-        imagen.setVisibility(View.VISIBLE);
-        progress.setVisibility(View.INVISIBLE);
-        btnDismiss.setVisibility(View.VISIBLE);
+        configuraElementosSinError();
         setMensaje(mensajeExito);
         // Colores de éxito
         titulo.setTextColor(getContext().getResources().getColor(R.color.exito));
@@ -104,15 +100,25 @@ public class CustomLoadDialog extends AlertDialog {
      */
     public void muestraMensajeError(String tituloError, String mensajeError) {
         show();
-        titulo.setText(tituloError);
+        setTitulo(tituloError);
         imagen.setImageDrawable(getContext().getResources().getDrawable(R.drawable.error));
-        imagen.setVisibility(View.VISIBLE);
-        progress.setVisibility(View.INVISIBLE);
-        btnDismiss.setVisibility(View.VISIBLE);
+        configuraElementosConError();
         setMensaje(mensajeError);
         // Colores de error
         titulo.setTextColor(getContext().getResources().getColor(R.color.error));
         mensaje.setTextColor(getContext().getResources().getColor(R.color.error));
+    }
+
+    private void configuraElementosSinError() {
+        progress.setVisibility(View.VISIBLE);
+        imagen.setVisibility(View.INVISIBLE);
+        btnDismiss.setVisibility(View.INVISIBLE);
+    }
+
+    private void configuraElementosConError() {
+        imagen.setVisibility(View.VISIBLE);
+        progress.setVisibility(View.INVISIBLE);
+        btnDismiss.setVisibility(View.VISIBLE);
     }
 
 
@@ -130,6 +136,15 @@ public class CustomLoadDialog extends AlertDialog {
         } else {
             mensaje.setVisibility(View.VISIBLE);
         }
+    }
+
+    /**
+     * Asigna un valor al título del diálogo.
+     * @param sTitulo Mensaje
+     */
+    private void setTitulo(String sTitulo) {
+        if(sTitulo == null) sTitulo = "";
+        titulo.setText(sTitulo);
     }
 
 }

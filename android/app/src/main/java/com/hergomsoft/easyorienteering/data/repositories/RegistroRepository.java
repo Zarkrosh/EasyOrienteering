@@ -178,9 +178,9 @@ public class RegistroRepository extends ApiRepository {
                             carreraActual = resp.getCarrera();
                             recorridoActual = null;
                             int i = 0;
-                            while(recorridoActual == null || i < carreraActual.getRecorridos().length) {
-                                if(carreraActual.getRecorridos()[i].getId() == resp.getIdRecorrido()) {
-                                    recorridoActual = carreraActual.getRecorridos()[i];
+                            while(recorridoActual == null || i < carreraActual.getRecorridos().size()) {
+                                if(carreraActual.getRecorridos().get(i).getId() == resp.getIdRecorrido()) {
+                                    recorridoActual = carreraActual.getRecorridos().get(i);
                                 }
                                 i++;
                             }

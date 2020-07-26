@@ -39,7 +39,7 @@ import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Registro;
-import com.hergomsoft.easyorienteering.util.CustomLoadDialog;
+import com.hergomsoft.easyorienteering.util.DialogoCarga;
 import com.hergomsoft.easyorienteering.util.Utils;
 
 import java.io.IOException;
@@ -57,7 +57,7 @@ public class ScanActivity extends AppCompatActivity {
     // Diálogos
     private AlertDialog dialogConfirmacion;
     private AlertDialog dialogRecorridoPendiente;
-    private CustomLoadDialog dialogEscaneo;
+    private DialogoCarga dialogoCarga;
 
     // Sonidos
     private SoundPool soundPool;
@@ -132,7 +132,7 @@ public class ScanActivity extends AppCompatActivity {
      * Inicializa todos los elementos de la actividad.
      */
     private void iniciar() {
-        setupDialogoGeneral();      // Diálogo de uso general (cargas/errores/exitos)
+        setupDialogoCarga();      // Diálogo de uso general (cargas/errores/exitos)
         setupDialogoConfirmacion(); // Diálogo de confirmación de inicio de recorridos
         setupDialogoPendiente();    // Diálogo de recorrido pendiente
         setupSonidos();             // Carga los sonidos utilizados
@@ -154,24 +154,24 @@ public class ScanActivity extends AppCompatActivity {
             public void onChanged(Integer integer) {
                 switch(integer) {
                     case ScanViewModel.ESTADO_CARGANDO:
-                        dialogEscaneo.muestraMensajeCarga(viewModel.getTituloDialogo(),
+                        dialogoCarga.muestraMensajeCarga(viewModel.getTituloDialogo(),
                                                           viewModel.getMensajeDialogo());
                         break;
                     case ScanViewModel.ESTADO_ERROR:
-                        dialogEscaneo.muestraMensajeError(viewModel.getTituloDialogo(),
+                        dialogoCarga.muestraMensajeError(viewModel.getTituloDialogo(),
                                                           viewModel.getMensajeDialogo());
                         break;
                     case ScanViewModel.ESTADO_EXITO:
-                        dialogEscaneo.muestraMensajeExito(viewModel.getTituloDialogo(),
+                        dialogoCarga.muestraMensajeExito(viewModel.getTituloDialogo(),
                                                           viewModel.getMensajeDialogo());
                         break;
                     case ScanViewModel.ESTADO_ELECCION_PENDIENTE:
-                        dialogEscaneo.dismiss();
+                        dialogoCarga.dismiss();
                         muestraDialogoRecorridoPendiente();
                         break;
                     case ScanViewModel.ESTADO_OCULTO:
                     default:
-                        dialogEscaneo.dismiss();
+                        dialogoCarga.dismiss();
                 }
             }
         });
@@ -204,7 +204,7 @@ public class ScanActivity extends AppCompatActivity {
             public void onChanged(Recurso<Registro> registroControl) {
                 if(registroControl.hayError()) {
                     // Error al registrar
-                    dialogEscaneo.muestraMensajeError(getString(R.string.registro_error), registroControl.getError());
+                    dialogoCarga.muestraMensajeError(getString(R.string.registro_error), registroControl.getError());
                 } else {
                     // Registro con éxito
                     ocultaDialogoCarga();
@@ -489,16 +489,16 @@ public class ScanActivity extends AppCompatActivity {
     /**
      * Configura el diálogo de uso general para operaciones de carga y notificaciones de éxito/error.
      */
-    private void setupDialogoGeneral() {
-        dialogEscaneo = new CustomLoadDialog(ScanActivity.this);
-        dialogEscaneo.setOnShowListener(new DialogInterface.OnShowListener() {
+    private void setupDialogoCarga() {
+        dialogoCarga = new DialogoCarga(ScanActivity.this);
+        dialogoCarga.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
                 // Pausa la captura de la cámara
                 cameraSource.stop();
             }
         });
-        dialogEscaneo.setOnDismissListener(new DialogInterface.OnDismissListener() {
+        dialogoCarga.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) { iniciaCapturaCamara(); }
         });
@@ -522,7 +522,7 @@ public class ScanActivity extends AppCompatActivity {
         alertBuilder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                if(!dialogEscaneo.isShowing()) iniciaCapturaCamara();
+                if(!dialogoCarga.isShowing()) iniciaCapturaCamara();
                 ultimoEscaneado = "";
             }
         });

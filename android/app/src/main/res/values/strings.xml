@@ -113,4 +113,10 @@
     <string name="mis_carreras_organizadas">Organizadas</string>
 
 
+    <!-- Detalles de carrera -->
+    <string name="detalles_carrera">Detalles de carrera</string>
+    <string name="detalles_carrera_error_id">ID de carrera inválido</string>
+    <string name="detalles_carrera_cargando">Cargando carrera…</string>
+
+
 </resources>

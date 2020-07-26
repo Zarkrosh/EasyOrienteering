@@ -34,8 +34,6 @@ public class MisCarrerasViewModel extends ViewModel {
         estadocargaCarreras.postValue(new Recurso<>(false));
     }
 
-    public void mostrarErrorCarga(String error) {
-        estadocargaCarreras.postValue(new Recurso<>(error));
-    }
+    public void mostrarErrorCarga(String error) { estadocargaCarreras.postValue(new Recurso<>(error)); }
 
 }

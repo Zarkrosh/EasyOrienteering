@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_margin="6dp"
+    android:background="@color/colorPrimary">
+
+    <TextView
+        android:id="@+id/item_recorridos_nombre_recorrido"
+        android:layout_width="0dp"
+        android:layout_weight="0.7"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"/>
+
+    <!-- TODO Icono corredor -->
+    <TextView
+        android:id="@+id/item_recorridos_numero_acabados"
+        android:layout_width="0dp"
+        android:layout_weight="0.3"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textSize="20sp" />
+
+</LinearLayout>

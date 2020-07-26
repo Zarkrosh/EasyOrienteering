@@ -2,6 +2,7 @@ package com.hergomsoft.easyorienteering.data.model;
 
 import com.google.gson.annotations.Expose;
 
+import java.util.List;
 import java.util.Map;
 
 public class Carrera {
@@ -18,7 +19,7 @@ public class Carrera {
     @Expose
     private Modalidad modalidad; // TODO Enum
     @Expose
-    private Recorrido[] recorridos;
+    private List<Recorrido> recorridos;
     @Expose
     private Map<String, Control> controles;
 
@@ -38,7 +39,7 @@ public class Carrera {
         return modalidad;
     }
 
-    public Recorrido[] getRecorridos() {
+    public List<Recorrido> getRecorridos() {
         return recorridos;
     }
 

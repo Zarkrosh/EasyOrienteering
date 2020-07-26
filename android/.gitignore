@@ -41,6 +41,8 @@ captures/
 # IntelliJ
 *.iml
 .idea/workspace.xml
+.idea/dbnavigator.xml
+.idea/misc.xml
 .idea/tasks.xml
 .idea/gradle.xml
 .idea/assetWizardSettings.xml
@@ -51,6 +53,7 @@ captures/
 .idea/modules.xml
 # Comment next line if keeping position of elements in Navigation Editor is relevant for you
 .idea/navEditor.xml
+# CodeStyles
 
 # Keystore files
 # Uncomment the following lines if you do not want to check your keystore files in.

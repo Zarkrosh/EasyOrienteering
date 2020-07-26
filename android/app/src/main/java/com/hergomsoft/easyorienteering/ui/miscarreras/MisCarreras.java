@@ -5,10 +5,12 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -20,7 +22,9 @@ import com.hergomsoft.easyorienteering.adapters.MisCarrerasPagerAdapter;
 import com.hergomsoft.easyorienteering.data.api.responses.CarrerasUsuarioResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
+import com.hergomsoft.easyorienteering.ui.detallescarrera.DetallesCarreraActivity;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
+import com.hergomsoft.easyorienteering.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +77,17 @@ public class MisCarreras extends BackableActivity {
         adapterOrganizadas = new CarrerasListAdapter(this, carrerasOrganizadas);
         listaCarrerasCorridas.setAdapter(adapterCorridas);
         listaCarrerasOrganizadas.setAdapter(adapterOrganizadas);
+        AdapterView.OnItemClickListener listenerLista = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Carrera clicked = (Carrera) parent.getItemAtPosition(position);
+                Intent intent = new Intent(MisCarreras.this, DetallesCarreraActivity.class);
+                intent.putExtra(Constants.EXTRA_ID_CARRERA, clicked.getId());
+                startActivity(intent);
+            }
+        };
+        listaCarrerasCorridas.setOnItemClickListener(listenerLista);
+        listaCarrerasOrganizadas.setOnItemClickListener(listenerLista);
 
         // Configura el ViewPager
         String[] titulosTabs = {getString(R.string.mis_carreras_corridas),
