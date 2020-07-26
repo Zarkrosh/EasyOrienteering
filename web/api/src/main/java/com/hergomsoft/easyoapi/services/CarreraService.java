@@ -2,6 +2,7 @@ package com.hergomsoft.easyoapi.services;
 
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Control;
+import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.repository.CarreraRepository;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -130,6 +131,18 @@ public class CarreraService implements ICarreraService {
     public String getSecretoControl(Control control) {
         return md5(control.getCodigo() + control.getCarrera().getSecret());
     }
+    
+    @Override
+    public List<Carrera> getCarrerasCorridasUsuario(Usuario usuario) {
+        return repoCarrera.getCarrerasCorridasUsuario(usuario.getId());
+    }
+
+    @Override
+    public List<Carrera> getCarrerasOrganizadasUsuario(Usuario usuario) {
+        return repoCarrera.findByOrganizadorId(usuario.getId());
+    }
+    
+    
     
     /**
      * Genera una cadena aleatoria del tamaño especificado.

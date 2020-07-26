@@ -1,24 +1,21 @@
 package com.hergomsoft.easyorienteering.data.model;
 
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-
 import com.google.gson.annotations.Expose;
 
-@Entity
 public class Control {
-    @PrimaryKey
-    @Expose
-    private String codigo;
+
+    public enum Tipo {SALIDA, CONTROL, META};
 
     @Expose
-    private String tipo;
+    private String codigo;
+    @Expose
+    private Tipo tipo;
 
     public String getCodigo() {
         return codigo;
     }
 
-    public String getTipo() {
+    public Tipo getTipo() {
         return tipo;
     }
 }

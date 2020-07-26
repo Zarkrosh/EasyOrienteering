@@ -42,7 +42,7 @@ public class RegistrosController {
     public PendienteResponse getDatosCarreraPendiente(HttpServletResponse response) {
         PendienteResponse res = null;
         
-        Usuario corredor = getUsuarioPeticion();
+        Usuario corredor = usuariosService.getUsuarioPeticion();
         Recorrido recorrido = registrosService.getRecorridoPendiente(corredor);
         if(recorrido != null) {
             // Tiene un recorrido pendiente de acabar
@@ -59,7 +59,7 @@ public class RegistrosController {
     @PostMapping("{idCarrera}/iniciar/{idRecorrido}")
     public InicioResponse iniciarRecorrido(@PathVariable long idCarrera, 
             @PathVariable long idRecorrido, @Valid @RequestBody RegistroRequest peticion) {
-        Usuario corredor = getUsuarioPeticion();
+        Usuario corredor = usuariosService.getUsuarioPeticion();
         Carrera carrera = carrerasService.getCarrera(idCarrera);
         Registro registro = null;
         Recorrido recorrido = null;
@@ -73,7 +73,7 @@ public class RegistrosController {
                     if(!registrosService.haCorridoRecorrido(corredor, recorrido)) {
                         // Comprueba que el control es una salida
                         Control control = carrera.getControles().get(peticion.getCodigo());
-                        if(control.getTipo() == Control.TIPO.SALIDA) {
+                        if(control.getTipo() == Control.Tipo.SALIDA) {
                             // Comprueba que el control es la salida del recorrido
                             if(control.getCodigo().contentEquals(recorrido.getTrazado().get(0))) {
                                 // Genera el registro
@@ -115,7 +115,7 @@ public class RegistrosController {
     public AbandonoResponse abandonarRecorrido(@PathVariable long idRecorrido) {
         AbandonoResponse res = new AbandonoResponse(false, "");
         
-        Usuario corredor = getUsuarioPeticion();
+        Usuario corredor = usuariosService.getUsuarioPeticion();
         Recorrido recorrido = registrosService.getRecorridoPendiente(corredor);
         if(recorrido != null) {
             // Tiene un recorrido pendiente de acabar
@@ -148,7 +148,7 @@ public class RegistrosController {
             Control control = carrera.getControles().get(peticion.getCodigo());
             if(control != null) {
                 // Obtiene el usuario corredor
-                Usuario corredor = getUsuarioPeticion();
+                Usuario corredor = usuariosService.getUsuarioPeticion();
                 Recorrido recorrido = registrosService.getRecorridoPendiente(corredor);
                 if(recorrido != null) {
                     // Corredor realizando recorrido
@@ -156,7 +156,7 @@ public class RegistrosController {
                         // Está corriendo recorrido de la carrera
                         if(carrerasService.checkSecretoControl(peticion.getSecreto(), control)) {
                             // Control válido, comprueba si el registro es válido
-                            if(carrera.getModalidad() == Carrera.MODALIDAD.LINEA) {
+                            if(carrera.getModalidad() == Carrera.Modalidad.LINEA) {
                                 // Comprueba si el control registrado es el siguiente que le toca
                                 String siguiente = registrosService.getCodigoSiguienteControlRecorrido(corredor, recorrido);
                                 if(siguiente != null) {
@@ -215,16 +215,6 @@ public class RegistrosController {
      */
     private void lanzaError422(String mensaje) throws ResponseStatusException {
         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, mensaje);
-    }
-    
-    
-    /**
-     * Obtiene el usuario que ha realizado la petición.
-     * @return Usuario
-     */
-    private Usuario getUsuarioPeticion() {
-        // TODO: extraer del método de autenticación
-        return usuariosService.getUsuario(3); // TEST ANDROID
     }
 
 }

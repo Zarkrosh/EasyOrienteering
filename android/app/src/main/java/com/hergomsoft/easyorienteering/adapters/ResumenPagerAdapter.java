@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.viewpager.widget.PagerAdapter;
 
-import com.hergomsoft.easyorienteering.data.model.pagers.ResumenPages;
+import com.hergomsoft.easyorienteering.data.model.pages.ResumenPages;
 
 public class ResumenPagerAdapter extends PagerAdapter {
 

@@ -2,14 +2,10 @@ package com.hergomsoft.easyorienteering.data.repositories;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.data.api.ApiClient;
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroRequest;
 import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.InicioResponse;
@@ -20,25 +16,18 @@ import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Registro;
-import com.hergomsoft.easyorienteering.util.Constants;
 
 import org.json.JSONObject;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RegistroRepository {
-
-    private ApiClient apiClient;
+public class RegistroRepository extends ApiRepository {
     //private RegistroDAO registroDAO;
     //private ControlDAO controlDAO;
     //private RecorridoDAO recorridoDAO;
@@ -63,16 +52,6 @@ public class RegistroRepository {
         abandonoResponse = new MutableLiveData<>();
         siguienteControl = new MutableLiveData<>();
         registroList = new ArrayList<>();
-
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-        apiClient = new retrofit2.Retrofit.Builder()
-                .baseUrl(ApiClient.BASE_URL)
-                .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(ApiClient.class);
     }
 
     /**
@@ -166,10 +145,7 @@ public class RegistroRepository {
 
             @Override
             public void onFailure(Call<RegistroResponse> call, Throwable t) {
-                // TODO Manejar algún error en concreto (sin internet, etc)
-                Recurso<Registro> recurso = new Recurso<>();
-                recurso.setError(t.getMessage());
-                registroResponse.postValue(recurso);
+                registroResponse.postValue(getRecursoConErrorConexion(t));
             }
         });
     }
@@ -224,7 +200,7 @@ public class RegistroRepository {
                 } else {
                     // Error desconocido
                     // TODO
-                    resultado.setError("Error desconocido");
+                    resultado.setError("Error desconocido. Código HTTP " + response.code());
                 }
 
                 resultado.setRecurso(pendiente);
@@ -233,15 +209,7 @@ public class RegistroRepository {
 
             @Override
             public void onFailure(Call<PendienteResponse> call, Throwable t) {
-                Recurso<Boolean> recurso = new Recurso<>();
-                if(t.getCause() instanceof SocketTimeoutException) {
-                    recurso.setError("No se ha podido contactar con el servidor (tiempo expirado)");
-                } else {
-                    // TODO Manejar algún error en concreto (sin internet, etc)
-                    recurso.setError("Error de conexión desconocido");
-                }
-
-                comprobacionPendiente.postValue(recurso);
+                comprobacionPendiente.postValue(getRecursoConErrorConexion(t));
             }
         });
     }
@@ -264,15 +232,7 @@ public class RegistroRepository {
 
             @Override
             public void onFailure(Call<AbandonoResponse> call, Throwable t) {
-                Recurso<AbandonoResponse> recurso = new Recurso<>();
-                if(t.getCause() instanceof SocketTimeoutException) {
-                    recurso.setError("No se ha podido contactar con el servidor (tiempo expirado)");
-                } else {
-                    // TODO Manejar algún error en concreto (sin internet, etc)
-                    recurso.setError("Error de conexión desconocido");
-                }
-
-                abandonoResponse.postValue(recurso);
+                abandonoResponse.postValue(getRecursoConErrorConexion(t));
             }
         });
     }
@@ -307,7 +267,7 @@ public class RegistroRepository {
 
     private void actualizaSiguienteControl() {
         // Carga siguiente control
-        if(carreraActual.getModalidad().contentEquals("LINEA")) {
+        if(carreraActual.getModalidad().equals(Carrera.Modalidad.LINEA)) {
             // LINEA
             String[] trazado = recorridoActual.getTrazado();
             if(registroList.size() < trazado.length) {

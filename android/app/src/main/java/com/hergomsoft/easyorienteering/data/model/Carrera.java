@@ -6,21 +6,19 @@ import java.util.Map;
 
 public class Carrera {
 
+    public enum Tipo {EVENTO, CIRCUITO};
+    public enum Modalidad {LINEA, SCORE};
+
     @Expose
     private long id;
-
     @Expose
     private String nombre;
-
     @Expose
-    private String tipo; // TODO Enum
-
+    private Tipo tipo; // TODO Enum
     @Expose
-    private String modalidad; // TODO Enum
-
+    private Modalidad modalidad; // TODO Enum
     @Expose
     private Recorrido[] recorridos;
-
     @Expose
     private Map<String, Control> controles;
 
@@ -32,11 +30,11 @@ public class Carrera {
         return nombre;
     }
 
-    public String getTipo() {
+    public Tipo getTipo() {
         return tipo;
     }
 
-    public String getModalidad() {
+    public Modalidad getModalidad() {
         return modalidad;
     }
 

@@ -12,8 +12,8 @@
     <dimen name="tamTitulo">30sp</dimen>
     <dimen name="tamContenido">22sp</dimen>
 
-    <!-- Registro -->
-    <dimen name="tamIndicadorDialogoRegistro">120dp</dimen>
+    <!-- Diálogo de carga -->
+    <dimen name="tamProgressDialogoCarga">120dp</dimen>
 
     <!-- Home -->
     <dimen name="dimImgPerfil">70dp</dimen>

@@ -1,4 +1,4 @@
-package com.hergomsoft.easyorienteering.data.model.pagers;
+package com.hergomsoft.easyorienteering.data.model.pages;
 
 import com.hergomsoft.easyorienteering.R;
 

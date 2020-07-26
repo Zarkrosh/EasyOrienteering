@@ -33,14 +33,14 @@ public class CustomLoadDialog extends AlertDialog {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        View content = LayoutInflater.from(getContext()).inflate(R.layout.dialog_scan, null);
+        View content = LayoutInflater.from(getContext()).inflate(R.layout.dialogo_carga, null);
         setView(content);
 
-        titulo = content.findViewById(R.id.dialog_scan_inicial_titulo);
-        progress = content.findViewById(R.id.dialog_scan_inicial_progress);
-        imagen = content.findViewById(R.id.dialog_scan_inicial_imagen);
-        mensaje = content.findViewById(R.id.dialog_scan_inicial_mensaje);
-        btnDismiss = content.findViewById(R.id.dialog_scan_inicial_dismiss);
+        titulo = content.findViewById(R.id.dialogo_carga_titulo);
+        progress = content.findViewById(R.id.dialogo_carga_progress);
+        imagen = content.findViewById(R.id.dialogo_carga_imagen);
+        mensaje = content.findViewById(R.id.dialogo_carga_mensaje);
+        btnDismiss = content.findViewById(R.id.dialogo_carga_dismiss);
 
         btnDismiss.setOnClickListener(new View.OnClickListener() {
             @Override

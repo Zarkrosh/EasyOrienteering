@@ -1,57 +1,61 @@
 package com.hergomsoft.easyorienteering.data.repositories;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.hergomsoft.easyorienteering.data.api.ApiClient;
+import com.hergomsoft.easyorienteering.data.api.responses.CarrerasUsuarioResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
+import com.hergomsoft.easyorienteering.data.model.Recurso;
 
 
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-public class CarreraRepository {
-
-    private ApiClient apiClient;
-    private MutableLiveData<Carrera> carreraResponse;
+public class CarreraRepository extends ApiRepository {
+    private MutableLiveData<Recurso<Carrera>> carreraResponse;
+    private MutableLiveData<Recurso<CarrerasUsuarioResponse>> carrerasUsuarioResponse;
 
     public CarreraRepository() {
         carreraResponse = new MutableLiveData<>();
-
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-        apiClient = new retrofit2.Retrofit.Builder()
-                .baseUrl(ApiClient.BASE_URL)
-                .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(ApiClient.class);
+        carrerasUsuarioResponse = new MutableLiveData<>();
     }
 
-    public void buscaCarreraPorId(long id) {
+    public LiveData<Recurso<Carrera>> getCarreraResponse() {
+        return carreraResponse;
+    }
+    public LiveData<Recurso<CarrerasUsuarioResponse>> getCarrerasUsuarioResponse() { return carrerasUsuarioResponse; }
+
+    public void getCarrera(long id) {
         apiClient.getCarrera(id).enqueue(new Callback<Carrera>() {
             @Override
             public void onResponse(Call<Carrera> call, Response<Carrera> response) {
                 if(response.body() != null) {
-                    carreraResponse.postValue(response.body());
+                    carreraResponse.postValue(new Recurso<>(response.body()));
                 }
             }
 
             @Override
             public void onFailure(Call<Carrera> call, Throwable t) {
-                carreraResponse.postValue(null);
+                carreraResponse.postValue(getRecursoConErrorConexion(t));
             }
         });
     }
 
-    public LiveData<Carrera> getCarreraResponse() {
-        return carreraResponse;
+    public void getCarrerasUsuario() {
+        apiClient.getCarrerasUsuario().enqueue(new Callback<CarrerasUsuarioResponse>() {
+            @Override
+            public void onResponse(Call<CarrerasUsuarioResponse> call, Response<CarrerasUsuarioResponse> response) {
+                carrerasUsuarioResponse.postValue(new Recurso<>(response.body()));
+            }
+
+            @Override
+            public void onFailure(Call<CarrerasUsuarioResponse> call, Throwable t) {
+                carrerasUsuarioResponse.postValue(getRecursoConErrorConexion(t));
+            }
+        });
     }
 }

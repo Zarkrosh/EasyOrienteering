@@ -30,4 +30,10 @@ public interface IUsuarioService {
      */
     void deleteUsuario(long id);
     
+    /**
+     * Devuelve el usuario que ha realizado la petición.
+     * @return Usuario
+     */
+    Usuario getUsuarioPeticion();
+    
 }

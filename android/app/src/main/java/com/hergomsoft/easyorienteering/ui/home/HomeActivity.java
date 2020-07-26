@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hergomsoft.easyorienteering.R;
+import com.hergomsoft.easyorienteering.ui.miscarreras.MisCarreras;
 import com.hergomsoft.easyorienteering.ui.scan.ScanActivity;
 import com.hergomsoft.easyorienteering.util.CircleTransform;
 import com.squareup.picasso.Picasso;
@@ -69,8 +70,7 @@ public class HomeActivity extends AppCompatActivity {
         btnMisCarreras.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
-                Toast.makeText(HomeActivity.this, "TODO Mis carreras", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(HomeActivity.this, MisCarreras.class));
             }
         });
 

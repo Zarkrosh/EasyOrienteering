@@ -41,5 +41,11 @@ public class UsuarioService implements IUsuarioService {
     public void deleteUsuario(long id) {
         repoUsuarios.deleteById(id);
     }
+    
+    @Override
+    public Usuario getUsuarioPeticion() {
+        // TODO: extraer del método de autenticación
+        return getUsuario(3); // TEST ANDROID
+    }
 
 }

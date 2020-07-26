@@ -2,6 +2,7 @@ package com.hergomsoft.easyorienteering.data.api;
 
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroRequest;
 import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.CarrerasUsuarioResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.InicioResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.RegistroResponse;
@@ -18,6 +19,10 @@ public interface ApiClient {
 
     @GET("carreras/{id}")
     Call<Carrera> getCarrera(@Path("id") long idCarrera);
+
+    @GET("carreras")
+    Call<CarrerasUsuarioResponse> getCarrerasUsuario();
+
 
     @POST("registros/{id}")
     Call<RegistroResponse> registraControl(@Path("id") long idCarrera, @Body RegistroRequest registro);

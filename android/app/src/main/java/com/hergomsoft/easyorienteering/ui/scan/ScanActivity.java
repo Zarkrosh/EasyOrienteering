@@ -1,9 +1,7 @@
 package com.hergomsoft.easyorienteering.ui.scan;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -211,13 +209,13 @@ public class ScanActivity extends AppCompatActivity {
                     // Registro con éxito
                     ocultaDialogoCarga();
                     Control control = registroControl.getRecurso().getControl();
-                    String tipo = control.getTipo();
-                    if(tipo.contentEquals("SALIDA")) {
+                    Control.Tipo tipo = control.getTipo();
+                    if(tipo.equals(Control.Tipo.SALIDA)) {
                         viewModel.pasaAModoCarrera();
                         animacionRegistroControl();
-                    } else if(tipo.contentEquals("CONTROL")) {
+                    } else if(tipo.equals(Control.Tipo.CONTROL)) {
                         animacionRegistroControl();
-                    } else if(tipo.contentEquals("META")) {
+                    } else if(tipo.equals(Control.Tipo.META)) {
                         // Finaliza la carrera y muestra los resultados
                         // TODO
                         animacionRegistroControl();
@@ -261,10 +259,10 @@ public class ScanActivity extends AppCompatActivity {
         viewModel.getSiguienteControl().observe(this, new Observer<Control>() {
             @Override
             public void onChanged(Control control) {
-                if(control.getTipo().contentEquals("CONTROL")) {
-                    mensajeScan.setText("Escanea el control " + control.getCodigo());
-                } else if(control.getTipo().contentEquals("META")) {
-                    mensajeScan.setText("Escanea la meta " + control.getCodigo());
+                if(control != null) {
+                    mensajeScan.setText("Siguiente control: " + control.getCodigo());
+                } else {
+                    mensajeScan.setText("Escanea un control");
                 }
             }
         });
@@ -450,7 +448,7 @@ public class ScanActivity extends AppCompatActivity {
                         } else {
                             // Está corriendo una carrera, obtiene cuál es su siguiente control
                             // null si es score, valor del codigo si es en línea
-                            if(carrera.getModalidad().contentEquals("SCORE")) {
+                            if(carrera.getModalidad().equals(Carrera.Modalidad.SCORE)) {
                                 // Carrera en score
                                 if(Utils.esEscaneoControl(escaneado) || Utils.esEscaneoMeta(escaneado)) {
                                     // Comprueba que no ha registrado ya el control (de forma local)
@@ -470,18 +468,15 @@ public class ScanActivity extends AppCompatActivity {
                             } else {
                                 // Carrera en línea
                                 Control siguienteControl = viewModel.getSiguienteControl().getValue();
-                                if(siguienteControl == null) {
-                                    // TODO Si hay error, enviar petición de todas formas
-                                    viewModel.setEstadoDialogoError(getString(R.string.error), "Error al obtener el siguiente control");
+                                String codigo = Utils.getCodigoControlEscaneado(escaneado);
+                                if(siguienteControl == null || codigo.contentEquals(siguienteControl.getCodigo())) {
+                                    // Si hay error al obtener el siguiente control se envía la petición de todas formas
+                                    if(siguienteControl == null) Toast.makeText(ScanActivity.this, "Error al obtener el siguiente control", Toast.LENGTH_SHORT).show();
+                                    // El código coincide, registro válido
+                                    viewModel.registraControl(escaneado);
                                 } else {
-                                    String codigo = Utils.getCodigoControlEscaneado(escaneado);
-                                    if(codigo.contentEquals(siguienteControl.getCodigo())) {
-                                        // El código coincide, registro válido
-                                        viewModel.registraControl(escaneado);
-                                    } else {
-                                        // Ha escaneado otro control
-                                        viewModel.setEstadoDialogoError(getString(R.string.error), "Debes escanear el control " + siguienteControl.getCodigo() + ". Este es el " + codigo);
-                                    }
+                                    // Ha escaneado otro control
+                                    viewModel.setEstadoDialogoError(getString(R.string.error), "Debes escanear el control " + siguienteControl.getCodigo() + ". Este es el " + codigo);
                                 }
                             }
                         }

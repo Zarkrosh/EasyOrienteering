@@ -3,9 +3,9 @@ package com.hergomsoft.easyoapi.controllers;
 
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Usuario;
+import com.hergomsoft.easyoapi.models.responses.CarrerasUsuarioResponse;
 import com.hergomsoft.easyoapi.services.CarreraService;
 import com.hergomsoft.easyoapi.services.UsuarioService;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +34,11 @@ public class CarrerasController {
     private UsuarioService usuariosService;
     
     @GetMapping("")
-    public List<Carrera> getCarreras() {
-        return carrerasService.findAll();
+    public CarrerasUsuarioResponse getCarrerasUsuario() {
+        Usuario usuario = usuariosService.getUsuarioPeticion();
+        List<Carrera> corridas = carrerasService.getCarrerasCorridasUsuario(usuario);
+        List<Carrera> organizadas = carrerasService.getCarrerasOrganizadasUsuario(usuario);
+        return new CarrerasUsuarioResponse(corridas, organizadas);
     }
     
     @GetMapping("/{id}")

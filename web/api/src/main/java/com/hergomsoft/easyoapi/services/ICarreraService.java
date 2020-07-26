@@ -2,6 +2,7 @@ package com.hergomsoft.easyoapi.services;
 
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Control;
+import com.hergomsoft.easyoapi.models.Usuario;
 import java.util.List;
 import java.util.Map;
 
@@ -77,4 +78,18 @@ public interface ICarreraService {
      * @return Secreto del control
      */
     String getSecretoControl(Control control);
+    
+    /**
+     * Devuelve una lista con las carreras que ha corrido el usuario especificado.
+     * @param usuario Usuario
+     * @return Lista de carreras corridas por el usuario
+     */
+    List<Carrera> getCarrerasCorridasUsuario(Usuario usuario);
+    
+    /**
+     * Devuelve una lista con las carreras que ha organizado el usuario especificado.
+     * @param usuario Usuario
+     * @return Lista de carreras organizadas por el usuario
+     */
+    List<Carrera> getCarrerasOrganizadasUsuario(Usuario usuario);
 }

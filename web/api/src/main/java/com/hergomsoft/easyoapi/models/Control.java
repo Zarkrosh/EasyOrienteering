@@ -19,7 +19,7 @@ import org.hibernate.annotations.Type;
 @Table(name = "controles")
 public class Control implements IdEntity {
     
-    public enum TIPO {SALIDA, CONTROL, META};
+    public enum Tipo {SALIDA, CONTROL, META};
     
     @JsonIgnore
     @Id
@@ -33,7 +33,7 @@ public class Control implements IdEntity {
     @Type(type = "com.hergomsoft.easyoapi.models.EnumTypesPostgres")
     @Column(name = "TIPO")
     @Enumerated(EnumType.STRING)
-    private TIPO tipo;
+    private Tipo tipo;
     
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -42,7 +42,7 @@ public class Control implements IdEntity {
 
     public Control() {}
 
-    public Control(String codigo, TIPO tipo, Carrera carrera) {
+    public Control(String codigo, Tipo tipo, Carrera carrera) {
         this.codigo = codigo;
         this.tipo = tipo;
         this.carrera = carrera;
@@ -64,11 +64,11 @@ public class Control implements IdEntity {
         this.codigo = codigo;
     }
 
-    public TIPO getTipo() {
+    public Tipo getTipo() {
         return tipo;
     }
 
-    public void setTipo(TIPO tipo) {
+    public void setTipo(Tipo tipo) {
         this.tipo = tipo;
     }
 

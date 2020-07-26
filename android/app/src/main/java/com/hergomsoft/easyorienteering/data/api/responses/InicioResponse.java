@@ -2,7 +2,6 @@ package com.hergomsoft.easyorienteering.data.api.responses;
 
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
-import com.hergomsoft.easyorienteering.data.model.Registro;
 
 public class InicioResponse {
     private RegistroResponse registro;

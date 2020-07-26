@@ -108,4 +108,9 @@
     <string name="scan_carga_registrando">Registrando control…</string>
 
 
+    <!-- Mis carreras -->
+    <string name="mis_carreras_corridas">Corridas</string>
+    <string name="mis_carreras_organizadas">Organizadas</string>
+
+
 </resources>

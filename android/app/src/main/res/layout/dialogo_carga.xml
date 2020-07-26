@@ -7,7 +7,7 @@
     android:background="@drawable/dialog_bg">
 
     <TextView
-        android:id="@+id/dialog_scan_inicial_titulo"
+        android:id="@+id/dialogo_carga_titulo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
@@ -26,32 +26,32 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dialog_scan_inicial_titulo">
+        app:layout_constraintTop_toBottomOf="@+id/dialogo_carga_titulo">
 
         <ProgressBar
-            android:id="@+id/dialog_scan_inicial_progress"
+            android:id="@+id/dialogo_carga_progress"
             style="?android:attr/progressBarStyle"
-            android:layout_width="@dimen/tamIndicadorDialogoRegistro"
-            android:layout_height="@dimen/tamIndicadorDialogoRegistro"
+            android:layout_width="@dimen/tamProgressDialogoCarga"
+            android:layout_height="@dimen/tamProgressDialogoCarga"
             android:layout_centerInParent="true"
             tools:layout_editor_absoluteY="149dp" />
 
         <ImageView
-            android:id="@+id/dialog_scan_inicial_imagen"
+            android:id="@+id/dialogo_carga_imagen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="40dp"
             android:layout_marginVertical="24dp"
             android:layout_centerInParent="true"
             android:adjustViewBounds="true"
-            android:maxWidth="@dimen/tamIndicadorDialogoRegistro"
+            android:maxWidth="@dimen/tamProgressDialogoCarga"
             android:scaleType="centerCrop"
             android:src="@drawable/exito" />
 
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/dialog_scan_inicial_mensaje"
+        android:id="@+id/dialogo_carga_mensaje"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -66,7 +66,7 @@
         tools:layout_editor_absoluteX="10dp" />
 
     <TextView
-        android:id="@+id/dialog_scan_inicial_dismiss"
+        android:id="@+id/dialogo_carga_dismiss"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"

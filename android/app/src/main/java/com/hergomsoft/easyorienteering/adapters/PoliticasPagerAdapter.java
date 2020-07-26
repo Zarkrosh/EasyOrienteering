@@ -7,20 +7,18 @@ import android.view.ViewGroup;
 
 import androidx.viewpager.widget.PagerAdapter;
 
-import com.hergomsoft.easyorienteering.data.model.pagers.PoliticasPages;
+import com.hergomsoft.easyorienteering.data.model.pages.PoliticasPages;
 
 public class PoliticasPagerAdapter extends PagerAdapter {
 
-    private Context mContext;
+    private Context context;
 
-    public PoliticasPagerAdapter(Context context) {
-        mContext = context;
-    }
+    public PoliticasPagerAdapter(Context context) { this.context = context; }
 
     @Override
     public Object instantiateItem(ViewGroup collection, int position) {
         PoliticasPages modelObject = PoliticasPages.values()[position];
-        LayoutInflater inflater = LayoutInflater.from(mContext);
+        LayoutInflater inflater = LayoutInflater.from(context);
         ViewGroup layout = (ViewGroup) inflater.inflate(modelObject.getLayoutResId(), collection, false);
         collection.addView(layout);
         return layout;
@@ -44,7 +42,7 @@ public class PoliticasPagerAdapter extends PagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         PoliticasPages customPagerEnum = PoliticasPages.values()[position];
-        return mContext.getString(customPagerEnum.getTitleResId());
+        return context.getString(customPagerEnum.getTitleResId());
     }
 
 }

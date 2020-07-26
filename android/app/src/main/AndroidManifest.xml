@@ -18,6 +18,7 @@
         android:usesCleartextTraffic="true">
 
         <activity android:name=".ui.scan.ScanActivity"
+        <activity android:name=".ui.detallescarrera.DetallesCarreraActivity" />
             android:noHistory="true"
             android:screenOrientation="portrait" />
         <activity android:name=".ui.home.HomeActivity"
