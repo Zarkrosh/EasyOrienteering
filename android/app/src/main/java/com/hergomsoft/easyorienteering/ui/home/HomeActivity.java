@@ -12,7 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.ui.miscarreras.MisCarreras;
+import com.hergomsoft.easyorienteering.ui.configuracion.ConfiguracionActivity;
+import com.hergomsoft.easyorienteering.ui.miscarreras.MisCarrerasActivity;
 import com.hergomsoft.easyorienteering.ui.scan.ScanActivity;
 import com.hergomsoft.easyorienteering.util.CircleTransform;
 import com.squareup.picasso.Picasso;
@@ -54,15 +55,13 @@ public class HomeActivity extends AppCompatActivity {
         layoutPerfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(HomeActivity.this, "[TODO] Pantalla de perfil", Toast.LENGTH_SHORT).show();
-                // TODO
+                startActivity(new Intent(HomeActivity.this, ConfiguracionActivity.class));
             }
         });
         btnPerfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(HomeActivity.this, "[TODO] Pantalla de perfil", Toast.LENGTH_SHORT).show();
-                // TODO
+                startActivity(new Intent(HomeActivity.this, ConfiguracionActivity.class));
             }
         });
 
@@ -70,7 +69,7 @@ public class HomeActivity extends AppCompatActivity {
         btnMisCarreras.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, MisCarreras.class));
+                startActivity(new Intent(HomeActivity.this, MisCarrerasActivity.class));
             }
         });
 

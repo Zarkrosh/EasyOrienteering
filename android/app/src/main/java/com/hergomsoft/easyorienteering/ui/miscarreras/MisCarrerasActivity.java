@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-public class MisCarreras extends BackableActivity {
+public class MisCarrerasActivity extends BackableActivity {
 
     private MisCarrerasViewModel viewModel;
 
@@ -81,7 +81,7 @@ public class MisCarreras extends BackableActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Carrera clicked = (Carrera) parent.getItemAtPosition(position);
-                Intent intent = new Intent(MisCarreras.this, DetallesCarreraActivity.class);
+                Intent intent = new Intent(MisCarrerasActivity.this, DetallesCarreraActivity.class);
                 intent.putExtra(Constants.EXTRA_ID_CARRERA, clicked.getId());
                 startActivity(intent);
             }

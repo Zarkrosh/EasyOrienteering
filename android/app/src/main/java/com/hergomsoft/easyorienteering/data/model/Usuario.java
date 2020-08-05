@@ -11,23 +11,26 @@ public class Usuario {
     @Expose
     private String email;
     @Expose
+    private String club;
+    @Expose
     private Date fechaRegistro;
+
+    public Usuario(String nombre, String email, String club, Date fechaRegistro) {
+        this.nombre = nombre;
+        this.email = email;
+        this.club = club;
+        this.fechaRegistro = fechaRegistro;
+    }
 
     public String getNombre() {
         return nombre;
     }
-
     public String getEmail() {
         return email;
     }
-
+    public String getClub() { return club; }
     public Date getFechaRegistro() {
         return fechaRegistro;
     }
 
-    public Usuario(String nombre, String email, Date fechaRegistro) {
-        this.nombre = nombre;
-        this.email = email;
-        this.fechaRegistro = fechaRegistro;
-    }
 }

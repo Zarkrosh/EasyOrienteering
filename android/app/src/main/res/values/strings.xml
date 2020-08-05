@@ -59,7 +59,7 @@
     <string name="registro_pass_largo">Al menos 8 letras</string>
     <string name="registro_pass_no_coinciden">Las contraseñas no coinciden</string>
     <string name="registro_registrar">REGISTRAR CUENTA</string>
-    <string name="registro_registrando">Registrando...</string>
+    <string name="registro_registrando">Registrando…</string>
     <string name="registro_registrada">Cuenta registrada</string>
     <string name="registro_error">Error al registrar</string>
     <string name="registro_error2">Comprueba tu conexión</string>
@@ -118,5 +118,16 @@
     <string name="detalles_carrera_error_id">ID de carrera inválido</string>
     <string name="detalles_carrera_cargando">Cargando carrera…</string>
 
+
+    <!-- Configuración -->
+    <string name="conf_configuracion">Configuración</string>
+    <string name="conf_ver_perfil">Ver perfil público</string>
+    <string name="conf_cambiar_nombre">Cambiar nombre</string>
+    <string name="conf_cambiar_club">Cambiar club</string>
+    <string name="conf_cambiar_contrasena">Cambiar contraseña</string>
+    <string name="conf_que_es_easyorienteering">¿Qué es EasyOrienteering?</string>
+    <string name="conf_compartir_aplicacion">Compartir aplicación</string>
+    <string name="conf_borrar_cuenta">Borrar cuenta</string>
+    <string name="conf_cerrar_sesion">Cerrar sesión</string>
 
 </resources>

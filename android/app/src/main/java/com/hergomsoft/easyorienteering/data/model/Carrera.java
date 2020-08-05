@@ -15,9 +15,9 @@ public class Carrera {
     @Expose
     private String nombre;
     @Expose
-    private Tipo tipo; // TODO Enum
+    private Tipo tipo;
     @Expose
-    private Modalidad modalidad; // TODO Enum
+    private Modalidad modalidad;
     @Expose
     private List<Recorrido> recorridos;
     @Expose

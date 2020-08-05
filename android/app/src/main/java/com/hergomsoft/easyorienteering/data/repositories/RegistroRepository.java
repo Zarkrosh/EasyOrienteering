@@ -19,7 +19,6 @@ import com.hergomsoft.easyorienteering.data.model.Registro;
 
 import org.json.JSONObject;
 
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,10 +97,7 @@ public class RegistroRepository extends ApiRepository {
 
             @Override
             public void onFailure(Call<InicioResponse> call, Throwable t) {
-                // TODO Manejar algún error en concreto (sin internet, etc)
-                Recurso<Registro> recurso = new Recurso<>();
-                recurso.setError(t.getMessage());
-                registroResponse.postValue(recurso);
+                registroResponse.postValue(getRecursoConErrorConexion(t));
             }
         });
     }
@@ -199,7 +195,6 @@ public class RegistroRepository extends ApiRepository {
                     }
                 } else {
                     // Error desconocido
-                    // TODO
                     resultado.setError("Error desconocido. Código HTTP " + response.code());
                 }
 

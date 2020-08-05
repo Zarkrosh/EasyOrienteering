@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.hergomsoft.easyorienteering" >
+    package="com.hergomsoft.easyorienteering">
     <!-- Permisos -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -17,9 +17,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true" >
-        <activity android:name=".ui.miscarreras.MisCarreras" >
-        </activity>
+        android:usesCleartextTraffic="true">
+        <activity android:name=".ui.configuracion.ConfiguracionActivity" />
+        <activity android:name=".ui.miscarreras.MisCarrerasActivity" />
         <activity android:name=".ui.detallescarrera.DetallesCarreraActivity" />
         <activity
             android:name=".ui.scan.ScanActivity"
@@ -33,7 +33,7 @@
             android:label="@string/app_name"
             android:noHistory="true"
             android:screenOrientation="portrait"
-            android:theme="@style/SplashTheme" >
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
