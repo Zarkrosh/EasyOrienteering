@@ -28,7 +28,7 @@
             <ImageView
                 android:layout_width="45dp"
                 android:layout_height="56dp"
-                android:src="@drawable/google" />
+                android:src="@drawable/img_google" />
 
             <TextView
                 android:layout_width="match_parent"

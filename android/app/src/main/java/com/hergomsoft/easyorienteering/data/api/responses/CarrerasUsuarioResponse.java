@@ -6,13 +6,10 @@ import java.util.List;
 
 public class CarrerasUsuarioResponse {
 
-    private List<Carrera> corridas;
+    private List<Carrera> participadas;
     private List<Carrera> organizadas;
 
-    public List<Carrera> getCorridas() {
-        return corridas;
-    }
-
+    public List<Carrera> getParticipadas() { return participadas; }
     public List<Carrera> getOrganizadas() {
         return organizadas;
     }

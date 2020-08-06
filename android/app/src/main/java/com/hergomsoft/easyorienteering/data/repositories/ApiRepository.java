@@ -2,6 +2,7 @@ package com.hergomsoft.easyorienteering.data.repositories;
 
 import com.hergomsoft.easyorienteering.data.api.ApiClient;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
+import com.hergomsoft.easyorienteering.util.LiveDataCallAdapterFactory;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -20,6 +21,7 @@ public abstract class ApiRepository {
         apiClient = new retrofit2.Retrofit.Builder()
                 .baseUrl(ApiClient.BASE_URL)
                 .client(client)
+                .addCallAdapterFactory(new LiveDataCallAdapterFactory())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(ApiClient.class);

@@ -93,14 +93,14 @@ public class RegisterActivity extends BackableActivity {
                     if(registerFormState.getPasswordConfError()) {
                         // Las contraseñas no coinciden
                         // Muestra imagen de error
-                        confirmPass.setImageDrawable(getResources().getDrawable(R.drawable.incorrect));
+                        confirmPass.setImageDrawable(getResources().getDrawable(R.drawable.img_incorrect));
                         inputPasswordConf.setError(getString(R.string.registro_pass_no_coinciden));
                         passConfError = true;
 
                     } else if(!inputPasswordConf.getText().toString().isEmpty()) {
                         // Las contraseñas coinciden
                         // Muestra imagen correcta
-                        confirmPass.setImageDrawable(getResources().getDrawable(R.drawable.correct));
+                        confirmPass.setImageDrawable(getResources().getDrawable(R.drawable.img_correct));
                         passConfError = false;
 
                     } else {

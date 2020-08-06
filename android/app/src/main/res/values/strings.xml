@@ -82,6 +82,7 @@
     <string name="home_mis_carreras">Mis carreras</string>
     <string name="home_explorar">Explorar</string>
     <string name="home_unirme">Unirme a evento</string>
+    <string name="home_cargando_datos">Cargando datos…</string>
 
     <!-- Pantalla de escaneo -->
     <string name="scan_error_es_control">Has escaneado un control, debes escanear un triángulo de salida</string>
@@ -109,7 +110,7 @@
 
 
     <!-- Mis carreras -->
-    <string name="mis_carreras_corridas">Corridas</string>
+    <string name="mis_carreras_participadas">Participadas</string>
     <string name="mis_carreras_organizadas">Organizadas</string>
 
 
@@ -129,5 +130,11 @@
     <string name="conf_compartir_aplicacion">Compartir aplicación</string>
     <string name="conf_borrar_cuenta">Borrar cuenta</string>
     <string name="conf_cerrar_sesion">Cerrar sesión</string>
+    <string name="conf_nuevo_nombre">Nuevo nombre</string>
+    <string name="conf_nuevo_club">Nuevo club</string>
+    <string name="conf_cambiando_nombre">Cambiando nombre…</string>
+    <string name="conf_resp_nombre_cambiado">Nombre cambiado con éxito</string>
+    <string name="conf_cambiando_club">Cambiando club…</string>
+    <string name="conf_resp_club_cambiado">Club cambiado con éxito</string>
 
 </resources>

@@ -46,7 +46,7 @@
             android:adjustViewBounds="true"
             android:maxWidth="@dimen/tamProgressDialogoCarga"
             android:scaleType="centerCrop"
-            android:src="@drawable/exito" />
+            android:src="@drawable/img_exito" />
 
     </RelativeLayout>
 

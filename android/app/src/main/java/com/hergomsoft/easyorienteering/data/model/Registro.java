@@ -4,8 +4,6 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
-import com.hergomsoft.easyorienteering.util.DateConverter;
-
 import java.util.Date;
 
 //@Entity

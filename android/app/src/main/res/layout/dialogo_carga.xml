@@ -46,7 +46,7 @@
             android:adjustViewBounds="true"
             android:maxWidth="@dimen/tamProgressDialogoCarga"
             android:scaleType="centerCrop"
-            android:src="@drawable/exito" />
+            android:src="@drawable/img_exito" />
 
     </RelativeLayout>
 
@@ -61,16 +61,17 @@
         android:text="Mensaje de éxito o error"
         android:textColor="@android:color/black"
         android:textSize="22sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rlRecursos"
+        app:layout_constraintBottom_toTopOf="@+id/dialogo_carga_dismiss"
         tools:layout_editor_absoluteX="10dp" />
 
     <TextView
         android:id="@+id/dialogo_carga_dismiss"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
         android:text="@android:string/ok"
         android:textSize="18sp"
         android:textStyle="bold"

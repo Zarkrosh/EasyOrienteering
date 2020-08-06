@@ -1,8 +1,7 @@
 package com.hergomsoft.easyorienteering.ui.detallescarrera;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Bundle;
 import android.view.View;
@@ -16,10 +15,9 @@ import com.hergomsoft.easyorienteering.adapters.RecorridosDetallesAdapter;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
-import com.hergomsoft.easyorienteering.util.DialogoCarga;
+import com.hergomsoft.easyorienteering.components.DialogoCarga;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class DetallesCarreraActivity extends BackableActivity {
 
@@ -41,7 +39,7 @@ public class DetallesCarreraActivity extends BackableActivity {
         setContentView(R.layout.activity_detalles_carrera);
         setTitle(R.string.detalles_carrera);
 
-        viewModel = new ViewModelProvider(this).get(DetallesCarreraViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(DetallesCarreraViewModel.class);
 
         nombreCarrera = findViewById(R.id.detalles_nombre_carrera);
         tipoCarrera = findViewById(R.id.detalles_tipo_carrera);
@@ -61,45 +59,31 @@ public class DetallesCarreraActivity extends BackableActivity {
             }
         });
 
-
+        setupDialogoCarga();
         setupObservadores();
         viewModel.cargaDatosCarrera(getIntent(), "", getString(R.string.detalles_carrera_cargando));
     }
 
-    private void setupObservadores() {
-        // Estado de diálogo de carga/error
-        viewModel.getEstadoDialogo().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                String titulo = viewModel.getTituloDialogo();
-                String mensaje = viewModel.getMensajeDialogo();
-                switch(integer) {
-                    case DetallesCarreraViewModel.ESTADO_ERROR:
-                        dialogoCarga.muestraMensajeError(titulo, mensaje);
-                        break;
-                    case DetallesCarreraViewModel.ESTADO_CARGANDO:
-                        dialogoCarga.muestraMensajeCarga(titulo, mensaje);
-                        break;
-                    case DetallesCarreraViewModel.ESTADO_OCULTO:
-                    default:
-                        dialogoCarga.dismiss();
-                        break;
-                }
-            }
-        });
+    private void setupDialogoCarga() {
+        dialogoCarga = new DialogoCarga(this);
+        dialogoCarga.setObservadorEstado(this, viewModel.getEstadoDialogo());
+        dialogoCarga.setObservadorTitulo(this, viewModel.getTituloDialogo());
+        dialogoCarga.setObservadorMensaje(this, viewModel.getMensajeDialogo());
+    }
 
+    private void setupObservadores() {
         // Respuesta a la petición de detalles de una carrera
         viewModel.getCarreraResponse().observe(this, new Observer<Recurso<Carrera>>() {
             @Override
             public void onChanged(Recurso<Carrera> carreraRecurso) {
                 if(carreraRecurso.hayError()) {
-                    viewModel.muestraErrorCarga(getString(R.string.error), carreraRecurso.getError());
+                    viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), carreraRecurso.getError());
                 } else {
                     Carrera carrera = carreraRecurso.getRecurso();
                     if(carrera == null) {
-                        viewModel.muestraErrorCarga(getString(R.string.error), "No se ha recibido ninguna carrera");
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), "No se ha recibido ninguna carrera");
                     } else {
-                        viewModel.ocultaDialogo();
+                        viewModel.ocultaDialogoCarga();
                         viewModel.setCarrera(carrera);
 
                         // Datos de la carrera

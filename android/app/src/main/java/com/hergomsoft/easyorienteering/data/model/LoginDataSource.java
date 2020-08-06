@@ -12,7 +12,7 @@ public class LoginDataSource {
         try {
             // TODO: handle loggedInUser authentication
             if(username.contentEquals("admin") && password.contentEquals("12341234")) {
-                Usuario usuario = new Usuario("Jane Doe", "jane@test.com", "ASDF", new Date());
+                Usuario usuario = new Usuario(1, "Jane Doe", "ASDF", new Date());
                 return new Result.Success<>(usuario);
             } else {
                 return new Result.Error(new IllegalAccessException("No autorizado"));

@@ -41,7 +41,17 @@ public class RegistroRepository extends ApiRepository {
     private MutableLiveData<Recurso<AbandonoResponse>> abandonoResponse; // Respuesta de comprobación de recorrido pendiente
     private MutableLiveData<Control> siguienteControl;
 
-    public RegistroRepository(Application application) {
+    // Singleton
+    private static RegistroRepository instance;
+    public static RegistroRepository getInstance(Context context) {
+        if(instance == null) {
+            instance = new RegistroRepository(context);
+        }
+
+        return instance;
+    }
+
+    private RegistroRepository(Context context) {
         //registroDAO = DatosDatabase.getDatabase(application).getRegistroDAO();
         //controlDAO = DatosDatabase.getDatabase(application).getControlDAO();
         //recorridoDAO = DatosDatabase.getDatabase(application).getRecorridoDAO();
@@ -150,9 +160,8 @@ public class RegistroRepository extends ApiRepository {
      * Realiza la comprobación de si el usuario tiene alguna carrera pendiente.
      * Si la respuesta es false, limpia cualquier dato anterior e indica que no hay ningún recorrido pendiente.
      * Si la respuesta es true, se generan los datos necesarios y se indica que hay un recorrido pendiente.
-     * @param context Contexto para preferencias compartidas
      */
-    public void comprobarRecorridoPendiente(Context context) {
+    public void comprobarRecorridoPendiente() {
         apiClient.getPendiente().enqueue(new Callback<PendienteResponse>() {
             @Override
             public void onResponse(Call<PendienteResponse> call, Response<PendienteResponse> response) {

@@ -4,16 +4,16 @@ import com.hergomsoft.easyoapi.models.Carrera;
 import java.util.List;
 
 public class CarrerasUsuarioResponse {
-    private List<Carrera> corridas;
-    private List<Carrera> organizadas;
+    private final List<Carrera> participadas;
+    private final List<Carrera> organizadas;
 
-    public CarrerasUsuarioResponse(List<Carrera> corridas, List<Carrera> organizadas) {
-        this.corridas = corridas;
+    public CarrerasUsuarioResponse(List<Carrera> participadas, List<Carrera> organizadas) {
+        this.participadas = participadas;
         this.organizadas = organizadas;
     }
 
-    public List<Carrera> getCorridas() {
-        return corridas;
+    public List<Carrera> getParticipadas() {
+        return participadas;
     }
 
     public List<Carrera> getOrganizadas() {

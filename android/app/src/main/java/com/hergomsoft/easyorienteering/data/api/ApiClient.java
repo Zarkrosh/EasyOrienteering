@@ -1,13 +1,19 @@
 package com.hergomsoft.easyorienteering.data.api;
 
+import androidx.lifecycle.LiveData;
+
+import com.hergomsoft.easyorienteering.data.api.requests.CambioRequest;
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroRequest;
 import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.ApiResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.CarrerasUsuarioResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.InicioResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.RegistroResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
+import com.hergomsoft.easyorienteering.data.model.Usuario;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -36,5 +42,14 @@ public interface ApiClient {
 
     @POST("registros/abandonar/{idRecorrido}")
     Call<AbandonoResponse> abandonaRecorrido(@Path("idRecorrido") long idRecorrido);
+
+
+    @GET("usuarios/{id}")
+    LiveData<ApiResponse<Usuario>> getUsuario(@Path("id") long id);
+    @POST("usuarios/cambionombre")
+    Call<Usuario> cambiaNombreUsuario(@Body CambioRequest registro);
+    @POST("usuarios/cambioclub")
+    Call<Usuario> cambiaClub(@Body CambioRequest registro);
+
 
 }

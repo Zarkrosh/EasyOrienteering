@@ -1,5 +1,7 @@
 package com.hergomsoft.easyorienteering.data.repositories;
 
+import android.content.Context;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -19,7 +21,17 @@ public class CarreraRepository extends ApiRepository {
     private MutableLiveData<Recurso<Carrera>> carreraResponse;
     private MutableLiveData<Recurso<CarrerasUsuarioResponse>> carrerasUsuarioResponse;
 
-    public CarreraRepository() {
+    // Singleton
+    private static CarreraRepository instance;
+    public static CarreraRepository getInstance(Context context) {
+        if(instance == null) {
+            instance = new CarreraRepository(context);
+        }
+
+        return instance;
+    }
+
+    private CarreraRepository(Context context) {
         carreraResponse = new MutableLiveData<>();
         carrerasUsuarioResponse = new MutableLiveData<>();
     }

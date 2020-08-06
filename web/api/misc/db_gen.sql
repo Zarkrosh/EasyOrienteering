@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS USUARIOS (
 	ID SERIAL,
 	NOMBRE TEXT NOT NULL UNIQUE,
 	EMAIL TEXT NOT NULL UNIQUE,
+	CLUB TEXT,
 	PASSWORD TEXT NOT NULL,
 	FECHA_REGISTRO DATE NOT NULL,
 	PRIMARY KEY (ID)
@@ -65,9 +66,9 @@ CREATE TABLE IF NOT EXISTS REGISTROS (
 /**** DATOS DE PRUEBA ****/
 ALTER SEQUENCE carreras_id_seq restart with 3;   -- Debido a las inserciones de prueba
 ALTER SEQUENCE controles_id_seq restart with 15; -- Debido a las inserciones de prueba
-INSERT INTO USUARIOS(ID, NOMBRE, EMAIL, PASSWORD, FECHA_REGISTRO) VALUES (1, 'Pepito Pérez', 'pepito@test.com', '<redacted>', '2020-06-18');
-INSERT INTO USUARIOS(ID, NOMBRE, EMAIL, PASSWORD, FECHA_REGISTRO) VALUES (2, 'Juanito Juárez', 'juanito@test.com', '<redacted>', '2020-06-20');
-INSERT INTO USUARIOS(ID, NOMBRE, EMAIL, PASSWORD, FECHA_REGISTRO) VALUES (3, 'Fernandito Fernández', 'fernandito@test.com', '<redacted>', '2020-07-06');
+INSERT INTO USUARIOS(ID, NOMBRE, EMAIL, CLUB, PASSWORD, FECHA_REGISTRO) VALUES (1, 'Pepito Pérez', 'pepito@test.com', 'ORCA', '<redacted>', '2020-06-18');
+INSERT INTO USUARIOS(ID, NOMBRE, EMAIL, CLUB, PASSWORD, FECHA_REGISTRO) VALUES (2, 'Juanito Juárez', 'juanito@test.com', '', '<redacted>', '2020-06-20');
+INSERT INTO USUARIOS(ID, NOMBRE, EMAIL, CLUB, PASSWORD, FECHA_REGISTRO) VALUES (3, 'Fernandito Fernández', 'fernandito@test.com', 'TJALVE', '<redacted>', '2020-07-06');
 
 INSERT INTO CARRERAS(ID, SECRET, NOMBRE, TIPO, MODALIDAD, ORGANIZADOR_ID) VALUES (1, 'not-a-real-secret', 'Prueba de carrera', 'EVENTO', 'LINEA', 1);
 INSERT INTO CARRERAS(ID, SECRET, NOMBRE, TIPO, MODALIDAD, ORGANIZADOR_ID) VALUES (2, 'not-a-real-secret', 'Otra carrera', 'EVENTO', 'SCORE', 3);

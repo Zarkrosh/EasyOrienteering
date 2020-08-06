@@ -20,21 +20,27 @@ import javax.validation.constraints.Email;
         @UniqueConstraint(columnNames = "email") 
 })
 public class Usuario implements IdEntity {
-    public static final int MLEN_NOMBRE = 20;
-    public static final int MLEN_EMAIL = 50;
-   
-    @JsonIgnore
+    public static final int MAXLEN_NOMBRE = 20;
+    public static final int MINLEN_NOMBRE = 2;
+    public static final int MAXLEN_EMAIL = 50;
+    public static final int MAXLEN_CLUB = 20;
+    public static final int MINLEN_CLUB = 0;
+    
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "NOMBRE", length = MLEN_NOMBRE, nullable = false, unique = true)
+    @Column(name = "NOMBRE", length = MAXLEN_NOMBRE, nullable = false, unique = true)
     private String nombre;
     
+    @JsonIgnore
     @Email
-    @Column(name = "EMAIL", length = MLEN_EMAIL, nullable = false, unique = true)
+    @Column(name = "EMAIL", length = MAXLEN_EMAIL, nullable = false, unique = true)
     private String email;
+    
+    @Column(name = "CLUB", length = MAXLEN_CLUB, nullable = true)
+    private String club;
     
     @JsonIgnore
     @Column(name = "PASSWORD")
@@ -46,9 +52,10 @@ public class Usuario implements IdEntity {
 
     public Usuario() {}
 
-    public Usuario(String nombre, String email, String password, Date fechaRegistro) {
+    public Usuario(String nombre, String email, String club, String password, Date fechaRegistro) {
         this.nombre = nombre;
         this.email = email;
+        this.club = club;
         this.password = password;
         this.fechaRegistro = fechaRegistro;
     }
@@ -75,6 +82,14 @@ public class Usuario implements IdEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getClub() {
+        return club;
+    }
+
+    public void setClub(String club) {
+        this.club = club;
     }
 
     public String getPassword() {

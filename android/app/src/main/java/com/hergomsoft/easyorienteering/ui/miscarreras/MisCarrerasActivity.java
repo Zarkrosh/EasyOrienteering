@@ -1,33 +1,20 @@
 package com.hergomsoft.easyorienteering.ui.miscarreras;
 
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
-import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.adapters.CarrerasListAdapter;
 import com.hergomsoft.easyorienteering.adapters.MisCarrerasPagerAdapter;
+import com.hergomsoft.easyorienteering.components.ListaCarrerasComponent;
 import com.hergomsoft.easyorienteering.data.api.responses.CarrerasUsuarioResponse;
-import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
-import com.hergomsoft.easyorienteering.ui.detallescarrera.DetallesCarreraActivity;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
-import com.hergomsoft.easyorienteering.util.Constants;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 public class MisCarrerasActivity extends BackableActivity {
@@ -36,13 +23,9 @@ public class MisCarrerasActivity extends BackableActivity {
 
     private ViewPager pager;
     private TabLayout tabs;
-    private ProgressBar progressBar;
-    private TextView error;
 
-    List<Carrera> carrerasCorridas;
-    List<Carrera> carrerasOrganizadas;
-    CarrerasListAdapter adapterCorridas;
-    CarrerasListAdapter adapterOrganizadas;
+    ListaCarrerasComponent listaCarrerasParticipadas;
+    ListaCarrerasComponent listaCarrerasOrganizadas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,19 +33,10 @@ public class MisCarrerasActivity extends BackableActivity {
         setContentView(R.layout.activity_mis_carreras);
         setTitle(getString(R.string.home_mis_carreras));
 
-        viewModel = new ViewModelProvider(this).get(MisCarrerasViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(MisCarrerasViewModel.class);
 
         pager = findViewById(R.id.mis_carreras_pager);
         tabs = findViewById(R.id.mis_carreras_tabs);
-        progressBar = findViewById(R.id.mis_carreras_progress);
-        error = findViewById(R.id.mis_carreras_error);
-
-        carrerasCorridas = new ArrayList<>();
-        carrerasOrganizadas = new ArrayList<>();
-
-        // Color del spinner circular
-        progressBar.getIndeterminateDrawable()
-                .setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN );
 
         setupListas();
         setupObservadores();
@@ -70,30 +44,15 @@ public class MisCarrerasActivity extends BackableActivity {
     }
 
     private void setupListas() {
-        // Configura los ListViews
-        ListView listaCarrerasCorridas = new ListView(this);
-        ListView listaCarrerasOrganizadas = new ListView(this);
-        adapterCorridas = new CarrerasListAdapter(this, carrerasCorridas);
-        adapterOrganizadas = new CarrerasListAdapter(this, carrerasOrganizadas);
-        listaCarrerasCorridas.setAdapter(adapterCorridas);
-        listaCarrerasOrganizadas.setAdapter(adapterOrganizadas);
-        AdapterView.OnItemClickListener listenerLista = new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Carrera clicked = (Carrera) parent.getItemAtPosition(position);
-                Intent intent = new Intent(MisCarrerasActivity.this, DetallesCarreraActivity.class);
-                intent.putExtra(Constants.EXTRA_ID_CARRERA, clicked.getId());
-                startActivity(intent);
-            }
-        };
-        listaCarrerasCorridas.setOnItemClickListener(listenerLista);
-        listaCarrerasOrganizadas.setOnItemClickListener(listenerLista);
+        // Crea las listas
+        listaCarrerasParticipadas = new ListaCarrerasComponent(this);
+        listaCarrerasOrganizadas = new ListaCarrerasComponent(this);
 
         // Configura el ViewPager
-        String[] titulosTabs = {getString(R.string.mis_carreras_corridas),
+        String[] titulosTabs = {getString(R.string.mis_carreras_participadas),
                 getString(R.string.mis_carreras_organizadas)};
         Vector<View> pages = new Vector<>();
-        pages.add(listaCarrerasCorridas);
+        pages.add(listaCarrerasParticipadas);
         pages.add(listaCarrerasOrganizadas);
         pager.setAdapter(new MisCarrerasPagerAdapter(this, pages, titulosTabs));
         tabs.setupWithViewPager(pager);
@@ -105,15 +64,16 @@ public class MisCarrerasActivity extends BackableActivity {
             @Override
             public void onChanged(Recurso<Boolean> recurso) {
                 if(recurso.hayError()) {
-                    error.setText(recurso.getError());
-                    error.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.GONE);
+                    // TODO Separar
+                    listaCarrerasParticipadas.muestraError(recurso.getError());
+                    listaCarrerasOrganizadas.muestraError(recurso.getError());
                 } else {
-                    error.setVisibility(View.GONE);
                     if(recurso.getRecurso()) {
-                        progressBar.setVisibility(View.VISIBLE);
+                        listaCarrerasParticipadas.muestraCargaCarreras();
+                        listaCarrerasOrganizadas.muestraCargaCarreras();
                     } else {
-                        progressBar.setVisibility(View.GONE);
+                        listaCarrerasParticipadas.muestraLista();
+                        listaCarrerasOrganizadas.muestraLista();
                     }
                 }
             }
@@ -123,26 +83,16 @@ public class MisCarrerasActivity extends BackableActivity {
         viewModel.getCarrerasResponse().observe(this, new Observer<Recurso<CarrerasUsuarioResponse>>() {
             @Override
             public void onChanged(Recurso<CarrerasUsuarioResponse> response) {
-                // TEST
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-
-
-                        if(response.hayError()) {
-                            viewModel.mostrarErrorCarga(response.getError());
-                        } else {
-                            viewModel.cargaCarrerasFinalizada();
-                            adapterCorridas.actualizaCarreras(response.getRecurso().getCorridas());
-                            adapterOrganizadas.actualizaCarreras(response.getRecurso().getOrganizadas());
-                        }
-
-
-                    }
-                }, 2000);
+                if(response.hayError()) {
+                    viewModel.mostrarErrorCarga(response.getError());
+                } else {
+                    viewModel.cargaCarrerasFinalizada();
+                    listaCarrerasParticipadas.actualizaCarreras(response.getRecurso().getParticipadas());
+                    listaCarrerasOrganizadas.actualizaCarreras(response.getRecurso().getOrganizadas());
+                }
             }
         });
+
     }
 
 
