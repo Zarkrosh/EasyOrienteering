@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.hergomsoft.easyorienteering">
     <!-- Permisos -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -17,10 +18,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        tools:replace="android:allowBackup">
         <activity android:name=".ui.perfil.PerfilActivity" />
         <activity android:name=".ui.configuracion.ConfiguracionActivity" />
-        <activity android:name=".ui.miscarreras.MisCarrerasActivity" />
+        <activity
+            android:name=".ui.miscarreras.MisCarrerasActivity"
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".ui.detallescarrera.DetallesCarreraActivity" />
         <activity
             android:name=".ui.scan.ScanActivity"

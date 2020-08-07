@@ -43,19 +43,19 @@
                     android:id="@+id/conf_nombre_usuario"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="AbelHerrero"
                     android:textSize="20sp"
                     android:textColor="@android:color/black"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="AbelHerrero" />
 
                 <TextView
                     android:id="@+id/conf_club_usuario"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="(ORCA)"
                     android:textSize="20sp"
                     android:textColor="@android:color/black"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="(ORCA)" />
 
             </LinearLayout>
 

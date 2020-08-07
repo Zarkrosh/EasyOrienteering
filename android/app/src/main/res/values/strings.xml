@@ -11,6 +11,8 @@
     <!-- Comunes -->
     <string name="error">Error</string>
     <string name="error_inesperado">Error inesperado</string>
+    <string name="cargando_datos">Cargando datos…</string>
+
 
     <!-- Permisos -->
     <string name="permiso_requerido">Se requiere este permiso para el funcionamiento de la aplicación</string>
@@ -82,7 +84,6 @@
     <string name="home_mis_carreras">Mis carreras</string>
     <string name="home_explorar">Explorar</string>
     <string name="home_unirme">Unirme a evento</string>
-    <string name="home_cargando_datos">Cargando datos…</string>
 
     <!-- Pantalla de escaneo -->
     <string name="scan_error_es_control">Has escaneado un control, debes escanear un triángulo de salida</string>
@@ -136,5 +137,9 @@
     <string name="conf_resp_nombre_cambiado">Nombre cambiado con éxito</string>
     <string name="conf_cambiando_club">Cambiando club…</string>
     <string name="conf_resp_club_cambiado">Club cambiado con éxito</string>
+
+
+    <!-- Perfil de usuario -->
+    <string name="perfil_miembro_desde">Miembro desde el %1$s</string>
 
 </resources>

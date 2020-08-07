@@ -133,7 +133,7 @@ public class CarreraService implements ICarreraService {
     }
     
     @Override
-    public List<Carrera> getCarrerasCorridasUsuario(Usuario usuario) {
+    public List<Carrera> getCarrerasParticipadasUsuario(Usuario usuario) {
         return repoCarrera.getCarrerasCorridasUsuario(usuario.getId());
     }
 

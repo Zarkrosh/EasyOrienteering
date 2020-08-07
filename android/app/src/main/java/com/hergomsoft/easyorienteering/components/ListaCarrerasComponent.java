@@ -83,6 +83,7 @@ public class ListaCarrerasComponent extends LinearLayout {
             }
         });
 
+        muestraLista();
     }
 
     public void muestraCargaCarreras() {
@@ -101,10 +102,16 @@ public class ListaCarrerasComponent extends LinearLayout {
         progressBar.setVisibility(View.GONE);
         error.setVisibility(View.GONE);
         listaCarreras.setVisibility(View.VISIBLE);
+
+        if(carreras.isEmpty()) {
+            error.setVisibility(View.VISIBLE);
+            error.setText("No hay carreras");
+        }
     }
 
     public void actualizaCarreras(List<Carrera> carreras) {
         adapterCarreras.actualizaCarreras(carreras);
+        muestraLista();
     }
 
 }

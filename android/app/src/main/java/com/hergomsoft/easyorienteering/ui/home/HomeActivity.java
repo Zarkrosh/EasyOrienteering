@@ -117,7 +117,7 @@ public class HomeActivity extends AppCompatActivity {
                     switch(usuarioResource.status) {
                         case LOADING:
                             viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO,
-                                    "", getString(R.string.home_cargando_datos));
+                                    "", getString(R.string.cargando_datos));
                             break;
                         case SUCCESS:
                             if(usuarioResource.data != null) {

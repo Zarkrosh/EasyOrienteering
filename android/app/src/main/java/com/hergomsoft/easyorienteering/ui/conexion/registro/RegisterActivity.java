@@ -23,8 +23,8 @@ import androidx.lifecycle.ViewModelProviders;
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.model.ConexionState;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
-import com.hergomsoft.easyorienteering.util.VisualUtils;
 import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
+import com.hergomsoft.easyorienteering.util.Utils;
 
 public class RegisterActivity extends BackableActivity {
 
@@ -216,7 +216,7 @@ public class RegisterActivity extends BackableActivity {
             @Override
             public void onClick(View v) {
                 // Oculta teclado
-                VisualUtils.hideKeyboard(activity);
+                Utils.hideKeyboard(activity);
 
                 Toast.makeText(RegisterActivity.this, "[TODO] Registrando cuenta...", Toast.LENGTH_SHORT).show();
                 viewModel.register(inputEmail.getText().toString(),

@@ -50,7 +50,7 @@ public class UsuarioRepository extends ApiRepository {
     public SingleLiveEvent<Recurso<String>> getCambioClubResponse() { return cambioClubResponse; }
 
     public LiveData<Resource<Usuario>> getUsuario(long id) {
-        return new NetworkBoundResource<Usuario, Usuario>(AppExecutors.getInstance()) {
+        return new NetworkBoundResource<Usuario, Usuario>(AppExecutors.getInstance(), true) {
             @Override
             protected void saveCallResult(@NonNull Usuario item) {
                 item.setTimestamp((int)(System.currentTimeMillis() / 1000));

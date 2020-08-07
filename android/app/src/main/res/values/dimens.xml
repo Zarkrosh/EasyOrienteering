@@ -34,5 +34,8 @@
     <!-- Vista escaneo/mapa -->
     <dimen name="tamBotonSwitch">80dp</dimen>
 
+    <!-- Lista recorridos -->
+    <dimen name="radiusBotonRecorrido">10dp</dimen>
+
 
 </resources>

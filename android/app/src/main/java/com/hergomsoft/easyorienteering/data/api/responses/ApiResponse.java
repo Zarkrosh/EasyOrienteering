@@ -1,6 +1,8 @@
 package com.hergomsoft.easyorienteering.data.api.responses;
 
 import java.io.IOException;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 import retrofit2.Response;
 
@@ -11,7 +13,16 @@ import retrofit2.Response;
 public class ApiResponse<T> {
 
     public ApiResponse<T> create(Throwable error){
-        return new ApiErrorResponse<>(error.getMessage().equals("") ? error.getMessage() : "Unknown error\nCheck network connection");
+        String sError ;
+        if(error instanceof SocketTimeoutException) {
+            sError = "No hay conexión con el servidor. Comprueba tu conexión e inténtalo de nuevo";
+        } else if(!error.getMessage().isEmpty()) {
+            sError = error.getMessage();
+        } else {
+            sError = "Error desconocido de red";
+        }
+
+        return new ApiErrorResponse<>(sError);
     }
 
     public ApiResponse<T> create(Response<T> response){

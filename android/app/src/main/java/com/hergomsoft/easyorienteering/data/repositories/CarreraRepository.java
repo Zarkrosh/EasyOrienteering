@@ -2,24 +2,32 @@ package com.hergomsoft.easyorienteering.data.repositories;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.hergomsoft.easyorienteering.data.api.responses.CarrerasUsuarioResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.ApiResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
+import com.hergomsoft.easyorienteering.data.model.Usuario;
+import com.hergomsoft.easyorienteering.data.persistence.CarreraDAO;
+import com.hergomsoft.easyorienteering.data.persistence.EasyODatabase;
+import com.hergomsoft.easyorienteering.util.AppExecutors;
+import com.hergomsoft.easyorienteering.util.Constants;
+import com.hergomsoft.easyorienteering.util.NetworkBoundResource;
+import com.hergomsoft.easyorienteering.util.Resource;
 
-
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CarreraRepository extends ApiRepository {
-    private MutableLiveData<Recurso<Carrera>> carreraResponse;
-    private MutableLiveData<Recurso<CarrerasUsuarioResponse>> carrerasUsuarioResponse;
+
+    CarreraDAO carreraDAO;
 
     // Singleton
     private static CarreraRepository instance;
@@ -32,42 +40,61 @@ public class CarreraRepository extends ApiRepository {
     }
 
     private CarreraRepository(Context context) {
-        carreraResponse = new MutableLiveData<>();
-        carrerasUsuarioResponse = new MutableLiveData<>();
+        carreraDAO = EasyODatabase.getInstance(context).getCarreraDAO();
     }
 
-    public LiveData<Recurso<Carrera>> getCarreraResponse() {
-        return carreraResponse;
+    public LiveData<Resource<Carrera>> getCarrera(long id) {
+        return new NetworkBoundResource<Carrera, Carrera>(AppExecutors.getInstance(), true) {
+            @Override
+            protected void saveCallResult(@NonNull Carrera item) {
+                item.setTimestamp((int)(System.currentTimeMillis() / 1000));
+                carreraDAO.insertCarrera(item);
+            }
+
+            @Override
+            protected boolean shouldFetch(@Nullable Carrera data) {
+                int currentTimeSecs = (int) (System.currentTimeMillis() / 1000);
+                if(data == null || data.getTimestamp() == null) return true;
+                return currentTimeSecs - data.getTimestamp() >= Constants.REFRESH_CARRERA_TIME;
+            }
+
+            @NonNull
+            @Override
+            protected LiveData<Carrera> loadFromDb() {
+                return carreraDAO.getCarrera(id);
+            }
+
+            @NonNull
+            @Override
+            protected LiveData<ApiResponse<Carrera>> createCall() {
+                return apiClient.getCarrera(id);
+            }
+        }.getAsLiveData();
     }
-    public LiveData<Recurso<CarrerasUsuarioResponse>> getCarrerasUsuarioResponse() { return carrerasUsuarioResponse; }
 
-    public void getCarrera(long id) {
-        apiClient.getCarrera(id).enqueue(new Callback<Carrera>() {
+    public LiveData<Resource<List<Carrera>>> getCarrerasParticipadasUsuario() {
+        return new NetworkBoundResource<List<Carrera>, List<Carrera>>(AppExecutors.getInstance(), false) {
+            @NonNull
             @Override
-            public void onResponse(Call<Carrera> call, Response<Carrera> response) {
-                if(response.body() != null) {
-                    carreraResponse.postValue(new Recurso<>(response.body()));
-                }
+            protected LiveData<ApiResponse<List<Carrera>>> createCall() {
+                return apiClient.getCarrerasParticipadasUsuario();
             }
-
-            @Override
-            public void onFailure(Call<Carrera> call, Throwable t) {
-                carreraResponse.postValue(getRecursoConErrorConexion(t));
-            }
-        });
+        }.getAsLiveData();
     }
 
-    public void getCarrerasUsuario() {
-        apiClient.getCarrerasUsuario().enqueue(new Callback<CarrerasUsuarioResponse>() {
+    public LiveData<Resource<List<Carrera>>> getCarrerasOrganizadasUsuario() {
+        return new NetworkBoundResource<List<Carrera>, List<Carrera>>(AppExecutors.getInstance(), false) {
+            @NonNull
             @Override
-            public void onResponse(Call<CarrerasUsuarioResponse> call, Response<CarrerasUsuarioResponse> response) {
-                carrerasUsuarioResponse.postValue(new Recurso<>(response.body()));
+            protected LiveData<List<Carrera>> loadFromDb() {
+                return new MutableLiveData<>(new ArrayList<>()); // No se usa DB
             }
 
+            @NonNull
             @Override
-            public void onFailure(Call<CarrerasUsuarioResponse> call, Throwable t) {
-                carrerasUsuarioResponse.postValue(getRecursoConErrorConexion(t));
+            protected LiveData<ApiResponse<List<Carrera>>> createCall() {
+                return apiClient.getCarrerasOrganizadasUsuario();
             }
-        });
+        }.getAsLiveData();
     }
 }

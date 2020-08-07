@@ -7,9 +7,11 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
+import com.hergomsoft.easyorienteering.data.model.Carrera;
+import com.hergomsoft.easyorienteering.data.model.Recorrido;
 import com.hergomsoft.easyorienteering.data.model.Usuario;
 
-@Database(entities = {Usuario.class}, version = 1)
+@Database(entities = {Usuario.class, Carrera.class}, version = 1)
 @TypeConverters({Converters.class})
 public abstract class EasyODatabase extends RoomDatabase {
 
@@ -30,5 +32,6 @@ public abstract class EasyODatabase extends RoomDatabase {
     }
 
     public abstract UsuarioDAO getUsuarioDAO();
+    public abstract CarreraDAO getCarreraDAO();
 
 }

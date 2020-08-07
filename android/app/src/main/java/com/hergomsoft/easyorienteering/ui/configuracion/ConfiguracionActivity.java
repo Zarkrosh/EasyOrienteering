@@ -21,10 +21,12 @@ import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Usuario;
 import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
+import com.hergomsoft.easyorienteering.ui.perfil.PerfilActivity;
 import com.hergomsoft.easyorienteering.ui.resumen.ResumenActivity;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
 import com.hergomsoft.easyorienteering.components.DialogoCarga;
 import com.hergomsoft.easyorienteering.util.CircleTransform;
+import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.Resource;
 import com.squareup.picasso.Picasso;
 
@@ -68,7 +70,17 @@ public class ConfiguracionActivity extends BackableActivity {
         };
 
         btnFotoPerfil.setOnClickListener(todoListener);
-        btnVerPerfil.setOnClickListener(todoListener);
+        btnVerPerfil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Obtener ID usuario conectado
+                // TODO
+                long idUsuario = Constants.ID_USUARIO_PRUEBA;
+                Intent i = new Intent(ConfiguracionActivity.this, PerfilActivity.class);
+                i.putExtra(Constants.EXTRA_ID_USUARIO, idUsuario);
+                startActivity(i);
+            }
+        });
         btnCambiarNombre.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,7 +97,9 @@ public class ConfiguracionActivity extends BackableActivity {
         btnResumen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ConfiguracionActivity.this, ResumenActivity.class));
+                Intent i = new Intent(ConfiguracionActivity.this, ResumenActivity.class);
+                i.putExtra(Constants.EXTRA_VOLUNTARIO, true);
+                startActivity(i);
             }
         });
         btnCompartirApp.setOnClickListener(todoListener);
@@ -202,11 +216,11 @@ public class ConfiguracionActivity extends BackableActivity {
                     switch(usuarioResource.status) {
                         case LOADING:
                             viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO,
-                                    "", getString(R.string.home_cargando_datos));
+                                    "", getString(R.string.cargando_datos));
                             break;
                         case SUCCESS:
                             if(usuarioResource.data != null) {
-                                viewModel.ocultaDialogoCarga();
+                                viewModel.ocultaResultadoDialogo();
                                 tvNombre.setText(usuarioResource.data.getNombre());
                                 if(usuarioResource.data.getClub().isEmpty()) {
                                     tvClub.setVisibility(View.GONE);

@@ -125,6 +125,10 @@ public class ScanActivity extends AppCompatActivity {
             finish();
         }
     }
+    
+    private void detieneCapturaCamara() {
+        cameraSource.stop();
+    }
 
     /**
      * Inicializa todos los elementos de la actividad.
@@ -146,22 +150,6 @@ public class ScanActivity extends AppCompatActivity {
      * Configura los observadores del ViewModel para realizar los cambios en la vista.
      */
     private void setupObservadores() {
-        // Diálogos de carga y error
-        viewModel.getEstadoDialogoCarga().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                /*
-                switch(integer) {
-                    case ScanViewModel.ESTADO_ELECCION_PENDIENTE:
-                        dialogoCarga.dismiss();
-                        muestraDialogoRecorridoPendiente();
-                        break;
-                }
-
-                 */
-            }
-        });
-
         // Respuesta de carrera pendiente
         viewModel.getCarreraPendienteResponse().observe(this, new Observer<Recurso<Boolean>>() {
             @Override
@@ -176,7 +164,7 @@ public class ScanActivity extends AppCompatActivity {
                         viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), "Error inesperado en la respuesta de carrera pendiente");
                     } else if(res) {
                         // Tiene una carrera pendiente
-                        viewModel.pideEleccionPendiente();
+                        muestraDialogoRecorridoPendiente();
                     } else {
                         viewModel.ocultaDialogoCarga();
                     }
@@ -254,9 +242,9 @@ public class ScanActivity extends AppCompatActivity {
         });
 
         // Elementos dependientes del modo de la vista
-        viewModel.getModoVista().observe(this, new Observer<ScanViewModel.ModoVista>() {
+        viewModel.getModoEscaneo().observe(this, new Observer<ScanViewModel.ModoEscaneo>() {
             @Override
-            public void onChanged(ScanViewModel.ModoVista modo) {
+            public void onChanged(ScanViewModel.ModoEscaneo modo) {
                 if(modo != null) {
                     switch(modo) {
                         case INICIO_RECORRIDO:
@@ -265,24 +253,24 @@ public class ScanActivity extends AppCompatActivity {
                         case CARRERA:
                             setupModoCarrera();
                             break;
-                        default:
-                            viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), "Error inesperado del modo de la vista");
-                            break;
                     }
                 }
             }
         });
 
         // Cambios entre vistas
-        viewModel.getAlternadoVistas().observe(this, new Observer<Boolean>() {
+        viewModel.getAlternadoVistas().observe(this, new Observer<ScanViewModel.ModoVista>() {
             @Override
-            public void onChanged(Boolean pantallaScan) {
-                if(pantallaScan) {
-                    // Muestra la vista de escaneo de QR
-                    mostrarVistaEscaneo();
-                } else {
-                    // Muestra la vista del mapa
-                    mostrarVistaMapa();
+            public void onChanged(ScanViewModel.ModoVista modo) {
+                if(modo != null) {
+                    switch(modo) {
+                        case ESCANEO:
+                            mostrarVistaEscaneo();
+                            break;
+                        case MAPA:
+                            mostrarVistaMapa();
+                            break;
+                    }
                 }
             }
         });
@@ -329,7 +317,7 @@ public class ScanActivity extends AppCompatActivity {
     private void mostrarVistaMapa() {
         btnSwitch.setImageResource(R.drawable.img_qr_icon);
         switcher.showPrevious();
-        cameraSource.stop();
+        detieneCapturaCamara();
     }
 
 
@@ -340,7 +328,7 @@ public class ScanActivity extends AppCompatActivity {
         btnSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewModel.alternarVistas();
+                viewModel.alternarModoVista();
             }
         });
     }
@@ -377,7 +365,7 @@ public class ScanActivity extends AppCompatActivity {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-                cameraSource.stop();
+                detieneCapturaCamara();
             }
         });
     }
@@ -486,7 +474,7 @@ public class ScanActivity extends AppCompatActivity {
             @Override
             public void onShow(DialogInterface dialog) {
                 // Pausa la captura de la cámara
-                cameraSource.stop();
+                detieneCapturaCamara();
             }
         });
         dialogoCarga.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -534,7 +522,7 @@ public class ScanActivity extends AppCompatActivity {
                 public void run() {
                     if(!dialogConfirmacion.isShowing()) {
                         // Pausa la captura de la cámara
-                        cameraSource.stop();
+                        detieneCapturaCamara();
                         // Muestra el diálogo
                         dialogConfirmacion.show();
                     }
@@ -577,7 +565,7 @@ public class ScanActivity extends AppCompatActivity {
         dialogRecorridoPendiente.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-                cameraSource.stop();
+                detieneCapturaCamara();
             }
         });
     }

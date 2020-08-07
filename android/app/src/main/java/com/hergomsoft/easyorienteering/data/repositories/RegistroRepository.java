@@ -16,6 +16,7 @@ import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Registro;
+import com.hergomsoft.easyorienteering.util.SingleLiveEvent;
 
 import org.json.JSONObject;
 
@@ -36,9 +37,9 @@ public class RegistroRepository extends ApiRepository {
     private Recorrido recorridoActual;
     private List<Registro> registroList;
 
-    private MutableLiveData<Recurso<Registro>> registroResponse;         // Respuesta de registro de control
-    private MutableLiveData<Recurso<Boolean>> comprobacionPendiente;     // Respuesta de comprobación de recorrido pendiente
-    private MutableLiveData<Recurso<AbandonoResponse>> abandonoResponse; // Respuesta de comprobación de recorrido pendiente
+    private SingleLiveEvent<Recurso<Registro>> registroResponse;         // Respuesta de registro de control
+    private SingleLiveEvent<Recurso<Boolean>> comprobacionPendiente;     // Respuesta de comprobación de recorrido pendiente
+    private SingleLiveEvent<Recurso<AbandonoResponse>> abandonoResponse; // Respuesta de comprobación de recorrido pendiente
     private MutableLiveData<Control> siguienteControl;
 
     // Singleton
@@ -56,9 +57,9 @@ public class RegistroRepository extends ApiRepository {
         //controlDAO = DatosDatabase.getDatabase(application).getControlDAO();
         //recorridoDAO = DatosDatabase.getDatabase(application).getRecorridoDAO();
 
-        registroResponse = new MutableLiveData<>();
-        comprobacionPendiente = new MutableLiveData<>();
-        abandonoResponse = new MutableLiveData<>();
+        registroResponse = new SingleLiveEvent<>();
+        comprobacionPendiente = new SingleLiveEvent<>();
+        abandonoResponse = new SingleLiveEvent<>();
         siguienteControl = new MutableLiveData<>();
         registroList = new ArrayList<>();
     }
@@ -241,9 +242,9 @@ public class RegistroRepository extends ApiRepository {
         });
     }
 
-    public LiveData<Recurso<Boolean>> getPendienteResponse() { return comprobacionPendiente; }
-    public LiveData<Recurso<Registro>> getRegistroResponse() { return registroResponse; }
-    public LiveData<Recurso<AbandonoResponse>> getAbandonoResponse() { return abandonoResponse; }
+    public SingleLiveEvent<Recurso<Boolean>> getPendienteResponse() { return comprobacionPendiente; }
+    public SingleLiveEvent<Recurso<Registro>> getRegistroResponse() { return registroResponse; }
+    public SingleLiveEvent<Recurso<AbandonoResponse>> getAbandonoResponse() { return abandonoResponse; }
     public LiveData<Control> getSiguienteControl() { return siguienteControl; }
     public Carrera getCarreraActual() { return carreraActual; }
     public Recorrido getRecorridoActual() { return recorridoActual; }
@@ -278,6 +279,9 @@ public class RegistroRepository extends ApiRepository {
                 Control control = carreraActual.getControles().get(trazado[registroList.size()]);
                 siguienteControl.postValue(control);
             }
+        } else {
+            // SCORE
+            siguienteControl.postValue(null);
         }
     }
 

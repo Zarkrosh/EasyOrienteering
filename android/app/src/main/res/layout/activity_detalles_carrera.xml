@@ -11,12 +11,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
-        android:text="VI Liga Norte 2020"
+        android:textColor="@android:color/black"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="VI Liga Norte 2020" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -32,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="EVENTO" />
+            tools:text="EVENTO" />
 
         <TextView
             android:id="@+id/detalles_modalidad_carrera"
@@ -40,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="LINEA" />
+            tools:text="LINEA" />
 
         <TextView
             android:id="@+id/detalles_organizador_carrera"
@@ -48,9 +49,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="center"
-            android:text="Pepito Pérez"
             app:layout_constraintTop_toBottomOf="@+id/detalles_nombre_carrera"
-            tools:layout_editor_absoluteX="176dp" />
+            tools:text="Pepito Pérez" />
 
     </LinearLayout>
 
@@ -60,18 +60,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Resultados"
         android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        tools:text="Resultados" />
 
     <ListView
         android:id="@+id/detalles_resultados"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="10.0sp"
         app:layout_constraintTop_toBottomOf="@+id/textView16" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

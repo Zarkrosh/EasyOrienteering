@@ -84,7 +84,7 @@ public interface ICarreraService {
      * @param usuario Usuario
      * @return Lista de carreras corridas por el usuario
      */
-    List<Carrera> getCarrerasCorridasUsuario(Usuario usuario);
+    List<Carrera> getCarrerasParticipadasUsuario(Usuario usuario);
     
     /**
      * Devuelve una lista con las carreras que ha organizado el usuario especificado.

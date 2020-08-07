@@ -4,40 +4,36 @@ import android.app.Application;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-import com.hergomsoft.easyorienteering.data.api.responses.CarrerasUsuarioResponse;
-import com.hergomsoft.easyorienteering.data.model.Recurso;
+import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.repositories.CarreraRepository;
+import com.hergomsoft.easyorienteering.util.Constants;
+import com.hergomsoft.easyorienteering.util.Resource;
+
+import java.util.List;
 
 public class MisCarrerasViewModel extends AndroidViewModel {
 
     private CarreraRepository carreraRepository;
 
-    private LiveData<Recurso<CarrerasUsuarioResponse>> carrerasResponse;
-    private MutableLiveData<Recurso<Boolean>> estadocargaCarreras;
-
     public MisCarrerasViewModel(Application app) {
         super(app);
         carreraRepository = CarreraRepository.getInstance(app);
-        carrerasResponse = carreraRepository.getCarrerasUsuarioResponse();
-        estadocargaCarreras = new MutableLiveData<>();
     }
 
-    public LiveData<Recurso<CarrerasUsuarioResponse>> getCarrerasResponse() { return carrerasResponse; }
-    public LiveData<Recurso<Boolean>> getEstadoCargaCarreras() { return estadocargaCarreras; }
-
-    public void cargaCarreras() {
-        estadocargaCarreras.postValue(new Recurso<>(true));
-        carreraRepository.getCarrerasUsuario();
+    public LiveData<Resource<List<Carrera>>> getCarrerasParticipadasUsuario() {
+        // Obtener ID usuario conectado
+        // TODO
+        long idUsuario = Constants.ID_USUARIO_PRUEBA;
+        return carreraRepository.getCarrerasParticipadasUsuario();
     }
 
-    public void cargaCarrerasFinalizada() {
-        estadocargaCarreras.postValue(new Recurso<>(false));
+    public LiveData<Resource<List<Carrera>>> getCarrerasOrganizadasUsuario() {
+        // Obtener ID usuario conectado
+        // TODO
+        long idUsuario = Constants.ID_USUARIO_PRUEBA;
+        return carreraRepository.getCarrerasOrganizadasUsuario();
     }
-
-    public void mostrarErrorCarga(String error) { estadocargaCarreras.postValue(new Recurso<>(error)); }
 
     public void actualizaBusqueda(String busqueda) {
         // TODO

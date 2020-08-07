@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
@@ -27,6 +28,8 @@ public class Usuario {
     private Date fechaRegistro;
 
     private Integer timestamp; // Momento en el que se crea en la BD
+
+    public Usuario() {}
 
     public Usuario(long id, String nombre, String club, Date fechaRegistro) {
         this.id = id;

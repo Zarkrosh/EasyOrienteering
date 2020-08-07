@@ -1,20 +1,21 @@
 package com.hergomsoft.easyorienteering.ui.miscarreras;
 
+import android.os.Bundle;
+import android.view.View;
+
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
-
-import android.os.Bundle;
-import android.view.View;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.adapters.MisCarrerasPagerAdapter;
 import com.hergomsoft.easyorienteering.components.ListaCarrerasComponent;
-import com.hergomsoft.easyorienteering.data.api.responses.CarrerasUsuarioResponse;
-import com.hergomsoft.easyorienteering.data.model.Recurso;
+import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
+import com.hergomsoft.easyorienteering.util.Resource;
 
+import java.util.List;
 import java.util.Vector;
 
 public class MisCarrerasActivity extends BackableActivity {
@@ -40,7 +41,6 @@ public class MisCarrerasActivity extends BackableActivity {
 
         setupListas();
         setupObservadores();
-        viewModel.cargaCarreras();
     }
 
     private void setupListas() {
@@ -59,41 +59,39 @@ public class MisCarrerasActivity extends BackableActivity {
     }
 
     private void setupObservadores() {
-        // Estados de carga o error de las listas
-        viewModel.getEstadoCargaCarreras().observe(this, new Observer<Recurso<Boolean>>() {
+        viewModel.getCarrerasParticipadasUsuario().observe(this, new Observer<Resource<List<Carrera>>>() {
             @Override
-            public void onChanged(Recurso<Boolean> recurso) {
-                if(recurso.hayError()) {
-                    // TODO Separar
-                    listaCarrerasParticipadas.muestraError(recurso.getError());
-                    listaCarrerasOrganizadas.muestraError(recurso.getError());
-                } else {
-                    if(recurso.getRecurso()) {
-                        listaCarrerasParticipadas.muestraCargaCarreras();
-                        listaCarrerasOrganizadas.muestraCargaCarreras();
-                    } else {
-                        listaCarrerasParticipadas.muestraLista();
-                        listaCarrerasOrganizadas.muestraLista();
-                    }
-                }
+            public void onChanged(Resource<List<Carrera>> listResource) {
+                manejaCargaCarreras(listResource, listaCarrerasParticipadas);
             }
         });
 
-        // Respuesta con las listas de carreras
-        viewModel.getCarrerasResponse().observe(this, new Observer<Recurso<CarrerasUsuarioResponse>>() {
+        viewModel.getCarrerasOrganizadasUsuario().observe(this, new Observer<Resource<List<Carrera>>>() {
             @Override
-            public void onChanged(Recurso<CarrerasUsuarioResponse> response) {
-                if(response.hayError()) {
-                    viewModel.mostrarErrorCarga(response.getError());
-                } else {
-                    viewModel.cargaCarrerasFinalizada();
-                    listaCarrerasParticipadas.actualizaCarreras(response.getRecurso().getParticipadas());
-                    listaCarrerasOrganizadas.actualizaCarreras(response.getRecurso().getOrganizadas());
-                }
+            public void onChanged(Resource<List<Carrera>> listResource) {
+                manejaCargaCarreras(listResource, listaCarrerasOrganizadas);
             }
         });
-
     }
 
+    private void manejaCargaCarreras(Resource<List<Carrera>> carrerasResource, ListaCarrerasComponent component) {
+        if(carrerasResource != null) {
+            switch (carrerasResource.status) {
+                case LOADING:
+                    component.muestraCargaCarreras();
+                    break;
+                case SUCCESS:
+                    if (carrerasResource.data != null) {
+                        component.actualizaCarreras(carrerasResource.data);
+                    } else {
+                        component.muestraError("Error inesperado");
+                    }
+                    break;
+                case ERROR:
+                    component.muestraError(carrerasResource.message);
+                    break;
+            }
+        }
+    }
 
 }

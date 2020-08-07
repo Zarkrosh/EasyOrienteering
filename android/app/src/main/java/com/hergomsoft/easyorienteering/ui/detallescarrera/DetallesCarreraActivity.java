@@ -16,6 +16,8 @@ import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
 import com.hergomsoft.easyorienteering.components.DialogoCarga;
+import com.hergomsoft.easyorienteering.util.Constants;
+import com.hergomsoft.easyorienteering.util.Resource;
 
 import java.util.ArrayList;
 
@@ -72,25 +74,43 @@ public class DetallesCarreraActivity extends BackableActivity {
     }
 
     private void setupObservadores() {
-        // Respuesta a la petición de detalles de una carrera
-        viewModel.getCarreraResponse().observe(this, new Observer<Recurso<Carrera>>() {
+        // Petición de datos de carrera
+        long idCarrera = 0;
+        if(getIntent().hasExtra(Constants.EXTRA_ID_CARRERA)){
+            idCarrera = getIntent().getLongExtra(Constants.EXTRA_ID_CARRERA, -1);
+            if(idCarrera == -1) {
+                Toast.makeText(this, "Se ha producido un error inesperado (ID inválido)", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        } else {
+            Toast.makeText(this, "Se ha producido un error inesperado (No hay ID)", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        viewModel.getCarrera(idCarrera).observe(this, new Observer<Resource<Carrera>>() {
             @Override
-            public void onChanged(Recurso<Carrera> carreraRecurso) {
-                if(carreraRecurso.hayError()) {
-                    viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), carreraRecurso.getError());
-                } else {
-                    Carrera carrera = carreraRecurso.getRecurso();
-                    if(carrera == null) {
-                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), "No se ha recibido ninguna carrera");
-                    } else {
-                        viewModel.ocultaDialogoCarga();
-                        viewModel.setCarrera(carrera);
-
-                        // Datos de la carrera
-                        nombreCarrera.setText(carrera.getNombre());
-                        tipoCarrera.setText(carrera.getTipo().toString());
-                        modalidadCarrera.setText(carrera.getModalidad().toString());
-                        adapterRecorridos.actualizaRecorridos(carrera.getRecorridos());
+            public void onChanged(Resource<Carrera> carreraRecurso) {
+                if(carreraRecurso != null) {
+                    switch (carreraRecurso.status) {
+                        case LOADING:
+                            viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getString(R.string.cargando_datos));
+                            break;
+                        case SUCCESS:
+                            Carrera carrera = carreraRecurso.data;
+                            if(carrera == null) {
+                                viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), "No se ha recibido ninguna carrera");
+                            } else {
+                                // Datos de la carrera
+                                nombreCarrera.setText(carrera.getNombre());
+                                tipoCarrera.setText(carrera.getTipo().toString());
+                                modalidadCarrera.setText(carrera.getModalidad().toString());
+                                organizadorCarrera.setText(carrera.getOrganizador().getNombre());
+                                adapterRecorridos.actualizaRecorridos(carrera.getRecorridos());
+                                viewModel.ocultaDialogoCarga();
+                            }
+                            break;
+                        case ERROR:
+                            viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), carreraRecurso.message);
+                            break;
                     }
                 }
             }

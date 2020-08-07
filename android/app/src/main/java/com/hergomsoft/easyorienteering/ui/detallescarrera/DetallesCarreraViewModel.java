@@ -11,24 +11,19 @@ import com.hergomsoft.easyorienteering.data.repositories.CarreraRepository;
 import com.hergomsoft.easyorienteering.util.AndroidViewModelConCarga;
 import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.components.DialogoCarga;
+import com.hergomsoft.easyorienteering.util.Resource;
 
 public class DetallesCarreraViewModel extends AndroidViewModelConCarga {
     private CarreraRepository carreraRepository;
 
-    private LiveData<Recurso<Carrera>> carreraResponse;
-
-    private Carrera carrera;
-
     public DetallesCarreraViewModel(Application app) {
         super(app);
         carreraRepository = CarreraRepository.getInstance(app);
-        carreraResponse = carreraRepository.getCarreraResponse();
     }
 
-    public LiveData<Recurso<Carrera>> getCarreraResponse() { return carreraResponse; }
-
-    public Carrera getCarrera() { return carrera; }
-    public void setCarrera(Carrera carrera) { this.carrera = carrera; }
+    public LiveData<Resource<Carrera>> getCarrera(long id) {
+        return carreraRepository.getCarrera(id);
+    }
 
     public void cargaDatosCarrera(Intent i, String tituloDialogo, String mensajeDialogo) {
         actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, tituloDialogo, mensajeDialogo);

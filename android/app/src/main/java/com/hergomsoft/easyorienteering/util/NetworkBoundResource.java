@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import com.hergomsoft.easyorienteering.data.api.responses.ApiResponse;
@@ -17,25 +18,24 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
     private static final String TAG = "NetworkBoundResource";
 
     private AppExecutors appExecutors;
+    private boolean usesDB;
     private MediatorLiveData<Resource<CacheObject>> results = new MediatorLiveData<>();
 
-    public NetworkBoundResource(AppExecutors appExecutors) {
+    public NetworkBoundResource(AppExecutors appExecutors, boolean usesDB) {
         this.appExecutors = appExecutors;
+        this.usesDB = usesDB;
         init();
     }
 
     private void init(){
-
-        // update LiveData for loading status
+        // Notifica estado "Cargando"
         results.setValue((Resource<CacheObject>) Resource.loading(null));
 
-        // observe LiveData source from local db
+        // Obtiene la fuente de LiveData de la DB
         final LiveData<CacheObject> dbSource = loadFromDb();
-
         results.addSource(dbSource, new Observer<CacheObject>() {
             @Override
             public void onChanged(@Nullable CacheObject cacheObject) {
-
                 results.removeSource(dbSource);
 
                 if(shouldFetch(cacheObject)){
@@ -72,15 +72,13 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
         });
 
         final LiveData<ApiResponse<RequestObject>> apiResponse = createCall();
-
         results.addSource(apiResponse, new Observer<ApiResponse<RequestObject>>() {
             @Override
             public void onChanged(@Nullable final ApiResponse<RequestObject> requestObjectApiResponse) {
                 results.removeSource(dbSource);
                 results.removeSource(apiResponse);
 
-                /*
-                    3 cases:
+                /* 3 situaciones:
                        1) ApiSuccessResponse
                        2) ApiErrorResponse
                        3) ApiEmptyResponse
@@ -89,19 +87,23 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
                     appExecutors.diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
-
-                            // save the response to the local db
+                            // Guarda la respuesta en la BD
                             saveCallResult((RequestObject) processResponse((ApiResponse.ApiSuccessResponse) requestObjectApiResponse));
-
                             appExecutors.mainThread().execute(new Runnable() {
                                 @Override
                                 public void run() {
-                                    results.addSource(loadFromDb(), new Observer<CacheObject>() {
-                                        @Override
-                                        public void onChanged(@Nullable CacheObject cacheObject) {
-                                            setValue(Resource.success(cacheObject));
-                                        }
-                                    });
+                                    if(usesDB) {
+                                        // Obtiene el valor desde la BD
+                                        results.addSource(loadFromDb(), new Observer<CacheObject>() {
+                                            @Override
+                                            public void onChanged(@Nullable CacheObject cacheObject) {
+                                                setValue(Resource.success(cacheObject));
+                                            }
+                                        });
+                                    } else {
+                                        // Devuelve el resultado directamente
+                                        setValue(Resource.success(processResponse((ApiResponse.ApiSuccessResponse) requestObjectApiResponse)));
+                                    }
                                 }
                             });
                         }
@@ -111,6 +113,7 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
                     appExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
+                            // Como es una respuesta vacía, no se guarda ningún valor
                             results.addSource(loadFromDb(), new Observer<CacheObject>() {
                                 @Override
                                 public void onChanged(@Nullable CacheObject cacheObject) {
@@ -149,16 +152,25 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
 
     // Called to save the result of the API response into the database.
     @WorkerThread
-    protected abstract void saveCallResult(@NonNull RequestObject item);
+    protected void saveCallResult(@NonNull RequestObject item) {
+        // Por defecto no se usa DB
+        // Si se desea usar, se overridea
+    }
 
     // Called with the data in the database to decide whether to fetch
     // potentially updated data from the network.
     @MainThread
-    protected abstract boolean shouldFetch(@Nullable CacheObject data);
+    protected boolean shouldFetch(@Nullable CacheObject data) {
+        // Por defecto no se usa DB
+        return true;
+    }
 
     // Called to get the cached data from the database.
     @NonNull @MainThread
-    protected abstract LiveData<CacheObject> loadFromDb();
+    protected LiveData<CacheObject> loadFromDb() {
+        // Por defecto no se usa DB
+        return new MutableLiveData<>(null);
+    }
 
     // Called to create the API call.
     @NonNull @MainThread

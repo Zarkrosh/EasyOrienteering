@@ -5,12 +5,15 @@ public class Constants {
     public static final long ID_USUARIO_PRUEBA = 3;
 
     // Extras de intents
-    public static final String EXTRA_EMAIL_NOMBRE = "EXTRA_EMAIL_NOMBRE";
-    public static final String EXTRA_ID_CARRERA = "EXTRA_ID_CARRERA";
+    public static final String EXTRA_EMAIL_NOMBRE = "EMAIL_NOMBRE";
+    public static final String EXTRA_ID_CARRERA = "ID_CARRERA";
+    public static final String EXTRA_ID_USUARIO = "ID_USUARIO";
+    public static final String EXTRA_VOLUNTARIO = "VOLUNTARIO";
 
     public static final int MIN_PASSWORD_LENGTH = 8;
 
     public static final int REFRESH_USUARIO_TIME = 60 * 5; // 5 minutos (segundos)
+    public static final int REFRESH_CARRERA_TIME = 60 * 5; // 5 minutos (segundos)
 
     // Regex
     public static final String REGEX_USERNAME = "^[a-zA-Z0-9_ ]+$";

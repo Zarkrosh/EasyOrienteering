@@ -26,8 +26,8 @@ import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.model.ConexionState;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
 import com.hergomsoft.easyorienteering.util.Constants;
-import com.hergomsoft.easyorienteering.util.VisualUtils;
 import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
+import com.hergomsoft.easyorienteering.util.Utils;
 
 public class LoginActivity extends BackableActivity {
 
@@ -166,7 +166,7 @@ public class LoginActivity extends BackableActivity {
 
     private void doLogin(String username, String password) {
         // Oculta teclado
-        VisualUtils.hideKeyboard(activity);
+        Utils.hideKeyboard(activity);
 
         textError.setText("");
         loginViewModel.login(username, password);

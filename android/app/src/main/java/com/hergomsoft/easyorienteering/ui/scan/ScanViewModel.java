@@ -1,6 +1,7 @@
 package com.hergomsoft.easyorienteering.ui.scan;
 
 import android.app.Application;
+import android.os.Handler;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -24,10 +25,8 @@ public class ScanViewModel extends AndroidViewModelConCarga {
     private String[] permisosNecesarios = new String[]{ CAMERA };
 
     // Modos de las vistas
-    public enum ModoVista { INICIO_RECORRIDO, CARRERA };
-
-    // Estados de los diálogos
-    public static final int ESTADO_ELECCION_PENDIENTE = 4;
+    public enum ModoEscaneo { INICIO_RECORRIDO, CARRERA };
+    public enum ModoVista { ESCANEO, MAPA };
 
     // Datos de control escaneado
     private String codigo;
@@ -43,12 +42,9 @@ public class ScanViewModel extends AndroidViewModelConCarga {
     private LiveData<Recurso<Registro>> registroResponse;
     private LiveData<Recurso<AbandonoResponse>> abandonoResponse;
     // MutableLiveDatas
-    private MutableLiveData<Integer> estadoDialogo;
-    private MutableLiveData<String> tituloDialogo;
-    private MutableLiveData<String> mensajeDialogo;
     private MutableLiveData<Control> siguienteControl;
-    private MutableLiveData<Boolean> pantallaEscaneo;
     private MutableLiveData<ModoVista> modoVista;
+    private MutableLiveData<ModoEscaneo> modoEscaneo;
 
     public ScanViewModel(Application app) {
         super(app);
@@ -56,49 +52,53 @@ public class ScanViewModel extends AndroidViewModelConCarga {
         peticionPendiente = registroRepository.getPendienteResponse();
         registroResponse = registroRepository.getRegistroResponse();
         abandonoResponse = registroRepository.getAbandonoResponse();
-        estadoDialogo = new MutableLiveData<>(DialogoCarga.ESTADO_OCULTO);
-        tituloDialogo = new MutableLiveData<>("");
-        mensajeDialogo = new MutableLiveData<>("");
         siguienteControl = new MutableLiveData<>();
-        pantallaEscaneo = new MutableLiveData<>(true);
-        modoVista = new MutableLiveData<>(ModoVista.INICIO_RECORRIDO);
+        modoVista = new MutableLiveData<>(ModoVista.ESCANEO);
+        modoEscaneo = new MutableLiveData<>(ModoEscaneo.INICIO_RECORRIDO);
     }
 
     public LiveData<Recurso<Boolean>> getCarreraPendienteResponse() { return peticionPendiente; }
     public LiveData<Recurso<Registro>> getRegistroResponse() {
         return registroResponse;
     }
-    public LiveData<Recurso<AbandonoResponse>> getAbandonoResponse() {
-        return abandonoResponse;
-    }
-    public LiveData<Integer> getEstadoDialogoCarga() { return estadoDialogo; }
-    public LiveData<Boolean> getAlternadoVistas() { return pantallaEscaneo; }
-    public LiveData<ModoVista> getModoVista() { return modoVista; }
+    public LiveData<Recurso<AbandonoResponse>> getAbandonoResponse() { return abandonoResponse; }
+    public LiveData<ModoVista> getAlternadoVistas() { return modoVista; }
+    public LiveData<ModoEscaneo> getModoEscaneo() { return modoEscaneo; }
 
     public Carrera getCarreraActual() { return registroRepository.getCarreraActual(); }
     public Recorrido getRecorridoActual() { return registroRepository.getRecorridoActual(); }
     public LiveData<Control> getSiguienteControl() { return registroRepository.getSiguienteControl(); }
 
-    public void alternarVistas() {
-        pantallaEscaneo.postValue(!pantallaEscaneo.getValue());
+    public void alternarModoVista() {
+        switch (modoVista.getValue()) {
+            case MAPA:
+                modoVista.postValue(ModoVista.ESCANEO);
+                break;
+            case ESCANEO:
+                modoVista.postValue(ModoVista.MAPA);
+                break;
+        }
     }
-    public void pasaAModoCarrera() { modoVista.postValue(ModoVista.CARRERA); }
+    public void pasaAModoCarrera() { modoEscaneo.postValue(ModoEscaneo.CARRERA); }
 
     /**
      * Realiza una petición de comprobación de recorrido pendiente.
      */
     public void compruebaRecorridoPendiente() {
-        tituloDialogo.postValue("");
-        mensajeDialogo.postValue(getApplication().getApplicationContext().getString(R.string.scan_carga_pendiente));
-        estadoDialogo.postValue(DialogoCarga.ESTADO_CARGANDO);
-        registroRepository.comprobarRecorridoPendiente();
-    }
+        actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.scan_carga_pendiente));
 
-    /**
-     * Muestra el diálogo de elección para un recorrido pendiente del usuario.
-     */
-    public void pideEleccionPendiente() {
-        estadoDialogo.postValue(ESTADO_ELECCION_PENDIENTE);
+        // TEST
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+
+                registroRepository.comprobarRecorridoPendiente();
+
+
+            }
+        }, 2000);
     }
 
     /**
@@ -106,9 +106,7 @@ public class ScanViewModel extends AndroidViewModelConCarga {
      * de salida del recorrido, si ha sido exitoso.
      */
     public void confirmaInicioRecorrido() {
-        tituloDialogo.postValue("");
-        mensajeDialogo.postValue(getApplication().getString(R.string.scan_carga_inicio));
-        estadoDialogo.postValue(DialogoCarga.ESTADO_CARGANDO);
+        actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.scan_carga_inicio));
         registroRepository.iniciaRecorrido(codigo, idCarrera, idRecorrido, secreto);
     }
 
@@ -117,9 +115,7 @@ public class ScanViewModel extends AndroidViewModelConCarga {
      * @param escaneado Texto escaneado en el control
      */
     public void registraControl(String escaneado) {
-        tituloDialogo.postValue("");
-        mensajeDialogo.postValue(getApplication().getString(R.string.scan_carga_registrando));
-        estadoDialogo.postValue(DialogoCarga.ESTADO_CARGANDO);
+        actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.scan_carga_registrando));
         codigo = Utils.getCodigoControlEscaneado(escaneado);
         secreto = Utils.getSecretoControlEscaneado(escaneado);
         registroRepository.registraControl(codigo, secreto);
@@ -129,9 +125,7 @@ public class ScanViewModel extends AndroidViewModelConCarga {
      * Realiza una petición de abandono del recorrido actual.
      */
     public void confirmaAbandonoRecorrido() {
-        tituloDialogo.postValue("");
-        mensajeDialogo.postValue(getApplication().getString(R.string.scan_carga_abandono));
-        estadoDialogo.postValue(DialogoCarga.ESTADO_CARGANDO);
+        actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.scan_carga_abandono));
         registroRepository.abandonaRecorrido();
     }
 
