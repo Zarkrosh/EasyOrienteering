@@ -60,12 +60,20 @@ public interface RegistroRepository extends JpaRepository<Registro, Long> {
     public boolean haCorridoRecorrido(@Param("idCorredor") long idCorredor, @Param("idRecorrido") long idRecorrido);
 
     /**
+     * Devuelve los registros de todos los corredores en un recorrido.
+     * @param idRecorrido ID del recorrido
+     * @return Registros del recorrido
+     */
+    @Query(value="SELECT * FROM registros WHERE recorrido_id = :idRecorrido", nativeQuery = true)
+    public List<Registro> getRegistrosRecorrido(@Param("idRecorrido") long idRecorrido);
+    
+    /**
      * Devuelve los registros de un corredor en un recorrido, ordenados de forma creciente en el tiempo.
      * @param idCorredor ID del usuario corredor
      * @param idRecorrido ID del recorrido
      * @return Registros del usuario en el recorrido
      */
-    @Query(value="SELECT * FROM registros WHERE corredor_id = :idCorredor AND recorrido_id = :idRecorrido", nativeQuery = true)
+    @Query(value="SELECT * FROM registros WHERE corredor_id = :idCorredor AND recorrido_id = :idRecorrido ORDER BY fecha ASC", nativeQuery = true)
     public Registro[] getRegistrosUsuarioRecorrido(@Param("idCorredor") long idCorredor, @Param("idRecorrido") long idRecorrido);
     
     /**

@@ -69,6 +69,11 @@ public class RegistroService implements IRegistroService {
     }
     
     @Override
+    public List<Registro> getRegistrosRecorrido(Recorrido recorrido) {
+        return repoRegistro.getRegistrosRecorrido(recorrido.getId());
+    }
+    
+    @Override
     public Registro[] getRegistrosUsuarioRecorrido(Usuario corredor, Recorrido recorrido) {
         return repoRegistro.getRegistrosUsuarioRecorrido(corredor.getId(), recorrido.getId());
     }

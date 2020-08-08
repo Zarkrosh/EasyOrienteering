@@ -10,11 +10,11 @@ import android.widget.Toast;
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.ui.conexion.ConexionActivity;
 import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
+import com.hergomsoft.easyorienteering.ui.resultados.ResultadosActivity;
 import com.hergomsoft.easyorienteering.ui.resumen.ResumenActivity;
+import com.hergomsoft.easyorienteering.util.Constants;
 
 public class SplashActivity extends AppCompatActivity {
-
-    private final int MIN_TIEMPO_LOGOTIPO = 1000; // ms
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +54,8 @@ public class SplashActivity extends AppCompatActivity {
                 startActivity(i);
                 */
 
-                startActivity(new Intent(SplashActivity.this, HomeActivity.class));
             }
-        }, MIN_TIEMPO_LOGOTIPO);
+        }, Constants.SPLASH_MIN_TIEMPO_LOGOTIPO);
 
 
     }

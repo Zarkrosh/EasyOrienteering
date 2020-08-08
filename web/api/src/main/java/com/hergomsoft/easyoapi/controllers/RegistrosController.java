@@ -9,10 +9,19 @@ import com.hergomsoft.easyoapi.models.responses.PendienteResponse;
 import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.models.responses.AbandonoResponse;
 import com.hergomsoft.easyoapi.models.responses.InicioResponse;
+import com.hergomsoft.easyoapi.models.responses.RegistrosRecorridoResponse;
+import com.hergomsoft.easyoapi.models.responses.RegistrosUsuario;
 import com.hergomsoft.easyoapi.services.CarreraService;
 import com.hergomsoft.easyoapi.services.RegistroService;
 import com.hergomsoft.easyoapi.services.UsuarioService;
 import com.hergomsoft.easyoapi.utils.MessageException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,6 +146,30 @@ public class RegistrosController {
         }
         
         return res;
+    }
+    
+    @GetMapping("/{idRecorrido}")
+    public RegistrosRecorridoResponse getRegistrosRecorrido(@PathVariable long idRecorrido) {
+        Recorrido recorrido = carrerasService.getRecorrido(idRecorrido);
+        if(recorrido != null) {
+            List<Registro> registros = registrosService.getRegistrosRecorrido(recorrido);
+            List<RegistrosUsuario> registrosUsuarios = new ArrayList<>();
+            Map<Usuario, List<Registro>> tempRegistros = new HashMap<>();
+            // Agrupa los registros por usuario
+            for(Registro r : registros) {
+                Usuario u = r.getCorredor();
+                List<Registro> reg = tempRegistros.putIfAbsent(u, new ArrayList<>());
+                if(reg == null) reg = tempRegistros.get(u);
+                reg.add(r);
+            }
+            for(Entry<Usuario, List<Registro>> e : tempRegistros.entrySet()) {
+                registrosUsuarios.add(new RegistrosUsuario(e.getKey(), e.getValue()));
+            }
+            return new RegistrosRecorridoResponse(recorrido, registrosUsuarios);
+        } else {
+            // No existe el recorrido
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe el recorrido");
+        }
     }
 
     

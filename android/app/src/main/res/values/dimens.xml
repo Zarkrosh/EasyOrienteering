@@ -37,5 +37,9 @@
     <!-- Lista recorridos -->
     <dimen name="radiusBotonRecorrido">10dp</dimen>
 
+    <!-- Resultados -->
+    <dimen name="tamLetraItemResultados">16sp</dimen>
+    <dimen name="marginStartItemResultados">10dp</dimen>
+
 
 </resources>

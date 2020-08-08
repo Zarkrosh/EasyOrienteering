@@ -9,6 +9,7 @@ import com.hergomsoft.easyorienteering.data.api.responses.ApiResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.InicioResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.RegistroResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.RegistrosRecorridoResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Usuario;
 
@@ -32,6 +33,8 @@ public interface ApiClient {
     LiveData<ApiResponse<List<Carrera>>> getCarrerasOrganizadasUsuario();
 
     // REGISTROS
+    @GET("registros/{idRecorrido}")
+    LiveData<ApiResponse<RegistrosRecorridoResponse>> getRegistrosRecorrido(@Path("idRecorrido") long idRecorrido);
     @POST("registros/{id}")
     Call<RegistroResponse> registraControl(@Path("id") long idCarrera, @Body RegistroRequest registro);
     @GET("registros/pendiente")

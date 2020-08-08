@@ -1,21 +1,24 @@
 package com.hergomsoft.easyorienteering.data.api.responses;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 import retrofit2.Response;
 
 /**
- * Generic class for handling responses from Retrofit
+ * Generic class for handling responses from Retrofit.
  * @param <T>
  */
 public class ApiResponse<T> {
 
     public ApiResponse<T> create(Throwable error){
         String sError ;
-        if(error instanceof SocketTimeoutException) {
+        if(error instanceof ConnectException) {
             sError = "No hay conexión con el servidor. Comprueba tu conexión e inténtalo de nuevo";
+        } else if(error instanceof SocketTimeoutException) {
+            sError = "Tiempo de espera agotado. Inténtalo de nuevo";
         } else if(!error.getMessage().isEmpty()) {
             sError = error.getMessage();
         } else {
@@ -50,7 +53,7 @@ public class ApiResponse<T> {
     }
 
     /**
-     * Generic success response from api
+     * Respuesta genérica exitosa de la API.
      * @param <T>
      */
     public class ApiSuccessResponse<T> extends ApiResponse<T> {
@@ -68,7 +71,8 @@ public class ApiResponse<T> {
     }
 
     /**
-     * Generic Error response from API
+     * Respuesta genérica errónea de la API.
+     * Generic Error response from API.
      * @param <T>
      */
     public class ApiErrorResponse<T> extends ApiResponse<T> {
@@ -86,7 +90,7 @@ public class ApiResponse<T> {
     }
 
     /**
-     * Separate class for HTTP 204 responses so that we can make ApiSuccessResponse's body non-null.
+     * Respuesta exitosa vacía de la API (código HTTP 204).
      */
     public class ApiEmptyResponse<T> extends ApiResponse<T> { }
 

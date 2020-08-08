@@ -3,19 +3,28 @@ package com.hergomsoft.easyorienteering.data.repositories;
 import android.app.Application;
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroRequest;
 import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.ApiResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.InicioResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.RegistroResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.RegistrosRecorridoResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Registro;
+import com.hergomsoft.easyorienteering.data.model.Usuario;
+import com.hergomsoft.easyorienteering.util.AppExecutors;
+import com.hergomsoft.easyorienteering.util.Constants;
+import com.hergomsoft.easyorienteering.util.NetworkBoundResource;
+import com.hergomsoft.easyorienteering.util.Resource;
 import com.hergomsoft.easyorienteering.util.SingleLiveEvent;
 
 import org.json.JSONObject;
@@ -242,6 +251,16 @@ public class RegistroRepository extends ApiRepository {
         });
     }
 
+    public LiveData<Resource<RegistrosRecorridoResponse>> getRegistrosRecorrido(long idRecorrido) {
+        return new NetworkBoundResource<RegistrosRecorridoResponse, RegistrosRecorridoResponse>(AppExecutors.getInstance(), false) {
+            @NonNull
+            @Override
+            protected LiveData<ApiResponse<RegistrosRecorridoResponse>> createCall() {
+                return apiClient.getRegistrosRecorrido(idRecorrido);
+            }
+        }.getAsLiveData();
+    }
+
     public SingleLiveEvent<Recurso<Boolean>> getPendienteResponse() { return comprobacionPendiente; }
     public SingleLiveEvent<Recurso<Registro>> getRegistroResponse() { return registroResponse; }
     public SingleLiveEvent<Recurso<AbandonoResponse>> getAbandonoResponse() { return abandonoResponse; }
@@ -284,40 +303,5 @@ public class RegistroRepository extends ApiRepository {
             siguienteControl.postValue(null);
         }
     }
-
-    /**
-     * Tarea asíncrona que guarda los datos de una carrera en la BD local.
-
-    private static class GuardaDatosCarrera extends AsyncTask<Carrera, Void, Void> {
-
-        GuardaDatosCarrera() {
-
-        }
-
-        @Override
-        protected Void doInBackground(final Carrera... params) {
-            Carrera carrera = params[0];
-
-
-            return null;
-        }
-    }*/
-
-    /**
-     * Tarea asíncrona que inserta los registros de una carrera pendiente.
-
-    private static class InsertRegistrosAT extends AsyncTask<Registro[], Void, Void> {
-        private RegistroDAO dao;
-        InsertRegistrosAT(RegistroDAO dao) {
-            this.dao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final Registro[]... params) {
-            dao.deleteAll();
-            dao.insert(params[0]);
-            return null;
-        }
-    }*/
 
 }

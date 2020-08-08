@@ -30,25 +30,32 @@
         <TextView
             android:id="@+id/detalles_tipo_carrera"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
             tools:text="EVENTO" />
 
         <TextView
             android:id="@+id/detalles_modalidad_carrera"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
             tools:text="LINEA" />
 
         <TextView
             android:id="@+id/detalles_organizador_carrera"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="2"
+            android:padding="5dp"
             android:gravity="center"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
             app:layout_constraintTop_toBottomOf="@+id/detalles_nombre_carrera"
             tools:text="Pepito Pérez" />
 

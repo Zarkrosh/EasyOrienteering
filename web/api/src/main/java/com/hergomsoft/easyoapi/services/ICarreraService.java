@@ -2,6 +2,7 @@ package com.hergomsoft.easyoapi.services;
 
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Control;
+import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
 import java.util.List;
 import java.util.Map;
@@ -92,4 +93,11 @@ public interface ICarreraService {
      * @return Lista de carreras organizadas por el usuario
      */
     List<Carrera> getCarrerasOrganizadasUsuario(Usuario usuario);
+    
+    /**
+     * Devuelve el recorrido con el ID especificado.
+     * @param id ID de recorrido
+     * @return Recorrido
+     */
+    Recorrido getRecorrido(long id);
 }

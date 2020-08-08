@@ -1,9 +1,15 @@
 package com.hergomsoft.easyorienteering.util;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 public final class Utils {
 
@@ -90,6 +96,43 @@ public final class Utils {
         // En todos los tipos es el último elemento separado por "-".
         String[] campos = escaneado.split("-");
         return campos[campos.length - 1];
+    }
+
+    public static String getTiempoResultadoFromSecs(Long tiempoSecs) {
+        String res = "";
+        if(tiempoSecs != null) {
+            // Primero genera mm.ss
+            res = String.format("%02d.%02d",
+                    TimeUnit.SECONDS.toMinutes(tiempoSecs) -
+                            TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(tiempoSecs)),
+                    TimeUnit.SECONDS.toSeconds(tiempoSecs) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(tiempoSecs)));
+
+            // Se añaden también las horas si es necesario
+            if(TimeUnit.SECONDS.toHours(tiempoSecs) > 0) {
+                res = String.format("%d:%s", TimeUnit.SECONDS.toHours(tiempoSecs), res);
+            }
+        }
+
+        return res;
+    }
+
+    public static int randomInt(int min, int max) {
+        return new Random().nextInt((max - min) + 1) + min;
+    }
+
+    /**
+     * Convierte una medida en DP a píxeles.
+     * @param dp DP
+     * @param r Recursos
+     * @return Medida en píxeles
+     */
+    public static int getPixFromDP(float dp, Resources r) {
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp,
+                r.getDisplayMetrics()
+        );
     }
 
     /**

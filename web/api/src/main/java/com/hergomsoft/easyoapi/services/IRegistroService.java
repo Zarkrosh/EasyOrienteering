@@ -56,6 +56,13 @@ public interface IRegistroService {
     boolean haCorridoRecorrido(Usuario corredor, Recorrido recorrido);
     
     /**
+     * Devuelve los registros de todos los corredores participantes en un recorrido.
+     * @param recorrido Recorrido
+     * @return Registros del recorrido
+     */
+    List<Registro> getRegistrosRecorrido(Recorrido recorrido);
+    
+    /**
      * Devuelve los registros de un corredor en un recorrido, en orden creciente temporal.
      * @param corredor Corredor
      * @param recorrido Recorrido

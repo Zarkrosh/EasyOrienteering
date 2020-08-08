@@ -2,6 +2,7 @@ package com.hergomsoft.easyorienteering.ui.scan;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -40,6 +41,8 @@ import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Registro;
 import com.hergomsoft.easyorienteering.components.DialogoCarga;
+import com.hergomsoft.easyorienteering.ui.resultados.ResultadosActivity;
+import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.Utils;
 
 import java.io.IOException;
@@ -193,8 +196,18 @@ public class ScanActivity extends AppCompatActivity {
                         // Finaliza la carrera y muestra los resultados
                         // TODO
                         animacionRegistroControl();
-                        Toast.makeText(ScanActivity.this, "Carrera finalizada", Toast.LENGTH_SHORT).show();
-                        finish();
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO, "", getString(R.string.scan_recorrido_acabado));
+                        // Tras un corto tiempo redirige a los resultados del recorrido
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                viewModel.ocultaResultadoDialogo();
+                                Intent i = new Intent(ScanActivity.this, ResultadosActivity.class);
+                                i.putExtra(Constants.EXTRA_ID_RECORRIDO, viewModel.getRecorridoActual().getId());
+                                startActivity(i);
+                            }
+                        }, 2000);
                     } else {
                         // Error inesperado
                         viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error_inesperado), "El tipo de control es incorrecto: " + tipo);

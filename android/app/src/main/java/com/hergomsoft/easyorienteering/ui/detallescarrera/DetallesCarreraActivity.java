@@ -3,6 +3,7 @@ package com.hergomsoft.easyorienteering.ui.detallescarrera;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,7 +14,10 @@ import android.widget.Toast;
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.adapters.RecorridosDetallesAdapter;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
+import com.hergomsoft.easyorienteering.data.model.Recorrido;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
+import com.hergomsoft.easyorienteering.ui.perfil.PerfilActivity;
+import com.hergomsoft.easyorienteering.ui.resultados.ResultadosActivity;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
 import com.hergomsoft.easyorienteering.components.DialogoCarga;
 import com.hergomsoft.easyorienteering.util.Constants;
@@ -56,8 +60,15 @@ public class DetallesCarreraActivity extends BackableActivity {
         listaRecorridos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO
-                Toast.makeText(DetallesCarreraActivity.this, "TODO Ver resultados recorrido", Toast.LENGTH_SHORT).show();
+                // Al clicar en un recorrido se visualizan sus resultados
+                Recorrido seleccionado = (Recorrido) parent.getItemAtPosition(position);
+                if(seleccionado != null) {
+                    Intent i = new Intent(DetallesCarreraActivity.this, ResultadosActivity.class);
+                    i.putExtra(Constants.EXTRA_ID_RECORRIDO, seleccionado.getId());
+                    startActivity(i);
+                } else {
+                    Toast.makeText(DetallesCarreraActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -105,6 +116,16 @@ public class DetallesCarreraActivity extends BackableActivity {
                                 modalidadCarrera.setText(carrera.getModalidad().toString());
                                 organizadorCarrera.setText(carrera.getOrganizador().getNombre());
                                 adapterRecorridos.actualizaRecorridos(carrera.getRecorridos());
+                                // Al clicar en el organizador, se ve su perfil
+                                organizadorCarrera.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent i = new Intent(DetallesCarreraActivity.this, PerfilActivity.class);
+                                        i.putExtra(Constants.EXTRA_ID_USUARIO, carrera.getOrganizador().getId());
+                                        startActivity(i);
+                                    }
+                                });
+
                                 viewModel.ocultaDialogoCarga();
                             }
                             break;

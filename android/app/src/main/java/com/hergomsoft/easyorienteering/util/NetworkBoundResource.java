@@ -157,19 +157,19 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
         // Si se desea usar, se overridea
     }
 
+    // Called to get the cached data from the database.
+    @NonNull @MainThread
+    protected LiveData<CacheObject> loadFromDb() {
+        // Por defecto no se usa DB
+        return new MutableLiveData<>(null);
+    }
+
     // Called with the data in the database to decide whether to fetch
     // potentially updated data from the network.
     @MainThread
     protected boolean shouldFetch(@Nullable CacheObject data) {
         // Por defecto no se usa DB
         return true;
-    }
-
-    // Called to get the cached data from the database.
-    @NonNull @MainThread
-    protected LiveData<CacheObject> loadFromDb() {
-        // Por defecto no se usa DB
-        return new MutableLiveData<>(null);
     }
 
     // Called to create the API call.
