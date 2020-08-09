@@ -54,6 +54,7 @@ public class SplashActivity extends AppCompatActivity {
                 startActivity(i);
                 */
 
+                startActivity(new Intent(SplashActivity.this, HomeActivity.class));
             }
         }, Constants.SPLASH_MIN_TIEMPO_LOGOTIPO);
 

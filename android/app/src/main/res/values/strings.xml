@@ -148,10 +148,12 @@
     <string name="resultados_cargando">Cargando resultados…</string>
     <string name="resultados_posicion">Pos.</string>
     <string name="resultados_nombre_club">Nombre\nClub</string>
+    <string name="resultados_puntuacion">Puntuación</string>
     <string name="resultados_tiempo_total">Tiempo total</string>
     <string name="resultados_diferencia">Diferencia</string>
     <string name="resultados_abandonado">Abandona</string>
     <string name="resultados_pendiente">Pendiente</string>
+    <string name="resultados_sin_resultados">No hay resultados</string>
 
 
 </resources>

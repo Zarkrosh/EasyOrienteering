@@ -10,17 +10,33 @@
 
     <!-- TODO Columnas laterales y fila superior fijadas -->
 
-    <HorizontalScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fillViewport="true">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <TableLayout
-            android:id="@+id/resultados_tabla"
+        <HorizontalScrollView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="#FFF"/>
+            android:layout_height="wrap_content"
+            android:fillViewport="true">
 
-    </HorizontalScrollView>
+                <TableLayout
+                    android:id="@+id/resultados_tabla"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="#FFF"/>
+
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/resultados_sin_resultados"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/resultados_sin_resultados"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
 
 </ScrollView>

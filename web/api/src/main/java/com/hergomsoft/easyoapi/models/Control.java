@@ -39,13 +39,17 @@ public class Control implements IdEntity {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name="CARRERA_ID")
     private Carrera carrera;
+    
+    @Column(name = "PUNTUACION")
+    private Integer puntuacion;
 
     public Control() {}
 
-    public Control(String codigo, Tipo tipo, Carrera carrera) {
+    public Control(String codigo, Tipo tipo, Carrera carrera, Integer puntuacion) {
         this.codigo = codigo;
         this.tipo = tipo;
         this.carrera = carrera;
+        this.puntuacion = puntuacion;
     }
 
     public Long getId() {
@@ -78,6 +82,14 @@ public class Control implements IdEntity {
 
     public void setCarrera(Carrera carrera) {
         this.carrera = carrera;
+    }
+
+    public Integer getPuntuacion() {
+        return puntuacion;
+    }
+
+    public void setPuntuacion(Integer puntuacion) {
+        this.puntuacion = puntuacion;
     }
     
     @Override
