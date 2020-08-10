@@ -97,4 +97,25 @@ public class CarreraRepository extends ApiRepository {
             }
         }.getAsLiveData();
     }
+
+    public LiveData<Resource<List<Carrera>>> buscaCarreras(String nombre, String tipo, String modalidad, int numeroPagina) {
+        return new NetworkBoundResource<List<Carrera>, List<Carrera>>(AppExecutors.getInstance(), true){
+            @Override
+            protected void saveCallResult(@NonNull List<Carrera> carreras) {
+                carreraDAO.insertCarreras(carreras);
+            }
+
+            @NonNull
+            @Override
+            protected LiveData<List<Carrera>> loadFromDb() {
+                return carreraDAO.buscaCarreras(nombre, tipo, modalidad, numeroPagina);
+            }
+
+            @NonNull
+            @Override
+            protected LiveData<ApiResponse<List<Carrera>>> createCall() {
+                return apiClient.buscaCarreras(nombre, tipo, modalidad, numeroPagina);
+            }
+        }.getAsLiveData();
+    }
 }

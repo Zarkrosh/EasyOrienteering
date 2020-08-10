@@ -19,7 +19,7 @@ public class Carrera {
 
     @PrimaryKey
     @Expose
-    private long id;
+    private Long id;
     @Expose
     private String nombre;
     @Expose
@@ -40,17 +40,7 @@ public class Carrera {
 
     public Carrera() {}
 
-    public Carrera(long id, String nombre, Tipo tipo, Modalidad modalidad, Usuario organizador, List<Recorrido> recorridos, Map<String, Control> controles) {
-        this.id = id;
-        this.nombre = nombre;
-        this.tipo = tipo;
-        this.modalidad = modalidad;
-        this.organizador = organizador;
-        this.recorridos = recorridos;
-        this.controles = controles;
-    }
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

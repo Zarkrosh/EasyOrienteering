@@ -313,7 +313,7 @@ public class ResultadosActivity extends BackableActivity {
                 TextView tvTrazado = new TextView(this);
                 tvTrazado.setLayoutParams(lpTvTrazado);
                 tvTrazado.setGravity(Gravity.CENTER);
-                tvTrazado.setPadding(10, 0, 10, 0);
+                tvTrazado.setPadding(15, 0, 15, 0);
                 tvTrazado.setText(text);
                 tvTrazado.setTextColor(Color.BLACK);
                 tvTrazado.setTextSize(TypedValue.COMPLEX_UNIT_SP, tamLetra);

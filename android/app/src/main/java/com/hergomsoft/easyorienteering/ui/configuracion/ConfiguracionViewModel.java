@@ -35,6 +35,7 @@ public class ConfiguracionViewModel extends AndroidViewModelConCarga {
     public SingleLiveEvent<Recurso<String>> getCambioNombreResponse() { return cambioNombreResponse; }
     public SingleLiveEvent<Recurso<String>> getCambioClubResponse() { return cambioClubResponse; }
     public SingleLiveEvent<Boolean> getEnvioCambioNombreHabilitado() { return envioCambioNombreHabilitado; }
+    public long getIdUsuarioConectado() { return usuarioRepository.getIdUsuarioConectado(); }
 
     public LiveData<Resource<Usuario>> cargaDatosUsuario() {
         // Obtiene el ID del usuario conectado

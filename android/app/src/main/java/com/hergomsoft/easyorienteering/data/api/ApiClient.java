@@ -20,6 +20,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiClient {
     String BASE_URL = "http://192.168.1.69:4200/api/";
@@ -31,6 +32,8 @@ public interface ApiClient {
     LiveData<ApiResponse<List<Carrera>>> getCarrerasParticipadasUsuario();
     @GET("carreras/organizadas")
     LiveData<ApiResponse<List<Carrera>>> getCarrerasOrganizadasUsuario();
+    @GET("carreras/buscar")
+    LiveData<ApiResponse<List<Carrera>>> buscaCarreras(@Query("nombre") String nombre, @Query("tipo") String tipo, @Query("modalidad") String modalidad, @Query("page") int numeroPagina);
 
     // REGISTROS
     @GET("registros/{idRecorrido}")
@@ -52,6 +55,5 @@ public interface ApiClient {
     Call<Usuario> cambiaNombreUsuario(@Body CambioRequest registro);
     @POST("usuarios/cambioclub")
     Call<Usuario> cambiaClub(@Body CambioRequest registro);
-
 
 }

@@ -153,4 +153,8 @@ public class UsuarioRepository extends ApiRepository {
 
     }
 
+    // TODO
+    public long getIdUsuarioConectado() {
+        return Constants.ID_USUARIO_PRUEBA;
+    }
 }

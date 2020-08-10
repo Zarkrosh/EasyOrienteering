@@ -1,11 +1,17 @@
 package com.hergomsoft.easyorienteering.data.repositories;
 
+import androidx.lifecycle.LiveData;
+
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.hergomsoft.easyorienteering.data.api.ApiClient;
+import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.util.LiveDataCallAdapterFactory;
+import com.hergomsoft.easyorienteering.util.Resource;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -17,7 +23,10 @@ public abstract class ApiRepository {
     public ApiRepository() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor)
+                .addNetworkInterceptor(new StethoInterceptor())
+                .build();
+
         apiClient = new retrofit2.Retrofit.Builder()
                 .baseUrl(ApiClient.BASE_URL)
                 .client(client)
@@ -45,4 +54,5 @@ public abstract class ApiRepository {
 
         return recurso;
     }
+
 }

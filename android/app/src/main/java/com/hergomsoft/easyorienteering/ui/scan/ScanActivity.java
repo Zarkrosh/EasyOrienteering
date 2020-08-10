@@ -193,8 +193,6 @@ public class ScanActivity extends AppCompatActivity {
                     } else if(tipo.equals(Control.Tipo.CONTROL)) {
                         animacionRegistroControl();
                     } else if(tipo.equals(Control.Tipo.META)) {
-                        // Finaliza la carrera y muestra los resultados
-                        // TODO
                         animacionRegistroControl();
                         viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO, "", getString(R.string.scan_recorrido_acabado));
                         // Tras un corto tiempo redirige a los resultados del recorrido
@@ -319,7 +317,7 @@ public class ScanActivity extends AppCompatActivity {
      * Muestra la vista de escaneo de control.
      */
     private void mostrarVistaEscaneo() {
-        btnSwitch.setImageResource(R.drawable.img_map_icon);
+        btnSwitch.setImageResource(R.drawable.img_trazado);
         switcher.showNext();
         iniciaCapturaCamara();
     }
@@ -328,7 +326,7 @@ public class ScanActivity extends AppCompatActivity {
      * Muestra la vista de visualizado de mapa.
      */
     private void mostrarVistaMapa() {
-        btnSwitch.setImageResource(R.drawable.img_qr_icon);
+        btnSwitch.setImageResource(R.drawable.img_qr);
         switcher.showPrevious();
         detieneCapturaCamara();
     }
@@ -352,7 +350,6 @@ public class ScanActivity extends AppCompatActivity {
     private void setupSonidos() {
         soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         beepSound = soundPool.load(this, R.raw.beep, 1); // Pitido de registro
-        // TODO Añadir sonidos
     }
 
     /**
@@ -409,21 +406,12 @@ public class ScanActivity extends AppCompatActivity {
                         contadorEscaneos.postValue(contadorEscaneos.getValue() + 1); // TEST
 
                         // Obtiene los datos locales de la carrera y recorrido actuales
-                        // TODO
                         Carrera carrera = viewModel.getCarreraActual();
                         if(carrera == null) {
                             // No está realizando ninguna carrera, solo puede escanear un triángulo
                             if (Utils.esEscaneoTriangulo(escaneado)) {
                                 // Ha escaneado un triángulo
-                                // Comprueba si ya ha corrido este recorrido (de forma local)
-                                // TODO
-                                boolean yaCorrido = false;
-                                if (yaCorrido) {
-                                    viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), getString(R.string.scan_error_ya_corrido));
-                                } else {
-                                    // Muestra confirmación de inicio de recorrido
-                                    muestraConfirmacionInicioRecorrido(escaneado);
-                                }
+                                muestraConfirmacionInicioRecorrido(escaneado);
                             } else if (Utils.esEscaneoControl(escaneado)) {
                                 // Ha escaneado un control: inválido
                                 viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), getString(R.string.scan_error_es_control));

@@ -7,39 +7,22 @@
     android:orientation="vertical">
 
     <!-- Buscador -->
-    <LinearLayout
+    <SearchView
+        android:id="@+id/lista_carreras_buscador"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:hint="Buscar por nombre"
+        android:inputType="textCapWords"
+        android:iconifiedByDefault="false"
+        android:textSize="18sp" />
 
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"
-            android:src="@drawable/img_search" />
-
-        <EditText
-            android:id="@+id/lista_carreras_buscador"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:hint="Buscar por nombre"
-            android:inputType="textCapWords"
-            android:textSize="18sp" />
-
-    </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp">
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/lista_carreras_lista"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

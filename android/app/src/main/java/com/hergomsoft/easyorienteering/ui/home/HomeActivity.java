@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.model.Usuario;
 import com.hergomsoft.easyorienteering.ui.configuracion.ConfiguracionActivity;
+import com.hergomsoft.easyorienteering.ui.explorar.ExplorarActivity;
 import com.hergomsoft.easyorienteering.ui.miscarreras.MisCarrerasActivity;
 import com.hergomsoft.easyorienteering.ui.scan.ScanActivity;
 import com.hergomsoft.easyorienteering.util.CircleTransform;
@@ -77,12 +78,11 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        // Al pulsar el botón, se muestra una pantalla de exploración de circuitos y carreras
+        // Al pulsar el botón, se muestra una pantalla de exploración carreras
         btnExplorar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
-                Toast.makeText(HomeActivity.this, "TODO Explorar", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(HomeActivity.this, ExplorarActivity.class));
             }
         });
 

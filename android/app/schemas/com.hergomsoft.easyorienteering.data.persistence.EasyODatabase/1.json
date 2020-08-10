@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6e0cb55d5b68d343b6669f09141949b6",
+    "identityHash": "10df429d680350f315a6cd1c59c1915a",
     "entities": [
       {
         "tableName": "usuarios",
@@ -50,13 +50,13 @@
       },
       {
         "tableName": "carreras",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `nombre` TEXT, `tipo` TEXT, `modalidad` TEXT, `recorridos` TEXT, `timestamp` INTEGER, `organizador_id` INTEGER, `organizador_nombre` TEXT, `organizador_club` TEXT, `organizador_fechaRegistro` INTEGER, `organizador_timestamp` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `nombre` TEXT, `tipo` TEXT, `modalidad` TEXT, `recorridos` TEXT, `timestamp` INTEGER, `organizador_id` INTEGER, `organizador_nombre` TEXT, `organizador_club` TEXT, `organizador_fechaRegistro` INTEGER, `organizador_timestamp` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "nombre",
@@ -131,7 +131,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"6e0cb55d5b68d343b6669f09141949b6\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"10df429d680350f315a6cd1c59c1915a\")"
     ]
   }
 }

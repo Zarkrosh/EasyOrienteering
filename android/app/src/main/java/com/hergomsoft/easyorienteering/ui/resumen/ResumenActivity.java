@@ -3,6 +3,7 @@ package com.hergomsoft.easyorienteering.ui.resumen;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ public class ResumenActivity extends BackableActivity {
     private boolean voluntario;
 
     private Button btnOmitir;
+    private Button btnFinalizar;
     private ViewPager pager;
     private TabLayout tabs;
     private Button btnFin;
@@ -29,6 +31,7 @@ public class ResumenActivity extends BackableActivity {
         setContentView(R.layout.activity_resumen);
 
         btnOmitir = findViewById(R.id.resumenOmitir);
+        //btnFinalizar = findViewById(R.id.resumenOmitir);
         pager = findViewById(R.id.resumenPager);
         tabs = findViewById(R.id.resumenPuntos);
 
@@ -46,19 +49,29 @@ public class ResumenActivity extends BackableActivity {
             getSupportActionBar().hide();
         }
 
-        btnOmitir.setOnClickListener(new View.OnClickListener() {
+
+        View.OnClickListener listenerFinaliza = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Omite el resumen
-                if(voluntario) {
-                    // Vuelve atrás (configuración)
-                    finish();
-                } else {
-                    // Pantalla de conexión
-                    mostrarPantallaConexion();
-                }
+                finalizaResumen();
             }
-        });
+        };
+        btnOmitir.setOnClickListener(listenerFinaliza);
+        //btnFinalizar.setOnClickListener(listenerFinaliza);
+    }
+
+    private void finalizaResumen() {
+        if(voluntario) {
+            // Vuelve atrás (configuración)
+            finish();
+        } else {
+            // Para que no vuelva a mostrar de nuevo el resumen
+            SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE).edit();
+            editor.putBoolean(Constants.PREFS_PRIMER_INICIO, false);
+            editor.apply();
+            // Lleva a la pantalla de conexión de cuenta
+            mostrarPantallaConexion();
+        }
     }
 
     /**

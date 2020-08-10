@@ -37,8 +37,8 @@ public class RecorridosDetallesAdapter extends ArrayAdapter<Recorrido> {
             TextView controles = convertView.findViewById(R.id.item_recorridos_numero_controles);
 
             nombre.setText(recorrido.getNombre());
-            acabados.setText("" + new Random().nextInt(100)); // TEST
-            controles.setText(String.format("%d", recorrido.getTrazado().length));
+            acabados.setText(String.valueOf(new Random().nextInt(100))); // TEST
+            controles.setText(String.valueOf(recorrido.getTrazado().length * 2));
         }
 
         return convertView;

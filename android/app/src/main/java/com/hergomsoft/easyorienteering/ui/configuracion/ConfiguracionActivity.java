@@ -74,10 +74,8 @@ public class ConfiguracionActivity extends BackableActivity {
             @Override
             public void onClick(View v) {
                 // Obtener ID usuario conectado
-                // TODO
-                long idUsuario = Constants.ID_USUARIO_PRUEBA;
                 Intent i = new Intent(ConfiguracionActivity.this, PerfilActivity.class);
-                i.putExtra(Constants.EXTRA_ID_USUARIO, idUsuario);
+                i.putExtra(Constants.EXTRA_ID_USUARIO, viewModel.getIdUsuarioConectado());
                 startActivity(i);
             }
         });

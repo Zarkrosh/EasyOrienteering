@@ -23,15 +23,11 @@ public class MisCarrerasViewModel extends AndroidViewModel {
 
     public LiveData<Resource<List<Carrera>>> getCarrerasParticipadasUsuario() {
         // Obtener ID usuario conectado
-        // TODO
-        long idUsuario = Constants.ID_USUARIO_PRUEBA;
         return carreraRepository.getCarrerasParticipadasUsuario();
     }
 
     public LiveData<Resource<List<Carrera>>> getCarrerasOrganizadasUsuario() {
         // Obtener ID usuario conectado
-        // TODO
-        long idUsuario = Constants.ID_USUARIO_PRUEBA;
         return carreraRepository.getCarrerasOrganizadasUsuario();
     }
 

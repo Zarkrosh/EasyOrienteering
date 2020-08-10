@@ -29,8 +29,6 @@ public class Usuario {
 
     private Integer timestamp; // Momento en el que se crea en la BD
 
-    public Usuario() {}
-
     public Usuario(long id, String nombre, String club, Date fechaRegistro) {
         this.id = id;
         this.nombre = nombre;

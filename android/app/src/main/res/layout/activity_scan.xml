@@ -91,7 +91,7 @@
         android:layout_marginEnd="20dp"
         android:background="@drawable/shape_btn_scan"
         android:padding="15dp"
-        android:src="@drawable/img_qr_icon"
+        android:src="@drawable/img_qr"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
         android:textColor="@android:color/white"

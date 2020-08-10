@@ -78,7 +78,7 @@ public class MisCarrerasActivity extends BackableActivity {
         if(carrerasResource != null) {
             switch (carrerasResource.status) {
                 case LOADING:
-                    component.muestraCargaCarreras();
+                    component.muestraCargaCarrerasGeneral();
                     break;
                 case SUCCESS:
                     if (carrerasResource.data != null) {
