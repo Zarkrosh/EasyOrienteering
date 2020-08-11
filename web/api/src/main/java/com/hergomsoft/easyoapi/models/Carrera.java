@@ -54,6 +54,9 @@ public class Carrera implements IdEntity {
     @ManyToOne(optional = false)
     private Usuario organizador;
     
+    @Column(name = "PRIVADA")
+    private boolean privada;
+    
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name="CARRERA_ID", referencedColumnName="ID")
     private List<Recorrido> recorridos;
@@ -63,18 +66,17 @@ public class Carrera implements IdEntity {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "carrera")
     @MapKey(name = "codigo")
     private Map<String, Control> controles;
-    
-    // PENDIENTES
-    //private List<Resultado> resultados;
 
     public Carrera() {}
 
-    public Carrera(String secret, String nombre, Tipo tipo, Modalidad modalidad, Usuario organizador, List<Recorrido> recorridos, Map<String, Control> controles) {
+    public Carrera(Long id, String secret, String nombre, Tipo tipo, Modalidad modalidad, Usuario organizador, boolean privada, List<Recorrido> recorridos, Map<String, Control> controles) {
+        this.id = id;
         this.secret = secret;
         this.nombre = nombre;
         this.tipo = tipo;
         this.modalidad = modalidad;
         this.organizador = organizador;
+        this.privada = privada;
         this.recorridos = recorridos;
         this.controles = controles;
     }
@@ -125,6 +127,14 @@ public class Carrera implements IdEntity {
 
     public void setOrganizador(Usuario organizador) {
         this.organizador = organizador;
+    }
+
+    public boolean isPrivada() {
+        return privada;
+    }
+
+    public void setPrivada(boolean privada) {
+        this.privada = privada;
     }
 
     public List<Recorrido> getRecorridos() {

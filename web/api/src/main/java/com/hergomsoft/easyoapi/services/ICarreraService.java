@@ -4,8 +4,10 @@ import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Control;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
+import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
 import java.util.List;
 import java.util.Map;
+import org.springframework.data.domain.Pageable;
 
 public interface ICarreraService {
     /**
@@ -13,6 +15,16 @@ public interface ICarreraService {
      * @return Lista de carreras
      */
     List<Carrera> findAll();
+    
+    /**
+     * Devuelve una lista con todas las carreras resultantes de la búsqueda.
+     * @param idUsuario ID del usuario que realiza la petición
+     * @param nombre Nombre
+     * @param tipo Tipo
+     * @param modalidad Modalidad
+     * @return Lista de carreras
+     */
+    List<CarreraSimplificada> buscaCarreras(long idUsuario, String nombre, String tipo, String modalidad, Pageable pageable);
     
       /**
      * Devuelve la carrera con el ID especificado, o null si no existe.

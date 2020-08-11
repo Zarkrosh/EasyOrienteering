@@ -1,6 +1,9 @@
 package com.hergomsoft.easyoapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hergomsoft.easyoapi.models.serializers.MapaSerializer;
+import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -11,13 +14,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "recorridos")
-public class Recorrido implements IdEntity {
+public class Recorrido implements IdEntity, Serializable {
     public static final int MLEN_NOMBRE = 15;
     
     @Id
@@ -40,12 +45,19 @@ public class Recorrido implements IdEntity {
     @Column(name = "CONTROL_CODIGO")
     private List<String> trazado; // Salida - Controles intermedios* - Meta
 
+    @JsonSerialize(using = MapaSerializer.class)
+    @Lob
+    @Column(name = "MAPA")
+    @Type(type="org.hibernate.type.BinaryType")
+    private byte[] mapa;
+
     public Recorrido() {}
 
-    public Recorrido(String nombre, Carrera carrera, List<String> trazado) {
+    public Recorrido(String nombre, Carrera carrera, List<String> trazado, byte[] mapa) {
         this.nombre = nombre;
         this.carrera = carrera;
         this.trazado = trazado;
+        this.mapa = mapa;
     }
 
     @Override
@@ -82,6 +94,12 @@ public class Recorrido implements IdEntity {
         this.trazado = trazado;
     }
 
-    
+    public byte[] getMapa() {
+        return mapa;
+    }
+
+    public void setMapa(byte[] mapa) {
+        this.mapa = mapa;
+    }    
 
 }

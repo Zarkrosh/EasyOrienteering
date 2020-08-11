@@ -1,8 +1,11 @@
 package com.hergomsoft.easyoapi.repository;
 
 import com.hergomsoft.easyoapi.models.Carrera;
+import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
 import java.util.List;
 import javax.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -37,5 +40,19 @@ public interface CarreraRepository extends JpaRepository<Carrera, Long> {
      * @return Carreras organizadas por el usuario
      */
     public List<Carrera> findByOrganizadorId(long idUsuario);
+    
+    /**
+     * Devuelve las carreras que validan los campos de búsqueda.Para realizar una
+ búsqueda independiente de la capitalización, se deben pasar los parámetros en mayúsculas.
+     * @param idUsuario ID del usuario que realiza la petición
+     * @param nombre Nombre de la carrera 
+     * @param tipo Tipo de la carrera 
+     * @param modalidad Modalidad de la carrera
+     * @return Carreras resultantes
+     */
+    @Query(value = "SELECT * FROM carreras WHERE UPPER(nombre) LIKE %:nombre%  AND tipo\\:\\:text LIKE %:tipo% AND modalidad\\:\\:text LIKE %:modalidad% AND (privada IS TRUE OR organizador_id = :idUsuario)",
+           countQuery = "SELECT count(*) FROM carreras WHERE UPPER(nombre) LIKE %:nombre%  AND tipo\\:\\:text LIKE %:tipo% AND modalidad\\:\\:text LIKE %:modalidad% AND (privada IS TRUE OR organizador_id = :idUsuario)", 
+           nativeQuery = true)
+    public Page<Carrera> buscaCarreras(@Param("idUsuario") long idUsuario, @Param("nombre") String nombre, @Param("tipo") String tipo, @Param("modalidad") String modalidad, Pageable pageable);
     
 }

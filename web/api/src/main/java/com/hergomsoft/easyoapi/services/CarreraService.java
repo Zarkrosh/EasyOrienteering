@@ -4,15 +4,19 @@ import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Control;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
+import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
 import com.hergomsoft.easyoapi.repository.CarreraRepository;
 import com.hergomsoft.easyoapi.repository.RecorridoRepository;
 import com.hergomsoft.easyoapi.utils.Utils;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,12 +36,21 @@ public class CarreraService implements ICarreraService {
     }
     
     @Override
+    public List<CarreraSimplificada> buscaCarreras(long idUsuario, String nombre, String tipo, String modalidad, Pageable pageable) {
+        Page<Carrera> carreras = repoCarrera.buscaCarreras(idUsuario, nombre.toUpperCase(), tipo.toUpperCase(), modalidad.toUpperCase(), pageable);
+        List<CarreraSimplificada> simplificadas = new ArrayList<>();
+        for(Carrera c : carreras) simplificadas.add(new CarreraSimplificada(c));
+        return simplificadas;
+    }
+    
+    @Override
     public Carrera getCarrera(long id) {
         try {
             Optional<Carrera> res = repoCarrera.findById(id);
             return (res.isPresent()) ? res.get() : null;
         } catch(Exception e) {
             System.out.println("[!] Error al obtener la carrera con id " + id);
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -150,6 +163,7 @@ public class CarreraService implements ICarreraService {
             return (res.isPresent()) ? res.get() : null;
         } catch(Exception e) {
             System.out.println("[!] Error al obtener el recorrido con id " + id);
+            System.out.println(e.getMessage());
             return null;
         }
     }
