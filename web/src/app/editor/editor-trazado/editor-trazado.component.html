@@ -21,9 +21,18 @@
     </div>
 
 
-    <div id="selector-tipo">
-        <img id="tipo-salida" src="assets/img/salida.png" class="tipo-punto tipo-seleccionado" alt="Salida" (click)="startSelected()" />
-        <img id="tipo-control" src="assets/img/control.png" class="tipo-punto" alt="Control" (click)="controlSelected()" />
-        <img id="tipo-meta" src="assets/img/meta.png" class="tipo-punto" alt="Meta" (click)="finishSelected()" />
+    <div #selectorTipo id="selector-tipo">
+        <label>
+            <input type="radio" name="tiposelector" #selectorSalida>
+            <img id="tipo-salida" src="assets/img/salida.png" class="tipo-punto" alt="Salida" (click)="seleccionaSalida()" />
+        </label>
+        <label>
+            <input type="radio" name="tiposelector" #selectorControl>
+            <img id="tipo-control" src="assets/img/control.png" class="tipo-punto" alt="Control" (click)="seleccionaControl()" />
+        </label>
+        <label>
+            <input type="radio" name="tiposelector" #selectorMeta>
+            <img id="tipo-meta" src="assets/img/meta.png" class="tipo-punto" alt="Meta" (click)="seleccionaMeta()" />
+        </label>
     </div>
 </div>

@@ -1,7 +1,9 @@
 package com.hergomsoft.easyoapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hergomsoft.easyoapi.models.serializers.MapaDeserializer;
 import com.hergomsoft.easyoapi.models.serializers.MapaSerializer;
 import java.io.Serializable;
 import java.util.List;
@@ -46,6 +48,7 @@ public class Recorrido implements IdEntity, Serializable {
     private List<String> trazado; // Salida - Controles intermedios* - Meta
 
     @JsonSerialize(using = MapaSerializer.class)
+    @JsonDeserialize(using = MapaDeserializer.class)
     @Lob
     @Column(name = "MAPA")
     @Type(type="org.hibernate.type.BinaryType")

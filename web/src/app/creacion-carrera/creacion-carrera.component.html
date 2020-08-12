@@ -1,6 +1,6 @@
 <div class="container">
     <h1 class="formHeader">Crear carrera</h1>
-    <form id="carreraForm" [formGroup]="carreraForm" (ngSubmit)="onSubmit()">
+    <form id="carreraForm" [formGroup]="carreraForm" (ngSubmit)="onSubmit()" *ngIf="carrera">
         <h2>Nombre</h2>
         <input id="nombre" type="text " formControlName="nombre" class="form-control">
         
@@ -36,6 +36,22 @@
             </label>
         </div>
 
+        <h2>Visibilidad</h2>
+        <div class="form-group">
+            <label>
+                <input type="radio" formControlName="visibilidad" name="visibilidad" value="publica" class="form-control selector-opcion" required/>
+                <div class="selector-opcion-cont noselect">
+                    <span>Pública</span>
+                </div>
+            </label>
+            <label>
+                <input type="radio" formControlName="visibilidad" name="visibilidad" value="privada" class="form-control selector-opcion"/>
+                <div class="selector-opcion-cont noselect">
+                    <span>Privada</span>
+                </div>
+            </label>
+        </div>
+
         <!--
         <h2>Tipo de cronometraje</h2>
         <div class="form-group">
@@ -65,7 +81,7 @@
             </label>
         </div> -->
 
-        <div class="btn-siguiente" (click)="clickRecorridos()">Recorridos</div>
+        <div class="btn-siguiente" (click)="clickRecorridos()">Crear recorridos</div>
 
     </form>
 </div>

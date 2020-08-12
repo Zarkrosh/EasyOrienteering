@@ -39,6 +39,10 @@ alert {
 }
 
 
+.oculto {
+    visibility: hidden;
+}
+
 // https://stackoverflow.com/questions/3779534/how-do-i-disable-text-selection-with-css-or-javascript
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */

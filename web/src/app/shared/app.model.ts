@@ -23,16 +23,18 @@ export class Carrera {
     controles: Map<any, any>;
     tipo: string;
     modalidad: string;
+    privada: boolean;
     creada: boolean; // True si la carrera existe en el sistema
                      // False cuando se está creando
     
     constructor(nombre: string, recorridos: Recorrido[], controles: Map<any, any>,
-                tipo: string, modalidad: string, creada: boolean) {
+                tipo: string, modalidad: string, privada: boolean, creada: boolean) {
         this.nombre = nombre;
         this.recorridos = recorridos;
         this.controles = controles;
         this.tipo = tipo;
         this.modalidad = modalidad;
+        this.privada = privada;
         this.creada = creada;
     }
 
@@ -59,6 +61,7 @@ export class Recorrido {
     id: Number;
     nombre: string;
     trazado: string[];
+    mapa: string; // Mapa en B64 "data:image/jpeg;base64, ..."
 
     constructor(nombre: string) {
         this.nombre = nombre;

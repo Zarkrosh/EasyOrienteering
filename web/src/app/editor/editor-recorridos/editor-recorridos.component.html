@@ -8,7 +8,7 @@
             <li id="btn-nuevo-recorrido" *ngIf="recorridos.size < MAX_RECORRIDOS" (click)="nuevoRecorrido()" class="noselect"><span><i class="fa fa-plus"></i></span></li>
         </ul>
         <!-- Editor de trazados -->
-        <editor-trazado id="trazador">
+        <editor-trazado id="trazador" #trazador>
 
         </editor-trazado>
     </div>

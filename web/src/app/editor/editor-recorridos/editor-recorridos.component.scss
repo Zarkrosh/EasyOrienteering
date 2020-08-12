@@ -78,7 +78,7 @@
     background: red;
     z-index: 3;
 }
-.tab-seleccionada {
+.tab-seleccionada * {
     background-color: $color-orientacion-dark !important;
     /*
     background: #fff;
@@ -90,7 +90,7 @@
     box-shadow: 0 -2px 3px -2px rgba(0, 0, 0, .5);
     cursor: auto !important;
 }
-.tab-seleccionada::after {
+.tab-seleccionada span::after {
     background-color: $color-orientacion-dark !important;
 }
 #btn-nuevo-recorrido {
@@ -145,6 +145,7 @@
     border: 2px solid black;
     border-top: none;
     border-bottom: none;
+    background-color: #eee;
 }
 #nombre-recorrido[readonly] {
     color: inherit;

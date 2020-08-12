@@ -24,23 +24,28 @@ export class CreacionCarreraComponent implements OnInit {
 
   ngOnInit() {
     this.carreraForm = this.formBuilder.group({
-      nombre: ['Carrera popular', Validators.required],
+      nombre: ['', Validators.required],
       tipo: ['EVENTO', Validators.required],
-      modalidad: ['LINEA', Validators.required]
+      modalidad: ['LINEA', Validators.required],
+      visibilidad: ['publica', Validators.required]
       //cronometraje: ['QR', Validators.required]
     });
 
     // Comprueba si hay algún borrador de carrera en el almacenamiento local
     if(localStorage.getItem(AppSettings.LOCAL_STORAGE_CARRERA) !== null) {
-      // Existe borrador, se notifica al usuario
+      // Existe borrador
       // TODO Añadir detalles del borrador en el diálogo
-      this.modalService.open(this.modalBorrador, {centered: true, size: 'lg'});
+      if(this.route.snapshot.queryParams['edit']) {
+        // Se restaura automáticamente
+        this.restauraBorrador(true);
+      } else {
+        // Se notifica al usuario
+        this.modalService.open(this.modalBorrador, {centered: true, size: 'lg'});
+      }
     } else {
       // Crea una nueva carrera: de momento no
       this.nuevaCarreraVacia();
     }
-
-    
   }
 
   // Para acceder más comodo a los campos del formulario
@@ -51,8 +56,7 @@ export class CreacionCarreraComponent implements OnInit {
    */
   nuevaCarreraVacia() {
     localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA);
-    //this.carrera = new Carrera("", [], [], Carrera.TIPO_EVENTO, Carrera.MOD_TRAZADO, false);
-    //this.guardaBorrador();
+    this.carrera = new Carrera("", [], new Map(), Carrera.TIPO_EVENTO, Carrera.MOD_TRAZADO, false, false);
   }
 
   /**
@@ -64,6 +68,11 @@ export class CreacionCarreraComponent implements OnInit {
       let jCarrera = localStorage.getItem(AppSettings.LOCAL_STORAGE_CARRERA);
       // TODO Manejar posible excepción
       this.carrera = JSON.parse(jCarrera) as Carrera;
+      this.f.nombre.setValue(this.carrera.nombre);
+      this.f.tipo.setValue(this.carrera.tipo);
+      this.f.modalidad.setValue(this.carrera.modalidad);
+      let visibilidad = (this.carrera.privada) ? 'privada' : 'publica';
+      this.f.visibilidad.setValue(visibilidad);
       this.guardaBorrador();
     } else {
       // Descarta el borrador y crea una nueva
@@ -80,16 +89,20 @@ export class CreacionCarreraComponent implements OnInit {
   }
 
 
-  nuevaCarreraDesdeDatos() {
-    this.carrera = new Carrera(this.f.nombre.value, [], new Map<string, Control>(), this.f.tipo.value, this.f.modalidad.value, false);
+  carreraDesdeDatos() {
+    let privada: boolean = (this.f.visibilidad.value == "privada") ? true : false;
+    this.carrera.nombre = this.f.nombre.value;
+    this.carrera.tipo = this.f.tipo.value;
+    this.carrera.modalidad = this.f.modalidad.value;
+    this.carrera.privada = privada;
     this.guardaBorrador();
   }
 
   clickRecorridos() {
     if(this.carreraForm.valid) {
       // TODO Comprobar valores correctos
-      this.nuevaCarreraDesdeDatos();
-      this.router.navigate(['recorridos'], {relativeTo: this.route});
+      this.carreraDesdeDatos();
+      this.router.navigate(['carreras', 'crear', 'recorridos']);
     } else {
       // TODO
     }

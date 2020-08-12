@@ -1,0 +1,88 @@
+<div class="container text-center">
+
+    <h1><u>Resumen de carrera</u></h1>
+
+    <ng-container *ngIf="carrera">
+        
+        <!-- Datos principales de la carrera -->
+        <div class="wrapper-datos">
+            <div class="header-seccion">
+                <h2>Datos</h2>
+                <button class="btn-editar" (click)="editarDatos()">Editar</button>
+            </div>
+            <table class="tabla-datos">
+                <col width="40%">
+                <tbody>
+                    <tr>
+                        <td><h4>Nombre</h4></td>
+                        <td><span>{{carrera.nombre}}</span></td>
+                    </tr>
+                    <tr>
+                        <td><h4>Tipo</h4></td>
+                        <td><span>{{carrera.tipo}}</span></td>
+                    </tr>
+                    <tr>
+                        <td><h4>Modalidad</h4></td>
+                        <td><span>{{carrera.modalidad}}</span></td>
+                    </tr>
+                    <tr>
+                        <td><h4>Visibilidad</h4></td>
+                        <td><span>{{(carrera.privada) ? 'Privada' : 'Pública'}}</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- Carrera en línea -->
+        <div *ngIf="carrera.modalidad === modalidadLinea">
+
+            <!-- Lista de recorridos -->
+            <div class="header-seccion">
+                <h2>Recorridos</h2>
+                <button class="btn-editar" (click)="editarRecorridos()">Editar</button>
+            </div>
+            <div id="lista-recorridos">
+                <div *ngFor="let recorrido of carrera.recorridos" class="recorrido">
+                    <span class="nombre-recorrido">{{recorrido.nombre}}</span>
+                    <!-- Lista de controles -->
+                    <span *ngFor="let control of recorrido.trazado" class="control-recorrido"><b>{{control}}</b></span>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Carrera score -->
+        <div *ngIf="carrera.modalidad === modalidadScore">
+
+            <!-- Lista de controles-->
+            <h2>Controles</h2>
+            <div id="lista-controles">
+                <div *ngFor="let control of controles.keys()">
+                    <!-- TODO Mostrar controles y sus puntos -->
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Mapas -->
+        <h2 class="header-seccion">Mapas</h2>
+        <ng-container *ngIf="mapas.size > 0">
+            <div id="lista-mapas">
+                <div *ngFor="let nombreRecorrido of mapas.keys()">
+                    <h4>{{nombreRecorrido}}</h4>
+                    <img src={{mapas.get(nombreRecorrido)}} />
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="mapas.size === 0">
+            <h4 class="sin-mapas">Sin mapas</h4>
+        </ng-container>
+
+        <button class="btn-crear" (click)="guardaCarrera()">Crear carrera</button>
+
+    </ng-container>
+
+</div>

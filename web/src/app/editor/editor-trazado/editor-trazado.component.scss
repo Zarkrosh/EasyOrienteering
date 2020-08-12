@@ -26,6 +26,10 @@
     border-radius: 20px;
 }
 
+.grabbable {
+    cursor: grab !important;
+}
+
 #mensaje-falta-mapa {
     position: absolute;
     width: 100%;
@@ -71,15 +75,21 @@
 #selector-tipo > * {
     display: block;
 }
+#selector-tipo input {
+    display: none;
+}
+#selector-tipo input:checked + .tipo-punto {
+    background: greenyellow !important;
+}
+#selector-tipo label {
+    margin-bottom: 0;
+}
 .tipo-punto {
     margin-bottom: 5px;
     border: 1px solid black;
     border-radius: 2px;
     padding: 5px;
     background: white;
-}
-.tipo-punto.tipo-seleccionado {
-    background: greenyellow !important;
 }
 .tipo-punto:hover {
     background: gainsboro;

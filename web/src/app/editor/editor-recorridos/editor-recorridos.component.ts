@@ -3,9 +3,10 @@ import { AlertService } from '../../alert';
 import { SharedEditorService } from '../shared-editor.service';
 import { Control, Recorrido, Coordenadas, AppSettings, Carrera } from 'src/app/shared/app.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { IfStmt } from '@angular/compiler';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ClienteApiService } from 'src/app/shared/cliente-api.service';
+import { EditorTrazadoComponent } from '../editor-trazado/editor-trazado.component';
+import { DataService } from 'src/app/shared/data.service';
 
 declare var $: any; // JQuery
 
@@ -32,6 +33,7 @@ export class EditorRecorridosComponent implements OnInit {
   @ViewChild('nombreRecorrido', {static: true}) nombreRecorrido: ElementRef<HTMLInputElement>;
   @ViewChild('modalControl', {static: true}) modalControl: ElementRef<NgbModal>;
   @ViewChild('modalRecorrido', {static: true}) modalRecorrido: ElementRef<NgbModal>;
+  @ViewChild('trazador', {static: true}) trazador: EditorTrazadoComponent;
   
   carrera: Carrera;
   recorridos: Map<string, Recorrido>;
@@ -47,7 +49,7 @@ export class EditorRecorridosComponent implements OnInit {
   // Alertas
   options = {
     autoClose: true,
-    keepAfterRouteChange: false
+    keepAfterRouteChange: true
   };
 
   // TODO
@@ -59,7 +61,7 @@ export class EditorRecorridosComponent implements OnInit {
     private modalService: NgbModal,
     private router: Router,
     private route: ActivatedRoute,
-    private clienteApi: ClienteApiService) { }
+    private data: DataService) { }
 
   ngOnInit() {
     this.recorridos = new Map<string, Recorrido>();
@@ -139,6 +141,7 @@ export class EditorRecorridosComponent implements OnInit {
         this.sharedData.actualizaRecorrido(this.recorridos.get(this.recorridoActual));
       }
     });
+
   }
 
   /**
@@ -155,11 +158,13 @@ export class EditorRecorridosComponent implements OnInit {
 
     if(this.carrera) {
       // Genera mapas de controles y recorridos
-      this.carrera.recorridos.forEach((recorrido, indice, array) => {
-        this.recorridos.set(recorrido.nombre, recorrido);
-        this.nombresRecorridos.push(recorrido.nombre);
-      });
-      this.controles = new Map(Object.entries(this.carrera.controles));
+      if(this.carrera.recorridos != null && this.carrera.controles != null) {
+        this.carrera.recorridos.forEach((recorrido, indice, array) => {
+          this.recorridos.set(recorrido.nombre, recorrido);
+          this.nombresRecorridos.push(recorrido.nombre);
+        });
+        this.controles = new Map(Object.entries(this.carrera.controles));
+      }
     } else {
       throw "Error al cargar la carrera";
     }
@@ -168,13 +173,40 @@ export class EditorRecorridosComponent implements OnInit {
     this.sharedData.actualizaControles(this.controles);
   }
 
-  /* Finaliza la pantalla de edición de recorridos */
+  /**
+   * Finaliza la pantalla de edición de recorridos
+   */
   guardarRecorridos() {
-    // TODO
-    // Elimina borrador (esto debería hacerse tras recibir confirmación de creación del servidor)
-    this.guardaBorrador();
-    this.alertService.success("Recorridos guardados");
-    //localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA); 
+    try {
+      let canvasMapa: ElementRef<HTMLCanvasElement> = this.trazador.getCanvasMapaBase();
+      let mapasTrazados: Map<string, string> = new Map();
+      // Genera las imágenes de los mapas con los trazados
+      for(let recorrido of this.recorridos.values()) {
+        //let canvas = new HTMLCanvasElement();
+        // Crea un nuevo canvas para el trazado del recorrido, clonando el del mapa base
+        let canvas = document.createElement('canvas');
+        let canvasContext = canvas.getContext('2d');
+        canvas.width = canvasMapa.nativeElement.width;
+        canvas.height = canvasMapa.nativeElement.height;
+        canvasContext.drawImage(canvasMapa.nativeElement, 0, 0);
+        // Dibuja el trazado del recorrido en el nuevo canvas
+        this.trazador.dibujaTrazado(canvasContext, recorrido.trazado, this.controles);
+
+        // Obtiene la imagen resultante y la asigna al mapa
+        mapasTrazados.set(recorrido.nombre, canvas.toDataURL('image/jpeg', 0.69));
+      }
+      // Guarda los mapas
+      this.data.setMapasTrazados(mapasTrazados);
+      // Guarda el borrador
+      this.guardaBorrador();
+      this.alertService.success("Recorridos guardados", this.options);
+      // Redirige a la pantalla de resumen de carrera
+      this.router.navigate(['carreras', 'crear', 'resumen']);
+    } catch (e) {
+      this.alertService.error("Error al guardar los recorridos", this.options);
+      console.log(e);
+    }
+    
   }
 
   /**
@@ -256,6 +288,7 @@ export class EditorRecorridosComponent implements OnInit {
       this.recorridos.set(nombre, new Recorrido(nombre));
       this.seleccionaRecorrido(nombre);
       this.nombresRecorridos.push(nombre); // Optimización
+      
       }
   }
 
@@ -405,8 +438,7 @@ export class EditorRecorridosComponent implements OnInit {
    * Guarda el borrador actual de la carrera en el almacenamiento local.
    */
   guardaBorrador() {
-    let lRecorridos = Array.from(this.recorridos.values());
-    this.carrera.recorridos = lRecorridos;
+    this.carrera.recorridos = Array.from(this.recorridos.values());
 
     let jControles = {};
     for(let k of this.controles.keys()) {
@@ -414,24 +446,6 @@ export class EditorRecorridosComponent implements OnInit {
     }
     this.carrera.controles = jControles as Map<any, any>;
     localStorage.setItem(AppSettings.LOCAL_STORAGE_CARRERA, JSON.stringify(this.carrera));
-
-    // TEST
-    this.clienteApi.crearCarrera(this.carrera).subscribe(
-      resp => {
-        if(resp.status == 201) {
-          // Carrera creada
-          localStorage.setItem(AppSettings.LOCAL_STORAGE_CARRERA, JSON.stringify(resp.body));
-          this.alertService.success("Carrera creada con éxito");
-          this.router.navigate(['carreras', resp.body.id]);
-        } else {
-          // Error
-          this.alertService.error("No se pudo crear la carrera");
-        }
-      },
-      err => {
-        this.alertService.error("Error al crear la carrera: " + err);
-      }
-    );
   }
 
 }
