@@ -1,22 +1,38 @@
 package com.hergomsoft.easyorienteering.ui.scan;
 
 import android.app.Application;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.hergomsoft.easyorienteering.R;
+import com.hergomsoft.easyorienteering.data.api.ApiClient;
 import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Registro;
+import com.hergomsoft.easyorienteering.data.repositories.CarreraRepository;
 import com.hergomsoft.easyorienteering.data.repositories.RegistroRepository;
 import com.hergomsoft.easyorienteering.util.AndroidViewModelConCarga;
 import com.hergomsoft.easyorienteering.components.DialogoCarga;
+import com.hergomsoft.easyorienteering.util.Resource;
 import com.hergomsoft.easyorienteering.util.Utils;
+
+import java.io.File;
+import java.util.List;
+
+import okhttp3.ResponseBody;
 
 import static android.Manifest.permission.CAMERA;
 
@@ -36,25 +52,29 @@ public class ScanViewModel extends AndroidViewModelConCarga {
 
     // Repositorios
     private RegistroRepository registroRepository;
+    private CarreraRepository carreraRepository;
 
     // LiveDatas
     private LiveData<Recurso<Boolean>> peticionPendiente;
     private LiveData<Recurso<Registro>> registroResponse;
     private LiveData<Recurso<AbandonoResponse>> abandonoResponse;
     // MutableLiveDatas
-    private MutableLiveData<Control> siguienteControl;
     private MutableLiveData<ModoVista> modoVista;
     private MutableLiveData<ModoEscaneo> modoEscaneo;
+    // MediatorLiveData
+    private MediatorLiveData<Resource<File>> mapaResponse;
+
 
     public ScanViewModel(Application app) {
         super(app);
         registroRepository = RegistroRepository.getInstance(app);
+        carreraRepository = CarreraRepository.getInstance(app);
         peticionPendiente = registroRepository.getPendienteResponse();
         registroResponse = registroRepository.getRegistroResponse();
         abandonoResponse = registroRepository.getAbandonoResponse();
-        siguienteControl = new MutableLiveData<>();
         modoVista = new MutableLiveData<>(ModoVista.ESCANEO);
         modoEscaneo = new MutableLiveData<>(ModoEscaneo.INICIO_RECORRIDO);
+        mapaResponse = new MediatorLiveData<>();
     }
 
     public LiveData<Recurso<Boolean>> getCarreraPendienteResponse() { return peticionPendiente; }
@@ -62,6 +82,7 @@ public class ScanViewModel extends AndroidViewModelConCarga {
         return registroResponse;
     }
     public LiveData<Recurso<AbandonoResponse>> getAbandonoResponse() { return abandonoResponse; }
+    public LiveData<Resource<File>> getMapaResponse() { return mapaResponse; }
     public LiveData<ModoVista> getAlternadoVistas() { return modoVista; }
     public LiveData<ModoEscaneo> getModoEscaneo() { return modoEscaneo; }
 
@@ -79,26 +100,17 @@ public class ScanViewModel extends AndroidViewModelConCarga {
                 break;
         }
     }
-    public void pasaAModoCarrera() { modoEscaneo.postValue(ModoEscaneo.CARRERA); }
+    public void pasaAModoCarrera() {
+        modoEscaneo.postValue(ModoEscaneo.CARRERA);
+        cargaMapaRecorrido();
+    }
 
     /**
      * Realiza una petición de comprobación de recorrido pendiente.
      */
     public void compruebaRecorridoPendiente() {
         actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.scan_carga_pendiente));
-
-        // TEST
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-
-                registroRepository.comprobarRecorridoPendiente();
-
-
-            }
-        }, 2000);
+        registroRepository.comprobarRecorridoPendiente();
     }
 
     /**
@@ -108,6 +120,32 @@ public class ScanViewModel extends AndroidViewModelConCarga {
     public void confirmaInicioRecorrido() {
         actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.scan_carga_inicio));
         registroRepository.iniciaRecorrido(codigo, idCarrera, idRecorrido, secreto);
+    }
+
+    public void cargaMapaRecorrido() {
+        Recorrido actual = registroRepository.getRecorridoActual();
+        if(actual != null && actual.tieneMapa()) {
+            Glide.with(getApplication())
+                .download(ApiClient.BASE_URL + ApiClient.MAPA_URL + actual.getId())
+                .into(new SimpleTarget<File>() {
+                    @Override
+                    public void onLoadStarted(@Nullable Drawable placeholder) {
+                        super.onLoadStarted(placeholder);
+                        mapaResponse.postValue(new Resource<>(Resource.Status.LOADING, null, null));
+                    }
+
+                    @Override
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        super.onLoadFailed(errorDrawable);
+                        mapaResponse.postValue(new Resource<File>(Resource.Status.ERROR, null, "Error en la descarga del mapa"));
+                    }
+
+                    @Override
+                    public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
+                        mapaResponse.postValue(new Resource<File>(Resource.Status.SUCCESS, resource, null));
+                    }
+                });
+        }
     }
 
     /**

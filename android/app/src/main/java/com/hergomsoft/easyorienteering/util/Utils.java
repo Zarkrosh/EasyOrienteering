@@ -49,8 +49,8 @@ public final class Utils {
      * @return Código del control
      */
     public static String getCodigoControlEscaneado(String escaneado) {
-        // En todos los tipos es el primer elemento separado por "-".
-        return escaneado.split("-")[0];
+        // En todos los tipos es el primer elemento separado por el separador designado.
+        return escaneado.split(Constants.SEPARADOR_QR_REGEX)[0];
     }
 
     /**
@@ -59,10 +59,10 @@ public final class Utils {
      * @return ID del recorrido o null
      */
     public static Long getIdentificadorCarreraEscaneado(String escaneado) {
-        // Según REGEX_SCAN_TRIANGULO el ID de la carrera es el segundo elemento delimitado por "-"
+        // Según REGEX_SCAN_TRIANGULO el ID de la carrera es el segundo elemento delimitado por el separador designado.
         Long res = null;
         try {
-            res = Long.parseLong(escaneado.split("-")[1]);
+            res = Long.parseLong(escaneado.split(Constants.SEPARADOR_QR_REGEX)[1]);
         } catch(Exception e) {
             Log.d("EASYO", "Error al procesar el identificador de la carrera: " + escaneado);
         }
@@ -76,10 +76,10 @@ public final class Utils {
      * @return ID del recorrido o null
      */
     public static Long getIdentificadorRecorridoEscaneado(String escaneado) {
-        // Según REGEX_SCAN_TRIANGULO el ID del recorrido es el tercer elemento delimitado por "-"
+        // Según REGEX_SCAN_TRIANGULO el ID del recorrido es el tercer elemento delimitado por el separador designado.
         Long res = null;
         try {
-            res = Long.parseLong(escaneado.split("-")[2]);
+            res = Long.parseLong(escaneado.split(Constants.SEPARADOR_QR_REGEX)[2]);
         } catch(Exception e) {
             Log.d("EASYO", "Error al procesar el identificador del recorrido: " + escaneado);
         }
@@ -93,8 +93,8 @@ public final class Utils {
      * @return Secreto del control
      */
     public static String getSecretoControlEscaneado(String escaneado) {
-        // En todos los tipos es el último elemento separado por "-".
-        String[] campos = escaneado.split("-");
+        // En todos los tipos es el último elemento separado por el separador designado.
+        String[] campos = escaneado.split(Constants.SEPARADOR_QR_REGEX);
         return campos[campos.length - 1];
     }
 

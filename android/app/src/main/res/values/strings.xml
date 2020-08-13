@@ -102,6 +102,8 @@
     <string name="scan_escanea_triangulo">Escanea un triángulo de salida</string>
     <string name="scan_btn_vista_scan">SCAN</string>
     <string name="scan_btn_vista_mapa">MAPA</string>
+    <string name="scan_cargando_mapa">Cargando mapa…</string>
+    <string name="scan_no_hay_mapa">No hay mapa</string>
     <!-- Diálogo de carga -->
     <string name="scan_carga_pendiente">Comprobando carrera pendiente…</string>
     <string name="scan_carga_inicio">Iniciando recorrido…</string>

@@ -4,6 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
@@ -14,7 +17,10 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -43,14 +49,19 @@ import com.hergomsoft.easyorienteering.data.model.Registro;
 import com.hergomsoft.easyorienteering.components.DialogoCarga;
 import com.hergomsoft.easyorienteering.ui.resultados.ResultadosActivity;
 import com.hergomsoft.easyorienteering.util.Constants;
+import com.hergomsoft.easyorienteering.util.Resource;
 import com.hergomsoft.easyorienteering.util.Utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import okhttp3.ResponseBody;
+
 public class ScanActivity extends AppCompatActivity {
 
-    private ViewSwitcher switcher;
+    private ViewSwitcher viewSwitcher;
+    private Animation slide_in_left, slide_in_right, slide_out_left, slide_out_right;
 
     // Escáner QR
     private BarcodeDetector barcodeDetector;
@@ -66,14 +77,16 @@ public class ScanActivity extends AppCompatActivity {
     private SoundPool soundPool;
     private int beepSound;
 
-    // Botones
+    // Común
     private ImageButton btnSwitch;
 
-    // Texto
+    // Vista de escaneo
     private TextView mensajeScan;
 
     // Vista del mapa
     private SubsamplingScaleImageView vistaMapa;
+    private TextView mensajeMapa;
+    private ProgressBar progressMapa;
 
     private ScanViewModel viewModel;
     private String ultimoEscaneado;
@@ -93,13 +106,29 @@ public class ScanActivity extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this).get(ScanViewModel.class);
 
         // Enlaza vistas
-        switcher = findViewById(R.id.scan_switcher);
+        viewSwitcher = findViewById(R.id.scan_switcher);
         cameraView = findViewById(R.id.scan_cameraView);
         mensajeScan = findViewById(R.id.scan_mensaje);
         btnSwitch = findViewById(R.id.scan_btn_switch);
         vistaMapa = findViewById(R.id.scan_vista_mapa);
+        progressMapa = findViewById(R.id.scan_progress_mapa);
+        mensajeMapa = findViewById(R.id.scan_error_mapa);
 
         cameraView.setVisibility(View.GONE); // Evita error por petición de permisos
+        // Color del spinner circular
+        progressMapa.getIndeterminateDrawable()
+                .setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+
+        // Animaciones
+        slide_in_left = AnimationUtils.loadAnimation(this, R.anim.slide_in_left);
+        slide_in_right = AnimationUtils.loadAnimation(this, R.anim.slide_in_right);
+        slide_out_left = AnimationUtils.loadAnimation(this, R.anim.slide_out_left);
+        slide_out_right = AnimationUtils.loadAnimation(this, R.anim.slide_out_right);
+        // Slide rápido
+        slide_in_left.setDuration(getResources().getInteger(R.integer.duracion_slide_fast));
+        slide_in_right.setDuration(getResources().getInteger(R.integer.duracion_slide_fast));
+        slide_out_left.setDuration(getResources().getInteger(R.integer.duracion_slide_fast));
+        slide_out_right.setDuration(getResources().getInteger(R.integer.duracion_slide_fast));
 
         // TEST
         contadorEscaneos = new MutableLiveData<>(0);
@@ -110,7 +139,6 @@ public class ScanActivity extends AppCompatActivity {
                 testContador.setText("" + integer);
             }
         });
-        vistaMapa.setImage(ImageSource.resource(R.drawable.img_sample_map));
 
         // Comprueba permisos
         if (compruebaPermisos()) {
@@ -209,6 +237,44 @@ public class ScanActivity extends AppCompatActivity {
                     } else {
                         // Error inesperado
                         viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error_inesperado), "El tipo de control es incorrecto: " + tipo);
+                    }
+                }
+            }
+        });
+
+        // Respuesta de imagen de mapa
+        viewModel.getMapaResponse().observe(this, new Observer<Resource<File>>() {
+            @Override
+            public void onChanged(Resource<File> mapaResponse) {
+                if(mapaResponse != null) {
+                    switch (mapaResponse.status) {
+                        case LOADING:
+                            progressMapa.setVisibility(View.VISIBLE);
+                            mensajeMapa.setVisibility(View.VISIBLE);
+                            mensajeMapa.setText(R.string.scan_cargando_mapa);
+                            break;
+                        case SUCCESS:
+                            if(mapaResponse.data != null) {
+                                try {
+                                    //byte[] bytes = mapaResponse.data.bytes();
+                                    //Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                    vistaMapa.setImage(ImageSource.uri(mapaResponse.data.getAbsolutePath()));
+                                    mensajeMapa.setVisibility(View.GONE);
+                                } catch (Exception e) {
+                                    mensajeMapa.setText("Error al obtener el mapa: " + e.getMessage());
+                                    mensajeMapa.setVisibility(View.VISIBLE);
+                                }
+                            } else {
+                                mensajeMapa.setText("Error al obtener el mapa");
+                                mensajeMapa.setVisibility(View.VISIBLE);
+                            }
+                            progressMapa.setVisibility(View.GONE);
+                            break;
+                        case ERROR:
+                            mensajeMapa.setText("Error al obtener el mapa: " + mapaResponse.message);
+                            progressMapa.setVisibility(View.GONE);
+                            mensajeMapa.setVisibility(View.VISIBLE);
+                            break;
                     }
                 }
             }
@@ -317,8 +383,10 @@ public class ScanActivity extends AppCompatActivity {
      * Muestra la vista de escaneo de control.
      */
     private void mostrarVistaEscaneo() {
+        viewSwitcher.setInAnimation(slide_in_left);
+        viewSwitcher.setOutAnimation(slide_out_right);
+        viewSwitcher.setDisplayedChild(0);
         btnSwitch.setImageResource(R.drawable.img_trazado);
-        switcher.showNext();
         iniciaCapturaCamara();
     }
 
@@ -326,8 +394,10 @@ public class ScanActivity extends AppCompatActivity {
      * Muestra la vista de visualizado de mapa.
      */
     private void mostrarVistaMapa() {
+        viewSwitcher.setInAnimation(slide_in_right);
+        viewSwitcher.setOutAnimation(slide_out_left);
+        viewSwitcher.setDisplayedChild(1);
         btnSwitch.setImageResource(R.drawable.img_qr);
-        switcher.showPrevious();
         detieneCapturaCamara();
     }
 

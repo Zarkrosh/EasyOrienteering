@@ -15,6 +15,7 @@ import com.hergomsoft.easyorienteering.data.model.Usuario;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -23,7 +24,8 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ApiClient {
-    String BASE_URL = "http://192.168.1.69:4200/api/";
+    String BASE_URL = "http://192.168.43.143:4200/api/";
+    String MAPA_URL = "carreras/mapa/"; // + idRecorrido
 
     // CARRERAS
     @GET("carreras/{id}")

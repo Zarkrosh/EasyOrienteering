@@ -17,14 +17,14 @@ declare var $: any; // JQuery
 })
 export class EditorRecorridosComponent implements OnInit {
   // Plantillas de códigos de salida/control/meta
-  START_PRECODE = "S-";
+  START_PRECODE = "S";
   START_MIN_CODE = 1;
   CONTROL_PRECODE = "";
   CONTROL_MIN_CODE = 31;
-  FINISH_PRECODE = "M-";
+  FINISH_PRECODE = "M";
   FINISH_MIN_CODE = 1;
 
-  RECORRIDO_DEFAULT_PRE = "Rec-";
+  RECORRIDO_DEFAULT_PRE = "R";
   MAX_RECORRIDOS = 10;
   MAX_CONTROLES_RECORRIDO = 32;
 

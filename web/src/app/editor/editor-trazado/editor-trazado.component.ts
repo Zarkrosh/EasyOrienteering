@@ -669,7 +669,7 @@ export class EditorTrazadoComponent implements OnInit {
             
             // Dibuja el número si es un control
             if(actual.tipo === Control.TIPO_CONTROL) {
-                this.dibujaNumero(previo, actual, siguiente, numControl, true);
+                this.dibujaNumero(previo, actual, siguiente, numControl, true, context);
                 numControl++;
             }
         }
@@ -689,7 +689,7 @@ export class EditorTrazadoComponent implements OnInit {
         else if(control.tipo === Control.TIPO_CONTROL) this.dibujaControl(coords, this.contextTrazado, true);
         else if(control.tipo === Control.TIPO_META) this.dibujaMeta(coords, this.contextTrazado, true);
         // Dibuja al lado el código
-        this.dibujaNumero(null, control, null, codigo, true);
+        this.dibujaNumero(null, control, null, codigo, true, this.contextTrazado);
       }
     } else {
       // Dibuja el trazado del recorrido actual
@@ -713,7 +713,7 @@ export class EditorTrazadoComponent implements OnInit {
               break;
           }
           // Dibuja al lado el código
-          this.dibujaNumero(null, control, null, codigo, false);
+          this.dibujaNumero(null, control, null, codigo, false, this.contextTrazado);
         }
       });
     }
@@ -728,7 +728,7 @@ export class EditorTrazadoComponent implements OnInit {
    * @param numero Número del control
    * @param activo True para color vivo, false para un poco transparente
    */
-  dibujaNumero(previo: Control, actual: Control, siguiente: Control, numero, activo: boolean) {
+  dibujaNumero(previo: Control, actual: Control, siguiente: Control, numero, activo: boolean, context: CanvasRenderingContext2D) {
     // Recalcula las coordenadas de los controles según el zoom
     var coordsPre = (previo) ? this.getCoordenadasCanvasTrazado(previo.coords) : null;
     var coordsAct = this.getCoordenadasCanvasTrazado(actual.coords);
@@ -766,15 +766,14 @@ export class EditorTrazadoComponent implements OnInit {
     var y = coordsAct.y - this.NUMBER_DISTANCE * Math.sin(anguloResultante);
     
     // Lo dibuja
-    let ctx = this.contextTrazado;
-    ctx.font = this.NUMBER_SIZE + 'px ' + this.NUMBER_FONT;
-    ctx.lineWidth = this.GENERAL_LINE_WIDTH;
-    ctx.fillStyle = this.GENERAL_COLOR;
-    if(activo) ctx.fillStyle = this.GENERAL_COLOR;
-    else ctx.fillStyle = this.GENERAL_COLOR_INACTIVE;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(numero, x, y);
+    context.font = this.NUMBER_SIZE + 'px ' + this.NUMBER_FONT;
+    context.lineWidth = this.GENERAL_LINE_WIDTH;
+    context.fillStyle = this.GENERAL_COLOR;
+    if(activo) context.fillStyle = this.GENERAL_COLOR;
+    else context.fillStyle = this.GENERAL_COLOR_INACTIVE;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(numero, x, y);
   }
 
   /* Dibuja un tramo entre dos controles */

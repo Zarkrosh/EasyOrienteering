@@ -12,6 +12,8 @@ import * as QRCode from 'easyqrcodejs';
 })
 export class VistaCarreraComponent implements OnInit {
 
+  SEPARADOR_QR: string = "|";
+
   // Alertas
   optionsAlerts = {
     autoClose: true,
@@ -62,7 +64,7 @@ export class VistaCarreraComponent implements OnInit {
                   for(let control of this.controles) {
                     if(control.tipo !== Control.TIPO_SALIDA && control.tipo) {
                       let options = {
-                        text: control.codigo + "-" + this.secretos.get(control.codigo),
+                        text: control.codigo + this.SEPARADOR_QR + this.secretos.get(control.codigo),
                         width: 200,
                         height: 200,
                         quietZone: 20,
@@ -79,7 +81,7 @@ export class VistaCarreraComponent implements OnInit {
                       let secretoTriangulo = this.secretos.get(codigoTriangulo);
                       if(secretoTriangulo) {
                         let options = {
-                          text: codigoTriangulo + "-" + this.carrera.id + "-" + recorrido.id + "-" + secretoTriangulo,
+                          text: codigoTriangulo + this.SEPARADOR_QR + this.carrera.id + this.SEPARADOR_QR + recorrido.id + this.SEPARADOR_QR + secretoTriangulo,
                           width: 200,
                           height: 200,
                           quietZone: 20,
