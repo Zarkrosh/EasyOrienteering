@@ -1,10 +1,13 @@
 export class AppSettings {
     public static readonly LOCAL_STORAGE_CARRERA = "carrera";
+    public static readonly CANVAS_MAPAS_RESOLUCION: number = 0.8;
+    public static readonly SEPARADOR_QR = "|";
 }
 
 export class Usuario {
     id: number;
-    username: string;
+    nombre: string;
+    club: string;
     email: string;
     fecharegistro: Date;
 }
@@ -19,17 +22,21 @@ export class Carrera {
     
     id: number;
     nombre: string;
+    organizador: Usuario;
     recorridos: Recorrido[];
     controles: Map<any, any>;
     tipo: string;
     modalidad: string;
+    latitud: number;
+    longitud: number;
     privada: boolean;
     creada: boolean; // True si la carrera existe en el sistema
                      // False cuando se está creando
     
-    constructor(nombre: string, recorridos: Recorrido[], controles: Map<any, any>,
+    constructor(nombre: string, organizador: Usuario, recorridos: Recorrido[], controles: Map<any, any>,
                 tipo: string, modalidad: string, privada: boolean, creada: boolean) {
         this.nombre = nombre;
+        this.organizador = organizador;
         this.recorridos = recorridos;
         this.controles = controles;
         this.tipo = tipo;

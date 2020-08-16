@@ -1,11 +1,94 @@
-<div id="wrap-vista-carrera">
-    <h1>Vista carrera</h1>
+<div class="easyo-container">
+    <ng-container *ngIf="carrera">
 
-    <h2>Lista de controles</h2>
-    <div id="lista-controles">
-        <div class="control" *ngFor="let control of controles">{{control.codigo}}
-            <div [attr.id]="'QR-' + control.codigo" class="qr-control"></div>
+        <!-- Botones de descarga y edición -->
+        <div class="botones-carrera">
+            <a href="/api/carreras/{{carrera.id}}/mapas" class="btn btn-secondary"><i class="fa fa-map"></i> Descargar mapas</a>
+            <button class="btn btn-secondary"><i class="fa fa-qrcode"></i> Descargar QR</button>
+            <button class="btn btn-primary"><i class="fa fa-edit"></i> Editar carrera</button>
         </div>
-    </div>
+
+        <div class="parte-superior-carrera">
+            <div class="datos-carrera">
+                <span class="nombre-carrera">{{carrera.nombre}}</span>
+                <div class="items-datos">
+                    <span class="tipo-carrera">{{carrera.tipo}}</span>
+                    <span class="modalidad-carrera">{{carrera.modalidad}}</span>
+                    <ng-container *ngIf="carrera.privada">
+                        <span class="carrera-privada">PRIVADA</span>
+                    </ng-container>
+                    <ng-container *ngIf="!carrera.privada">
+                        <span class="carrera-publica">PÚBLICA</span>
+                    </ng-container>
+                </div>
+                
+                <p class="organizador"><b>Organizador:</b>  <a href="/usuarios/{{carrera.organizador.id}}">{{getOrganizador()}}</a></p>
+                <p class="notas-titulo"><b>Notas:</b></p>
+                <div class="notas">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit amet ullamcorper ante, eget eleifend lorem. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Curabitur imperdiet nisl vitae ipsum aliquet viverra. In lacinia condimentum porttitor. Sed finibus ligula eu velit pellentesque, eget pharetra eros sodales. Nam varius elit id leo maximus, id elementum magna vulputate. Praesent sem risus, pharetra sed lacus a, malesuada finibus eros. Duis a porta nisi. Mauris mattis justo a imperdiet malesuada.</p>
+                    <p>Nunc fermentum, magna vitae pellentesque auctor, diam leo pharetra magna, et fringilla nunc lectus eget lectus. Nulla faucibus at velit non ultrices. Sed fermentum quam mauris, at aliquet orci posuere vestibulum. Morbi fermentum convallis pretium. Nunc ante arcu, cursus vel nibh consectetur, fermentum lobortis leo. Vivamus pharetra, dolor in cursus lacinia, enim libero gravida massa, ac rutrum turpis sapien sit amet turpis. Curabitur semper nunc nec pharetra iaculis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer dictum ac lectus in commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae</p>    
+                </div>
+            </div>
+    
+            <div class="ubicacion">
+                <div class="header-ubicacion">
+                    <h1>Ubicación</h1>
+                    <button *ngIf="!editandoUbicacion && mostrarEditUbicacion" id="btn-editar-ubicacion" class="btn btn-primary" (click)="editarUbicacion()">Editar</button>
+                </div>
+                <div id="mapa-ubicacion" class="ubicacion-mapa" [style.cursor]="(marcarUbicacion) ? 'crosshair' : auto">
+                    
+                    <div *ngIf="editandoUbicacion && mostrarAnadirUbicacion" id="btn-anadir-ubicacion" (click)="editarUbicacion()">
+                        <i class="fa fa-plus-square"></i>
+                        <span>Añadir ubicación</span>
+                    </div>
+                </div>
+                <span *ngIf="editandoUbicacion && mensajeUbicacion" [ngClass]="(marcarUbicacion) ? 'mensaje-ubicacion-exito' : 'mensaje-ubicacion-error'" class="mensaje-ubicacion">{{mensajeUbicacion}}</span>
+                <button *ngIf="editandoUbicacion && marcarUbicacion && latitudElegida != null && longitudElegida != null" 
+                    class="btn btn-primary btn-guardar-ubicacion" (click)="guardarUbicacion()" [disabled]="guardandoUbicacion">
+
+                    <span *ngIf="guardandoUbicacion" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Guardar ubicación
+                </button>
+            </div>
+        </div>
+
+        
+
+        <div class="recorridos">
+            <h1>Recorridos</h1>
+            <div class="lista-recorridos">
+                <div *ngFor="let recorrido of carrera.recorridos" class="recorrido">
+                    <div class="datos-recorrido">
+                        <span class="nombre-recorrido"><b>{{recorrido.nombre}}</b></span>
+                        <span class="numero-corredores">18</span>
+                        <span class="numero-controles">12</span>
+                    </div>
+                    <a class="overlay-recorrido" href="#">
+                        <span>Ver resultados</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <h2>Controles</h2>
+        <div id="lista-controles">
+            <div class="control" *ngFor="let control of controles">
+                <div [attr.id]="'QR-' + control.codigo" class="qr-control"></div>
+                {{control.codigo}}
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="!carrera">
+        <div class="wrapper-cargando">
+            <div class="lds-baliza-wrapper" *ngIf="!errorCarga">
+                <div class="lds-baliza"></div>
+            </div>
+            <div *ngIf="errorCarga">
+                <h1>Ocurrió un error :(</h1>
+                <button class="btn btn-primary btn-reintentar" (click)="refresh()">Volver a intentar</button>
+            </div>
+        </div>
+    </ng-container>
     
 </div>

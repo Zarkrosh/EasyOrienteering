@@ -63,10 +63,15 @@ public class CarreraService implements ICarreraService {
             String rand = Utils.cadenaAleatoria(secretCarreras.length());
             String secret = Utils.md5(secretCarreras + rand);
             carrera.setSecret(secret);
-            return guardaCarrera(carrera);
+            return guardaCarrera(carrera, true);
         } else {
             throw new IllegalArgumentException("La carrera a guardar no puede ser null");
         }
+    }
+    
+    @Override
+    public void editDatosCarrera(Carrera carrera) {
+        guardaCarrera(carrera, false);
     }
 
     @Override
@@ -81,7 +86,7 @@ public class CarreraService implements ICarreraService {
                 repoCarrera.deleteById(carrera.getId());
                 // TODO: analizar optimización de destrucción de los recorridos
                 // Guarda la carrera actualizada
-                guardaCarrera(carrera);
+                guardaCarrera(carrera, true);
             } else {
                 // No existe ninguna carrera con ese ID
             }
@@ -128,15 +133,17 @@ public class CarreraService implements ICarreraService {
         return res;
     }
     
-    private Carrera guardaCarrera(Carrera carrera) {
+    private Carrera guardaCarrera(Carrera carrera, boolean deepEdit) {
         // Primero guarda la carrera general
         Carrera res = repoCarrera.save(carrera);
         // Luego guarda los controles que no son guardados debido al problema
         // asociado al uso de la clave foránea del ID de la carrera.
-        for(Control c : carrera.getControles().values()) {
-            repoCarrera.insertaControl(c.getCodigo(), res.getId(), c.getTipo().name());
+        if(deepEdit) {
+            for(Control c : carrera.getControles().values()) {
+                repoCarrera.insertaControl(c.getCodigo(), res.getId(), c.getTipo().name());
+            }
+            res.setControles(carrera.getControles());
         }
-        res.setControles(carrera.getControles());
         
         return res;
     }

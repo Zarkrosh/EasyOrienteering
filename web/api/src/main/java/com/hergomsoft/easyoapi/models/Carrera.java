@@ -54,6 +54,12 @@ public class Carrera implements IdEntity {
     @ManyToOne(optional = false)
     private Usuario organizador;
     
+    @Column(name = "LATITUD")
+    private Float latitud;
+    
+    @Column(name = "LONGITUD")
+    private Float longitud;
+    
     @Column(name = "PRIVADA")
     private boolean privada;
     
@@ -69,13 +75,15 @@ public class Carrera implements IdEntity {
 
     public Carrera() {}
 
-    public Carrera(Long id, String secret, String nombre, Tipo tipo, Modalidad modalidad, Usuario organizador, boolean privada, List<Recorrido> recorridos, Map<String, Control> controles) {
+    public Carrera(Long id, String secret, String nombre, Tipo tipo, Modalidad modalidad, Usuario organizador, Float latitud, Float longitud, boolean privada, List<Recorrido> recorridos, Map<String, Control> controles) {
         this.id = id;
         this.secret = secret;
         this.nombre = nombre;
         this.tipo = tipo;
         this.modalidad = modalidad;
         this.organizador = organizador;
+        this.latitud = latitud;
+        this.longitud = longitud;
         this.privada = privada;
         this.recorridos = recorridos;
         this.controles = controles;
@@ -127,6 +135,26 @@ public class Carrera implements IdEntity {
 
     public void setOrganizador(Usuario organizador) {
         this.organizador = organizador;
+    }
+
+    public Float getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(Float latitud) {
+        this.latitud = latitud;
+    }
+
+    public Float getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(Float longitud) {
+        this.longitud = longitud;
+    }
+    
+    public boolean tieneUbicacion() {
+        return latitud != null && longitud != null;
     }
 
     public boolean isPrivada() {

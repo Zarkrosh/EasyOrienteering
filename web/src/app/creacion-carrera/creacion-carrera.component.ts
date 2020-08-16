@@ -56,7 +56,7 @@ export class CreacionCarreraComponent implements OnInit {
    */
   nuevaCarreraVacia() {
     localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA);
-    this.carrera = new Carrera("", [], new Map(), Carrera.TIPO_EVENTO, Carrera.MOD_TRAZADO, false, false);
+    this.carrera = new Carrera("", null, [], new Map(), Carrera.TIPO_EVENTO, Carrera.MOD_TRAZADO, false, false);
   }
 
   /**

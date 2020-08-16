@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { InicioComponent } from './inicio/inicio.component';
 import { PerfilComponent } from './perfil/perfil.component';
 import { AlertModule } from './alert';
@@ -17,6 +18,7 @@ import { EditorTrazadoComponent } from './editor/editor-trazado/editor-trazado.c
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { VistaCarreraComponent } from './vista-carrera/vista-carrera.component';
 import { ResumenCarreraComponent } from './creacion-carrera/resumen-carrera/resumen-carrera.component';
+import { QueEsComponent } from './que-es/que-es.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +32,8 @@ import { ResumenCarreraComponent } from './creacion-carrera/resumen-carrera/resu
     EditorRecorridosComponent,
     EditorTrazadoComponent,
     VistaCarreraComponent,
-    ResumenCarreraComponent
+    ResumenCarreraComponent,
+    QueEsComponent
   ],
   imports: [
     BrowserModule,
@@ -38,7 +41,8 @@ import { ResumenCarreraComponent } from './creacion-carrera/resumen-carrera/resu
     HttpClientModule,
     AlertModule,
     ReactiveFormsModule,
-    NgbModule
+    NgbModule,
+    LeafletModule
   ],
   providers: [],
   bootstrap: [AppComponent]

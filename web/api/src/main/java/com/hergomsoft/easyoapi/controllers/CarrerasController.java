@@ -4,19 +4,21 @@ package com.hergomsoft.easyoapi.controllers;
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
+import com.hergomsoft.easyoapi.models.requests.UbicacionRequest;
 import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
 import com.hergomsoft.easyoapi.services.CarreraService;
 import com.hergomsoft.easyoapi.services.UsuarioService;
+import com.hergomsoft.easyoapi.utils.Utils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javassist.bytecode.ByteArray;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,9 +77,32 @@ public class CarrerasController {
         return carrerasService.buscaCarreras(idUsuario, nombre, tipo, modalidad, pageable);
     }
     
+    @GetMapping("/{idCarrera}/mapas")
+    public void getMapasCarrera(@PathVariable long idCarrera, HttpServletResponse response) {
+        Carrera carrera = getCarrera(idCarrera);
+        response.setContentType("application/zip");
+        response.setHeader("Content-Disposition", "attachment; filename=mapas.zip");
+
+        try (ZipOutputStream zippedOut = new ZipOutputStream(response.getOutputStream())) {
+            for(Recorrido r : carrera.getRecorridos()) {
+                ZipEntry e = new ZipEntry(r.getNombre() + ".jpg");
+                byte[] mapa = r.getMapa();
+                e.setSize(mapa.length);
+                e.setTime(System.currentTimeMillis());
+                zippedOut.putNextEntry(e);
+                // And the content of the resource:
+                StreamUtils.copy(mapa, zippedOut);
+                zippedOut.closeEntry();
+            }
+            
+            zippedOut.finish();
+        } catch (Exception e) {
+            // Do something with Exception
+        }   
+    }
+    
     @GetMapping("/mapa/{idRecorrido}")
     public void getMapaRecorrido(@PathVariable long idRecorrido, HttpServletResponse response) {
-
         Recorrido rec = carrerasService.getRecorrido(idRecorrido);
         if(rec != null) {
             if(rec.getMapa() != null) {
@@ -160,6 +186,29 @@ public class CarrerasController {
         }
         
         return res;
+    }
+    
+    @PutMapping("/{idCarrera}/ubicacion")
+    public void setUbicacionCarrera(@PathVariable long idCarrera, @RequestBody UbicacionRequest ubicacion) {
+        Usuario usuario = usuariosService.getUsuarioPeticion();
+        Carrera carrera = getCarrera(idCarrera);
+        
+        if(true) { // DEBUG
+        //if(Objects.equals(usuario.getId(), carrera.getOrganizador().getId())) {
+            if(ubicacion.getLatitud() != null && ubicacion.getLongitud() != null) {
+                carrera.setLatitud(ubicacion.getLatitud());
+                carrera.setLongitud(ubicacion.getLongitud());
+                carrerasService.editDatosCarrera(carrera);
+            } else {
+                // Mala petición
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "No puede haber ningún campo nulo");
+            }
+        } else {
+            // No es el organizador de la carrera
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, "No eres el organizador de esta carrera");
+        }
     }
     
 }

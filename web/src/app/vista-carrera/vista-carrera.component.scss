@@ -1,11 +1,233 @@
-#wrap-vista-carrera {
-    margin: 40px 100px;
-    text-align: center;
+@import "../../styles.scss";
+
+$color-item-tipo: #00cce8;
+$color-item-modalidad: #6adb00;
+$color-item-privado: #a200ff;
+
+.wrapper-cargando {
+    width: 100%;
+    min-height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.btn-reintentar {
+    margin: 35px auto 0 auto;
+    display: block;
+}
+
+.botones-carrera {
+    text-align: end;
+}
+.botones-carrera button {
+    margin-left: 20px;
+}
+.botones-carrera i {
+    margin-right: 4px;
 }
 
 
+.parte-superior-carrera {
+    display: inline-flex;
+}
+
+.datos-carrera {
+    margin-top: 20px;
+    margin-left: 30px;
+}
+.nombre-carrera {
+    display: block;
+    font-size: 2.3em;
+}
+.datos-carrera p {
+    font-size: 1.2rem;
+}
+.items-datos {
+    display: inline-flex;
+    margin-bottom: 20px;
+}
+.items-datos > span {
+    margin-right: 10px;
+    border: 2px solid black;
+    border-radius: 20px;
+    padding: 4px 10px;
+    color: white;
+    font-weight: bold;
+}
+.tipo-carrera {
+    background-color: $color-item-tipo;
+}
+.modalidad-carrera {
+    background-color: $color-item-modalidad;
+}
+.carrera-privada {
+    background-color: $color-item-privado;
+}
+.carrera-publica {
+    background-color: $color-orientacion;
+}
+.organizador a {
+    margin-left: 10px;
+}
+.notas-titulo {
+    margin-bottom: 4px;
+}
+.notas {
+    margin-left: 24px;
+    text-align: justify;
+}
+
+
+.ubicacion {
+    margin: 100px 0 0 40px;
+}
+.header-ubicacion {
+    position: relative;
+}
+#btn-editar-ubicacion {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    font-size: 0.8rem;
+}
+.ubicacion-mapa {
+    width: 400px;
+    height: 300px;
+    border: 2px solid black;
+}
+.ubicacion h1 {
+    font-size: 1.6rem;
+    text-align: center;
+}
+#btn-anadir-ubicacion {
+    display: flex;
+    height: 100%;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.3rem;
+    background-color: white;
+    color: black;
+    cursor: pointer;
+    transition: .3s all;
+}
+#btn-anadir-ubicacion:hover {
+    color: white;
+    background-color: $color-orientacion;
+}
+#btn-anadir-ubicacion i {
+    margin-right: 10px;
+}
+.mensaje-ubicacion {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+}
+.mensaje-ubicacion-error {
+    color: #bb0000;
+}
+.mensaje-ubicacion-exito {
+    color: #10bb00;
+}
+.btn-guardar-ubicacion {
+    display: block;
+    margin: 10px auto;
+}
+.btn-guardar-ubicacion .spinner-border {
+    margin-right: 5px;
+}
+
+
+
+.recorridos {
+    margin-top: 60px;
+}
+.recorridos h1 {
+    font-size: 1.6rem;
+    text-align: center;
+}
+.lista-recorridos {
+    width: 100%;
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.recorrido {
+    position: relative;
+    margin-top: 10px;
+    margin-right: 20px;
+    border: 2px solid $color-orientacion;
+    border-radius: 20px;
+    padding: 10px;
+    overflow: hidden;
+}
+.datos-recorrido {
+    display: inline-block;
+    font-size: 1.3rem;
+}
+.nombre-recorrido {
+    min-width: 50px;
+    margin-right: 20px;
+    font-size: 1.5rem;
+}
+.numero-corredores {
+    position: relative;
+    margin-right: 35px;
+}
+.numero-corredores:after {
+    position: absolute;
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    top: 2px;
+    margin-left: 4px;
+    content: url("../../assets/img/runner.png");
+}
+.numero-controles {
+    position: relative;
+    margin-right: 35px;
+    margin-left: 15px;
+}
+.numero-controles:after {
+    position: absolute;
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    top: 2px;
+    margin-left: 4px;
+    content: url("../../assets/img/orienteering_control.png");
+}
+
+.overlay-recorrido {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    background-color: $color-orientacion;
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: .2s ease-in-out;
+}
+.recorrido:hover .overlay-recorrido{
+    opacity: 1;
+}
+
+
+
+
+
 h2 {
-    margin-top: 40px;
+    margin-top: 140px;
+    text-align: center;
 }
 #lista-controles {
     width: 100%;
@@ -14,9 +236,10 @@ h2 {
 }
 
 .control {
-    margin: 30px 200px;
+    margin: 40px 200px;
     font-weight: bold;
     font-size: x-large;
+    text-align: center;
 }
 
 .qr-control {

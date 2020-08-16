@@ -9,6 +9,7 @@ import { CreacionCarreraComponent } from './creacion-carrera/creacion-carrera.co
 import { EditorRecorridosComponent } from './editor/editor-recorridos/editor-recorridos.component';
 import { VistaCarreraComponent } from './vista-carrera/vista-carrera.component';
 import { ResumenCarreraComponent } from './creacion-carrera/resumen-carrera/resumen-carrera.component';
+import { QueEsComponent } from './que-es/que-es.component';
 
 
 const routes: Routes = [
@@ -17,6 +18,7 @@ const routes: Routes = [
   {path: 'registro', component: RegistroComponent},
   {path: 'olvido', component: OlvidoComponent},
   {path: 'perfil', component: PerfilComponent},
+  {path: 'easyorienteering', component: QueEsComponent},
   {path: 'carreras/crear/datos', component: CreacionCarreraComponent},
   {path: 'carreras/crear/recorridos', component: EditorRecorridosComponent},
   {path: 'carreras/crear/resumen', component: ResumenCarreraComponent},

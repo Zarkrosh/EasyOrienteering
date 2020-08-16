@@ -193,7 +193,7 @@ export class EditorRecorridosComponent implements OnInit {
         this.trazador.dibujaTrazado(canvasContext, recorrido.trazado, this.controles);
 
         // Obtiene la imagen resultante y la asigna al mapa
-        mapasTrazados.set(recorrido.nombre, canvas.toDataURL('image/jpeg', 0.69));
+        mapasTrazados.set(recorrido.nombre, canvas.toDataURL('image/jpeg', AppSettings.CANVAS_MAPAS_RESOLUCION));
       }
       // Guarda los mapas
       this.data.setMapasTrazados(mapasTrazados);

@@ -84,6 +84,12 @@ export class ClienteApiService {
     return this.http.get<any>(url, {observe: 'response'});
   }
 
-
+  cambiaUbicacionCarrera(idCarrera: number, latitud: number, longitud: number) {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + idCarrera + '/ubicacion';
+    let ubicacion = new Object();
+    ubicacion["latitud"] = latitud;
+    ubicacion["longitud"] = longitud;
+    return this.http.put<any>(url, ubicacion, {observe: 'response'});
+  }
 
 }

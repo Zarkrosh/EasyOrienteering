@@ -1,7 +1,16 @@
+@import "~leaflet/dist/leaflet.css";
+
+$max-width-content: 1400px;
+$umbral-width: 1000px;
+
 $color-orientacion: #F76D22;
 $color-orientacion-light: rgba($color-orientacion, 0.8);
 $color-orientacion-dark: #ce5d21;
 $color-exito: #66CC00;
+$color-secondary: #007bff;
+$color-secondary-light: rgba($color-secondary, 0.8);
+$color-secondary-dark: #0061c9;
+
 
 alert {
     position: fixed;
@@ -30,11 +39,38 @@ alert {
 .btn-primary:focus {
     box-shadow: 0 0 0 0.2rem rgba($color-orientacion, 0.5);
 }
+.btn-secondary {
+    background-color: $color-secondary;
+    border-color: $color-secondary;
+}
+.btn-secondary:hover {
+    background-color: $color-secondary-light;
+}
+.btn-secondary:not(:disabled):active {
+    background-color: $color-secondary-dark;
+}
+.btn-secondary:focus {
+    box-shadow: 0 0 0 0.2rem rgba($color-secondary, 0.5);
+}
+.btn-secondary:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 0.2rem rgba($color-secondary, 0.5);
+}
+
+.easyo-container {
+    width: $max-width-content;
+    margin: 50px auto;
+    border-radius: 20px;
+    box-shadow: 2px 2px #AAA7;
+    padding: 40px 80px;
+    background-color: white;
+    overflow: hidden;
+}
+
 
 #footer-web {
     width: 100%;
     height: 200px;
-    margin-top: 40px;
+    margin-top: 100px;
     background-color: grey;
 }
 
@@ -42,6 +78,26 @@ alert {
 .oculto {
     visibility: hidden;
 }
+
+// Basado en código de https://loading.io/css/
+.lds-baliza {
+    display: block;
+    border: 3vh solid white;
+    border-color: white $color-orientacion $color-orientacion white;
+}
+.lds-baliza-wrapper {
+    border: 2px solid black;
+    animation: lds-baliza 1.5s infinite;
+}
+@keyframes lds-baliza {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(720deg);
+    }
+}
+  
 
 // https://stackoverflow.com/questions/3779534/how-do-i-disable-text-selection-with-css-or-javascript
 .noselect {
@@ -52,4 +108,18 @@ alert {
           -ms-user-select: none; /* Internet Explorer/Edge */
               user-select: none; /* Non-prefixed version, currently
                                     supported by Chrome and Opera */
+}
+
+
+@media only screen and (max-width: $umbral-width) {
+    .easyo-container {
+        max-width: 100%;
+        border-radius: 0;
+    }
+}
+
+@media only screen and (min-width: $umbral-width) {
+    .easyo-container {
+        max-width: 90%;
+    }
 }
