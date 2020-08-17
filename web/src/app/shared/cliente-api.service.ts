@@ -79,8 +79,8 @@ export class ClienteApiService {
     return this.http.post<any>(url, carrera, {observe: 'response', headers: cabeceras});
   }
 
-  getSecretosControlesCarrera(idCarrera: number) {
-    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + idCarrera + '/secretos';
+  getControlesQRCarrera(idCarrera: number) {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + idCarrera + '/qr';
     return this.http.get<any>(url, {observe: 'response'});
   }
 

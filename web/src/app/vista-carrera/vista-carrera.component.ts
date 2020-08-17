@@ -1,9 +1,8 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClienteApiService } from '../shared/cliente-api.service';
 import { AlertService } from '../alert';
 import { Carrera, Control, AppSettings, Usuario } from '../shared/app.model';
-import * as QRCode from 'easyqrcodejs';
 import * as L from 'leaflet';
 
 @Component({
@@ -20,8 +19,6 @@ export class VistaCarreraComponent implements OnInit {
   };
 
   carrera: Carrera;
-  controles: Control[];
-  secretos: Map<string, string>;
   errorCarga: boolean;
 
   // Ubicación
@@ -29,6 +26,7 @@ export class VistaCarreraComponent implements OnInit {
   readonly LONGITUD_DEFECTO = -3.74922;
   readonly ZOOM_DEFECTO = 5;
   readonly MIN_ZOOM_MARCAR = 16;
+  @ViewChildren('mapaUbicacion') queryMapa: QueryList<ElementRef>;
   mapaUbicacion: L.Map;
   capaMarcador: L.LayerGroup;
   iconoMarcador: L.Icon;
@@ -48,8 +46,6 @@ export class VistaCarreraComponent implements OnInit {
 
   ngOnInit() {
     this.carrera = null;
-    this.controles = [];
-    this.secretos = new Map<string, string>();
     this.errorCarga = false;
     this.editandoUbicacion = false;
     this.mostrarEditUbicacion = false;
@@ -60,40 +56,10 @@ export class VistaCarreraComponent implements OnInit {
     this.cargaDatosCarrera();
   }
 
-  guardarUbicacion() {
-    this.guardandoUbicacion = true;
-    if(this.carrera.id != null && this.latitudElegida != null && this.longitudElegida != null) {
-      this.clienteApi.cambiaUbicacionCarrera(this.carrera.id, this.latitudElegida, this.longitudElegida).subscribe(
-        resp => {
-          if(resp.status == 200) {
-            this.alertService.success("Ubicación cambiada", this.optionsAlerts);
-          } else {
-            this.alertService.warn("Código de respuesta inesperado: " + resp.status, this.optionsAlerts);
-          }
-          this.editandoUbicacion = this.marcarUbicacion = this.guardandoUbicacion = false;
-          this.mostrarEditUbicacion = true; // TODO Solo para el organizador
-        }, err => {
-          this.alertService.error("No se pudo cambiar la ubicación", this.optionsAlerts);
-          console.log(err); // DEBUG
-          this.guardandoUbicacion = false;
-      });
-    }
-  }
-
-  onCambioZoomMapa(map: L.Map): void {
-    if(this.editandoUbicacion) {
-      if(map.getZoom() >= this.MIN_ZOOM_MARCAR) {
-        if(this.latitudElegida == null && this.longitudElegida == null) {
-          this.mensajeUbicacion = "Haz click en el mapa";
-        } else {
-          this.mensajeUbicacion = null;
-        }
-        this.marcarUbicacion = true;
-      } else {
-        this.mensajeUbicacion = "Aumenta el zoom para elegir ubicación";
-        this.marcarUbicacion = false;
-      }
-    }
+  ngAfterViewInit() {
+    this.queryMapa.changes.subscribe((items: Array<any>) => {
+      if(!this.mapaUbicacion) this.iniciaMapa();
+    });
   }
 
   iniciaMapa(): void {
@@ -146,70 +112,10 @@ export class VistaCarreraComponent implements OnInit {
       this.clienteApi.getCarrera(idCarrera).subscribe(
         resp => {
           if(resp.status == 200) {
-            // TODO
-            console.log(resp.body);
             this.carrera = resp.body;
-            this.controles = [];
-            for(let control of Object.entries(this.carrera.controles)) {
-              if(control[1].tipo != Control.TIPO_SALIDA) this.controles.push(control[1]);
+            if(this.carrera.latitud == null || this.carrera.longitud == null) {
+              this.mostrarAnadirUbicacion = true; // TODO Solo para el organizador
             }
-
-            // Triángulos de recorridos
-            for(let recorrido of this.carrera.recorridos) {
-              if(recorrido.trazado.length > 0) {
-                this.controles.push(new Control(recorrido.nombre, null, null));
-              }
-            }
-
-            // DEBUG: muestra los controles QR
-            this.clienteApi.getSecretosControlesCarrera(idCarrera).subscribe(
-              resp => {
-                if(resp.status == 200) {
-                  // Renderiza la lista
-                  this.secretos = new Map(Object.entries(resp.body));
-
-                  for(let control of this.controles) {
-                    if(control.tipo !== Control.TIPO_SALIDA && control.tipo) {
-                      let options = {
-                        text: control.codigo + AppSettings.SEPARADOR_QR + this.secretos.get(control.codigo),
-                        width: 200,
-                        height: 200,
-                        quietZone: 20,
-                        quietZoneColor: 'transparent',
-                      }
-                      
-                      new QRCode(document.getElementById("QR-" + control.codigo), options);
-                    }
-                  }
-
-                  for(let recorrido of this.carrera.recorridos) {
-                    if(recorrido.trazado.length > 0) {
-                      let codigoTriangulo = recorrido.trazado[0];
-                      let secretoTriangulo = this.secretos.get(codigoTriangulo);
-                      if(secretoTriangulo) {
-                        let options = {
-                          text: codigoTriangulo + AppSettings.SEPARADOR_QR + this.carrera.id + AppSettings.SEPARADOR_QR + recorrido.id + AppSettings.SEPARADOR_QR + secretoTriangulo,
-                          width: 200,
-                          height: 200,
-                          quietZone: 20,
-                          quietZoneColor: 'transparent',
-                        }
-                        
-                        new QRCode(document.getElementById("QR-" + recorrido.nombre), options);
-                      }
-                    }
-                  }
-
-                  this.iniciaMapa();
-                  if(this.carrera.latitud == null || this.carrera.longitud == null) {
-                    this.mostrarAnadirUbicacion = true; // TODO Solo para el organizador
-                  }
-                }
-              }, err => {
-                this.alertService.error("Error al obtener los secretos: " + JSON.stringify(err), this.optionsAlerts);
-                this.errorCarga = true;
-              }
-            );
           } else {
             this.alertService.error("Error al obtener la carrera", this.optionsAlerts);
             this.errorCarga = true;
@@ -227,7 +133,6 @@ export class VistaCarreraComponent implements OnInit {
       );
     })
   }
-  
 
   // TODO Convertir a pure pipe para mejorar rendimiento
   getOrganizador(): string {
@@ -241,7 +146,6 @@ export class VistaCarreraComponent implements OnInit {
     this.router.navigate(['/carreras', this.carrera.id]); // TODO
   }
 
-
   editarUbicacion(): void {
     this.latitudElegida = (this.carrera.latitud != null) ? this.carrera.latitud : null;
     this.longitudElegida = (this.carrera.longitud != null) ? this.carrera.longitud : null;
@@ -250,9 +154,45 @@ export class VistaCarreraComponent implements OnInit {
     this.onCambioZoomMapa(this.mapaUbicacion);
   }
 
+  guardarUbicacion() {
+    this.guardandoUbicacion = true;
+    if(this.carrera.id != null && this.latitudElegida != null && this.longitudElegida != null) {
+      this.clienteApi.cambiaUbicacionCarrera(this.carrera.id, this.latitudElegida, this.longitudElegida).subscribe(
+        resp => {
+          if(resp.status == 200) {
+            this.alertService.success("Ubicación cambiada", this.optionsAlerts);
+          } else {
+            this.alertService.warn("Código de respuesta inesperado: " + resp.status, this.optionsAlerts);
+          }
+          this.editandoUbicacion = this.marcarUbicacion = this.guardandoUbicacion = false;
+          this.mostrarEditUbicacion = true; // TODO Solo para el organizador
+        }, err => {
+          this.alertService.error("No se pudo cambiar la ubicación", this.optionsAlerts);
+          console.log(err); // DEBUG
+          this.guardandoUbicacion = false;
+      });
+    }
+  }
+
   manejaClickMapa(evento: L.LeafletMouseEvent) {
     if(this.editandoUbicacion) {
       this.setMarcadorUbicacion(evento.latlng.lat, evento.latlng.lng);
+    }
+  }
+
+  onCambioZoomMapa(map: L.Map): void {
+    if(this.editandoUbicacion) {
+      if(map.getZoom() >= this.MIN_ZOOM_MARCAR) {
+        if(this.latitudElegida == null && this.longitudElegida == null) {
+          this.mensajeUbicacion = "Haz click en el mapa";
+        } else {
+          this.mensajeUbicacion = null;
+        }
+        this.marcarUbicacion = true;
+      } else {
+        this.mensajeUbicacion = "Aumenta el zoom para elegir ubicación";
+        this.marcarUbicacion = false;
+      }
     }
   }
 
@@ -276,6 +216,10 @@ export class VistaCarreraComponent implements OnInit {
         animate: true,
         duration: 1
     });
+  }
+
+  generarQR() {
+    this.router.navigate(["qr"], {relativeTo: this.route});
   }
 
   refresh(): void {

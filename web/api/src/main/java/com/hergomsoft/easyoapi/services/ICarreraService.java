@@ -88,11 +88,20 @@ public interface ICarreraService {
      * @param carrera Carrera de la que obtener los secretos
      * @return Mapa de secretos
      */
-    Map<String, String> getSecretosCarrera(Carrera carrera);
+    Map<String, String> getControlesConSecretosCarrera(Carrera carrera);
+    
+    /**
+     * Devuelve el secreto de un recorrido, el cual depende del secreto de la carrera
+     * a la que pertenece. Su generación es el MD5 de la concatenación del nombre del
+     * recorrido con el secreto de la carrera.
+     * @param recorrido Recorrido del cual obtener el secreto
+     * @return Secreto del recorrido
+     */
+    String getSecretoRecorrido(Recorrido recorrido);
     
     /**
      * Devuelve el secreto de un control, el cual depende del secreto de la carrera
-     * a la que pertenece. Su generación es el MD5 de la concatenación del código de
+     * a la que pertenece. Su generación es el MD5 de la concatenación del código del
      * control con el secreto de la carrera.
      * @param control Control del cual obtener el secreto
      * @return Secreto del control

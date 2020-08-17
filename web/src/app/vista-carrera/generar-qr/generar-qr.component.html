@@ -1,0 +1,36 @@
+<div class="easyo-container">
+
+    <ng-container *ngIf="carrera">
+        <button class="btn btn-secondary btn-descargar-pdf" (click)="descargar()"><i class="fa fa-file-pdf"></i> Descargar PDF</button>
+        
+        <h2>Configuración</h2>
+        <h2>Previsualización</h2>
+        <div class="wrapper-pdf">
+            <div id="informePDF">
+                <h1>Controles de la carrera "{{carrera.nombre}}"</h1>
+                <div id="lista-controles">
+                    <div class="control" *ngFor="let control of controles">
+                        <div [attr.id]="'QR-' + control.codigo" class="qr-control"></div>
+                        <span class="codigo-control">{{control.codigo}}</span>
+                        <span class="marca-agua">easyorienteering.com</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+                
+    </ng-container>
+
+
+    <ng-container *ngIf="!carrera">
+        <div class="wrapper-cargando">
+            <div class="lds-baliza-wrapper" *ngIf="!errorCarga">
+                <div class="lds-baliza"></div>
+            </div>
+            <div *ngIf="errorCarga">
+                <h1>Ocurrió un error :(</h1>
+                <button class="btn btn-primary btn-reintentar" (click)="refresh()">Volver a intentar</button>
+            </div>
+        </div>
+    </ng-container>
+
+</div>

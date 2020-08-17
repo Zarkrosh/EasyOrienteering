@@ -19,6 +19,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { VistaCarreraComponent } from './vista-carrera/vista-carrera.component';
 import { ResumenCarreraComponent } from './creacion-carrera/resumen-carrera/resumen-carrera.component';
 import { QueEsComponent } from './que-es/que-es.component';
+import { GenerarQRComponent } from './vista-carrera/generar-qr/generar-qr.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { QueEsComponent } from './que-es/que-es.component';
     EditorTrazadoComponent,
     VistaCarreraComponent,
     ResumenCarreraComponent,
-    QueEsComponent
+    QueEsComponent,
+    GenerarQRComponent
   ],
   imports: [
     BrowserModule,

@@ -4,18 +4,6 @@ $color-item-tipo: #00cce8;
 $color-item-modalidad: #6adb00;
 $color-item-privado: #a200ff;
 
-.wrapper-cargando {
-    width: 100%;
-    min-height: 500px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.btn-reintentar {
-    margin: 35px auto 0 auto;
-    display: block;
-}
-
 .botones-carrera {
     text-align: end;
 }
@@ -29,9 +17,13 @@ $color-item-privado: #a200ff;
 
 .parte-superior-carrera {
     display: inline-flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .datos-carrera {
+    flex: 1;
     margin-top: 20px;
     margin-left: 30px;
 }
@@ -101,7 +93,10 @@ $color-item-privado: #a200ff;
     text-align: center;
 }
 #btn-anadir-ubicacion {
+    z-index: 1001;
+    position: absolute;
     display: flex;
+    width: 100%;
     height: 100%;
     text-align: center;
     justify-content: center;
@@ -142,6 +137,7 @@ $color-item-privado: #a200ff;
 
 .recorridos {
     margin-top: 60px;
+    margin-bottom: 30px;
 }
 .recorridos h1 {
     font-size: 1.6rem;
@@ -221,29 +217,3 @@ $color-item-privado: #a200ff;
     opacity: 1;
 }
 
-
-
-
-
-h2 {
-    margin-top: 140px;
-    text-align: center;
-}
-#lista-controles {
-    width: 100%;
-    display: inline-flex;
-    flex-wrap: wrap;
-}
-
-.control {
-    margin: 40px 200px;
-    font-weight: bold;
-    font-size: x-large;
-    text-align: center;
-}
-
-.qr-control {
-    background-color: gray;
-    width: 200px;
-    height: 200px;
-}

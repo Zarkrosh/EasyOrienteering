@@ -25,6 +25,7 @@ import org.hibernate.annotations.Type;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Carrera implements IdEntity {
     public static final int MLEN_NOMBRE = 50;
+    public static final int MLEN_NOTAS = 1000;
     
     public enum Tipo {EVENTO, CIRCUITO};
     public enum Modalidad {LINEA, SCORE};
@@ -54,14 +55,17 @@ public class Carrera implements IdEntity {
     @ManyToOne(optional = false)
     private Usuario organizador;
     
+    @Column(name = "PRIVADA")
+    private boolean privada;
+    
     @Column(name = "LATITUD")
     private Float latitud;
     
     @Column(name = "LONGITUD")
     private Float longitud;
     
-    @Column(name = "PRIVADA")
-    private boolean privada;
+    @Column(name = "NOTAS")
+    private String notas;
     
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name="CARRERA_ID", referencedColumnName="ID")
@@ -75,7 +79,9 @@ public class Carrera implements IdEntity {
 
     public Carrera() {}
 
-    public Carrera(Long id, String secret, String nombre, Tipo tipo, Modalidad modalidad, Usuario organizador, Float latitud, Float longitud, boolean privada, List<Recorrido> recorridos, Map<String, Control> controles) {
+    public Carrera(Long id, String secret, String nombre, Tipo tipo, Modalidad modalidad, 
+            Usuario organizador, Float latitud, Float longitud, boolean privada, 
+            List<Recorrido> recorridos, Map<String, Control> controles, String notas) {
         this.id = id;
         this.secret = secret;
         this.nombre = nombre;
@@ -87,6 +93,7 @@ public class Carrera implements IdEntity {
         this.privada = privada;
         this.recorridos = recorridos;
         this.controles = controles;
+        this.notas = notas;
     }
 
     public Long getId() {
@@ -163,6 +170,14 @@ public class Carrera implements IdEntity {
 
     public void setPrivada(boolean privada) {
         this.privada = privada;
+    }
+
+    public String getNotas() {
+        return notas;
+    }
+
+    public void setNotas(String notas) {
+        this.notas = notas;
     }
 
     public List<Recorrido> getRecorridos() {

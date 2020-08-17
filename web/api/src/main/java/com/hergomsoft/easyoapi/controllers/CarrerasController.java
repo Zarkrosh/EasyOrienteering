@@ -2,19 +2,19 @@ package com.hergomsoft.easyoapi.controllers;
 
 
 import com.hergomsoft.easyoapi.models.Carrera;
+import com.hergomsoft.easyoapi.models.Control;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.models.requests.UbicacionRequest;
 import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
 import com.hergomsoft.easyoapi.services.CarreraService;
 import com.hergomsoft.easyoapi.services.UsuarioService;
-import com.hergomsoft.easyoapi.utils.Utils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -79,6 +79,7 @@ public class CarrerasController {
     
     @GetMapping("/{idCarrera}/mapas")
     public void getMapasCarrera(@PathVariable long idCarrera, HttpServletResponse response) {
+        // TODO Restricción solo usuario organizador
         Carrera carrera = getCarrera(idCarrera);
         response.setContentType("application/zip");
         response.setHeader("Content-Disposition", "attachment; filename=mapas.zip");
@@ -103,6 +104,7 @@ public class CarrerasController {
     
     @GetMapping("/mapa/{idRecorrido}")
     public void getMapaRecorrido(@PathVariable long idRecorrido, HttpServletResponse response) {
+        // TODO Restricciones de descarga (solo participantes, organizador...)
         Recorrido rec = carrerasService.getRecorrido(idRecorrido);
         if(rec != null) {
             if(rec.getMapa() != null) {
@@ -133,7 +135,7 @@ public class CarrerasController {
         if(res == null) {
             // No existe -> 404
             throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "No existe la carrera con ese ID");
+                HttpStatus.NOT_FOUND, "No existe ninguna carrera con ese ID");
         } else {
             return res;
         }
@@ -153,16 +155,18 @@ public class CarrerasController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Object> editarCarrera(@RequestBody Carrera carrera, @PathVariable long id) {
-        Carrera res = carrerasService.getCarrera(id);
-        if(res == null) {
-            return ResponseEntity.notFound().build();
+    public void editarCarrera(@RequestBody Carrera carrera, @PathVariable long id) {
+        Usuario usuario = usuariosService.getUsuarioPeticion();
+        Carrera c = getCarrera(id);
+        if(Objects.equals(usuario.getId(), c.getOrganizador().getId())) {
+            // TODO Comprobar datos válidos
+            carrera.setId(id);
+            carrerasService.editCarrera(carrera);
+        } else {
+            // No es el organizador de la carrera
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, "Solo puede editar el organizador de la carrera");
         }
-
-        // TODO Comprobar datos válidos
-        carrera.setId(id);
-        carrerasService.editCarrera(carrera);
-        return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping("/{id}")
@@ -170,19 +174,20 @@ public class CarrerasController {
         carrerasService.deleteCarrera(id);
     }
     
-    @GetMapping("/{id}/secretos")
-    public Map<String, String> getSecretosControlesCarrera(@PathVariable long id) {
-        // Solo es accesible por el organizador de la carrera
-        // TODO 
+    @GetMapping("/{id}/qr")
+    public Map<String, String> getControlesQRCarrera(@PathVariable long id) {
+        Map<String, String> res = new TreeMap<>();
         
-        Map<String, String> res = new HashMap<>();
-        Carrera carrera = carrerasService.getCarrera(id);
-        if(carrera != null) {
-            res = carrerasService.getSecretosCarrera(carrera);
+        Usuario usuario = usuariosService.getUsuarioPeticion();
+        Carrera carrera = getCarrera(id);
+        // Solo es accesible por el organizador de la carrera
+        //if(Objects.equals(usuario.getId(), carrera.getOrganizador().getId())) {
+        if(true) { // DEBUG
+            res = carrerasService.getControlesConSecretosCarrera(carrera);
         } else {
-            // No existe -> 404
+            // No es el organizador de la carrera
             throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "No existe la carrera con ese ID");
+                HttpStatus.FORBIDDEN, "Solo puede acceder el organizador de la carrera");
         }
         
         return res;
@@ -193,8 +198,7 @@ public class CarrerasController {
         Usuario usuario = usuariosService.getUsuarioPeticion();
         Carrera carrera = getCarrera(idCarrera);
         
-        if(true) { // DEBUG
-        //if(Objects.equals(usuario.getId(), carrera.getOrganizador().getId())) {
+        if(Objects.equals(usuario.getId(), carrera.getOrganizador().getId())) {
             if(ubicacion.getLatitud() != null && ubicacion.getLongitud() != null) {
                 carrera.setLatitud(ubicacion.getLatitud());
                 carrera.setLongitud(ubicacion.getLongitud());

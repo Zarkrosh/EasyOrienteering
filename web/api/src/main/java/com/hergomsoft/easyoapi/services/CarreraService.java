@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -121,13 +122,23 @@ public class CarreraService implements ICarreraService {
     }
     
     @Override
-    public Map<String, String> getSecretosCarrera(Carrera carrera) {
-        Map<String, String> res = new HashMap<>();
+    public Map<String, String> getControlesConSecretosCarrera(Carrera carrera) {
+        Map<String, String> res = new TreeMap<>();
         
-        // Itera por los controles calculando su secreto
+        // Itera los recorridos
+        for(Recorrido recorrido : carrera.getRecorridos()) {
+            // Salida: INICIO|<ID-RECORRIDO>|<SECRETO-CONTROL> 
+            String secreto = getSecretoRecorrido(recorrido);
+            res.put(recorrido.getNombre(), String.format("INICIO|%d|%s", recorrido.getId(), secreto));
+        }
+        
+        // Itera los controles
         for(Control control : carrera.getControles().values()) {
-            String secreto = getSecretoControl(control);
-            res.put(control.getCodigo(), secreto);
+            if(control.getTipo() != Control.Tipo.SALIDA) {
+                // Resto : <CODIGO-CONTROL>|<SECRETO-CONTROL>
+                String secreto = getSecretoControl(control);
+                res.put(control.getCodigo(), String.format("%s|%s", control.getCodigo(), secreto));
+            }
         }
         
         return res;
@@ -146,6 +157,11 @@ public class CarreraService implements ICarreraService {
         }
         
         return res;
+    }
+    
+    @Override
+    public String getSecretoRecorrido(Recorrido recorrido) {
+        return Utils.md5(recorrido.getNombre()+ recorrido.getCarrera().getSecret());
     }
     
     @Override

@@ -10,6 +10,7 @@ import { EditorRecorridosComponent } from './editor/editor-recorridos/editor-rec
 import { VistaCarreraComponent } from './vista-carrera/vista-carrera.component';
 import { ResumenCarreraComponent } from './creacion-carrera/resumen-carrera/resumen-carrera.component';
 import { QueEsComponent } from './que-es/que-es.component';
+import { GenerarQRComponent } from './vista-carrera/generar-qr/generar-qr.component';
 
 
 const routes: Routes = [
@@ -22,7 +23,8 @@ const routes: Routes = [
   {path: 'carreras/crear/datos', component: CreacionCarreraComponent},
   {path: 'carreras/crear/recorridos', component: EditorRecorridosComponent},
   {path: 'carreras/crear/resumen', component: ResumenCarreraComponent},
-  {path: 'carreras/:id', component: VistaCarreraComponent}
+  {path: 'carreras/:id', component: VistaCarreraComponent},
+  {path: 'carreras/:id/qr', component: GenerarQRComponent}
 ];
 
 @NgModule({

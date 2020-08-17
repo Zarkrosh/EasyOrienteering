@@ -2,6 +2,7 @@ export class AppSettings {
     public static readonly LOCAL_STORAGE_CARRERA = "carrera";
     public static readonly CANVAS_MAPAS_RESOLUCION: number = 0.8;
     public static readonly SEPARADOR_QR = "|";
+    public static readonly TAM_LADO_QR = 200;
 }
 
 export class Usuario {
@@ -30,21 +31,11 @@ export class Carrera {
     latitud: number;
     longitud: number;
     privada: boolean;
+    notas: string;
     creada: boolean; // True si la carrera existe en el sistema
                      // False cuando se está creando
-    
-    constructor(nombre: string, organizador: Usuario, recorridos: Recorrido[], controles: Map<any, any>,
-                tipo: string, modalidad: string, privada: boolean, creada: boolean) {
-        this.nombre = nombre;
-        this.organizador = organizador;
-        this.recorridos = recorridos;
-        this.controles = controles;
-        this.tipo = tipo;
-        this.modalidad = modalidad;
-        this.privada = privada;
-        this.creada = creada;
-    }
 
+    constructor() {}
 }
 
 export class Control {

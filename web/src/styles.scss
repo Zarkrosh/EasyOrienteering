@@ -57,6 +57,7 @@ alert {
 }
 
 .easyo-container {
+    position: relative;
     width: $max-width-content;
     margin: 50px auto;
     border-radius: 20px;
@@ -66,6 +67,17 @@ alert {
     overflow: hidden;
 }
 
+.wrapper-cargando {
+    width: 100%;
+    min-height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.btn-reintentar {
+    margin: 35px auto 0 auto;
+    display: block;
+}
 
 #footer-web {
     width: 100%;
