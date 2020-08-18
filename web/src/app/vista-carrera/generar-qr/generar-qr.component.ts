@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Control, Carrera, AppSettings } from 'src/app/shared/app.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClienteApiService } from 'src/app/shared/cliente-api.service';
@@ -17,10 +17,22 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 export class GenerarQRComponent implements OnInit {
 
 
-  errorCarga: boolean;
+  private vistaPDF: ElementRef<HTMLDivElement>;
+  @ViewChild('vistaPDF', {static: false}) set content(content: ElementRef) {
+    if(content) {
+      this.vistaPDF = content;
+    }
+  }
+  //@ViewChild('vistaPDF', {static: false}) vistaPDF: HTMLDivElement;
+
   carrera: Carrera;
   controles: Control[];
   secretos: Map<string, string>;
+  paginasControles: HTMLDivElement[][];
+  elemsControles: HTMLDivElement[];
+
+  errorCarga: boolean;
+  generandoPDF: boolean;
 
   // Alertas
   optionsAlerts = {
@@ -36,31 +48,107 @@ export class GenerarQRComponent implements OnInit {
   ngOnInit() {
     this.controles = [];
     this.secretos = new Map<string, string>();
+    this.generandoPDF = false;
+    this.paginasControles = [];
+    this.elemsControles = [];
     
     this.cargaDatosCarrera();
   }
 
-  descargar(): void {
+  async descargarPDF() {
     // Genera el PDF con los controles
-    let filename = 'Controles-QR.pdf';
-    let informe = document.getElementById("informePDF");
-    
-    let options = {
+    this.generandoPDF = true;
+    const filename = 'Controles-QR.pdf';
+    const widA4 = 595.28;
+    let optionsCanvas = {
       background: "white",
       logging: false,
       scale: 2
     };
-    html2canvas(informe, options).then(canvas => {
-      var data = canvas.toDataURL();
-      var docDefinition = {
-        content: [{
+    let docDefinition = {
+      pageSize: 'A4',
+      pageMargins: [0,0,0,0],
+      content: []
+    }
+
+    const paginas: HTMLDivElement[] = <HTMLDivElement[]> Array.from(document.getElementsByClassName('pagina-pdf'));
+    for(let i = 0; i < paginas.length; i++) {
+      await html2canvas(<HTMLElement> paginas[i], optionsCanvas).then(canvas => {
+        let data = canvas.toDataURL();
+        let c = {
           image: data,
-          width: 500 // A4
-        }]
-      };
-      pdfMake.createPdf(docDefinition).open(); // .download()
-    });
-    
+          width: widA4
+        }
+
+        if(i < paginas.length - 1) {
+          c["pageBreak"] = 'after';
+        }
+
+        docDefinition.content.push(c);
+      });
+    }
+
+    pdfMake.createPdf(docDefinition).open(); // Debug más rápido
+    //pdfMake.createPdf(docDefinition).download(filename); // Producción
+    this.generandoPDF = false;
+  }
+
+
+  actualizaPaginasPDF() {
+    console.log("[*] Actualizando páginas");
+
+    // Genera las páginas en base a la configuración actual
+    const chunk = 6; // 3 filas y 2 columnas 
+    this.paginasControles = [];
+    for(let i = 0, j = this.elemsControles.length; i < j; i += chunk) {
+      this.paginasControles.push(this.elemsControles.slice(i, i + chunk));
+    }
+
+    for(let pagina of this.paginasControles) {
+      let divPagina = document.createElement('div') as HTMLDivElement;
+      let divLista = document.createElement('div') as HTMLDivElement;
+      divPagina.classList.add("pagina-pdf");
+      divLista.classList.add("lista-controles");
+
+      for(let control of pagina) {
+        divLista.appendChild(control);
+      }
+
+      divPagina.appendChild(divLista);
+      this.vistaPDF.nativeElement.appendChild(divPagina);
+    }
+  }
+
+  generaControles() {
+    for(let control of this.controles) {
+      // Crea los elementos individuales
+      let divControl = document.createElement('div') as HTMLDivElement;
+      let divQR = document.createElement('div') as HTMLDivElement;
+      let spanCodigo = document.createElement('span') as HTMLSpanElement;
+      let spanMarca = document.createElement('span') as HTMLSpanElement;
+      divControl.classList.add("control");
+      divQR.classList.add("control-QR");
+      spanCodigo.classList.add("control-codigo");
+      spanMarca.classList.add("control-marca-agua");
+
+      // Genera el código QR
+      let options = {
+        text: this.secretos.get(control.codigo),
+        width: AppSettings.TAM_LADO_QR,
+        height: AppSettings.TAM_LADO_QR,
+        quietZone: 20,
+        quietZoneColor: 'transparent',
+      }
+      new QRCode(divQR, options);
+
+      // Compone el elemento
+      divControl.appendChild(divQR);
+      divControl.appendChild(spanCodigo);
+      divControl.appendChild(spanMarca);
+      this.elemsControles.push(divControl);
+    }
+
+    this.actualizaPaginasPDF();
   }
 
   cargaDatosCarrera(): void {
@@ -83,23 +171,13 @@ export class GenerarQRComponent implements OnInit {
               }
             }
 
-            // Genera los códigos QR
+            // Obtiene los valores de los QR
             this.clienteApi.getControlesQRCarrera(idCarrera).subscribe(
               resp => {
                 if(resp.status == 200) {
                   // Genera la lista
                   this.secretos = new Map(Object.entries(resp.body));
-                  for(let control of this.controles) {
-                    let options = {
-                      text: this.secretos.get(control.codigo),
-                      width: AppSettings.TAM_LADO_QR,
-                      height: AppSettings.TAM_LADO_QR,
-                      quietZone: 20,
-                      quietZoneColor: 'transparent',
-                    }
-                    
-                    new QRCode(document.getElementById("QR-" + control.codigo), options);
-                  }
+                  this.generaControles();
                 }
               }, err => {
                 console.log(err);

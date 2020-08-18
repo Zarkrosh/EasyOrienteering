@@ -23,7 +23,7 @@
                 </div>
                 
                 <p class="organizador"><b>Organizador:</b>  <a href="/usuarios/{{carrera.organizador.id}}">{{getOrganizador()}}</a></p>
-                <p class="notas-titulo"><b>Notas:</b></p>
+                <p *ngIf="carrera.notas && carrera.notas.length > 0" class="notas-titulo"><b>Notas:</b></p>
                 <div *ngIf="carrera.notas && carrera.notas.length > 0" class="notas">
                     <p *ngFor="let parrafo of carrera.notas.split('\\n')">{{parrafo}}</p>   
                 </div>

@@ -1,14 +1,41 @@
 <div class="easyo-container">
 
     <ng-container *ngIf="carrera">
-        <button class="btn btn-secondary btn-descargar-pdf" (click)="descargar()"><i class="fa fa-file-pdf"></i> Descargar PDF</button>
+        <button class="btn btn-secondary btn-descargar-pdf" (click)="descargarPDF()" [disabled]="generandoPDF">
+            Descargar PDF
+            <span *ngIf="generandoPDF" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        </button>
+
+        <h1>Controles "{{carrera.nombre}}"</h1>
         
+        <!-- TODO 
         <h2>Configuración</h2>
-        <h2>Previsualización</h2>
-        <div class="wrapper-pdf">
-            <div id="informePDF">
+        
+            - Tamaño QR
+            - Tamaño código control / nombre recorrido
+            - Distancia QR / texto
+            - Formato folio de impresión (A3/4/5...)
+        -->
+
+
+        <h2>Previsualización PDF</h2>
+        <div id="vista-pdf" #vistaPDF>
+
+            <!--
+            <div *ngFor="let pagina of paginasControles" class="pagina-pdf">
+                <div class="lista-controles">
+                    <div class="control" *ngFor="let control of pagina">
+                        <div [attr.id]="'QR-' + control.codigo" class="qr-control"></div>
+                        <span class="codigo-control">{{control.codigo}}</span>
+                        <span class="marca-agua">easyorienteering.com</span>
+                    </div>
+                </div>
+            </div>
+            -->
+            <!--
+            <div class="pagina-pdf">
                 <h1>Controles de la carrera "{{carrera.nombre}}"</h1>
-                <div id="lista-controles">
+                <div class="lista-controles">
                     <div class="control" *ngFor="let control of controles">
                         <div [attr.id]="'QR-' + control.codigo" class="qr-control"></div>
                         <span class="codigo-control">{{control.codigo}}</span>
@@ -16,6 +43,7 @@
                     </div>
                 </div>
             </div>
+            -->
         </div>
                 
     </ng-container>
