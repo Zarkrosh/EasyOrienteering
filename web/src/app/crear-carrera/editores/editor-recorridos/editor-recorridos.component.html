@@ -1,0 +1,113 @@
+<div id="wrapper">
+    <div id="wrapper-trazador">
+        <!-- Pestañas de recorridos -->
+        <ul id="tabs-recorridos" class="nav nav-tabs">
+            <li [class.tab-seleccionada]="recorridoActual === null" (click)="todosLosControles()" class="noselect"><span>Controles</span></li>
+            <li *ngFor="let nombre of getNombresRecorridos()" (click)="seleccionaRecorrido(nombre)" 
+                [class.tab-seleccionada]="nombre === recorridoActual" class="noselect"><span >{{nombre}}</span></li>
+            <li id="btn-nuevo-recorrido" *ngIf="recorridos.size < MAX_RECORRIDOS && tipoEdicion === EDICION_RECORRIDOS" (click)="nuevoRecorrido()" class="noselect"><span><i class="fa fa-plus"></i></span></li>
+        </ul>
+        <!-- Editor de trazados -->
+        <editor-trazado id="trazador" #trazador>
+
+        </editor-trazado>
+    </div>
+
+    <!-- Barra lateral -->
+    <div id="barra-lateral">
+
+        <div class="info-lateral">
+
+            <div *ngIf="tipoEdicion === EDICION_RECORRIDOS">
+                <div id="acciones-recorrido" *ngIf="recorridoActual">
+                    <button id="btn-editar-nombre-recorrido" class="btn" (click)="editarNombreRecorrido(!editandoNombreRecorrido)">
+                        <i *ngIf="!editandoNombreRecorrido" class="fa fa-edit"></i>
+                        <i *ngIf="editandoNombreRecorrido" class="fa fa-save"></i>
+                    </button>
+                    <input #nombreRecorrido id="nombre-recorrido" value="{{recorridoActual}}" 
+                        [class.noselect]="!editandoNombreRecorrido" [readonly]="!editandoNombreRecorrido" type="text"
+                        (dblclick)="editarNombreRecorrido(true)" (keyup.enter)="editarNombreRecorrido(false)">
+                    <button id="btn-borrar-recorrido"  class="btn" (click)="borrarRecorrido()"><i class="fa fa-trash"></i></button>
+                </div>
+                <table class="descripcion-controles">
+                    <tbody>
+                        <ng-container *ngIf="recorridoActual !== null">
+                            <tr *ngFor="let c of recorridos.get(recorridoActual).trazado; let i = index"
+                                class="entrada-descripcion">{{i}} - {{c}}</tr>
+                            <span *ngIf="recorridos.get(recorridoActual).trazado.length === 0">Sin controles</span>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+
+            <div *ngIf="tipoEdicion === EDICION_CONTROLES" class="info-controles">
+                <h4>Lista de controles</h4>
+                <table class="tabla-info-controles">
+                    <col width="50%">
+                    <col width="50%">
+                    <thead>
+                        <tr>
+                            <td>Control</td>
+                            <td>Puntuación</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let c of listaControlesOrdenados">
+                            <td>{{c.codigo}}</td>
+                            <td class="puntuacion-control">
+                                <button class="puntuacion-control-btn" (click)="decPuntuacionControl(c)" tabindex="-1"><i class="fa fa-minus"></i></button>
+                                <input type="number" class="puntuacion-control-valor" value={{c.puntuacion}} (change)="cambiaPuntuacionControl(c, $event)" />
+                                <button class="puntuacion-control-btn" (click)="incPuntuacionControl(c)" tabindex="-1"><i class="fa fa-plus"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        
+
+        <!-- Importación PurplePen 
+        <input #inputPurplePen id="input-purplepen" type="file" class="inputfile" (change)="importarPurplePen($event)">
+        <label id="label-importar-purplepen" for="input-purplepen" class="btn btn-primary">Importar desde PurplePen</label>
+        -->
+
+        <!-- Selección de imagen de mapa base -->
+        <input #inputMapa id="input-mapa" type="file" class="inputfile" (change)="cargarMapa($event)">
+        <label id="label-seleccionar-mapa" for="input-mapa" class="btn btn-primary">Seleccionar mapa base</label>
+
+        <!-- Botón de guardado -->
+        <button id="btn-guardar" class="btn btn-primary" (click)="guardar()">Guardar {{(tipoEdicion)}}</button>
+    </div>
+</div>
+
+<!-- Diálogo de confirmación de borrado de control -->
+<ng-template #modalControl let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿De verdad quieres borrar el control?</h5>
+        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Este control se utiliza en otros recorridos ☹</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" ngbAutofocus (click)="modal.close()">Cancelar</button>
+        <button id="btn-confirmar-borrar" type="button" class="btn btn-danger" (click)="borrarControlConfirmado()">Borrar</button>
+    </div>
+</ng-template>
+
+<!-- Diálogo de confirmación de borrado de recorrido -->
+<ng-template #modalRecorrido let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿De verdad quieres borrar el recorrido actual?</h5>
+        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">No podrás recuperarlo después ☹</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" ngbAutofocus (click)="modal.close()">Cancelar</button>
+        <button id="btn-confirmar-borrar" type="button" class="btn btn-danger" (click)="borrarRecorridoConfirmado()">Borrar</button>
+    </div>
+</ng-template>
+

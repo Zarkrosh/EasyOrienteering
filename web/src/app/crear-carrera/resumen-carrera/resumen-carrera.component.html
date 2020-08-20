@@ -1,0 +1,199 @@
+<div class="easyo-container text-center">
+    <ng-container *ngIf="carrera">
+        <h1><u>Crear carrera</u></h1>
+
+        <div class="header-seccion header-resumen">
+            <!-- Datos principales de la carrera -->
+            <form [formGroup]="carreraForm" class="form-datos">
+                <table class="tabla-datos">
+                    <col width="40%">
+                    <tbody>
+                        <tr>
+                            <td>Nombre</td>
+                            <td>
+                                <input id="nombre" type="text " formControlName="nombre" class="form-control form-nombre" minlength="5" maxlength="50">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tipo</td>
+                            <td>
+                                <div class="datos-selector">
+                                    <label>
+                                        <input type="radio" formControlName="tipo" value="EVENTO" class="form-control selector-opcion" required />
+                                        <div class="selector-opcion-cont noselect">
+                                            <span>Evento</span>
+                                        </div>
+                                    </label>
+                                    <label>
+                                        <input type="radio" formControlName="tipo" value="CIRCUITO" class="form-control selector-opcion"/>
+                                        <div class="selector-opcion-cont noselect">
+                                            <span>Circuito</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Modalidad</td>
+                            <td>
+                                <div class="datos-selector">
+                                    <label>
+                                        <input type="radio" formControlName="modalidad" value="TRAZADO" class="form-control selector-opcion" required/>
+                                        <div class="selector-opcion-cont noselect">
+                                            <span>Trazado</span>
+                                        </div>
+                                    </label>
+                                    <label>
+                                        <input type="radio" formControlName="modalidad" value="SCORE" class="form-control selector-opcion"/>
+                                        <div class="selector-opcion-cont noselect">
+                                            <span>Score</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Visibilidad</td>
+                            <td>
+                                <div class="datos-selector">
+                                    <label>
+                                        <input type="radio" formControlName="visibilidad" value="{{PRIV_PUBLICA}}" class="form-control selector-opcion" required/>
+                                        <div class="selector-opcion-cont noselect">
+                                            <span>Pública</span>
+                                        </div>
+                                    </label>
+                                    <label>
+                                        <input type="radio" formControlName="visibilidad" value="{{PRIV_PRIVADA}}" class="form-control selector-opcion" />
+                                        <div class="selector-opcion-cont noselect">
+                                            <span>Privada</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Notas</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="form-notas">
+                                <textarea rows="3" formControlName="notas" placeholder="Aspectos importantes para los corredores (acceso, ubicación, contacto...)" maxlength="1000"></textarea>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+
+            <!-- Ubicación de la carrera -->
+            <app-editor-ubicacion #editorUbicacion></app-editor-ubicacion>
+        </div>
+
+
+        <!-- Carrera trazada -->
+        <ng-container *ngIf="f.modalidad.value === modalidadTrazado">
+
+            <!-- Lista de recorridos -->
+            <div class="header-seccion">
+                <h2>Recorridos</h2>
+                <button *ngIf="carrera.recorridos.length > 0" class="btn-editar" (click)="editarRecorridos()">Editar</button>
+            </div>
+            <div id="lista-recorridos">
+                <div *ngFor="let recorrido of carrera.recorridos" class="recorrido">
+                    <span class="nombre-recorrido">{{recorrido.nombre}}</span>
+                    <!-- Lista de controles -->
+                    <span *ngFor="let control of recorrido.trazado" class="control-recorrido"><b>{{control}}</b></span>
+                </div>
+            </div>
+
+            <!-- Si no hay ningún recorrido -->
+            <button *ngIf="carrera.recorridos.length === 0" class="btn btn-primary btn-sin-algo" (click)="editarRecorridos()">
+                <i class="fa fa-plus"></i>
+                Crear recorridos
+            </button>
+
+            <!-- Mapas -->
+            <h2 class="header-seccion">Mapas</h2>
+            <div *ngIf="carrera.recorridos.length > 0" id="lista-mapas">
+                <div *ngFor="let recorrido of carrera.recorridos">
+                    <h4>{{recorrido.nombre}}</h4>
+                    <img *ngIf="recorrido.mapa" src={{recorrido.mapa}} />
+                    <button *ngIf="!recorrido.mapa" class="btn btn-primary btn-sin-algo">
+                        <i class="fa fa-plus"></i>
+                        Añadir mapa
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+
+
+        <!-- Carrera score -->
+        <ng-container *ngIf="f.modalidad.value === modalidadScore">
+
+            <!-- Lista de controles-->
+            <div class="header-seccion">
+                <h2>Controles</h2>
+                <button *ngIf="controles.length > 0" class="btn-editar" (click)="editarControles()">Editar</button>
+            </div>
+            <div id="lista-controles">
+                <div *ngFor="let control of controles" class="detalle-control">
+                    <b>{{control.codigo}}</b> ({{control.puntuacion}} puntos)
+                </div>
+            </div>
+
+            <!-- Si no hay ningún control -->
+            <button *ngIf="controles.length === 0" class="btn btn-primary btn-sin-algo" (click)="editarControles()">
+                <i class="fa fa-plus"></i>
+                Añadir controles
+            </button>
+
+            <!-- Mapa -->
+            <ng-container *ngIf="controles.length > 0 && carrera.recorridos.length > 0">
+                <h2 class="header-seccion">Mapa</h2>
+                <div *ngIf="carrera.recorridos[0].mapa" id="lista-mapas">
+                    <div>
+                        <h4>{{carrera.recorridos[0].nombre}}</h4>
+                        <img src={{carrera.recorridos[0].mapa}} />
+                    </div>
+                </div>
+                <div *ngIf="!carrera.recorridos[0].mapa">
+                    <button class="btn btn-primary btn-sin-algo">
+                        <i class="fa fa-plus"></i>
+                        Añadir mapa
+                    </button>
+                </div>
+            </ng-container>
+
+        </ng-container>
+
+
+        <button class="btn btn-secondary btn-crear" (click)="guardaCarrera()" [disabled]="!carreraForm.valid">Crear carrera</button>
+
+    </ng-container>
+
+
+    <div *ngIf="!carrera" class="wrapper-cargando">
+        <div class="lds-baliza-wrapper" *ngIf="!errorCarga">
+            <div class="lds-baliza"></div>
+        </div>
+        <div *ngIf="errorCarga">
+            <h1>Ocurrió un error :(</h1>
+            <button class="btn btn-primary btn-reintentar" (click)="refresh()">Volver a intentar</button>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Diálogo de restauración de borrador de carrera -->
+<ng-template #modalBorrador let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿Restaurar borrador de carrera?</h5>
+        <button type="button" class="close" (click)="restauraBorrador(false)" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Parece que no acabaste de crear una carrera anteriormente, ¿quieres continuar con su creación?<br><br>Se cargará de nuevo toda la configuración que elegiste:<br>TODO Añadir detalles del borrador en el diálogo</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" ngbAutofocus (click)="restauraBorrador(false)">Descartar</button>
+        <button type="button" class="btn btn-success" (click)="restauraBorrador(true)">Restaurar</button>
+    </div>
+</ng-template>

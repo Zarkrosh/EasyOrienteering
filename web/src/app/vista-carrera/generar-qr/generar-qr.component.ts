@@ -120,6 +120,7 @@ export class GenerarQRComponent implements OnInit {
   }
 
   generaControles() {
+    // Controles
     for(let control of this.controles) {
       // Crea los elementos individuales
       let divControl = document.createElement('div') as HTMLDivElement;
@@ -131,6 +132,8 @@ export class GenerarQRComponent implements OnInit {
       spanCodigo.classList.add("control-codigo");
       spanMarca.classList.add("control-marca-agua");
 
+      spanCodigo.innerText = control.codigo;
+      spanMarca.innerText = AppSettings.MARCA_AGUA_CONTROLES;
       // Genera el código QR
       let options = {
         text: this.secretos.get(control.codigo),
@@ -199,6 +202,10 @@ export class GenerarQRComponent implements OnInit {
         }
       );
     })
+  }
+
+  volver(): void {
+    this.router.navigate(['/carreras', this.carrera.id], { replaceUrl: true });
   }
 
   refresh(): void {

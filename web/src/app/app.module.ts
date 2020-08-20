@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
+import { NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { InicioComponent } from './inicio/inicio.component';
 import { PerfilComponent } from './perfil/perfil.component';
 import { AlertModule } from './alert';
@@ -12,14 +13,14 @@ import { LoginComponent } from './auth/login/login.component';
 import { RegistroComponent } from './auth/registro/registro.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OlvidoComponent } from './auth/olvido/olvido.component';
-import { CreacionCarreraComponent } from './creacion-carrera/creacion-carrera.component';
-import { EditorRecorridosComponent } from './editor/editor-recorridos/editor-recorridos.component';
-import { EditorTrazadoComponent } from './editor/editor-trazado/editor-trazado.component';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { WizardCarreraComponent } from './crear-carrera/wizard-carrera/wizard-carrera.component';
+import { EditorRecorridosComponent } from './crear-carrera/editores/editor-recorridos/editor-recorridos.component';
+import { EditorTrazadoComponent } from './crear-carrera/editores/editor-trazado/editor-trazado.component';
 import { VistaCarreraComponent } from './vista-carrera/vista-carrera.component';
-import { ResumenCarreraComponent } from './creacion-carrera/resumen-carrera/resumen-carrera.component';
+import { ResumenCarreraComponent } from './crear-carrera/resumen-carrera/resumen-carrera.component';
 import { QueEsComponent } from './que-es/que-es.component';
 import { GenerarQRComponent } from './vista-carrera/generar-qr/generar-qr.component';
+import { EditorUbicacionComponent } from './crear-carrera/editores/editor-ubicacion/editor-ubicacion.component';
 
 @NgModule({
   declarations: [
@@ -29,13 +30,14 @@ import { GenerarQRComponent } from './vista-carrera/generar-qr/generar-qr.compon
     PerfilComponent,
     RegistroComponent,
     OlvidoComponent,
-    CreacionCarreraComponent,
+    WizardCarreraComponent,
     EditorRecorridosComponent,
     EditorTrazadoComponent,
     VistaCarreraComponent,
     ResumenCarreraComponent,
     QueEsComponent,
-    GenerarQRComponent
+    GenerarQRComponent,
+    EditorUbicacionComponent
   ],
   imports: [
     BrowserModule,

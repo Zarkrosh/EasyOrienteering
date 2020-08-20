@@ -85,18 +85,3 @@
 
     </form>
 </div>
-
-<!-- Diálogo de restauración de borrador de carrera -->
-<ng-template #modalBorrador let-modal>
-    <div class="modal-header">
-        <h5 class="modal-title">¿Restaurar borrador de carrera?</h5>
-        <button type="button" class="close" (click)="restauraBorrador(false)" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div class="modal-body">Parece que no acabaste de crear una carrera anteriormente, ¿quieres continuar con su creación?<br><br>Se cargará de nuevo toda la configuración que elegiste:<br>TODO Añadir detalles del borrador en el diálogo</div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-danger" ngbAutofocus (click)="restauraBorrador(false)">Descartar</button>
-        <button type="button" class="btn btn-success" (click)="restauraBorrador(true)">Restaurar</button>
-    </div>
-</ng-template>

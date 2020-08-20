@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Recorrido, Control, Coordenadas } from '../../shared/app.model';
-import { AlertService } from '../../alert';
+import { Recorrido, Control, Coordenadas } from '../../../shared/app.model';
+import { AlertService } from '../../../alert';
 import { SharedEditorService } from '../shared-editor.service';
 
 declare var $:any;

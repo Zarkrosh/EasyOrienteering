@@ -1,0 +1,249 @@
+import { Component, OnInit, ElementRef, ViewChild, ViewChildren, QueryList } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Router, ActivatedRoute } from '@angular/router';
+import { AlertService } from 'src/app/alert';
+import { AppSettings, Carrera, Control } from 'src/app/shared/app.model';
+import { ClienteApiService } from 'src/app/shared/cliente-api.service';
+import { DataService } from 'src/app/shared/data.service';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { EditorUbicacionComponent } from '../editores/editor-ubicacion/editor-ubicacion.component';
+
+@Component({
+  selector: 'app-resumen-carrera',
+  templateUrl: './resumen-carrera.component.html',
+  styleUrls: ['./resumen-carrera.component.scss']
+})
+export class ResumenCarreraComponent implements OnInit {
+
+  readonly TIPO_CREAR = "crear";
+  readonly TIPO_CREAR_NUEVA = "nueva";
+  readonly TIPO_EDITAR = "editar";
+  readonly PRIV_PUBLICA = "publica";
+  readonly PRIV_PRIVADA = "privada";
+
+  private editorUbicacion: EditorUbicacionComponent;
+  @ViewChild('editorUbicacion', {static: false}) set content(content: EditorUbicacionComponent) {
+    if(content) {
+      this.editorUbicacion = content;
+      if(this.carrera && this.carrera.latitud) {
+        this.editorUbicacion.latitudElegida = this.carrera.latitud;
+        this.editorUbicacion.longitudElegida = this.carrera.longitud;
+        this.editorUbicacion.setMarcadorUbicacion(this.carrera.latitud, this.carrera.longitud);
+      }
+    }
+  }
+  @ViewChild('modalBorrador', {static: true}) modalBorrador: ElementRef<NgbModal>;
+
+  // Datos de carrera
+  carreraForm: FormGroup;
+  carrera: Carrera;
+  controles: Control[];
+  //mapas: Map<string, string>;
+  mapasKeys: string[];
+  modalidadTrazado = Carrera.MOD_TRAZADO;
+  modalidadScore = Carrera.MOD_SCORE;
+
+  errorCarga: boolean;
+
+  // Alertas
+  alertOptions = {
+    autoClose: true,
+    keepAfterRouteChange: true
+  };
+
+
+  constructor(
+    protected alertService: AlertService,
+    private modalService: NgbModal,
+    private router: Router,
+    private clienteApi: ClienteApiService,
+    private data: DataService,
+    private formBuilder: FormBuilder,
+    private route: ActivatedRoute) {
+    
+    //this.mapas = new Map();
+    this.errorCarga = false;
+  }
+
+  ngOnInit() {
+    this.carreraForm = this.formBuilder.group({
+      nombre: ['', Validators.required],
+      tipo: [Carrera.TIPO_EVENTO, Validators.required],
+      modalidad: [Carrera.MOD_TRAZADO, Validators.required],
+      visibilidad: [this.PRIV_PUBLICA, Validators.required],
+      notas: ['']
+    });
+
+    if(window.location.toString().indexOf(this.TIPO_EDITAR) > -1) {
+      // Edición de carrera, ¿puede editar?
+      // TODO
+      let editar = true;
+      if(editar) {
+        this.cargaDatosCarrera();
+      } else {
+        this.alertService.error("Solo el organizador puede editar esta carrera", this.alertOptions);
+        this.router.navigate(["/"]);
+      }
+    } else {
+      // Creación de carrera
+      if(window.location.toString().indexOf(this.TIPO_CREAR_NUEVA) > -1) {
+        // Comienzo de nueva carrera, ¿hay borrador anterior?
+        if(localStorage.getItem(AppSettings.LOCAL_STORAGE_CARRERA) !== null) {
+          // Se notifica al usuario 
+          // Las opciones de backdrop y keyboard son para evitar cerrar al clicar fuera o pulsar Escape
+          this.modalService.open(this.modalBorrador, {centered: true, size: 'lg', backdrop : 'static', keyboard : false});
+        } else {
+          // Crea una nueva carrera vacía
+          this.nuevaCarreraVacia();
+        }
+      } else {
+        // Vuelta al resumen, no se pregunta restauración
+        this.restauraBorrador(true);
+      }
+    }
+
+    this.data.mapasTrazados.subscribe(mapas => {
+      //this.mapas = mapas;
+      for(let recorrido of this.carrera.recorridos) {
+        recorrido.mapa = mapas.get(recorrido.nombre);
+      }
+    });
+    
+  }
+
+  /**
+   * Carga los datos de la carrera del ID
+   */
+  cargaDatosCarrera(): void {
+    this.route.params.subscribe(routeParams => {
+      let idCarrera = +routeParams['id']; // (+) Convierte string a number
+      this.clienteApi.getCarrera(idCarrera).subscribe(
+        resp => {
+          if(resp.status == 200) {
+            this.carrera = resp.body;
+
+            // TODO Refleja cambios en la vista
+          } else {
+            this.alertService.error("Error al obtener la carrera", this.alertOptions);
+            this.errorCarga = true;
+          }
+        }, err => {
+          if(err.status == 504) {
+            this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
+          } else {
+            this.alertService.error("Error al obtener la carrera: " + JSON.stringify(err), this.alertOptions);
+          }
+          this.errorCarga = true;
+        }
+      );
+    });
+  }
+
+
+  guardaCarrera() {
+    // TODO Diferenciar entre creación y edición
+    //  Si es creación, se envían todos los datos (formulario, mapas, etc)
+    //  Si es edición, se envían los datos modificados (?) 
+
+    this.clienteApi.crearCarrera(this.carrera).subscribe(
+      resp => {
+        if(resp.status == 201) {
+          // Carrera creada
+          this.alertService.success("Carrera creada con éxito", this.alertOptions);
+          this.router.navigate(['carreras', resp.body.id]);
+        } else {
+          // Error
+          this.alertService.error("No se pudo crear la carrera");
+          console.log(resp);
+        }
+      },
+      err => {
+        this.alertService.error("Error al crear la carrera: " + err);
+        console.log(err);
+      }
+    );
+
+    // Elimina el borrador
+    //localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA); 
+  }
+
+
+  /**
+   * Guarda un borrador con los datos actuales de los formularios.
+   */
+  guardaDatosCarrera() {
+    this.carrera.nombre = this.f.nombre.value;
+    this.carrera.tipo = this.f.tipo.value;
+    this.carrera.modalidad = this.f.modalidad.value;
+    this.carrera.privada = (this.f.visibilidad.value == "privada") ? true : false;
+    this.carrera.notas = this.f.notas.value;
+    this.carrera.latitud = this.editorUbicacion.latitudElegida;
+    this.carrera.longitud = this.editorUbicacion.longitudElegida;
+    if(this.carrera.modalidad === Carrera.MOD_SCORE) this.carrera.recorridos = [];
+    else {
+      for(let recorrido of this.carrera.recorridos) {
+        recorrido.mapa = null; // Borra mapa para evitar error de espacio de almacenamiento local
+      }
+    }
+    
+    // Guarda borrador
+    localStorage.setItem(AppSettings.LOCAL_STORAGE_CARRERA, JSON.stringify(this.carrera));
+  }
+
+  /**
+   * Confirma la restauración o descartado del borrador. 
+   */
+  restauraBorrador(restaurar) {
+    this.modalService.dismissAll();
+    if(restaurar) {
+      try {
+        let jCarrera = localStorage.getItem(AppSettings.LOCAL_STORAGE_CARRERA);
+        this.carrera = JSON.parse(jCarrera) as Carrera;
+        this.f.nombre.setValue(this.carrera.nombre);
+        this.f.tipo.setValue(this.carrera.tipo);
+        this.f.modalidad.setValue(this.carrera.modalidad);
+        this.f.visibilidad.setValue((this.carrera.privada) ? 'privada' : 'publica');
+        this.f.notas.setValue(this.carrera.notas);
+        this.actualizaListaControles();
+      } catch (e) {
+        console.log(e);
+        this.alertService.error("Error al restaurar el borrador.", this.alertOptions);
+        //this.nuevaCarreraVacia();
+      }
+    } else {
+      // Descarta el borrador y crea una nueva
+      this.nuevaCarreraVacia();
+    }
+  }
+
+  /**
+   * Genera una nueva carrera vacía.
+   */
+  nuevaCarreraVacia() {
+    localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA);
+    this.carrera = new Carrera();
+  }
+
+  actualizaListaControles(): void {
+    this.controles = Object.values(this.carrera.controles).filter(function(control: Control) {
+      return control.tipo === Control.TIPO_CONTROL;
+    });
+  }
+
+  /**
+   * Navega a la vista de edición de recorridos.
+   */
+  editarRecorridos() {
+    this.guardaDatosCarrera();
+    this.router.navigate(['/crear', 'recorridos']);
+  }
+
+  editarControles() {
+    this.guardaDatosCarrera();
+    this.router.navigate(['/crear', 'controles']);
+  }
+  
+  // Para acceder más comodo a los campos del formulario
+  get f() { return this.carreraForm.controls; }
+
+}

@@ -1,11 +1,11 @@
-@import "../../../styles.scss";
+@import "../../../../styles.scss";
 
 /*********** LAYOUT GENERAL ***********/
 #wrapper {
     width: 100%;
     display: inline-flex;
-    margin-top: 30px;
-    padding: 0 15px;
+    padding: 30px 15px;
+    background-color: white;
 }
 
 #wrapper-trazador {
@@ -103,14 +103,15 @@
     -webkit-transform: rotate(180deg);
 }
 
-
-/*********** DETALLES RECORRIDO ***********/
-#detalles-recorrido {
+.info-lateral {
+    height: 400px; // Actúa como min-height con el grow 
     flex-grow: 1;
     margin-bottom: 20px;
     border: 2px solid black;
+    overflow-y: scroll;
 }
 
+/*********** INFO RECORRIDO ***********/
 #acciones-recorrido {
     display: inline-flex;
     border-bottom: 2px solid black;
@@ -161,7 +162,9 @@
     -webkit-transform: scale(1.2);
 }
 
-#descripcion-controles {
+.descripcion-controles {
+    width: 100%;
+    text-align: center;
     overflow-y: scroll;
 }
 .entrada-descripcion {
@@ -169,11 +172,51 @@
     font-weight: bold;
 }
 
-// TEST
-#detalles-recorrido table {
+
+/******** INFO CONTROLES ***********/
+.info-controles h4 {
+    margin-bottom: 0;
+    padding: 8px 0;
+    font-size: 1.4rem;
+    text-align: center;
+    border-bottom: 2px solid black;
+}
+.tabla-info-controles {
     width: 100%;
+    font-size: 1.3rem;
+    font-weight: bold;
     text-align: center;
 }
+.tabla-info-controles thead {
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-bottom: 2px solid black;
+}
+.puntuacion-control {
+    display: inline-flex;
+}
+.puntuacion-control-btn {
+    border: 2px solid black;
+}
+.puntuacion-control-btn i {
+    margin: 0;
+}
+.puntuacion-control-btn:focus {
+    outline: none;
+}
+.puntuacion-control-valor {
+    width: 3rem;
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    border-left: none;
+    border-right: none;
+    text-align: center;
+    appearance: textfield;
+}
+.puntuacion-control-valor:focus {
+    outline: none;
+}
+
 
 /*********** BOTÓN IMPORTAR PURPLE PEN ***********/
 #label-importar-purplepen {

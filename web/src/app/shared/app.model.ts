@@ -3,6 +3,7 @@ export class AppSettings {
     public static readonly CANVAS_MAPAS_RESOLUCION: number = 0.8;
     public static readonly SEPARADOR_QR = "|";
     public static readonly TAM_LADO_QR = 200;
+    public static readonly MARCA_AGUA_CONTROLES = "easyorienteering.com";
 }
 
 export class Usuario {
@@ -18,7 +19,7 @@ export class Carrera {
     public static readonly TIPO_EVENTO = "EVENTO"; 
     public static readonly TIPO_CIRCUITO = "CIRCUITO"; 
     // Modalidades
-    public static readonly MOD_TRAZADO = "LINEA"; 
+    public static readonly MOD_TRAZADO = "TRAZADO"; 
     public static readonly MOD_SCORE = "SCORE"; 
     
     id: number;
@@ -35,7 +36,13 @@ export class Carrera {
     creada: boolean; // True si la carrera existe en el sistema
                      // False cuando se está creando
 
-    constructor() {}
+    constructor() {
+        this.nombre = this.tipo = this.modalidad = this.notas = "";
+        this.recorridos = [];
+        this.controles = new Map();
+        this.creada = this.privada = false;
+        this.id = this.organizador = this.latitud = this.longitud = null;
+    }
 }
 
 export class Control {
@@ -47,11 +54,13 @@ export class Control {
     codigo: string;
     tipo: string;
     coords: Coordenadas;
+    puntuacion: number;
 
     constructor(codigo: string, tipo: string, coords: Coordenadas) {
         this.codigo = codigo;
         this.tipo = tipo;
         this.coords = coords;
+        this.puntuacion = 0;
     }
 }
 
