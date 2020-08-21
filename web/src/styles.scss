@@ -153,6 +153,9 @@ alert {
     border-color: white $color-orientacion $color-orientacion white;
 }
 .lds-baliza-wrapper {
+    width: min-content;
+    height: min-content;
+    margin: auto;
     border: 2px solid black;
     animation: lds-baliza 1.5s infinite;
 }

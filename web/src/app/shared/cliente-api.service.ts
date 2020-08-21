@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Carrera } from './app.model';
 
@@ -90,6 +90,17 @@ export class ClienteApiService {
     ubicacion["latitud"] = latitud;
     ubicacion["longitud"] = longitud;
     return this.http.put<any>(url, ubicacion, {observe: 'response'});
+  }
+
+  buscaCarreras(nombre: string, tipo: string, modalidad: string, pagina: number, numero: number): Observable<HttpResponse<Carrera[]>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + 'buscar';
+    let params = new HttpParams();
+    params = params.append('nombre', (nombre !== null) ? nombre : "");
+    params = params.append('tipo', (tipo !== null) ? tipo : "");
+    params = params.append('modalidad', (modalidad !== null) ? modalidad : "");
+    params = params.append('pagina', (pagina !== null) ? pagina.toString() : "0");
+    params = params.append('numero', (numero !== null) ? numero.toString() : "20");
+    return this.http.get<Carrera[]>(url, {params: params, observe: 'response'});
   }
 
 }

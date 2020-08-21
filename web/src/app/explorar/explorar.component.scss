@@ -1,0 +1,31 @@
+@import "../../styles.scss";
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.custom-select {
+    margin-left: 10px;
+}
+
+.form-busqueda {
+    margin: 0 auto;
+}
+.form-busqueda button {
+    margin-left: 20px;
+}
+
+.wrapper-resultados {
+    display: flex;
+    min-height: 400px;
+}
+
+.mensaje-resultados {
+    margin: auto;
+    text-align: center;
+}
+.resultados-busqueda {
+    margin: 30px 10px;
+    border: 1px solid gray;
+}

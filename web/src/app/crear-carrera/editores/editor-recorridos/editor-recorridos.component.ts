@@ -145,7 +145,6 @@ export class EditorRecorridosComponent implements OnInit {
     this.sharedData.controlBorrado.subscribe((control) => {
       if(control !== null) {
         if(this.tipoEdicion === this.EDICION_CONTROLES) {
-          debugger;
           this.borrarControl(control, true);
         } else {
           // Borra el control del recorrido actual
@@ -231,7 +230,7 @@ export class EditorRecorridosComponent implements OnInit {
     } else {
       // Las carreras score solo tienen un recorrido
       this.recorridos.clear();
-      this.recorridos.set("", new Recorrido(""));
+      this.recorridos.set(AppSettings.NOMBRE_RECORRIDO_SCORE, new Recorrido(AppSettings.NOMBRE_RECORRIDO_SCORE));
       // TODO Salida meta
     }
 
@@ -263,7 +262,6 @@ export class EditorRecorridosComponent implements OnInit {
       } else {
         // Crea un nuevo canvas para el mapa maestro, clonando el del mapa base
         try {
-          debugger;
           let canvas = document.createElement('canvas');
           let canvasContext = canvas.getContext('2d');
           canvas.width = canvasMapa.nativeElement.width;
@@ -272,7 +270,7 @@ export class EditorRecorridosComponent implements OnInit {
           // Dibuja todos los controles de la carrera
           //  TODO
           // Obtiene la imagen resultante y la asigna al mapa
-          mapasTrazados.set("", canvas.toDataURL('image/jpeg', AppSettings.CANVAS_MAPAS_RESOLUCION));
+          mapasTrazados.set(AppSettings.NOMBRE_RECORRIDO_SCORE, canvas.toDataURL('image/jpeg', AppSettings.CANVAS_MAPAS_RESOLUCION));
         } catch (e) {
           this.alertService.error("No se pudo generar el mapa con los controles", this.alertOptions);
           console.log(e);

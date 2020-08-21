@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { InicioComponent } from './inicio/inicio.component';
 import { PerfilComponent } from './perfil/perfil.component';
@@ -21,6 +22,7 @@ import { ResumenCarreraComponent } from './crear-carrera/resumen-carrera/resumen
 import { QueEsComponent } from './que-es/que-es.component';
 import { GenerarQRComponent } from './vista-carrera/generar-qr/generar-qr.component';
 import { EditorUbicacionComponent } from './crear-carrera/editores/editor-ubicacion/editor-ubicacion.component';
+import { ExplorarComponent } from './explorar/explorar.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +39,8 @@ import { EditorUbicacionComponent } from './crear-carrera/editores/editor-ubicac
     ResumenCarreraComponent,
     QueEsComponent,
     GenerarQRComponent,
-    EditorUbicacionComponent
+    EditorUbicacionComponent,
+    ExplorarComponent
   ],
   imports: [
     BrowserModule,
@@ -46,7 +49,8 @@ import { EditorUbicacionComponent } from './crear-carrera/editores/editor-ubicac
     AlertModule,
     ReactiveFormsModule,
     NgbModule,
-    LeafletModule
+    LeafletModule,
+    InfiniteScrollModule
   ],
   providers: [],
   bootstrap: [AppComponent]

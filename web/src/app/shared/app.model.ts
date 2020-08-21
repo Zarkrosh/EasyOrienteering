@@ -4,6 +4,8 @@ export class AppSettings {
     public static readonly SEPARADOR_QR = "|";
     public static readonly TAM_LADO_QR = 200;
     public static readonly MARCA_AGUA_CONTROLES = "easyorienteering.com";
+    public static readonly NOMBRE_RECORRIDO_SCORE = "Controles";
+    public static readonly NUMERO_RESULTADOS_BUSQUEDA = 20;
 }
 
 export class Usuario {

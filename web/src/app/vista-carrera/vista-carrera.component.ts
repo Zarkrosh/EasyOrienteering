@@ -143,7 +143,7 @@ export class VistaCarreraComponent implements OnInit {
   }
 
   editarCarrera(): void {
-    this.router.navigate(['/carreras', this.carrera.id]); // TODO
+    this.router.navigate(['/editar', this.carrera.id]);
   }
 
   editarUbicacion(): void {

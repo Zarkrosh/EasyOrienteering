@@ -5,7 +5,7 @@
         <div class="botones-carrera">
             <a href="/api/carreras/{{carrera.id}}/mapas" class="btn btn-secondary"><i class="fa fa-map"></i> Descargar mapas</a>
             <button class="btn btn-secondary" (click)="generarQR()"><i class="fa fa-qrcode"></i> Generar controles QR</button>
-            <button class="btn btn-primary"><i class="fa fa-edit"></i> Editar carrera</button>
+            <button class="btn btn-primary" (click)="editarCarrera()"><i class="fa fa-edit"></i> Editar carrera</button>
         </div>
 
         <div class="parte-superior-carrera">

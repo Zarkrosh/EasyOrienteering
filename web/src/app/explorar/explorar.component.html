@@ -1,0 +1,63 @@
+<div class="easyo-container">
+    <h1>Explorar carreras</h1>
+
+    <form [formGroup]="busquedaForm" class="form-inline" (submit)="buscarCarreras()">
+
+        <table class="text-center form-busqueda ">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Modalidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input class="form-control" formControlName="nombre" type="text" placeholder="Buscar carreras" aria-label="Buscar carreras">
+                    </td>
+                    <td>
+                        <select class="custom-select" formControlName="tipo">
+                            <option value="" selected>Cualquiera</option>
+                            <option value="EVENTO"><b>Evento</b></option>
+                            <option value="CIRCUITO">Circuito</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="custom-select" formControlName="modalidad">
+                            <option value="" selected>Cualquiera</option>
+                            <option value="TRAZADO"><b>Trazado</b></option>
+                            <option value="SCORE">Score</option>
+                        </select>
+                    </td>
+                    <!-- TODO Participadas/Organizadas-->
+                    <td>
+                        <button class="btn btn-primary" [disabled]="busquedaForm.invalid || buscando">Buscar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </form>
+
+    <div class="wrapper-resultados">
+        <h3 *ngIf="resultados === null" class="mensaje-resultados">Haz una búsqueda</h3>
+        <h3 *ngIf="!buscando && resultados && resultados.length === 0" class="mensaje-resultados">No hay resultados</h3>
+        <div class="lds-baliza-wrapper" *ngIf="buscando">
+            <div class="lds-baliza"></div>
+        </div>
+        <div *ngIf="resultados && resultados.length > 0" class="resultados-busqueda"
+          infiniteScroll
+          [infiniteScrollDistance]="2"
+          [infiniteScrollThrottle]="50"
+          (scrolled)="onScroll()"
+          [scrollWindow]="true">
+    
+            <div *ngFor="let carrera of resultados">
+                {{carrera.nombre}}
+            </div>
+    
+        </div>
+    </div>
+    
+</div>

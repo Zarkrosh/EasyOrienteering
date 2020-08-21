@@ -20,6 +20,8 @@ export class ResumenCarreraComponent implements OnInit {
   readonly TIPO_EDITAR = "editar";
   readonly PRIV_PUBLICA = "publica";
   readonly PRIV_PRIVADA = "privada";
+  readonly MODALIDAD_TRAZADO = Carrera.MOD_TRAZADO;
+  readonly MODALIDAD_SCORE = Carrera.MOD_SCORE;
 
   private editorUbicacion: EditorUbicacionComponent;
   @ViewChild('editorUbicacion', {static: false}) set content(content: EditorUbicacionComponent) {
@@ -38,10 +40,7 @@ export class ResumenCarreraComponent implements OnInit {
   carreraForm: FormGroup;
   carrera: Carrera;
   controles: Control[];
-  //mapas: Map<string, string>;
   mapasKeys: string[];
-  modalidadTrazado = Carrera.MOD_TRAZADO;
-  modalidadScore = Carrera.MOD_SCORE;
 
   errorCarga: boolean;
 
@@ -102,10 +101,12 @@ export class ResumenCarreraComponent implements OnInit {
       }
     }
 
+    // TODO Asíncrono para ediciones y restauraciones de borrador
     this.data.mapasTrazados.subscribe(mapas => {
-      //this.mapas = mapas;
-      for(let recorrido of this.carrera.recorridos) {
-        recorrido.mapa = mapas.get(recorrido.nombre);
+      if(this.carrera) {
+        for(let recorrido of this.carrera.recorridos) {
+          recorrido.mapa = mapas.get(recorrido.nombre);
+        }
       }
     });
     
@@ -121,8 +122,14 @@ export class ResumenCarreraComponent implements OnInit {
         resp => {
           if(resp.status == 200) {
             this.carrera = resp.body;
+            this.f.nombre.setValue(this.carrera.nombre);
+            this.f.tipo.setValue(this.carrera.tipo);
+            this.f.modalidad.setValue(this.carrera.modalidad);
+            this.f.visibilidad.setValue((this.carrera.privada) ? 'privada' : 'publica');
+            this.f.notas.setValue(this.carrera.notas);
+            this.actualizaListaControles();
 
-            // TODO Refleja cambios en la vista
+            // TODO Carga mapas recorrido(s)
           } else {
             this.alertService.error("Error al obtener la carrera", this.alertOptions);
             this.errorCarga = true;
@@ -158,7 +165,9 @@ export class ResumenCarreraComponent implements OnInit {
         }
       },
       err => {
-        this.alertService.error("Error al crear la carrera: " + err);
+        let mensaje = "Error al crear la carrera";
+        if(typeof err.error === 'string') mensaje += ": " + err.error;
+        this.alertService.error(mensaje, this.alertOptions);
         console.log(err);
       }
     );
