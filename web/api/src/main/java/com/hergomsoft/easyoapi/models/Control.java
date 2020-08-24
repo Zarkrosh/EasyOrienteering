@@ -1,8 +1,11 @@
 package com.hergomsoft.easyoapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -42,14 +45,22 @@ public class Control implements IdEntity {
     
     @Column(name = "PUNTUACION")
     private Integer puntuacion;
+    
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride( name = "x", column = @Column(name = "COORD_X", nullable = true)),
+        @AttributeOverride( name = "y", column = @Column(name = "COORD_Y", nullable = true))
+    })
+    private Coordenadas coords;
+    
 
     public Control() {}
 
-    public Control(String codigo, Tipo tipo, Carrera carrera, Integer puntuacion) {
+    public Control(String codigo, Tipo tipo, Integer puntuacion, Coordenadas coords) {
         this.codigo = codigo;
         this.tipo = tipo;
-        this.carrera = carrera;
         this.puntuacion = puntuacion;
+        this.coords = coords;
     }
 
     public Long getId() {
@@ -90,6 +101,14 @@ public class Control implements IdEntity {
 
     public void setPuntuacion(Integer puntuacion) {
         this.puntuacion = puntuacion;
+    }
+
+    public Coordenadas getCoords() {
+        return coords;
+    }
+
+    public void setCoords(Coordenadas coords) {
+        this.coords = coords;
     }
     
     @Override

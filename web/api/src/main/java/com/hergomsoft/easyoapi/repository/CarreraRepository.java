@@ -1,7 +1,6 @@
 package com.hergomsoft.easyoapi.repository;
 
 import com.hergomsoft.easyoapi.models.Carrera;
-import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -10,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -20,11 +20,15 @@ public interface CarreraRepository extends JpaRepository<Carrera, Long> {
      * @param codigo Código del control
      * @param idCarrera ID de la carrera a la que pertenece
      * @param tipo Tipo de control
+     * @param puntuacion Puntuación del control
+     * @param coordX Coordenada X del sistema
+     * @param coordY Coordenada Y del sistema
      */
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO CONTROLES(CODIGO, CARRERA_ID, TIPO) VALUES (:codigo, :idCarrera, :tipo)", nativeQuery = true)
-    public void insertaControl(@Param("codigo") String codigo, @Param("idCarrera") long idCarrera, @Param("tipo") String tipo);
+    @Query(value = "INSERT INTO CONTROLES(CODIGO, CARRERA_ID, TIPO, PUNTUACION, COORD_X, COORD_Y) VALUES (:codigo, :idCarrera, :tipo, :puntuacion, :coordx, :coordy)", nativeQuery = true)
+    public void insertaControl(@Param("codigo") String codigo, @Param("idCarrera") long idCarrera, 
+            @Param("tipo") String tipo, @Param("puntuacion") Integer puntuacion, @Nullable @Param("coordx") Float coordX, @Nullable @Param("coordy") Float coordY);
     
     /**
      * Devuelve las carreras que ha corrido el usuario especificado.

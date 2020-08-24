@@ -9,7 +9,6 @@ import com.hergomsoft.easyoapi.repository.CarreraRepository;
 import com.hergomsoft.easyoapi.repository.RecorridoRepository;
 import com.hergomsoft.easyoapi.utils.Utils;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CarreraService implements ICarreraService {
@@ -52,7 +54,7 @@ public class CarreraService implements ICarreraService {
         } catch(Exception e) {
             System.out.println("[!] Error al obtener la carrera con id " + id);
             System.out.println(e.getMessage());
-            return null;
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al obtener la carrera");
         }
     }
 
@@ -151,7 +153,9 @@ public class CarreraService implements ICarreraService {
         // asociado al uso de la clave foránea del ID de la carrera.
         if(deepEdit) {
             for(Control c : carrera.getControles().values()) {
-                repoCarrera.insertaControl(c.getCodigo(), res.getId(), c.getTipo().name());
+                Float coordX = (c.getCoords() != null) ? c.getCoords().getX() : null;
+                Float coordY = (c.getCoords() != null) ? c.getCoords().getY() : null;
+                repoCarrera.insertaControl(c.getCodigo(), res.getId(), c.getTipo().name(), c.getPuntuacion(), coordX, coordY);
             }
             res.setControles(carrera.getControles());
         }
@@ -187,7 +191,7 @@ public class CarreraService implements ICarreraService {
         } catch(Exception e) {
             System.out.println("[!] Error al obtener el recorrido con id " + id);
             System.out.println(e.getMessage());
-            return null;
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al obtener el recorrido");
         }
     }
     

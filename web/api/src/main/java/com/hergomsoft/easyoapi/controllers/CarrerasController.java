@@ -2,7 +2,6 @@ package com.hergomsoft.easyoapi.controllers;
 
 
 import com.hergomsoft.easyoapi.models.Carrera;
-import com.hergomsoft.easyoapi.models.Control;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.models.requests.UbicacionRequest;
@@ -25,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -145,10 +143,30 @@ public class CarrerasController {
     @ResponseStatus(HttpStatus.CREATED)
     public Carrera nuevaCarrera(@RequestBody Carrera carrera) {
         // El creador de la carrera es el usuario que realiza la petición
-        // TODO
-        Usuario org = usuariosService.getUsuario(2L); // Usuario de prueba
+        //Usuario org = usuariosService.getUsuarioPeticion();
+        Usuario org = usuariosService.getUsuario(2L); // Usuario de prueba de creación
         carrera.setOrganizador(org);
-        // TODO Comprobar datos válidos
+        
+        // Comprueba datos válidos de carrera
+        String nombre = carrera.getNombre().trim();
+        if(nombre.length() >= Carrera.MIN_LEN_NOMBRE && nombre.length() <= Carrera.MAX_LEN_NOMBRE) {
+            carrera.setNombre(nombre);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, 
+                String.format("La longitud del nombre debe comprender entre %d y %d caracteres.", Carrera.MIN_LEN_NOMBRE, Carrera.MAX_LEN_NOMBRE));
+        }
+        
+        // TODO
+        // ¿Enums?
+        // ....
+        
+        String notas = carrera.getNotas().trim();
+        if(notas.length() <= Carrera.MAX_LEN_NOTAS) {
+            carrera.setNotas(notas);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, 
+                String.format("La longitud máxima de las notas es de %d caracteres.", Carrera.MAX_LEN_NOTAS));
+        }
         
         // Crea la carrera
         return carrerasService.saveCarrera(carrera);

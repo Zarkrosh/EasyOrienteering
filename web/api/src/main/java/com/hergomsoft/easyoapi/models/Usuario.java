@@ -23,9 +23,9 @@ public class Usuario implements IdEntity {
     public static final int MAXLEN_NOMBRE = 30;
     public static final int MINLEN_NOMBRE = 2;
     public static final int MAXLEN_EMAIL = 100;
-    public static final int MAXLEN_CLUB = 20;
+    public static final int MAXLEN_CLUB = 30;
     public static final int MINLEN_CLUB = 0;
-    public static final int MAXLEN_PASS = 50;
+    public static final int MAXLEN_PASS = 64;
     public static final int MINLEN_PASS = 8;
     
     @Id

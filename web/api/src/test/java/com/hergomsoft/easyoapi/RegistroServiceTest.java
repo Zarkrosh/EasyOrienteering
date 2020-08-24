@@ -94,7 +94,7 @@ public class RegistroServiceTest {
     @Test
     void registroControlEquivocado() throws Exception {
         Carrera carrera = carrerasService.getCarrera(1);
-        Map<String, String> secretos = carrerasService.getSecretosCarrera(carrera);
+        Map<String, String> secretos = carrerasService.getControlesConSecretosCarrera(carrera);
         RegistroRequest registroSalida = new RegistroRequest("S1", secretos.get("S1"), 1L, 1L);
         RegistroRequest registroErroneo = new RegistroRequest("32", secretos.get("32"), 1L, 1L);
         
@@ -114,7 +114,7 @@ public class RegistroServiceTest {
     @Test
     void registroSalidaYaIniciado() throws Exception {
         Carrera carrera = carrerasService.getCarrera(1);
-        Map<String, String> secretos = carrerasService.getSecretosCarrera(carrera);
+        Map<String, String> secretos = carrerasService.getControlesConSecretosCarrera(carrera);
         RegistroRequest registroSalida = new RegistroRequest("S1", secretos.get("S1"), 1L, 1L);
         RegistroRequest registro31 = new RegistroRequest("31", secretos.get("31"), 1L, 1L);
         RegistroRequest registro33 = new RegistroRequest("33", secretos.get("33"), 1L, 1L);

@@ -56,9 +56,8 @@ public class Recorrido implements IdEntity, Serializable {
 
     public Recorrido() {}
 
-    public Recorrido(String nombre, Carrera carrera, List<String> trazado, byte[] mapa) {
+    public Recorrido(String nombre, List<String> trazado, byte[] mapa) {
         this.nombre = nombre;
-        this.carrera = carrera;
         this.trazado = trazado;
         this.mapa = mapa;
     }

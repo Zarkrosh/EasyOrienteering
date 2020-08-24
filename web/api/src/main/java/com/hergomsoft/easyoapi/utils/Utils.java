@@ -46,4 +46,26 @@ public class Utils {
             throw new IllegalArgumentException("Error al obtener el MD5. La cadena no puede ser null.");
         }
     }
+    
+    /**
+     * Devuelve el hash SHA-256 de la cadena especificada.
+     * Creds: https://www.baeldung.com/sha-256-hashing-java
+     * @param cadena Cadena a computar
+     * @return SHA-256 de la cadena
+     */
+    public static String sha256(String cadena) {
+        if(cadena != null) {
+            String res = null;
+            try {
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                md.update(cadena.getBytes());
+                byte[] digest = md.digest();
+                res = DatatypeConverter.printHexBinary(digest).toUpperCase();
+            } catch (NoSuchAlgorithmException e) {}
+
+            return res;
+        } else {
+            throw new IllegalArgumentException("Error al obtener el SHA-256. La cadena no puede ser null.");
+        }
+    }
 }

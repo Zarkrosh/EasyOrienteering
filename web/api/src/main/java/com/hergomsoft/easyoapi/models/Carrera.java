@@ -24,11 +24,12 @@ import org.hibernate.annotations.Type;
 @Table(name = "carreras")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Carrera implements IdEntity {
-    public static final int MLEN_NOMBRE = 50;
-    public static final int MLEN_NOTAS = 1000;
+    public static final int MAX_LEN_NOMBRE = 50;
+    public static final int MIN_LEN_NOMBRE = 5;
+    public static final int MAX_LEN_NOTAS = 1000;
     
     public enum Tipo {EVENTO, CIRCUITO};
-    public enum Modalidad {LINEA, SCORE};
+    public enum Modalidad {TRAZADO, SCORE};
    
     @Id
     @Column(name = "ID", columnDefinition = "serial")
@@ -79,11 +80,9 @@ public class Carrera implements IdEntity {
 
     public Carrera() {}
 
-    public Carrera(Long id, String secret, String nombre, Tipo tipo, Modalidad modalidad, 
+    public Carrera(String nombre, Tipo tipo, Modalidad modalidad, 
             Usuario organizador, Float latitud, Float longitud, boolean privada, 
             List<Recorrido> recorridos, Map<String, Control> controles, String notas) {
-        this.id = id;
-        this.secret = secret;
         this.nombre = nombre;
         this.tipo = tipo;
         this.modalidad = modalidad;

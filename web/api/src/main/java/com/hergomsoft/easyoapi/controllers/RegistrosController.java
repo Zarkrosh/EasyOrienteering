@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -189,7 +187,7 @@ public class RegistrosController {
                         // Está corriendo recorrido de la carrera
                         if(carrerasService.checkSecretoControl(peticion.getSecreto(), control)) {
                             // Control válido, comprueba si el registro es válido
-                            if(carrera.getModalidad() == Carrera.Modalidad.LINEA) {
+                            if(carrera.getModalidad() == Carrera.Modalidad.TRAZADO) {
                                 // Comprueba si el control registrado es el siguiente que le toca
                                 String siguiente = registrosService.getCodigoSiguienteControlRecorrido(corredor, recorrido);
                                 if(siguiente != null) {
