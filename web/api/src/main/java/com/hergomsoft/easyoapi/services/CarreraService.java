@@ -7,6 +7,7 @@ import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
 import com.hergomsoft.easyoapi.repository.CarreraRepository;
 import com.hergomsoft.easyoapi.repository.RecorridoRepository;
+import com.hergomsoft.easyoapi.utils.MessageException;
 import com.hergomsoft.easyoapi.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,22 @@ public class CarreraService implements ICarreraService {
     @Override
     public Carrera saveCarrera(Carrera carrera) {
         if(carrera != null) {
+            // Comprueba datos válidos de carrera
+            String nombre = carrera.getNombre().trim();
+            if(nombre.length() >= Carrera.MIN_LEN_NOMBRE && nombre.length() <= Carrera.MAX_LEN_NOMBRE) {
+                carrera.setNombre(nombre);
+            } else {
+                throw new IllegalArgumentException(String.format("La longitud del nombre debe comprender entre %d y %d caracteres.", Carrera.MIN_LEN_NOMBRE, Carrera.MAX_LEN_NOMBRE));
+            }
+
+            // TODO
+            // ¿Enums?
+            // ....
+
+            String notas = (carrera.getNotas() != null) ? carrera.getNotas().trim() : "";
+            if(notas.length() > Carrera.MAX_LEN_NOTAS) notas = notas.substring(0, Carrera.MAX_LEN_NOTAS);
+            carrera.setNotas(notas);
+        
             // Genera el secret para la carrera mediante el hash MD5 de la concatenación
             // del secret del servidor con una cadena aleatoria generada de su mismo largo.
             String rand = Utils.cadenaAleatoria(secretCarreras.length());

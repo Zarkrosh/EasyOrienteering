@@ -48,8 +48,8 @@ public class Control implements IdEntity {
     
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride( name = "x", column = @Column(name = "COORD_X", nullable = true)),
-        @AttributeOverride( name = "y", column = @Column(name = "COORD_Y", nullable = true))
+        @AttributeOverride(name = "x", column = @Column(name = "COORD_X", nullable = true)),
+        @AttributeOverride(name = "y", column = @Column(name = "COORD_Y", nullable = true))
     })
     private Coordenadas coords;
     
