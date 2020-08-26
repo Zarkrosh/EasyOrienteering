@@ -2,6 +2,7 @@ package com.hergomsoft.easyoapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.CascadeType;
@@ -18,13 +19,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "carreras")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Carrera implements IdEntity {
-    public static final int MAX_LEN_NOMBRE = 50;
+    public static final int MAX_LEN_NOMBRE = 64;
     public static final int MIN_LEN_NOMBRE = 5;
     public static final int MAX_LEN_NOTAS = 1000;
     
@@ -68,21 +71,24 @@ public class Carrera implements IdEntity {
     @Column(name = "NOTAS")
     private String notas;
     
+    @Temporal(TemporalType.DATE)
+    @Column(name = "FECHA", nullable = false)
+    private Date fecha;
+    
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name="CARRERA_ID", referencedColumnName="ID")
     private List<Recorrido> recorridos;
     
-    // No se utiliza cascada porque da error debido a la clave foránea del ID de carrera
-    // usado como clave primaria conjunta
+    // No se utiliza cascada
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "carrera")
     @MapKey(name = "codigo")
     private Map<String, Control> controles;
 
     public Carrera() {}
 
-    public Carrera(String nombre, Tipo tipo, Modalidad modalidad, 
-            Usuario organizador, Float latitud, Float longitud, boolean privada, 
-            List<Recorrido> recorridos, Map<String, Control> controles, String notas) {
+    public Carrera(String nombre, Tipo tipo, Modalidad modalidad, Usuario organizador, 
+            Float latitud, Float longitud, boolean privada, List<Recorrido> recorridos, 
+            Map<String, Control> controles, String notas, Date fecha) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.modalidad = modalidad;
@@ -93,6 +99,7 @@ public class Carrera implements IdEntity {
         this.recorridos = recorridos;
         this.controles = controles;
         this.notas = notas;
+        this.fecha = fecha;
     }
 
     public Long getId() {
@@ -177,6 +184,14 @@ public class Carrera implements IdEntity {
 
     public void setNotas(String notas) {
         this.notas = notas;
+    }
+
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
     }
 
     public List<Recorrido> getRecorridos() {

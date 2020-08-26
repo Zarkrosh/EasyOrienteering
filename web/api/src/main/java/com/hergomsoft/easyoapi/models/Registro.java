@@ -38,9 +38,9 @@ public class Registro implements IdEntity {
     @ManyToOne(optional = false)
     private Recorrido recorrido;
     
-    @CreationTimestamp
+    //@CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "FECHA", insertable = false)
+    @Column(name = "FECHA")
     private Date fecha;
 
     public Registro() {
@@ -50,6 +50,7 @@ public class Registro implements IdEntity {
         this.corredor = corredor;
         this.control = control;
         this.recorrido = recorrido;
+        this.fecha = null;
     }
     
     @Override

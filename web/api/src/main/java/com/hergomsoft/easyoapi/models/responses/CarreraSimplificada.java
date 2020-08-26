@@ -3,6 +3,7 @@ package com.hergomsoft.easyoapi.models.responses;
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
+import java.util.Date;
 import java.util.List;
 
 public class CarreraSimplificada {
@@ -12,6 +13,9 @@ public class CarreraSimplificada {
     private Carrera.Tipo tipo;
     private Carrera.Modalidad modalidad;
     private Usuario organizador;
+    private Float latitud;
+    private Float longitud;
+    private Date fecha;
     private List<Recorrido> recorridos;
     
     public CarreraSimplificada(Carrera carrera) {
@@ -20,6 +24,9 @@ public class CarreraSimplificada {
         this.tipo = carrera.getTipo();
         this.modalidad = carrera.getModalidad();
         this.organizador = carrera.getOrganizador();
+        this.latitud = carrera.getLatitud();
+        this.longitud = carrera.getLongitud();
+        this.fecha = carrera.getFecha();
         this.recorridos = carrera.getRecorridos();
     }
 
@@ -63,6 +70,30 @@ public class CarreraSimplificada {
         this.organizador = organizador;
     }
 
+    public Float getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(Float latitud) {
+        this.latitud = latitud;
+    }
+
+    public Float getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(Float longitud) {
+        this.longitud = longitud;
+    }
+
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
+    }
+
     public List<Recorrido> getRecorridos() {
         return recorridos;
     }
@@ -70,6 +101,5 @@ public class CarreraSimplificada {
     public void setRecorridos(List<Recorrido> recorridos) {
         this.recorridos = recorridos;
     }
-    
     
 }

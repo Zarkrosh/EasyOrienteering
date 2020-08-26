@@ -39,7 +39,7 @@ public class Control implements IdEntity {
     private Tipo tipo;
     
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinColumn(name="CARRERA_ID")
     private Carrera carrera;
     

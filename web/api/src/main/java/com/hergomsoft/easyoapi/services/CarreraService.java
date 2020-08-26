@@ -6,18 +6,24 @@ import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
 import com.hergomsoft.easyoapi.repository.CarreraRepository;
+import com.hergomsoft.easyoapi.repository.ControlRepository;
 import com.hergomsoft.easyoapi.repository.RecorridoRepository;
 import com.hergomsoft.easyoapi.utils.MessageException;
 import com.hergomsoft.easyoapi.utils.Utils;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -30,6 +36,8 @@ public class CarreraService implements ICarreraService {
     private CarreraRepository repoCarrera;
     @Autowired
     private RecorridoRepository repoRecorrido;
+    @Autowired
+    private ControlRepository repoControl;
     
     @Value("${easyo.carreras.secretgeneral}")
     private String secretCarreras; // Secreto guardado en el servidor
@@ -41,7 +49,8 @@ public class CarreraService implements ICarreraService {
     
     @Override
     public List<CarreraSimplificada> buscaCarreras(long idUsuario, String nombre, String tipo, String modalidad, Pageable pageable) {
-        Page<Carrera> carreras = repoCarrera.buscaCarreras(idUsuario, nombre.toUpperCase(), tipo.toUpperCase(), modalidad.toUpperCase(), pageable);
+        int offset = pageable.getPageSize() * pageable.getPageNumber();
+        List<Carrera> carreras = repoCarrera.buscaCarreras(idUsuario, nombre.toUpperCase(), tipo.toUpperCase(), modalidad.toUpperCase(), offset, pageable.getPageSize());
         List<CarreraSimplificada> simplificadas = new ArrayList<>();
         for(Carrera c : carreras) simplificadas.add(new CarreraSimplificada(c));
         return simplificadas;
@@ -169,12 +178,12 @@ public class CarreraService implements ICarreraService {
         // Luego guarda los controles que no son guardados debido al problema
         // asociado al uso de la clave foránea del ID de la carrera.
         if(deepEdit) {
+            Map<String, Control> gControles = new HashMap<>();
             for(Control c : carrera.getControles().values()) {
-                Float coordX = (c.getCoords() != null) ? c.getCoords().getX() : null;
-                Float coordY = (c.getCoords() != null) ? c.getCoords().getY() : null;
-                repoCarrera.insertaControl(c.getCodigo(), res.getId(), c.getTipo().name(), c.getPuntuacion(), coordX, coordY);
+                c.setCarrera(res);
+                gControles.put(c.getCodigo(), repoControl.save(c));
             }
-            res.setControles(carrera.getControles());
+            res.setControles(gControles);
         }
         
         return res;

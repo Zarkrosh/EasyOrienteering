@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -41,18 +42,18 @@ public class DatosPrueba {
     @Autowired
     RegistroService registrosService;
     
-    final int NUMERO_USUARIOS = 300;
+    final int NUMERO_USUARIOS = 100;
     final int NUMERO_CARRERAS_EVENTO = 50;
     final int NUMERO_CARRERAS_CIRCUITO = 50;
     final float PROBABILIDAD_CLUB = 0.7f;
     final int LARGO_PASSWORD = 12;
     final Date MIN_RANDOM_DATE = new Date(LocalDateTime.of(2020, 1, 1, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
-    final Date MAX_RANDOM_DATE = new Date();
-    final int MIN_CONTROLES = 15;
-    final int MAX_CONTROLES = 50;
+    final Date MAX_RANDOM_DATE = new Date(LocalDateTime.of(2020, 7, 1, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
+    final int MIN_CONTROLES = 10;
+    final int MAX_CONTROLES = 40;
     final int MIN_CONTROLES_RECORRIDO = 8;
-    final int MAX_CONTROLES_RECORRIDO = 30;
-    final int MAX_RECORRIDOS = 10;
+    final int MAX_CONTROLES_RECORRIDO = 24;
+    final int MAX_RECORRIDOS = 6;
     final float MIN_LATITUD = 38.2f;
     final float MAX_LATITUD = 43.3f;
     final float MIN_LONGITUD = -8.5f;
@@ -61,7 +62,7 @@ public class DatosPrueba {
     final float PROBABILIDAD_NOTAS = 0.7f;
     final float PROBABILIDAD_COORDENADAS_EVENTO = 0.8f;
     final int MIN_CORREDORES_RESULTADOS = 5;
-    final int MAX_CORREDORES_RESULTADOS = 50;
+    final int MAX_CORREDORES_RESULTADOS = 20;
     final int MIN_TIEMPO_PARCIAL = 60;
     final int MAX_TIEMPO_PARCIAL = 1000;
     final float MAX_DESVIACION_PARCIAL = 0.5f;
@@ -123,6 +124,36 @@ public class DatosPrueba {
             Carrera carrera = getCarreraAleatoria(organizador, getStringAleatoria(poblaciones), modalidad, Carrera.Tipo.CIRCUITO);
             carrerasGeneradas.add( carrerasService.saveCarrera(carrera) );
         }
+        
+        // RESULTADOS
+        Date fechaSalida = new Date(LocalDateTime.of(2020, 8, 25, 9, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
+        int cont = 1;
+        for(Carrera carrera : carrerasGeneradas) {
+            System.out.println(cont++ + " / " + carrerasGeneradas.size());
+            if(carrera.getModalidad()== Carrera.Modalidad.TRAZADO) {
+                for(Recorrido recorrido : carrera.getRecorridos()) {
+                    int numeroCorredores = getIntAleatorio(MIN_CORREDORES_RESULTADOS, MAX_CORREDORES_RESULTADOS);
+                    Collections.shuffle(usuariosGenerados);
+                    Map<Usuario, Long> millisAcumulados = new HashMap<>();
+                    for(String codigoControl : recorrido.getTrazado()) {
+                        int millisOptimo = getIntAleatorio(MIN_TIEMPO_PARCIAL, MAX_TIEMPO_PARCIAL) * 1000;
+                        for(int i = 0; i < numeroCorredores; i++) {
+                            float desviacion = millisOptimo * getFloatAleatorio(0, MAX_DESVIACION_PARCIAL);
+                            long millisParcial = millisOptimo + (long) desviacion;
+                            Registro registro = new Registro(usuariosGenerados.get(i), carrera.getControles().get(codigoControl), recorrido);
+                            long millisAcum = millisAcumulados.getOrDefault(usuariosGenerados.get(i), 0l) + millisParcial;
+                            millisAcumulados.put(usuariosGenerados.get(i), millisAcum);
+                            Date fechaRegistro = new Date(fechaSalida.getTime() + millisAcum);
+                            registro.setFecha(fechaRegistro);
+                            registrosService.registraPasoControl(registro);
+                        }
+                    }
+                }
+            } else {
+                // SCORE
+                // TODO
+            }
+        }
     }
     
     public Carrera getCarreraAleatoria(Usuario organizador, String poblacion, Carrera.Modalidad modalidad, Carrera.Tipo tipoCarrera) {
@@ -140,15 +171,17 @@ public class DatosPrueba {
             if(random.nextFloat() >= PROBABILIDAD_COORDENADAS_EVENTO) latitud = longitud = null;
             privada = (random.nextFloat() <= PROBABILIDAD_EVENTO_PRIVADO);
         }
+        Date fecha = new Date(ThreadLocalRandom.current()
+                .nextLong(MIN_RANDOM_DATE.getTime(), MAX_RANDOM_DATE.getTime()));
         
         // Controles
         Map<String, Control> controles = new HashMap<>();
-        Coordenadas coordsFake = new Coordenadas(0,0); // TODO Corregir fallo cuando es null
+        Coordenadas coordsFake = null;
         int nControles = getIntAleatorio(MIN_CONTROLES, MAX_CONTROLES);
         controles.put("S1", new Control("S1", Control.Tipo.SALIDA, 0, coordsFake));
         controles.put("M1", new Control("M1", Control.Tipo.META, 0, coordsFake));
         for(int j = 0; j < nControles; j++) {
-            String codigo = "" + j + 31;
+            String codigo = Integer.toString(j + 31);
             int puntuacion = (modalidad == Carrera.Modalidad.SCORE) ? (j + 31) / 10 : 0;
             controles.put(codigo, new Control(codigo, Control.Tipo.CONTROL, puntuacion, coordsFake));
         }
@@ -156,7 +189,7 @@ public class DatosPrueba {
         // Recorridos
         List<Recorrido> recorridos = new ArrayList<>();
         if(modalidad == Carrera.Modalidad.TRAZADO) {
-            Set<String> setCodigosControles = controles.keySet();
+            Set<String> setCodigosControles = new HashSet<>(controles.keySet());
             setCodigosControles.remove("S1");
             setCodigosControles.remove("M1");
             String[] codigosControles = new String[setCodigosControles.size()];
@@ -178,7 +211,7 @@ public class DatosPrueba {
             }
         }
 
-        return new Carrera(nombre, tipoCarrera, modalidad, organizador, latitud, longitud, privada, recorridos, controles, notas);
+        return new Carrera(nombre, tipoCarrera, modalidad, organizador, latitud, longitud, privada, recorridos, controles, notas, fecha);
     }
     
     public String getNombreCarreraAleatorio(String poblacion, boolean esCircuito) {
@@ -201,7 +234,8 @@ public class DatosPrueba {
     }
     
     public float getFloatAleatorio(float min, float max) {
-        return min + random.nextFloat() * (max - min);
+        float res = min + random.nextFloat() * (max - min);
+        return res;
     }
 
     public String getStringAleatoria(String[] array) {

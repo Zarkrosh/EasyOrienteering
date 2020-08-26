@@ -25,7 +25,29 @@ h1 {
     margin: auto;
     text-align: center;
 }
-.resultados-busqueda {
+
+
+.tableFixHead { 
+    width: 100%;
+    height: 700px;
     margin: 30px 10px;
-    border: 1px solid gray;
+    overflow-y: auto;  
+}
+.tableFixHead thead th { 
+    position: sticky; 
+    top: 0; 
+}
+.resultados-busqueda {
+    text-align: center;
+}
+.resultados-busqueda tr:hover {
+    cursor: pointer;
+}
+
+.row-cargando:hover {
+    cursor: default !important;
+    background-color: inherit !important;
+}
+.spinner-border {
+    color: $color-orientacion;
 }

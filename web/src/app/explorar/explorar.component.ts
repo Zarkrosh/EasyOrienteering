@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { ClienteApiService } from '../shared/cliente-api.service';
 import { AppSettings, Carrera } from '../shared/app.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-explorar',
@@ -11,15 +12,14 @@ import { AppSettings, Carrera } from '../shared/app.model';
 export class ExplorarComponent implements OnInit {
 
   busquedaForm: FormGroup;
-  busquedaNombre: string;
-  busquedaTipo: string;
-  busquedaModalidad: string;
   paginaActual: number;
   resultados: Carrera[];
   buscando: boolean;
+  busqueda;
 
   constructor(
     private clienteApi: ClienteApiService,
+    private router: Router,
     private formBuilder: FormBuilder) { }
 
   ngOnInit() {
@@ -27,10 +27,13 @@ export class ExplorarComponent implements OnInit {
     this.resultados = null;
     this.buscando = false;
     this.busquedaForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
+      nombre: [''],
       tipo: [''],
       modalidad: ['']
     });
+    this.busqueda = null;
+
+    this.buscarCarreras();
   }
 
 
@@ -39,15 +42,18 @@ export class ExplorarComponent implements OnInit {
     if(this.busquedaForm.invalid) return;
     this.paginaActual = 0;
     this.resultados = [];
-    this.busquedaNombre = this.f.nombre.value;
-    this.busquedaTipo = this.f.tipo.value;
-    this.busquedaModalidad = this.f.modalidad.value;
+    this.busqueda = {
+      nombre: this.f.nombre.value,
+      tipo: this.f.tipo.value,
+      modalidad: this.f.modalidad.value
+    }
     this.realizaBusqueda();
   }
 
   realizaBusqueda(): void {
+    console.log("[*] Buscando página " + this.paginaActual);
     this.buscando = true;
-    this.clienteApi.buscaCarreras(this.busquedaNombre, this.busquedaTipo, this.busquedaModalidad, this.paginaActual, AppSettings.NUMERO_RESULTADOS_BUSQUEDA).subscribe(
+    this.clienteApi.buscaCarreras(this.busqueda.nombre, this.busqueda.tipo, this.busqueda.modalidad, this.paginaActual, AppSettings.NUMERO_RESULTADOS_BUSQUEDA).subscribe(
       resp => {
         if(resp.status === 200) {
           this.resultados = this.resultados.concat(resp.body as Carrera[]);
@@ -63,11 +69,15 @@ export class ExplorarComponent implements OnInit {
     );
   }
 
+  verCarrera(idCarrera: number) {
+    this.router.navigate(["/carreras", idCarrera]);
+  }
 
   onScroll() {
-    console.log("Scrolled");
     this.paginaActual++;
-
+    if(this.busqueda) {
+      this.realizaBusqueda();
+    }
   }
 
   // Para acceder más comodo a los campos del formulario

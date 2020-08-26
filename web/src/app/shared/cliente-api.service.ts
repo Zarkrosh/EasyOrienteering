@@ -95,11 +95,11 @@ export class ClienteApiService {
   buscaCarreras(nombre: string, tipo: string, modalidad: string, pagina: number, numero: number): Observable<HttpResponse<Carrera[]>> {
     let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + 'buscar';
     let params = new HttpParams();
-    params = params.append('nombre', (nombre !== null) ? nombre : "");
-    params = params.append('tipo', (tipo !== null) ? tipo : "");
-    params = params.append('modalidad', (modalidad !== null) ? modalidad : "");
-    params = params.append('pagina', (pagina !== null) ? pagina.toString() : "0");
-    params = params.append('numero', (numero !== null) ? numero.toString() : "20");
+    if(nombre !== null) params = params.append('nombre', nombre);
+    if(tipo !== null) params = params.append('tipo', tipo);
+    if(modalidad !== null) params = params.append('modalidad', modalidad);
+    params = params.append('page', (pagina !== null) ? pagina.toString() : "0");
+    params = params.append('size', (numero !== null) ? numero.toString() : "20");
     return this.http.get<Carrera[]>(url, {params: params, observe: 'response'});
   }
 

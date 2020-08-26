@@ -41,22 +41,41 @@
     </form>
 
     <div class="wrapper-resultados">
-        <h3 *ngIf="resultados === null" class="mensaje-resultados">Haz una búsqueda</h3>
         <h3 *ngIf="!buscando && resultados && resultados.length === 0" class="mensaje-resultados">No hay resultados</h3>
-        <div class="lds-baliza-wrapper" *ngIf="buscando">
+        <div class="lds-baliza-wrapper" *ngIf="buscando && resultados.length === 0">
             <div class="lds-baliza"></div>
         </div>
-        <div *ngIf="resultados && resultados.length > 0" class="resultados-busqueda"
-          infiniteScroll
-          [infiniteScrollDistance]="2"
-          [infiniteScrollThrottle]="50"
-          (scrolled)="onScroll()"
-          [scrollWindow]="true">
-    
-            <div *ngFor="let carrera of resultados">
-                {{carrera.nombre}}
-            </div>
-    
+
+        <div *ngIf="resultados && resultados.length > 0" class="tableFixHead" 
+                infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="20"
+                (scrolled)="onScroll()" [scrollWindow]="false">
+                
+            <table class="table table-hover resultados-busqueda">
+        
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Modalidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let carrera of resultados" (click)="verCarrera(carrera.id)">
+                        <td>{{carrera.fecha}}</td>
+                        <td class="text-left">{{carrera.nombre}}</td>
+                        <td>{{carrera.tipo}}</td>
+                        <td>{{carrera.modalidad}}</td>
+                    </tr>
+
+                    <tr *ngIf="buscando && resultados.length > 0" class="row-cargando">
+                        <td colspan="4">
+                            <span class="spinner-border" role="status" aria-hidden="true"></span>
+                        </td>
+                    </tr>
+                </tbody>
+                
+            </table>
         </div>
     </div>
     
