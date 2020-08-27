@@ -67,24 +67,31 @@ export class ClienteApiService {
 
   /******************* CARRERAS *******************/
 
-  getCarrera(idCarrera: number) {
+  getCarrera(idCarrera: number): Observable<HttpResponse<Carrera>> {
     let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + idCarrera;
     return this.http.get<Carrera>(url, {observe: 'response'});
   }
 
-  crearCarrera(carrera: Carrera) {
+  createCarrera(carrera: Carrera): Observable<HttpResponse<any>> {
     let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS;
     // Cabeceras
     const cabeceras = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(url, carrera, {observe: 'response', headers: cabeceras});
   }
 
-  getControlesQRCarrera(idCarrera: number) {
+  // TODO editCarrera(carrera: Carrera)
+
+  deleteCarrera(idCarrera: number): Observable<HttpResponse<any>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + idCarrera;
+    return this.http.delete<any>(url, {observe: 'response'});
+  }
+
+  getControlesQRCarrera(idCarrera: number): Observable<HttpResponse<any>> {
     let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + idCarrera + '/qr';
     return this.http.get<any>(url, {observe: 'response'});
   }
 
-  cambiaUbicacionCarrera(idCarrera: number, latitud: number, longitud: number) {
+  cambiaUbicacionCarrera(idCarrera: number, latitud: number, longitud: number): Observable<HttpResponse<any>> {
     let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + idCarrera + '/ubicacion';
     let ubicacion = new Object();
     ubicacion["latitud"] = latitud;
@@ -95,9 +102,9 @@ export class ClienteApiService {
   buscaCarreras(nombre: string, tipo: string, modalidad: string, pagina: number, numero: number): Observable<HttpResponse<Carrera[]>> {
     let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + 'buscar';
     let params = new HttpParams();
-    if(nombre !== null) params = params.append('nombre', nombre);
-    if(tipo !== null) params = params.append('tipo', tipo);
-    if(modalidad !== null) params = params.append('modalidad', modalidad);
+    if(nombre) params = params.append('nombre', nombre);
+    if(tipo) params = params.append('tipo', tipo);
+    if(modalidad) params = params.append('modalidad', modalidad);
     params = params.append('page', (pagina !== null) ? pagina.toString() : "0");
     params = params.append('size', (numero !== null) ? numero.toString() : "20");
     return this.http.get<Carrera[]>(url, {params: params, observe: 'response'});

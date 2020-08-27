@@ -1,6 +1,14 @@
 <div class="easyo-container text-center">
     <ng-container *ngIf="carrera">
-        <h1><u>Crear carrera</u></h1>
+        <div class="btns-cabecera" *ngIf="tipoVista === TIPO_EDITAR">
+            <button class="btn btn-info btn-cabecera-izda" (click)="clickBotonVolver()">Volver a carrera</button>
+            <button class="btn btn-danger btn-cabecera-dcha" (click)="clickBotonBorrar()" [disabled]="borrandoCarrera">
+                <span *ngIf="borrandoCarrera" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Borrar carrera
+            </button>
+        </div>
+
+        <h1><u>{{titulo}}</u></h1>
 
         <div class="header-seccion header-resumen">
             <!-- Datos principales de la carrera -->
@@ -165,7 +173,7 @@
         </ng-container>
 
 
-        <button class="btn btn-secondary btn-crear" (click)="guardaCarrera()" [disabled]="!carreraForm.valid">Crear carrera</button>
+        <button class="btn btn-secondary btn-crear" (click)="guardaCarrera()" [disabled]="!carreraForm.valid">Guardar</button>
 
     </ng-container>
 
@@ -193,7 +201,22 @@
     </div>
     <div class="modal-body">Parece que no acabaste de crear una carrera anteriormente, ¿quieres continuar con su creación?<br><br>Se cargará de nuevo toda la configuración que elegiste:<br>TODO Añadir detalles del borrador en el diálogo</div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-danger" ngbAutofocus (click)="restauraBorrador(false)">Descartar</button>
+        <button type="button" class="btn btn-danger"  (click)="restauraBorrador(false)" ngbAutofocus>Descartar</button>
         <button type="button" class="btn btn-success" (click)="restauraBorrador(true)">Restaurar</button>
+    </div>
+</ng-template>
+
+<!-- Diálogo de confirmación de borrado de carrera -->
+<ng-template #modalBorrarCarrera let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿Estás seguro de que quieres borrar la carrera?</h5>
+        <button type="button" class="close" (click)="confirmaBorrar(false)" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Tras borrar la carrera se perderán todos los datos y no se podrán recuperar.<br><br>Piénsalo bien ☹</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="confirmaBorrar(false)" ngbAutofocus>Cancelar</button>
+        <button type="button" class="btn btn-danger"    (click)="confirmaBorrar(true)">Borrar carrera</button>
     </div>
 </ng-template>

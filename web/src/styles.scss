@@ -37,11 +37,17 @@ alert {
 }
 .btn-primary:hover {
     background-color: $color-orientacion-light;
+    border-color: rgba($color-orientacion-light, 0.8);
 }
 .btn-primary:not(:disabled):active {
     background-color: $color-orientacion-dark;
 }
 .btn-primary:focus {
+    background-color: $color-orientacion-dark;
+    box-shadow: 0 0 0 0.2rem rgba($color-orientacion, 0.5);
+}
+.btn-primary:not(:disabled):not(.disabled):active:focus {
+    background-color: $color-orientacion-dark;
     box-shadow: 0 0 0 0.2rem rgba($color-orientacion, 0.5);
 }
 .btn-secondary {
@@ -50,6 +56,7 @@ alert {
 }
 .btn-secondary:hover {
     background-color: $color-secondary-light;
+    border-color: rgba($color-secondary-light, 0.8);
 }
 .btn-secondary:not(:disabled):active {
     background-color: $color-secondary-dark;
@@ -72,6 +79,25 @@ alert {
     overflow: hidden;
 }
 
+.easyo-container > h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.btns-cabecera button {
+    position: absolute;
+    top: 0;
+    padding: 10px 20px;
+}
+.btn-cabecera-izda {
+    left: 0;
+}
+.btn-cabecera-dcha {
+    right: 0;
+}
+
+
+/**** MENSAJE DE CARGA ****/
 .wrapper-cargando {
     width: 100%;
     min-height: 500px;
@@ -83,6 +109,31 @@ alert {
     margin: 35px auto 0 auto;
     display: block;
 }
+
+
+/**** POPUPS LEAFLET ****/
+.info-popup {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: column;
+    font-size: 1rem;
+    text-align: center;
+}
+.info-popup h4 {
+    font-size: 1.3rem;
+}
+.info-popup table {
+    width: 100%;
+    margin: 10px auto;
+}
+.info-popup a {
+    width: max-content; // Ajusta ancho al botón
+    margin: 20px auto 0 auto;
+    color: white !important;
+    text-decoration: none !important;
+    text-align: center;
+}
+
 
 .footer-web {
     width: 100%;
@@ -124,9 +175,6 @@ alert {
     height: min-content;
     margin: 0 auto;
 }
-.control-codigo {
-    //
-}
 .control-marca-agua {
     position: absolute;
     top: 0;
@@ -138,8 +186,11 @@ alert {
 /**************************/
 
 
-
-
+/**** DIALOGO MODAL ****/
+.modal-fit .modal-dialog {
+    width: min-content !important;
+    max-width: none !important;
+}
 
 
 .oculto {

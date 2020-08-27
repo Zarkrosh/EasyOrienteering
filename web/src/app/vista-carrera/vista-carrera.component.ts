@@ -1,8 +1,8 @@
-import { Component, OnInit, ElementRef, ViewChild, ViewChildren, QueryList } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClienteApiService } from '../shared/cliente-api.service';
 import { AlertService } from '../alert';
-import { Carrera, Control, AppSettings, Usuario } from '../shared/app.model';
+import { Carrera, Usuario } from '../shared/app.model';
 import * as L from 'leaflet';
 
 @Component({
@@ -22,22 +22,11 @@ export class VistaCarreraComponent implements OnInit {
   errorCarga: boolean;
 
   // Ubicación
-  readonly LATITUD_DEFECTO = 40.463667;
-  readonly LONGITUD_DEFECTO = -3.74922;
-  readonly ZOOM_DEFECTO = 5;
-  readonly MIN_ZOOM_MARCAR = 16;
   @ViewChildren('mapaUbicacion') queryMapa: QueryList<ElementRef>;
   mapaUbicacion: L.Map;
   capaMarcador: L.LayerGroup;
   iconoMarcador: L.Icon;
-  editandoUbicacion: boolean;
-  mostrarEditUbicacion: boolean;
-  mostrarAnadirUbicacion: boolean;
-  mensajeUbicacion: string;
-  marcarUbicacion: boolean;
-  guardandoUbicacion: boolean;
-  latitudElegida: number;
-  longitudElegida: number;
+  readonly NIVEL_ZOOM = 14;
 
   constructor(private route: ActivatedRoute,
     private router: Router,
@@ -47,11 +36,6 @@ export class VistaCarreraComponent implements OnInit {
   ngOnInit() {
     this.carrera = null;
     this.errorCarga = false;
-    this.editandoUbicacion = false;
-    this.mostrarEditUbicacion = false;
-    this.mostrarAnadirUbicacion = false;
-    this.guardandoUbicacion = false;
-    this.mensajeUbicacion = null;
 
     this.cargaDatosCarrera();
   }
@@ -62,49 +46,6 @@ export class VistaCarreraComponent implements OnInit {
     });
   }
 
-  iniciaMapa(): void {
-    let latCentro = this.LATITUD_DEFECTO;
-    let lonCentro = this.LONGITUD_DEFECTO;
-    let zoomCentro = this.ZOOM_DEFECTO;
-    if(this.carrera.latitud != null && this.carrera.longitud != null) {
-      latCentro = this.carrera.latitud;
-      lonCentro = this.carrera.longitud;
-      zoomCentro = 16;
-      this.mostrarEditUbicacion = true; // TODO Solo mostrar para el organizador de la carrera
-    }
-
-    this.mapaUbicacion = L.map('mapa-ubicacion', {
-      center: [ latCentro,  lonCentro],
-      zoom: zoomCentro
-    });
-
-    // Tiles
-    const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    });
-    tiles.addTo(this.mapaUbicacion);
-
-    // Capa del marcador
-    this.capaMarcador = new L.LayerGroup();
-    this.capaMarcador.addTo(this.mapaUbicacion);
-    // Icono personalizado
-    this.iconoMarcador = L.icon({
-        iconUrl: 'assets/img/marcador.png',
-        iconSize:     [48, 56],
-        iconAnchor:   [24, 55], // point of the icon which will correspond to marker's location
-    });
-
-    // Eventos
-    this.mapaUbicacion.on("zoomend", (evt) => this.onCambioZoomMapa(evt.target));
-    this.mapaUbicacion.on("click", (evt: L.LeafletMouseEvent) => this.manejaClickMapa(evt));
-
-    // Muestra marcador si existen coordenadas
-    if(this.carrera.latitud != null && this.carrera.longitud != null) {
-      this.setMarcadorUbicacion(this.carrera.latitud, this.carrera.longitud);
-    }
-  }
-
   cargaDatosCarrera(): void {
     this.route.params.subscribe(routeParams => {
       let idCarrera = +routeParams['id'];
@@ -113,9 +54,6 @@ export class VistaCarreraComponent implements OnInit {
         resp => {
           if(resp.status == 200) {
             this.carrera = resp.body;
-            if(this.carrera.latitud == null || this.carrera.longitud == null) {
-              this.mostrarAnadirUbicacion = true; // TODO Solo para el organizador
-            }
           } else {
             this.alertService.error("Error al obtener la carrera", this.optionsAlerts);
             this.errorCarga = true;
@@ -142,80 +80,51 @@ export class VistaCarreraComponent implements OnInit {
     return res;
   }
 
-  editarCarrera(): void {
-    this.router.navigate(['/editar', this.carrera.id]);
-  }
+  iniciaMapa(): void {
+    if(this.carrera.latitud == null || this.carrera.longitud == null) return;
 
-  editarUbicacion(): void {
-    this.latitudElegida = (this.carrera.latitud != null) ? this.carrera.latitud : null;
-    this.longitudElegida = (this.carrera.longitud != null) ? this.carrera.longitud : null;
-    this.mostrarEditUbicacion = this.mostrarAnadirUbicacion = this.guardandoUbicacion = this.marcarUbicacion = false;
-    this.editandoUbicacion = true;
-    this.onCambioZoomMapa(this.mapaUbicacion);
-  }
+    this.mapaUbicacion = L.map('mapa-ubicacion', {
+      center: [ this.carrera.latitud,  this.carrera.longitud],
+      zoom: this.NIVEL_ZOOM
+    });
 
-  guardarUbicacion() {
-    this.guardandoUbicacion = true;
-    if(this.carrera.id != null && this.latitudElegida != null && this.longitudElegida != null) {
-      this.clienteApi.cambiaUbicacionCarrera(this.carrera.id, this.latitudElegida, this.longitudElegida).subscribe(
-        resp => {
-          if(resp.status == 200) {
-            this.alertService.success("Ubicación cambiada", this.optionsAlerts);
-          } else {
-            this.alertService.warn("Código de respuesta inesperado: " + resp.status, this.optionsAlerts);
-          }
-          this.editandoUbicacion = this.marcarUbicacion = this.guardandoUbicacion = false;
-          this.mostrarEditUbicacion = true; // TODO Solo para el organizador
-        }, err => {
-          this.alertService.error("No se pudo cambiar la ubicación", this.optionsAlerts);
-          console.log(err); // DEBUG
-          this.guardandoUbicacion = false;
-      });
-    }
-  }
+    // Tiles
+    const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    });
+    tiles.addTo(this.mapaUbicacion);
 
-  manejaClickMapa(evento: L.LeafletMouseEvent) {
-    if(this.editandoUbicacion) {
-      this.setMarcadorUbicacion(evento.latlng.lat, evento.latlng.lng);
-    }
-  }
+    // Capa del marcador
+    this.capaMarcador = new L.LayerGroup();
+    this.capaMarcador.addTo(this.mapaUbicacion);
+    // Icono personalizado
+    this.iconoMarcador = L.icon({
+        iconUrl: 'assets/img/marcador.png',
+        iconSize:     [48, 56],
+        iconAnchor:   [24, 55], // point of the icon which will correspond to marker's location
+    });
 
-  onCambioZoomMapa(map: L.Map): void {
-    if(this.editandoUbicacion) {
-      if(map.getZoom() >= this.MIN_ZOOM_MARCAR) {
-        if(this.latitudElegida == null && this.longitudElegida == null) {
-          this.mensajeUbicacion = "Haz click en el mapa";
-        } else {
-          this.mensajeUbicacion = null;
-        }
-        this.marcarUbicacion = true;
-      } else {
-        this.mensajeUbicacion = "Aumenta el zoom para elegir ubicación";
-        this.marcarUbicacion = false;
-      }
-    }
+    this.setMarcadorUbicacion(this.carrera.latitud, this.carrera.longitud);
   }
 
   setMarcadorUbicacion(latitud: number, longitud: number) {
-    if(this.mapaUbicacion.getZoom() >= this.MIN_ZOOM_MARCAR) {
-      this.latitudElegida = latitud;
-      this.longitudElegida = longitud;
-      // Borra posible marcador anterior y añade el nuevo
-      this.capaMarcador.clearLayers();
-      let marcador = L.marker([this.latitudElegida, this.longitudElegida], {icon: this.iconoMarcador});
-      marcador.on("click", (evt) => this.animacionVueloMarcador());
-      this.capaMarcador.addLayer(marcador);
-    } else {
-      // Agita el mensaje de ubicación
-      // TODO
-    }
+    // Borra posible marcador anterior y añade el nuevo
+    this.capaMarcador.clearLayers();
+    let marcador = L.marker([this.carrera.latitud, this.carrera.longitud], {icon: this.iconoMarcador});
+    marcador.on("click", (evt) => this.animacionVueloMarcador());
+    this.capaMarcador.addLayer(marcador);
   }
 
   animacionVueloMarcador() {
-    this.mapaUbicacion.flyTo([this.latitudElegida, this.longitudElegida], this.MIN_ZOOM_MARCAR, {
+    this.mapaUbicacion.flyTo([this.carrera.latitud, this.carrera.longitud], this.NIVEL_ZOOM, {
         animate: true,
         duration: 1
     });
+  }
+
+  editarCarrera(): void {
+    this.router.navigate(['/editar', this.carrera.id]);
   }
 
   generarQR() {

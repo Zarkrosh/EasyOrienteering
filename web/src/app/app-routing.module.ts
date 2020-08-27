@@ -12,6 +12,7 @@ import { WizardCarreraComponent } from './crear-carrera/wizard-carrera/wizard-ca
 import { EditorRecorridosComponent } from './crear-carrera/editores/editor-recorridos/editor-recorridos.component';
 import { ResumenCarreraComponent } from './crear-carrera/resumen-carrera/resumen-carrera.component';
 import { ExplorarComponent } from './explorar/explorar.component';
+import { MapaCircuitosComponent } from './explorar/mapa-circuitos/mapa-circuitos.component';
 
 
 const routes: Routes = [

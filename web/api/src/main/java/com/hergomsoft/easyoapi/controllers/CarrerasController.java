@@ -162,13 +162,21 @@ public class CarrerasController {
         } else {
             // No es el organizador de la carrera
             throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN, "Solo puede editar el organizador de la carrera");
+                HttpStatus.FORBIDDEN, "Solo el organizador puede editar la carrera");
         }
     }
     
     @DeleteMapping("/{id}")
     public void borrarCarrera(@PathVariable long id) {
-        carrerasService.deleteCarrera(id);
+        Usuario usuario = usuariosService.getUsuarioPeticion();
+        Carrera c = getCarrera(id);
+        if(Objects.equals(usuario.getId(), c.getOrganizador().getId())) {
+            carrerasService.deleteCarrera(id);
+        } else {
+            // No es el organizador de la carrera
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, "Solo el organizador puede borrar la carrera.");
+        }
     }
     
     @GetMapping("/{id}/qr")

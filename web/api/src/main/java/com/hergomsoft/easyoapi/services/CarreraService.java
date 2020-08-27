@@ -50,7 +50,8 @@ public class CarreraService implements ICarreraService {
     @Override
     public List<CarreraSimplificada> buscaCarreras(long idUsuario, String nombre, String tipo, String modalidad, Pageable pageable) {
         int offset = pageable.getPageSize() * pageable.getPageNumber();
-        List<Carrera> carreras = repoCarrera.buscaCarreras(idUsuario, nombre.toUpperCase(), tipo.toUpperCase(), modalidad.toUpperCase(), offset, pageable.getPageSize());
+        int size = pageable.getPageSize();
+        List<Carrera> carreras = repoCarrera.buscaCarreras(idUsuario, nombre.toUpperCase(), tipo.toUpperCase(), modalidad.toUpperCase(), offset, size);
         List<CarreraSimplificada> simplificadas = new ArrayList<>();
         for(Carrera c : carreras) simplificadas.add(new CarreraSimplificada(c));
         return simplificadas;
@@ -71,22 +72,6 @@ public class CarreraService implements ICarreraService {
     @Override
     public Carrera saveCarrera(Carrera carrera) {
         if(carrera != null) {
-            // Comprueba datos válidos de carrera
-            String nombre = carrera.getNombre().trim();
-            if(nombre.length() >= Carrera.MIN_LEN_NOMBRE && nombre.length() <= Carrera.MAX_LEN_NOMBRE) {
-                carrera.setNombre(nombre);
-            } else {
-                throw new IllegalArgumentException(String.format("La longitud del nombre debe comprender entre %d y %d caracteres.", Carrera.MIN_LEN_NOMBRE, Carrera.MAX_LEN_NOMBRE));
-            }
-
-            // TODO
-            // ¿Enums?
-            // ....
-
-            String notas = (carrera.getNotas() != null) ? carrera.getNotas().trim() : "";
-            if(notas.length() > Carrera.MAX_LEN_NOTAS) notas = notas.substring(0, Carrera.MAX_LEN_NOTAS);
-            carrera.setNotas(notas);
-        
             // Genera el secret para la carrera mediante el hash MD5 de la concatenación
             // del secret del servidor con una cadena aleatoria generada de su mismo largo.
             String rand = Utils.cadenaAleatoria(secretCarreras.length());
@@ -173,10 +158,30 @@ public class CarreraService implements ICarreraService {
     }
     
     private Carrera guardaCarrera(Carrera carrera, boolean deepEdit) {
-        // Primero guarda la carrera general
+        // Comprueba datos válidos de carrera
+        String nombre = carrera.getNombre().trim();
+        if(nombre.length() >= Carrera.MIN_LEN_NOMBRE && nombre.length() <= Carrera.MAX_LEN_NOMBRE) {
+            carrera.setNombre(nombre);
+        } else {
+            throw new IllegalArgumentException(String.format("La longitud del nombre debe comprender entre %d y %d caracteres.", Carrera.MIN_LEN_NOMBRE, Carrera.MAX_LEN_NOMBRE));
+        }
+
+        // TODO
+        // ¿Enums?
+        // ....
+
+        String notas = (carrera.getNotas() != null) ? carrera.getNotas().trim() : "";
+        if(notas.length() > Carrera.MAX_LEN_NOTAS) notas = notas.substring(0, Carrera.MAX_LEN_NOTAS);
+        carrera.setNotas(notas);
+
+        if(carrera.getModalidad() == Carrera.Modalidad.TRAZADO) {
+            // Los controles no tienen puntuación
+            for(Control c : carrera.getControles().values()) c.setPuntuacion(0);
+        }
+        
+        // Guarda la carrera general
         Carrera res = repoCarrera.save(carrera);
-        // Luego guarda los controles que no son guardados debido al problema
-        // asociado al uso de la clave foránea del ID de la carrera.
+        // Luego guarda los controles que no son guardados en cascada
         if(deepEdit) {
             Map<String, Control> gControles = new HashMap<>();
             for(Control c : carrera.getControles().values()) {

@@ -35,6 +35,7 @@ export class ResumenCarreraComponent implements OnInit {
     }
   }
   @ViewChild('modalBorrador', {static: true}) modalBorrador: ElementRef<NgbModal>;
+  @ViewChild('modalBorrarCarrera', {static: true}) modalBorrarCarrera: ElementRef<NgbModal>;
 
   // Datos de carrera
   carreraForm: FormGroup;
@@ -42,14 +43,17 @@ export class ResumenCarreraComponent implements OnInit {
   controles: Control[];
   mapasKeys: string[];
 
+  tipoVista: string;
+  titulo: string;
+
   errorCarga: boolean;
+  borrandoCarrera: boolean;
 
   // Alertas
   alertOptions = {
     autoClose: true,
     keepAfterRouteChange: true
   };
-
 
   constructor(
     protected alertService: AlertService,
@@ -61,7 +65,7 @@ export class ResumenCarreraComponent implements OnInit {
     private route: ActivatedRoute) {
     
     //this.mapas = new Map();
-    this.errorCarga = false;
+    this.errorCarga = this.borrandoCarrera = false;
   }
 
   ngOnInit() {
@@ -74,7 +78,10 @@ export class ResumenCarreraComponent implements OnInit {
     });
 
     if(window.location.toString().indexOf(this.TIPO_EDITAR) > -1) {
-      // Edición de carrera, ¿puede editar?
+      // Edición de carrera
+      this.tipoVista = this.TIPO_EDITAR;
+      this.titulo = "Editar carrera";
+      // ¿Puede editar?
       // TODO
       let editar = true;
       if(editar) {
@@ -85,6 +92,8 @@ export class ResumenCarreraComponent implements OnInit {
       }
     } else {
       // Creación de carrera
+      this.tipoVista = this.TIPO_CREAR;
+      this.titulo = "Crear carrera";
       if(window.location.toString().indexOf(this.TIPO_CREAR_NUEVA) > -1) {
         // Comienzo de nueva carrera, ¿hay borrador anterior?
         if(localStorage.getItem(AppSettings.LOCAL_STORAGE_CARRERA) !== null) {
@@ -152,7 +161,7 @@ export class ResumenCarreraComponent implements OnInit {
     //  Si es creación, se envían todos los datos (formulario, mapas, etc)
     //  Si es edición, se envían los datos modificados (?) 
 
-    this.clienteApi.crearCarrera(this.carrera).subscribe(
+    this.clienteApi.createCarrera(this.carrera).subscribe(
       resp => {
         if(resp.status == 201) {
           // Carrera creada
@@ -240,6 +249,51 @@ export class ResumenCarreraComponent implements OnInit {
   }
 
   /**
+   * Maneja click en el botón de borrado de carrera.
+   */
+  clickBotonBorrar() {
+    // Muestra el diálogo de confirmación de borrado
+    this.modalService.open(this.modalBorrarCarrera, {centered: true, size: 'lg'});
+  }
+
+  /**
+   * Confirma el borrado de la carrera.
+   */
+  confirmaBorrar(borrar: boolean) {
+    if(borrar) {
+      this.borrandoCarrera = true;
+      this.clienteApi.deleteCarrera(this.carrera.id).subscribe(
+        resp => {
+          this.borrandoCarrera = false;
+          if(resp.status == 200) {
+            this.alertService.success("Se ha borrado la carrera", this.alertOptions);
+            this.router.navigate(['/explorar']);
+          } else {
+            // ?
+            console.log(resp);
+          }
+
+        }, err => {
+          let mensaje = "No se pudo borrar la carrera";
+          if(typeof err.error === 'string') mensaje += ": " + err.error;
+          this.alertService.error(mensaje, this.alertOptions);
+          this.borrandoCarrera = false;
+          console.log(err);
+        }
+      );
+    }
+    
+    this.modalService.dismissAll();
+  }
+
+  /**
+   * Maneja click en el botón de volver a la carrera.
+   */
+  clickBotonVolver() {
+    if(this.carrera.id) this.router.navigate(['/carreras', this.carrera.id]);
+  }
+
+  /**
    * Navega a la vista de edición de recorridos.
    */
   editarRecorridos() {
@@ -247,6 +301,9 @@ export class ResumenCarreraComponent implements OnInit {
     this.router.navigate(['/crear', 'recorridos']);
   }
 
+  /**
+   * Navega a la vista de edición de controles.
+   */
   editarControles() {
     this.guardaDatosCarrera();
     this.router.navigate(['/crear', 'controles']);

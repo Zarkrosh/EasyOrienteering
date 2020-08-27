@@ -68,7 +68,11 @@ export class GenerarQRComponent implements OnInit {
     let docDefinition = {
       pageSize: 'A4',
       pageMargins: [0,0,0,0],
-      content: []
+      content: [],
+      info: {
+        title: 'Controles ' + this.carrera.nombre,
+        author: 'EasyOrienteering'
+      }
     }
 
     const paginas: HTMLDivElement[] = <HTMLDivElement[]> Array.from(document.getElementsByClassName('pagina-pdf'));
@@ -88,8 +92,8 @@ export class GenerarQRComponent implements OnInit {
       });
     }
 
-    pdfMake.createPdf(docDefinition).open(); // Debug más rápido
-    //pdfMake.createPdf(docDefinition).download(filename); // Producción
+    //pdfMake.createPdf(docDefinition).open(); // Debug más rápido
+    pdfMake.createPdf(docDefinition).download();
     this.generandoPDF = false;
   }
 

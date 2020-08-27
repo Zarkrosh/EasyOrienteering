@@ -1,10 +1,5 @@
 @import "../../styles.scss";
 
-h1 {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
 .custom-select {
     margin-left: 10px;
 }
@@ -25,7 +20,6 @@ h1 {
     margin: auto;
     text-align: center;
 }
-
 
 .tableFixHead { 
     width: 100%;
@@ -50,4 +44,11 @@ h1 {
 }
 .spinner-border {
     color: $color-orientacion;
+}
+
+#mapa-circuitos {
+    width: 100%;
+    max-width: 1000px;
+    height: 600px;
+    margin: 0 auto;
 }

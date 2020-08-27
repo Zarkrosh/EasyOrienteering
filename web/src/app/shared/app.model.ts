@@ -35,6 +35,7 @@ export class Carrera {
     longitud: number;
     privada: boolean;
     notas: string;
+    fecha: Date;
     creada: boolean; // True si la carrera existe en el sistema
                      // False cuando se está creando
 
@@ -43,7 +44,7 @@ export class Carrera {
         this.recorridos = [];
         this.controles = new Map();
         this.creada = this.privada = false;
-        this.id = this.organizador = this.latitud = this.longitud = null;
+        this.id = this.organizador = this.latitud = this.longitud = this.fecha = null;
     }
 }
 

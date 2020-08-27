@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -54,10 +55,6 @@ public class DatosPrueba {
     final int MIN_CONTROLES_RECORRIDO = 8;
     final int MAX_CONTROLES_RECORRIDO = 24;
     final int MAX_RECORRIDOS = 6;
-    final float MIN_LATITUD = 38.2f;
-    final float MAX_LATITUD = 43.3f;
-    final float MIN_LONGITUD = -8.5f;
-    final float MAX_LONGITUD = -0.5f;
     final float PROBABILIDAD_EVENTO_PRIVADO = 0.3f;
     final float PROBABILIDAD_NOTAS = 0.7f;
     final float PROBABILIDAD_COORDENADAS_EVENTO = 0.8f;
@@ -82,13 +79,12 @@ public class DatosPrueba {
     void generaDatosPrueba() throws Exception {
         File fileNombres = new File("src/test/resources/nombres.txt");
         File fileClubes = new File("src/test/resources/clubes.txt");
-        File filePoblaciones = new File("src/test/resources/poblaciones.txt");
+        File fileMunicipios = new File("src/test/resources/municipios.txt");
         String[] nombres = readLines(fileNombres);
         String[] clubes = readLines(fileClubes);
-        String[] poblaciones = readLines(filePoblaciones);
+        List<Municipio> municipios = generaMunicipios(readLines(fileMunicipios));
         
         aleatoriza(nombres);
-        aleatoriza(poblaciones);
         
         // USUARIOS
         List<Usuario> usuariosGenerados = new ArrayList<>();
@@ -114,14 +110,14 @@ public class DatosPrueba {
         for(int i = 0; i < NUMERO_CARRERAS_EVENTO; i++) {
             Usuario organizador = getUsuarioAleatorio(usuariosGenerados);
             Carrera.Modalidad modalidad = modalidades[random.nextInt(modalidades.length)];
-            Carrera carrera = getCarreraAleatoria(organizador, getStringAleatoria(poblaciones), modalidad, Carrera.Tipo.EVENTO);
+            Carrera carrera = getCarreraAleatoria(organizador, getMunicipioAleatorio(municipios), modalidad, Carrera.Tipo.EVENTO);
             carrerasGeneradas.add( carrerasService.saveCarrera(carrera) );
         }
         // Circuitos
         for(int i = 0; i < NUMERO_CARRERAS_CIRCUITO; i++) {
             Usuario organizador = getUsuarioAleatorio(usuariosGenerados);
             Carrera.Modalidad modalidad = modalidades[random.nextInt(modalidades.length)];
-            Carrera carrera = getCarreraAleatoria(organizador, getStringAleatoria(poblaciones), modalidad, Carrera.Tipo.CIRCUITO);
+            Carrera carrera = getCarreraAleatoria(organizador, getMunicipioAleatorio(municipios), modalidad, Carrera.Tipo.CIRCUITO);
             carrerasGeneradas.add( carrerasService.saveCarrera(carrera) );
         }
         
@@ -156,14 +152,14 @@ public class DatosPrueba {
         }
     }
     
-    public Carrera getCarreraAleatoria(Usuario organizador, String poblacion, Carrera.Modalidad modalidad, Carrera.Tipo tipoCarrera) {
-        String nombre = getNombreCarreraAleatorio(poblacion, (tipoCarrera == Carrera.Tipo.CIRCUITO));
+    public Carrera getCarreraAleatoria(Usuario organizador, Municipio municipio, Carrera.Modalidad modalidad, Carrera.Tipo tipoCarrera) {
+        String nombre = getNombreCarreraAleatorio(municipio.nombre, (tipoCarrera == Carrera.Tipo.CIRCUITO));
         String notas = "";
         if(random.nextFloat() <= PROBABILIDAD_NOTAS) {
             notas = LoremIpsum.getInstance().getParagraphs(1, 3);
         }
-        Float latitud = getFloatAleatorio(MIN_LATITUD, MAX_LATITUD);
-        Float longitud = getFloatAleatorio(MIN_LONGITUD, MAX_LONGITUD);
+        Float latitud = municipio.latitud;
+        Float longitud = municipio.longitud;
         boolean privada;
         if(tipoCarrera == Carrera.Tipo.CIRCUITO) {
             privada = false;
@@ -229,6 +225,10 @@ public class DatosPrueba {
         return lista.get( random.nextInt(lista.size()) );
     }
     
+    public Municipio getMunicipioAleatorio(List<Municipio> lista) {
+        return lista.get( random.nextInt(lista.size()) );
+    }
+    
     public int getIntAleatorio(int min, int max) {
         return min + random.nextInt(max - min);
     }
@@ -276,5 +276,31 @@ public class DatosPrueba {
             }
         }
         return lines.toArray(new String[lines.size()]);
+    }
+    
+    private class Municipio {
+        public String nombre;
+        public float latitud;
+        public float longitud;
+
+        public Municipio(String nombre, float latitud, float longitud) {
+            this.nombre = nombre;
+            this.latitud = latitud;
+            this.longitud = longitud;
+        }
+    }
+    
+    private List<Municipio> generaMunicipios(String[] lineas) {
+        List<Municipio> municipios = new ArrayList<>();
+        // nombremunicipio;latitud;longitud
+        for(String linea : lineas) {
+            String[] campos = linea.split(";");
+            String nombre = new String(campos[0].getBytes(), StandardCharsets.UTF_8).split("\\(")[0];
+            float latitud = Float.parseFloat(campos[1]);
+            float longitud = Float.parseFloat(campos[2]);
+            municipios.add(new Municipio(nombre, latitud, longitud));
+        }
+        
+        return municipios;
     }
 }

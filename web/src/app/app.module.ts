@@ -23,6 +23,8 @@ import { QueEsComponent } from './que-es/que-es.component';
 import { GenerarQRComponent } from './vista-carrera/generar-qr/generar-qr.component';
 import { EditorUbicacionComponent } from './crear-carrera/editores/editor-ubicacion/editor-ubicacion.component';
 import { ExplorarComponent } from './explorar/explorar.component';
+import { MapaCircuitosComponent } from './explorar/mapa-circuitos/mapa-circuitos.component';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -40,7 +42,8 @@ import { ExplorarComponent } from './explorar/explorar.component';
     QueEsComponent,
     GenerarQRComponent,
     EditorUbicacionComponent,
-    ExplorarComponent
+    ExplorarComponent,
+    MapaCircuitosComponent
   ],
   imports: [
     BrowserModule,
@@ -52,7 +55,7 @@ import { ExplorarComponent } from './explorar/explorar.component';
     LeafletModule,
     InfiniteScrollModule
   ],
-  providers: [],
+  providers: [DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -30,24 +30,8 @@
             </div>
     
             <div class="ubicacion">
-                <div class="header-ubicacion">
-                    <h1>Ubicación</h1>
-                    <button *ngIf="!editandoUbicacion && mostrarEditUbicacion" id="btn-editar-ubicacion" class="btn btn-primary" (click)="editarUbicacion()">Editar</button>
-                </div>
-                <div #mapaUbicacion id="mapa-ubicacion" class="ubicacion-mapa" [style.cursor]="(marcarUbicacion) ? 'crosshair' : auto">
-                    
-                    <div *ngIf="mostrarAnadirUbicacion" id="btn-anadir-ubicacion" (click)="editarUbicacion()">
-                        <i class="fa fa-plus-square"></i>
-                        <span>Añadir ubicación</span>
-                    </div>
-                </div>
-                <span *ngIf="editandoUbicacion && mensajeUbicacion" [ngClass]="(marcarUbicacion) ? 'mensaje-ubicacion-exito' : 'mensaje-ubicacion-error'" class="mensaje-ubicacion">{{mensajeUbicacion}}</span>
-                <button *ngIf="editandoUbicacion && marcarUbicacion && latitudElegida != null && longitudElegida != null" 
-                    class="btn btn-primary btn-guardar-ubicacion" (click)="guardarUbicacion()" [disabled]="guardandoUbicacion">
-
-                    <span *ngIf="guardandoUbicacion" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    Guardar ubicación
-                </button>
+                <h1>Ubicación</h1>
+                <div #mapaUbicacion id="mapa-ubicacion" class="ubicacion-mapa" [style.cursor]="(marcarUbicacion) ? 'crosshair' : auto"></div>
             </div>
         </div>
 

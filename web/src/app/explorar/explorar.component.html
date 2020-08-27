@@ -1,4 +1,8 @@
 <div class="easyo-container">
+    <div class="btns-cabecera">
+        <button type="button" class="btn btn-info btn-cabecera-dcha" (click)="muestraMapaCircuitos(true)">Mapa de circuitos permanentes</button>
+    </div>
+
     <h1>Explorar carreras</h1>
 
     <form [formGroup]="busquedaForm" class="form-inline" (submit)="buscarCarreras()">
@@ -80,3 +84,19 @@
     </div>
     
 </div>
+
+<!-- Diálogo con mapa de circuitos -->
+<ng-template #modalMapaCircuitos let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Circuitos permanentes de orientación</h5>
+        <button type="button" class="close" (click)="muestraMapaCircuitos(false)" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <app-mapa-circuitos></app-mapa-circuitos>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="muestraMapaCircuitos(false)" ngbAutofocus>Cerrar</button>
+    </div>
+</ng-template>
