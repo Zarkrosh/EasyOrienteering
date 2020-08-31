@@ -1,4 +1,4 @@
-<div #vistaMapa id="vista-mapa" (window:resize)="onResize($event)">
+<div #vistaMapa id="vista-mapa" (window:resize)="onResize($event)" [hidden]="!imgMapa">
     <canvas #canvasMapa id="canvas-mapa">Necesitas utilizar un explorador más moderno</canvas>
     <canvas #canvasTrazado id="canvas-trazado"></canvas>
     <canvas #canvasMarcador id="canvas-marcador"
@@ -20,6 +20,10 @@
         <span><b>Canv. Y</b>: {{canvY}}</span>
     </div>
 
+    <div class="wrapper-slider-tamano">
+        <span>Tamaño elementos</span>
+        <input type="range" min="3" max="14" value="8" class="slider-tamano" (input)="cambiaTamanoElementos()" #selectorTamano />
+    </div>
 
     <div #selectorTipo id="selector-tipo">
         <label>

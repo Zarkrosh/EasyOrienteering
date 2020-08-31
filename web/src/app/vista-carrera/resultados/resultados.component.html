@@ -1,0 +1,72 @@
+<div class="easyo-container">
+    <div class="btns-cabecera">
+        <button *ngIf="idCarrera" class="btn btn-info btn-cabecera-izda" (click)="clickBotonVolver()">Volver a carrera</button>
+    </div>
+
+    <h1>Resultados <i>{{(recorrido) ?  recorrido.nombre : ""}}</i></h1>
+
+    <table *ngIf="resultados" class="tabla-resultados text-center" (mousedown)="mouseDownResultados($event)" 
+            (mousemove)="mouseMoveResultados($event)" (mouseup)="mouseUpResultados()" (mouseleave)="mouseUpResultados()" #tablaResultados>
+        <thead>
+            <tr>
+                <th rowspan="2">#</th>
+                <th class="resultado-nombre-club">Nombre</th>
+                <th rowspan="2">Tiempo</th>
+
+                <th rowspan="2" colspan="2" *ngFor="let cabecera of cabecerasTrazado" class="cabecera-trazado">{{cabecera}}</th> <!-- TEST -->
+
+
+                <ng-template *ngIf="modalidad === MOD_TRAZADO">
+                    <th *ngFor="let codigo of recorrido.trazado">{{codigo}}</th>
+                </ng-template>
+                <ng-template *ngIf="modalidad === MOD_SCORE">
+                    <th rowspan="2">Puntuación</th>
+                    <!-- TODO Controles ordenados de menor a mayor (sin salida, meta al final) -->
+                </ng-template>
+            </tr>
+            <tr>
+                <th class="resultado-nombre-club">Club</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-template ngFor let-resultado [ngForOf]="resultados">
+                <tr>
+                    <td rowspan="2">{{resultado.posicion}}</td>
+                    <td class="text-left resultado-nombre">{{resultado.nombre}}</td>
+                    <td><b>{{resultado.tiempoTotal | tiempo}}</b></td>
+
+                    <ng-template ngFor let-parcial [ngForOf]="resultado.parciales">
+                        <td [ngClass]="{'parcial-primero': parcial.posicionParcial === 1, 'parcial-podio': parcial.posicionParcial <= 3}">
+                            {{parcial.tiempoParcial | tiempo}}</td>
+                        <td [ngClass]="{'parcial-primero': parcial.posicionParcial === 1, 'parcial-podio': parcial.posicionParcial <= 3}"
+                            class="resultado-posicion">({{parcial.posicionParcial}})</td>
+                    </ng-template>
+                    <!--
+                    <ng-template *ngIf="modalidad === MOD_TRAZADO">
+                        <td *ngFor="let parcial of resultado.parciales">
+                            <div>
+                                <span>{{parcial.tiempoParcial}} ({{parcial.posicionParcial}})</span>
+                                <span>{{parcial.tiempoAcumulado}} ({{parcial.posicionAcumulada}})</span>
+                            </div>
+                        </td>
+                    </ng-template>-->
+                    <ng-template *ngIf="modalidad === MOD_SCORE">
+                        <!-- TODO Puntuación total -->
+                        <!-- TODO Controles registrados -->
+                    </ng-template>
+                </tr>
+                <tr class="fila-inferior">
+                    <td class="text-left resultado-nombre">{{resultado.club}}</td>
+                    <td>{{resultado.diferenciaGanador | tiempo:'+'}}</td>
+
+                    <ng-template ngFor let-parcial [ngForOf]="resultado.parciales">
+                        <td [ngClass]="{'parcial-primero': parcial.posicionAcumulada === 1, 'parcial-podio': parcial.posicionAcumulada <= 3}">
+                            {{parcial.tiempoAcumulado | tiempo}}</td>                        
+                        <td [ngClass]="{'parcial-primero': parcial.posicionAcumulada === 1, 'parcial-podio': parcial.posicionAcumulada <= 3}" 
+                            class="resultado-posicion">({{parcial.posicionAcumulada}})</td>                        
+                    </ng-template>
+                </tr>
+            </ng-template>
+        </tbody>
+    </table>
+</div>

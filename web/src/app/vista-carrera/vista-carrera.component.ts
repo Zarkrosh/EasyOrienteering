@@ -124,11 +124,15 @@ export class VistaCarreraComponent implements OnInit {
   }
 
   editarCarrera(): void {
-    this.router.navigate(['/editar', this.carrera.id]);
+    this.router.navigate(["/editar", this.carrera.id]);
   }
 
-  generarQR() {
+  generarQR(): void {
     this.router.navigate(["qr"], {relativeTo: this.route});
+  }
+
+  verResultados(idRecorrido: number): void {
+    this.router.navigate(["/resultados", idRecorrido]);
   }
 
   refresh(): void {

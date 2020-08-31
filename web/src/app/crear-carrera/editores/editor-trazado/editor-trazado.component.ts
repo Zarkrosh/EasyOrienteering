@@ -3,15 +3,13 @@ import { Recorrido, Control, Coordenadas } from '../../../shared/app.model';
 import { AlertService } from '../../../alert';
 import { SharedEditorService } from '../shared-editor.service';
 
-declare var $:any;
-
 @Component({
   selector: 'editor-trazado',
   templateUrl: './editor-trazado.component.html',
   styleUrls: ['./editor-trazado.component.scss']
 })
 export class EditorTrazadoComponent implements OnInit {
-  DEBUG_VISUAL = false;
+  DEBUG_VISUAL = false; // DEBUG
 
   // Medidas y aspectos de los símbolos (según ISOM 2017)
   MM_UNIT_ORI = 8; // Valor (original) para controlar el escalado
@@ -28,6 +26,7 @@ export class EditorTrazadoComponent implements OnInit {
   NUMBER_FONT = "sans-serif"; 
 
   // Medidas y aspectos del marcador
+  @ViewChild('selectorTamano', {static: true}) selectorTamano: ElementRef<HTMLInputElement>; 
   @ViewChild('selectorTipo', {static: true}) selectorTipo: ElementRef<HTMLDivElement>; 
   @ViewChild('selectorSalida', {static: true}) selectorSalida: ElementRef<HTMLInputElement>; 
   @ViewChild('selectorControl', {static: true}) selectorControl: ElementRef<HTMLInputElement>; 
@@ -96,11 +95,9 @@ export class EditorTrazadoComponent implements OnInit {
     this.offsetX = this.offsetY = 0;
     this.MARKER_STATE = Control.TIPO_SALIDA;
 
-    // DEBUG Para no tener que estar cargándolo a mano
-    this.cargaMapaAutomatico();
+    
+    this.cargaMapaAutomatico(); // DEBUG Para no tener que estar cargándolo a mano
 
-    this.updateCanvasDims(this.canvasMarcador.nativeElement);
-    this.setupCanvas(false);
     this.setupObservadores();
   }
 
@@ -119,10 +116,11 @@ export class EditorTrazadoComponent implements OnInit {
 
     // Controlador de cambio del recorrido
     this.sharedData.recorridoActual.subscribe((nRecorrido) => {
-      if(!nRecorrido) nRecorrido = null;
-      this.recorridoActual = nRecorrido;
-      this.redibujaTrazado();
-      this.actualizaMarcador();
+      if(nRecorrido != null) {
+        this.recorridoActual = nRecorrido;
+        this.redibujaTrazado();
+        this.actualizaMarcador();
+      }
     });
 
     // Controlador de confirmación de borrado de control
@@ -941,30 +939,6 @@ export class EditorTrazadoComponent implements OnInit {
     this.canvasTrazado.nativeElement.style.top = this.offsetY + "px";
   }
 
-  /* DEBUG: borrar */
-  cargaMapaAutomatico() {
-    this.imgMapa = new Image();
-    this.imgMapaOrig = new Image();
-    this.imgMapa.onload = (() => {
-      this.setZoom(0, new Coordenadas(0,0), 0);
-      this.actualizaLimites();
-
-      //this.offsetX = -(this.imgMapa.width / 2);
-      //this.offsetY = -(this.imgMapa.height / 2);
-      this.offsetX = -500;
-      this.offsetY = -1000;
-      this.desplazaCanvas(); // Actualiza posiciones de los canvas
-
-      // TEST
-      this.setupCanvas(true);
-      this.redibujaMapa();
-      this.redibujaTrazado();
-    });
-
-    this.imgMapa.src = "assets/img/sample-map.jpg";
-    this.imgMapaOrig.src = "assets/img/sample-map.jpg";
-  }
-
   /* Actualiza los límites horizontal y vertical de desplazamiento de la vista */
   actualizaLimites() {
     this.MAX_OFFSET_X = -(this.imgMapa.width - this.vistaMapa.nativeElement.getBoundingClientRect().width);
@@ -1019,8 +993,6 @@ export class EditorTrazadoComponent implements OnInit {
     canvas.height = height;
   }
 
-
-
   /**
    * Devuelve las coordenadas corregidas en el lienzo de marcado teniendo en cuenta el zoom
    * y el desplazamiento actuales.
@@ -1062,4 +1034,72 @@ export class EditorTrazadoComponent implements OnInit {
     return deg * Math.PI / 180.0;
   }
 
+  cambiaTamanoElementos() {
+    this.MM_UNIT_ORI = this.selectorTamano.nativeElement.valueAsNumber;
+    console.log("[*] Nueva medida: " + this.MM_UNIT_ORI);
+    this.actualizaMetricas();
+    this.redibujaTrazado();
+    this.redibujaMapa();
+  }
+
+
+  cargaMapa(srcImagenMapa: string) {
+    this.imgMapa = new Image();
+    this.imgMapaOrig = new Image();
+    this.imgMapa.onload = (() => {
+      this.setZoom(0, new Coordenadas(0,0), 0);
+      this.actualizaLimites();
+
+      this.offsetX = -(this.imgMapa.width / 2);
+      this.offsetY = -(this.imgMapa.height / 2);
+      this.desplazaCanvas(); // Actualiza posiciones de los canvas
+
+      // TEST
+      this.setupCanvas(true);
+      this.redibujaMapa();
+      this.redibujaTrazado();
+
+      //this.updateCanvasDims(this.canvasMarcador.nativeElement);
+      //this.setupCanvas(false);
+    });
+
+    this.imgMapa.src = srcImagenMapa;
+    this.imgMapaOrig.src = srcImagenMapa;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* DEBUG: borrar */
+  cargaMapaAutomatico() {
+    this.imgMapa = new Image();
+    this.imgMapaOrig = new Image();
+    this.imgMapa.onload = (() => {
+      this.setZoom(0, new Coordenadas(0,0), 0);
+      this.actualizaLimites();
+
+      //this.offsetX = -(this.imgMapa.width / 2);
+      //this.offsetY = -(this.imgMapa.height / 2);
+      this.offsetX = -500;
+      this.offsetY = -1000;
+      this.desplazaCanvas(); // Actualiza posiciones de los canvas
+
+      // TEST
+      this.setupCanvas(true);
+      this.redibujaMapa();
+      this.redibujaTrazado();
+    });
+
+    this.imgMapa.src = "assets/img/sample-map.jpg";
+    this.imgMapaOrig.src = "assets/img/sample-map.jpg";
+  }
 }

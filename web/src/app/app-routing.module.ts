@@ -13,6 +13,7 @@ import { EditorRecorridosComponent } from './crear-carrera/editores/editor-recor
 import { ResumenCarreraComponent } from './crear-carrera/resumen-carrera/resumen-carrera.component';
 import { ExplorarComponent } from './explorar/explorar.component';
 import { MapaCircuitosComponent } from './explorar/mapa-circuitos/mapa-circuitos.component';
+import { ResultadosComponent } from './vista-carrera/resultados/resultados.component';
 
 
 const routes: Routes = [
@@ -30,7 +31,8 @@ const routes: Routes = [
   {path: 'crear', component: ResumenCarreraComponent},
   {path: 'editar/:id', component: ResumenCarreraComponent},
   {path: 'carreras/:id', component: VistaCarreraComponent},
-  {path: 'carreras/:id/qr', component: GenerarQRComponent}
+  {path: 'carreras/:id/qr', component: GenerarQRComponent},
+  {path: 'resultados/:id', component: ResultadosComponent}
 ];
 
 @NgModule({

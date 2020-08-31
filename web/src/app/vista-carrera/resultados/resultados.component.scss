@@ -1,0 +1,57 @@
+@import "../../../styles.scss";
+
+.tabla-resultados {
+    display: block;
+    max-height: 700px;
+    border: 2px solid black;
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: auto;
+}
+.tabla-resultados thead {
+    color: white;
+    background-color: $color-orientacion;
+    border-bottom: 2px solid black;
+    position: sticky; 
+    top: 0; 
+}
+.tabla-resultados td {
+    border-left: 1px solid gray;
+    padding: 0 5px;
+}
+.tabla-resultados th {
+    border-left: 2px solid black;
+    padding: 0px 4px;
+}
+
+.cabecera-trazado {
+    min-width: 84px;
+}
+
+.fila-inferior {
+    border-bottom: 1px solid gray;
+}
+
+.resultado-nombre-club {
+    text-align: left;
+    padding-left: 10px !important;
+}
+
+.resultado-nombre {
+    min-width: 300px;
+}
+
+.resultado-posicion {
+    border-left: none !important;
+    padding-left: 6px;
+}
+
+.parcial-primero {
+    color: red !important;
+    font-weight: bold;
+}
+
+.parcial-podio {
+    color: rgb(46, 46, 255);
+    font-weight: bold;
+}

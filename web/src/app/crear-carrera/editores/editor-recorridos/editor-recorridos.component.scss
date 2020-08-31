@@ -17,9 +17,21 @@
     flex-direction: column;
     overflow: hidden;
 }
-
 #trazador {
     flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border: 2px solid black;
+    border-radius: 20px;
+}
+
+#wrapper-recorridos {
+    flex: 1;
+}
+#wrapper-recorridos h3 {
+    text-align: center;
 }
 
 #barra-lateral {
@@ -102,6 +114,33 @@
     transform: rotate(180deg);
     -webkit-transform: rotate(180deg);
 }
+
+editor-trazado {
+    width: 100%;
+    height: 100%;
+}
+
+
+/*********** LISTA DE RECORRIDOS ***********/
+.lista-recorridos {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.lista-recorridos button {
+
+}
+.item-recorridos {
+    width: 400px;
+    height: 300px;
+}
+
+
+
+
+
+
+
 
 .info-lateral {
     height: 400px; // Actúa como min-height con el grow 
@@ -235,6 +274,7 @@
 
 /*********** BOTÓN SELECCIONAR MAPA BASE ***********/
 #label-seleccionar-mapa {
+    position: absolute;
     background-color: limegreen;
     border-color: limegreen;
     padding: 10px;
@@ -261,17 +301,70 @@
 	pointer-events: none;
 }
 
+.wrapper-botones {
+    margin-top: 20px;
+    display: inline-flex;
+    flex-direction: row;
+    justify-items: center;
+}
 /*********** BOTÓN GUARDAR RECORRIDOS ***********/
 #btn-guardar {
-    width: 50%;
-    margin: 15px auto;
+    margin-left: 20%;
     font-size: large;
     font-weight: bold;
+    flex:1;
 }
 
 
 
-/***********  ***********/
+/*********** DIALOGO DE ELECCION ***********/
+.wrapper-elecciones {
+    width: 100%;
+    display: inline-flex;
+    justify-items: center;
+}
+.selector-eleccion {
+    width: 300px;
+    height: 300px;
+    margin: 30px 50px;
+    display: inline-flex;
+    flex-direction: column;
+    padding: 10px 20px;
+    border: 2px solid black;
+    border-radius: 20px;
+    color: black;
+    cursor: pointer;
+    transition: .3s background-color;
+}
+.selector-eleccion:hover {
+    background-color: $color-orientacion;
+    color: white;
+}
+.recorrido:hover .overlay-recorrido{
+    opacity: 1;
+}
+
+.titulo-eleccion {
+    width: 100%;
+    margin: 0 5px;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 1.3rem;
+    text-align: center;
+}
+.texto-eleccion {
+    text-align: center;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.texto-aclaracion {
+    text-align: center;
+    font-size: 1rem;
+}
+
+
 /***********  ***********/
 /***********  ***********/
 /***********  ***********/

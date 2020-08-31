@@ -1,11 +1,12 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { AlertService } from '../../../alert';
 import { SharedEditorService } from '../shared-editor.service';
 import { Control, Recorrido, AppSettings, Carrera } from 'src/app/shared/app.model';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import { EditorTrazadoComponent } from '../editor-trazado/editor-trazado.component';
 import { DataService } from 'src/app/shared/data.service';
+import { FormBuilder } from '@angular/forms';
 
 declare var $: any; // JQuery
 
@@ -39,8 +40,36 @@ export class EditorRecorridosComponent implements OnInit {
   @ViewChild('nombreRecorrido', {static: true}) nombreRecorrido: ElementRef<HTMLInputElement>;
   @ViewChild('modalControl', {static: true}) modalControl: ElementRef<NgbModal>;
   @ViewChild('modalRecorrido', {static: true}) modalRecorrido: ElementRef<NgbModal>;
-  @ViewChild('trazador', {static: true}) trazador: EditorTrazadoComponent;
-  
+  @ViewChild('modalEleccionInicial', {static: true}) modalEleccionInicial: ElementRef<NgbModal>;
+  @ViewChild('modalCancelar', {static: true}) modalCancelar: ElementRef<NgbModal>;
+
+  wrapperTrazador: ElementRef<HTMLDivElement>;
+  @ViewChild('wrapperTrazador', {static: false}) set contentWrapperTrazador(content: ElementRef<HTMLDivElement>) {
+    if(content) {
+      // Maximiza el contenido
+      let offset = content.nativeElement.offsetTop;
+      let wHeight = window.innerHeight;
+      content.nativeElement.style.height = (wHeight - offset - 20) + "px";
+      this.wrapperTrazador = content;
+    }
+  }
+  wrapperRecorridos: ElementRef<HTMLDivElement>;
+  @ViewChild('wrapperRecorridos', {static: false}) set contentWrapperRecorridos(content: ElementRef<HTMLDivElement>) {
+    if(content) {
+      // Maximiza el contenido
+      let offset = content.nativeElement.offsetTop;
+      let wHeight = window.innerHeight;
+      content.nativeElement.style.height = (wHeight - offset - 100) + "px";
+      this.wrapperRecorridos = content;
+    }
+  }
+  trazador: EditorTrazadoComponent;
+  @ViewChild('trazador', {static: false}) set contentTrazador(content: ElementRef) {
+    if(content) {
+      this.trazador = content.nativeElement;
+    }
+  }
+
   carrera: Carrera;
   recorridos: Map<string, Recorrido>;
   recorridoActual: string;
@@ -51,6 +80,10 @@ export class EditorRecorridosComponent implements OnInit {
   editandoNombreRecorrido: boolean;
 
   // Diálogos modales
+  readonly ELECCION_SOLO_RECORRIDOS = "RECORRIDOS";
+  readonly ELECCION_TRAZAR = "TRAZAR";
+  eleccionTrazado;
+  activeModal: NgbModalRef;
   tempControl: Control; // Temporal para la confirmación de borrado
 
   // Alertas
@@ -68,6 +101,7 @@ export class EditorRecorridosComponent implements OnInit {
     protected alertService: AlertService,
     private modalService: NgbModal,
     private router: Router,
+    private formBuilder: FormBuilder,
     private data: DataService) { }
 
   ngOnInit() {
@@ -76,6 +110,7 @@ export class EditorRecorridosComponent implements OnInit {
     this.listaControlesOrdenados = [];
     this.recorridoActual = null;
     this.editandoNombreRecorrido = false;
+    this.eleccionTrazado = null;
   
     // Diferencia entre edición de controles y de recorridos
     //  Controles: para carreras score. Solo se pueden añadir controles en mapa maestro.
@@ -103,10 +138,10 @@ export class EditorRecorridosComponent implements OnInit {
       return;
     }
     
-    // Hace que el editor sea tan grande como el resto de la pantalla restante
-    var wHeight = $(window).height();
-    var offset = $("#wrapper-trazador").offset().top;
-    $("#wrapper-trazador").height(wHeight - offset - 20);
+    // Hace que el editor sea tan grande como el resto de la pantalla restante (borrar)
+    //var wHeight = $(window).height();
+    //var offset = $("#wrapper-trazador").offset().top;
+    //$("#wrapper-trazador").height(wHeight - offset - 20);
 
     // Controlador de adición de control
     this.sharedData.nuevoControl.subscribe((control) => {
@@ -199,20 +234,40 @@ export class EditorRecorridosComponent implements OnInit {
 
     if(this.carrera) {
       // Genera mapas de controles y recorridos
-      if(this.carrera.recorridos != null && this.carrera.controles != null) {
+      if(this.carrera.recorridos != null && this.carrera.controles != null
+          && this.carrera.recorridos.length > 0 && this.carrera.controles.size > 0) {
         this.carrera.recorridos.forEach((recorrido, indice, array) => {
           this.recorridos.set(recorrido.nombre, recorrido);
           this.nombresRecorridos.push(recorrido.nombre);
         });
         this.controles = new Map(Object.entries(this.carrera.controles));
+
+        this.generaListaGlobalControles();
+        // Actualiza el modelo compartido con el editor de trazados
+        this.sharedData.actualizaControles(this.controles);
+      } else {
+        // Primera creación
+        this.eleccionTrazado = this.ELECCION_SOLO_RECORRIDOS; // DEBUG
+        /*
+        this.activeModal = this.modalService.open(this.modalEleccionInicial, {centered: true, size: 'lg', backdrop : 'static', keyboard : false, windowClass: 'modal-fit'});
+        this.activeModal.result.then(
+          (data) => {
+            // Close
+            console.log("Close: " + data);
+            this.eleccionTrazado = data;
+          }, (reason) => {
+            if(reason === 0) {
+              // Ha conseguido cerrar el diálogo modal obligatorio de elegir
+              this.alertService.error("Debes elegir una opción", this.alertOptions);
+              this.router.navigate(["/crear"]);
+            }
+          }
+        );
+        */
       }
     } else {
       throw "Error al cargar la carrera";
     }
-
-    this.generaListaGlobalControles();
-    // Actualiza el modelo compartido con el editor de trazados
-    this.sharedData.actualizaControles(this.controles);
   }
 
   /**
@@ -290,6 +345,21 @@ export class EditorRecorridosComponent implements OnInit {
   }
 
   /**
+   * Maneja el click en el botón de cancelar.
+   */
+  clickCancelar(): void {
+    this.activeModal = this.modalService.open(this.modalCancelar, {centered: true, size: 'lg'});
+  }
+
+  /**
+   * Cancela la edición.
+   */
+  cancelar(): void {
+    // TODO Mensaje de confirmación
+    this.router.navigate(['/crear']);
+  }
+
+  /**
    * Genera una lista global de controles (sin salidas o metas).
    */
   generaListaGlobalControles(): void {
@@ -343,14 +413,16 @@ export class EditorRecorridosComponent implements OnInit {
    */
   cargarMapa(event) {
     if(!this.checkFileAPIs()) return;
-    
-    let file : File = event.target.files[0];
-    if(file) {
-      this.sharedData.cambiarMapaBase(file);
+    if(event.target.files && event.target.files[0]) {
+      const reader = new FileReader();
+      reader.addEventListener('load', (event: any) => {
+        // TODO Aplicar restricciones/validaciones
+        this.trazador.cargaMapa(event.target.result);
+      });
+      reader.readAsDataURL(event.target.files[0]);
     } else {
       this.alertService.error("Ocurrió un error al cargar el mapa.");
     }
-    
   }
 
   /**
@@ -479,11 +551,6 @@ export class EditorRecorridosComponent implements OnInit {
     }
 
     this.sharedData.confirmaBorrado(control.tipo);
-  }
-
-  /* Devuelve una lista con los nombres de los recorridos */
-  getNombresRecorridos() {
-    return this.nombresRecorridos;
   }
 
   /**

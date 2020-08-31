@@ -7,6 +7,9 @@
 .btn-sin-algo {
     margin-top: 40px;
 }
+.btn-sin-algo input {
+    display: none;
+}
 
 
 .header-seccion {
@@ -126,7 +129,7 @@
 }
 .recorrido {
     display: inline-flex;
-    width: 300px;
+    width: 200px;
     margin: 0 20px;
     margin-bottom: 20px;
     padding-bottom: 10px;
@@ -161,6 +164,7 @@
     justify-content: center;
 }
 #lista-mapas > div {
+    position: relative;
     width: 45%;
     min-width: 200px;
     margin: 15px 5px;
@@ -168,7 +172,15 @@
 #lista-mapas img {
     width: 100%;
 }
-
+.btn-borrar-mapa {
+    position: absolute;
+    right: 10px;
+    top: 4px;
+    padding: 0px 5px;
+}
+.btn-borrar-mapa i {
+    margin: 0;
+}
 
 
 .btn-crear {

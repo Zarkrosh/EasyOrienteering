@@ -1,16 +1,40 @@
-<div id="wrapper">
-    <div id="wrapper-trazador">
+<div id="wrapper" [style.visibility]="(eleccionTrazado !== null) ? 'visible' : 'hidden'">
+    <div id="wrapper-trazador" *ngIf="eleccionTrazado === ELECCION_TRAZAR" #wrapperTrazador>
         <!-- Pestañas de recorridos -->
         <ul id="tabs-recorridos" class="nav nav-tabs">
             <li [class.tab-seleccionada]="recorridoActual === null" (click)="todosLosControles()" class="noselect"><span>Controles</span></li>
-            <li *ngFor="let nombre of getNombresRecorridos()" (click)="seleccionaRecorrido(nombre)" 
+            <li *ngFor="let nombre of nombresRecorridos" (click)="seleccionaRecorrido(nombre)" 
                 [class.tab-seleccionada]="nombre === recorridoActual" class="noselect"><span >{{nombre}}</span></li>
             <li id="btn-nuevo-recorrido" *ngIf="recorridos.size < MAX_RECORRIDOS && tipoEdicion === EDICION_RECORRIDOS" (click)="nuevoRecorrido()" class="noselect"><span><i class="fa fa-plus"></i></span></li>
         </ul>
-        <!-- Editor de trazados -->
-        <editor-trazado id="trazador" #trazador>
 
-        </editor-trazado>
+        <div id="trazador">
+
+            <!-- Editor de trazados -->
+            <editor-trazado #trazador>
+
+            </editor-trazado>
+
+            <!-- Importación PurplePen 
+            <input #inputPurplePen id="input-purplepen" type="file" class="inputfile" (change)="importarPurplePen($event)">
+            <label id="label-importar-purplepen" for="input-purplepen" class="btn btn-primary">Importar desde PurplePen</label>
+            -->
+
+            <!-- Selección de imagen de mapa base -->
+            <input #inputMapa id="input-mapa" type="file" class="inputfile" (change)="cargarMapa($event)">
+            <label *ngIf="!trazador.imgMapa" id="label-seleccionar-mapa" for="input-mapa" class="btn btn-primary">Seleccionar mapa base</label>
+            
+        </div>        
+        
+    </div>
+
+    <div id="wrapper-recorridos" *ngIf="eleccionTrazado === ELECCION_SOLO_RECORRIDOS" #wrapperRecorridos>
+        <h3>Recorridos</h3>
+        <div class="lista-recorridos">
+            <li *ngFor="let nombre of nombresRecorridos" (click)="seleccionaRecorrido(nombre)"
+                [class.rec-seleccionado]="nombre === recorridoActual" class="item-recorridos noselect"><span >{{nombre}}</span></li>
+            <button (click)="nuevoRecorrido()"><i class="fa fa-plus"></i></button>
+        </div>
     </div>
 
     <!-- Barra lateral -->
@@ -65,19 +89,11 @@
             </div>
 
         </div>
-        
 
-        <!-- Importación PurplePen 
-        <input #inputPurplePen id="input-purplepen" type="file" class="inputfile" (change)="importarPurplePen($event)">
-        <label id="label-importar-purplepen" for="input-purplepen" class="btn btn-primary">Importar desde PurplePen</label>
-        -->
-
-        <!-- Selección de imagen de mapa base -->
-        <input #inputMapa id="input-mapa" type="file" class="inputfile" (change)="cargarMapa($event)">
-        <label id="label-seleccionar-mapa" for="input-mapa" class="btn btn-primary">Seleccionar mapa base</label>
-
-        <!-- Botón de guardado -->
-        <button id="btn-guardar" class="btn btn-primary" (click)="guardar()">Guardar {{(tipoEdicion)}}</button>
+        <div class="wrapper-botones">
+            <button id="btn-cancelar" class="btn btn-danger" (click)="clickCancelar()">Cancelar</button>
+            <button id="btn-guardar" class="btn btn-primary" (click)="guardar()">Guardar {{(tipoEdicion)}}</button>
+        </div>
     </div>
 </div>
 
@@ -85,13 +101,13 @@
 <ng-template #modalControl let-modal>
     <div class="modal-header">
         <h5 class="modal-title">¿De verdad quieres borrar el control?</h5>
-        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="modal-body">Este control se utiliza en otros recorridos ☹</div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-light" ngbAutofocus (click)="modal.close()">Cancelar</button>
+        <button type="button" class="btn btn-light" ngbAutofocus (click)="activeModal.close()">Cancelar</button>
         <button id="btn-confirmar-borrar" type="button" class="btn btn-danger" (click)="borrarControlConfirmado()">Borrar</button>
     </div>
 </ng-template>
@@ -100,14 +116,50 @@
 <ng-template #modalRecorrido let-modal>
     <div class="modal-header">
         <h5 class="modal-title">¿De verdad quieres borrar el recorrido actual?</h5>
-        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="modal-body">No podrás recuperarlo después ☹</div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-light" ngbAutofocus (click)="modal.close()">Cancelar</button>
+        <button type="button" class="btn btn-light" ngbAutofocus (click)="activeModal.close()">Cancelar</button>
         <button id="btn-confirmar-borrar" type="button" class="btn btn-danger" (click)="borrarRecorridoConfirmado()">Borrar</button>
+    </div>
+</ng-template>
+
+<!-- Diálogo de elección de tipo de creación -->
+<ng-template #modalEleccionInicial let-modal>
+
+    <div class="modal-body">
+        <h2 class="text-center">¿Cómo lo quieres organizar?</h2>
+        <div class="wrapper-elecciones">
+            <div class="selector-eleccion" (click)="activeModal.close(ELECCION_SOLO_RECORRIDOS)">
+                <span class="titulo-eleccion">Solo recorridos</span>
+                <span class="texto-eleccion">Crea los recorridos que necesites sin tener que trazar nada</span>
+                <span class="texto-aclaracion"><i>* Podrás subir tus propios mapas tras generar los recorridos</i></span>
+            </div>
+            <div class="selector-eleccion" (click)="activeModal.close(ELECCION_TRAZAR)">
+                <span class="titulo-eleccion">Trazar recorridos</span>
+                <span class="texto-eleccion">Utiliza el trazador web y una imagen como mapa base para trazar tus recorridos</span>
+                <span class="texto-aclaracion"><i>* Se generarán imágenes de los mapas para cada recorrido cuando acabes</i></span>
+            </div>
+        </div>
+    </div>
+
+</ng-template>
+
+<!-- Diálogo de confirmación de cancelado -->
+<ng-template #modalCancelar let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿De verdad quieres salir?</h5>
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Perderás todos los cambios ☹</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" ngbAutofocus (click)="activeModal.close()">Volver</button>
+        <button id="btn-confirmar-borrar" type="button" class="btn btn-danger" (click)="cancelar()">Salir</button>
     </div>
 </ng-template>
 

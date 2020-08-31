@@ -2,7 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild, ViewChildren, QueryList } fro
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AlertService } from 'src/app/alert';
-import { AppSettings, Carrera, Control } from 'src/app/shared/app.model';
+import { AppSettings, Carrera, Control, Recorrido } from 'src/app/shared/app.model';
 import { ClienteApiService } from 'src/app/shared/cliente-api.service';
 import { DataService } from 'src/app/shared/data.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -36,18 +36,19 @@ export class ResumenCarreraComponent implements OnInit {
   }
   @ViewChild('modalBorrador', {static: true}) modalBorrador: ElementRef<NgbModal>;
   @ViewChild('modalBorrarCarrera', {static: true}) modalBorrarCarrera: ElementRef<NgbModal>;
+  @ViewChild('modalBorrarMapa', {static: true}) modalBorrarMapa: ElementRef<NgbModal>;
 
   // Datos de carrera
   carreraForm: FormGroup;
   carrera: Carrera;
   controles: Control[];
-  mapasKeys: string[];
 
   tipoVista: string;
   titulo: string;
 
   errorCarga: boolean;
   borrandoCarrera: boolean;
+  indiceRecorridoBorradoMapa: number;
 
   // Alertas
   alertOptions = {
@@ -66,6 +67,7 @@ export class ResumenCarreraComponent implements OnInit {
     
     //this.mapas = new Map();
     this.errorCarga = this.borrandoCarrera = false;
+    this.controles = [];
   }
 
   ngOnInit() {
@@ -161,6 +163,8 @@ export class ResumenCarreraComponent implements OnInit {
     //  Si es creación, se envían todos los datos (formulario, mapas, etc)
     //  Si es edición, se envían los datos modificados (?) 
 
+    // Evitar envío de mapas innecesarios (cambio de modalidad, etc)
+
     this.clienteApi.createCarrera(this.carrera).subscribe(
       resp => {
         if(resp.status == 201) {
@@ -251,7 +255,7 @@ export class ResumenCarreraComponent implements OnInit {
   /**
    * Maneja click en el botón de borrado de carrera.
    */
-  clickBotonBorrar() {
+  clickBotonBorrarCarrera() {
     // Muestra el diálogo de confirmación de borrado
     this.modalService.open(this.modalBorrarCarrera, {centered: true, size: 'lg'});
   }
@@ -259,7 +263,7 @@ export class ResumenCarreraComponent implements OnInit {
   /**
    * Confirma el borrado de la carrera.
    */
-  confirmaBorrar(borrar: boolean) {
+  confirmaBorrarCarrera(borrar: boolean) {
     if(borrar) {
       this.borrandoCarrera = true;
       this.clienteApi.deleteCarrera(this.carrera.id).subscribe(
@@ -284,6 +288,40 @@ export class ResumenCarreraComponent implements OnInit {
     }
     
     this.modalService.dismissAll();
+  }
+
+  clickBotonBorrarMapa(recorrido: Recorrido): void {
+    if(recorrido) {
+      this.indiceRecorridoBorradoMapa = this.carrera.recorridos.indexOf(recorrido);
+      this.modalService.open(this.modalBorrarMapa, {centered: true, size: 'lg'});
+    }
+  }
+
+  confirmaBorrarMapa(borrar: boolean): void {
+    if(borrar && this.indiceRecorridoBorradoMapa !== null) {
+      console.log("Borrando mapa indice "+ this.indiceRecorridoBorradoMapa);
+      this.carrera.recorridos[this.indiceRecorridoBorradoMapa].mapa = null;
+    }
+
+    this.modalService.dismissAll();
+  }
+
+  /**
+   * Añade un mapa a un recorrido.
+   * @param fileInput Archivo seleccionado
+   * @param recorrido Recorrido
+   */
+  procesaCargaMapa(fileInput: any, recorrido: Recorrido): void {
+    if (fileInput.target.files && fileInput.target.files[0]) {
+      const reader = new FileReader();
+      reader.addEventListener('load', (event: any) => {
+        // TODO Aplicar restricciones/validaciones
+
+        let src = event.target.result;
+        recorrido.mapa = src;
+      });
+      reader.readAsDataURL(fileInput.target.files[0]);
+    }
   }
 
   /**

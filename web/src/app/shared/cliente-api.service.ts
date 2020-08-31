@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Carrera } from './app.model';
+import { Carrera, RegistrosRecorridoResponse } from './app.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +10,7 @@ export class ClienteApiService {
   // URL base de la API
   private static readonly BASE_URL = '/api/';
   private static readonly BASE_CARRERAS = 'carreras/';
+  private static readonly BASE_REGISTROS = 'registros/';
   // Autenticación
   private static readonly API_LOGIN = 'login/';
   private static readonly API_REGISTRO = 'registro/';
@@ -108,6 +109,13 @@ export class ClienteApiService {
     params = params.append('page', (pagina !== null) ? pagina.toString() : "0");
     params = params.append('size', (numero !== null) ? numero.toString() : "20");
     return this.http.get<Carrera[]>(url, {params: params, observe: 'response'});
+  }
+
+
+  /******************* RESULTADOS *******************/
+  getRegistrosRecorrido(idRecorrido: number):  Observable<HttpResponse<RegistrosRecorridoResponse>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_REGISTROS + idRecorrido;
+    return this.http.get<RegistrosRecorridoResponse>(url, {observe: 'response'});
   }
 
 }

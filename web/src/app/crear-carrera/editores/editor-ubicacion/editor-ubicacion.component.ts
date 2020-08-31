@@ -41,7 +41,8 @@ export class EditorUbicacionComponent implements OnInit {
 
     this.mapaUbicacion = L.map('mapa-ubicacion', {
       center: [ latCentro,  lonCentro],
-      zoom: zoomCentro
+      zoom: zoomCentro,
+      scrollWheelZoom: false
     });
 
     // Tiles
@@ -67,6 +68,7 @@ export class EditorUbicacionComponent implements OnInit {
   }
 
   editarUbicacion(event): void {
+    this.mapaUbicacion.scrollWheelZoom.enable();
     event.stopPropagation();
     this.latitudTemporal = this.latitudElegida;
     this.longitudTemporal = this.longitudElegida;
@@ -76,23 +78,6 @@ export class EditorUbicacionComponent implements OnInit {
   }
 
   guardarUbicacion(): void {
-    /* TODO Si está editando
-    if(this.carrera.id != null && this.latitudElegida != null && this.longitudElegida != null) {
-      this.clienteApi.cambiaUbicacionCarrera(this.carrera.id, this.latitudElegida, this.longitudElegida).subscribe(
-        resp => {
-          if(resp.status == 200) {
-            this.alertService.success("Ubicación cambiada", this.optionsAlerts);
-          } else {
-            this.alertService.warn("Código de respuesta inesperado: " + resp.status, this.optionsAlerts);
-          }
-          this.editandoUbicacion = this.marcarUbicacion = this.guardandoUbicacion = false;
-        }, err => {
-          this.alertService.error("No se pudo cambiar la ubicación", this.optionsAlerts);
-          console.log(err); // DEBUG
-          this.guardandoUbicacion = false;
-      });
-    }*/
-
     this.latitudElegida = this.latitudTemporal;
     this.longitudElegida = this.longitudTemporal;
     this.finalizarEdicion();

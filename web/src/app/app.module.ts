@@ -25,6 +25,8 @@ import { EditorUbicacionComponent } from './crear-carrera/editores/editor-ubicac
 import { ExplorarComponent } from './explorar/explorar.component';
 import { MapaCircuitosComponent } from './explorar/mapa-circuitos/mapa-circuitos.component';
 import { DatePipe } from '@angular/common';
+import { ResultadosComponent } from './vista-carrera/resultados/resultados.component';
+import { PipeTiempo } from './shared/pipes/PipeTiempo';
 
 @NgModule({
   declarations: [
@@ -43,7 +45,9 @@ import { DatePipe } from '@angular/common';
     GenerarQRComponent,
     EditorUbicacionComponent,
     ExplorarComponent,
-    MapaCircuitosComponent
+    MapaCircuitosComponent,
+    ResultadosComponent,
+    PipeTiempo
   ],
   imports: [
     BrowserModule,

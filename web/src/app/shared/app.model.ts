@@ -1,3 +1,5 @@
+import { Timestamp } from 'rxjs/internal/operators/timestamp';
+
 export class AppSettings {
     public static readonly LOCAL_STORAGE_CARRERA = "carrera";
     public static readonly CANVAS_MAPAS_RESOLUCION: number = 0.8;
@@ -96,5 +98,73 @@ export class Pair<T, U> {
     constructor(k: T, v: U) {
         this.key = k;
         this.value = v;
+    }
+}
+
+export class Registro {
+    id: number;
+    corredor: number;  // ID
+    control: string;   // Codigo
+    recorrido: number; // ID
+    fecha: string;
+}
+
+export class RegistrosUsuario {
+    usuario: Usuario;
+    registros: Registro[];
+}
+
+export class RegistrosRecorridoResponse {
+    modalidad: string;
+    idCarrera: number;
+    recorrido: Recorrido;
+    puntuacionesControles: Map<string, number>;
+    registrosUsuarios: RegistrosUsuario[];
+}
+
+export class ResultadoUsuario {
+    public static readonly TIPO_OK = "OK";
+    public static readonly TIPO_PENDIENTE = "PENDIENTE";
+    public static readonly TIPO_ABANDONADO = "ABANDONADO";
+    public static readonly ORDEN_TIPOS = [ResultadoUsuario.TIPO_OK, ResultadoUsuario.TIPO_PENDIENTE, ResultadoUsuario.TIPO_ABANDONADO];
+
+    idUsuario: number;
+    posicion: number;
+    nombre: string;
+    club: string;
+    tiempoTotal: number;
+    diferenciaGanador: number;
+    tipo: string;
+    parciales: ParcialUsuario[];
+    puntosRegistrados: Map<string, number>;
+
+    constructor(idUsuario: number, nombre: string, club: string, tiempoTotal: number, tipo: string) {
+        this.idUsuario = idUsuario;
+        this.nombre = nombre;
+        this.club = club;
+        this.tiempoTotal = tiempoTotal;
+        this.tipo = tipo;
+    }
+
+    getPuntuacion(): number {
+        let puntuacion = 0;
+        if(this.puntosRegistrados) {
+            for(let punt of this.puntosRegistrados.values()) {
+                puntuacion += punt;
+            }
+        }
+        return puntuacion;
+    }
+}
+
+export class ParcialUsuario {
+    tiempoParcial: number;
+    tiempoAcumulado: number;
+    posicionParcial: number;
+    posicionAcumulada: number;
+
+    constructor(tiempoParcial: number, tiempoAcumulado: number) {
+        this.tiempoParcial = tiempoParcial;
+        this.tiempoAcumulado = tiempoAcumulado;
     }
 }

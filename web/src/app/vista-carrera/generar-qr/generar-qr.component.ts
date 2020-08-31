@@ -23,7 +23,6 @@ export class GenerarQRComponent implements OnInit {
       this.vistaPDF = content;
     }
   }
-  //@ViewChild('vistaPDF', {static: false}) vistaPDF: HTMLDivElement;
 
   carrera: Carrera;
   controles: Control[];
