@@ -5,7 +5,7 @@
 
     <h1>Resultados <i>{{(recorrido) ?  recorrido.nombre : ""}}</i></h1>
 
-    <table *ngIf="resultados" class="tabla-resultados text-center" (mousedown)="mouseDownResultados($event)" 
+    <table *ngIf="resultados && resultados.length > 0" class="tabla-resultados text-center" (mousedown)="mouseDownResultados($event)" 
             (mousemove)="mouseMoveResultados($event)" (mouseup)="mouseUpResultados()" (mouseleave)="mouseUpResultados()" #tablaResultados>
         <thead>
             <tr>
@@ -69,4 +69,7 @@
             </ng-template>
         </tbody>
     </table>
+
+    
+    <h3 *ngIf="resultados && resultados.length === 0" class="sin-resultados">No hay resultados (aún)</h3>
 </div>

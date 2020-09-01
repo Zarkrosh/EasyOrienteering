@@ -12,7 +12,7 @@ import { PerfilComponent } from './perfil/perfil.component';
 import { AlertModule } from './alert';
 import { LoginComponent } from './auth/login/login.component';
 import { RegistroComponent } from './auth/registro/registro.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { OlvidoComponent } from './auth/olvido/olvido.component';
 import { WizardCarreraComponent } from './crear-carrera/wizard-carrera/wizard-carrera.component';
 import { EditorRecorridosComponent } from './crear-carrera/editores/editor-recorridos/editor-recorridos.component';
@@ -27,6 +27,7 @@ import { MapaCircuitosComponent } from './explorar/mapa-circuitos/mapa-circuitos
 import { DatePipe } from '@angular/common';
 import { ResultadosComponent } from './vista-carrera/resultados/resultados.component';
 import { PipeTiempo } from './shared/pipes/PipeTiempo';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 @NgModule({
   declarations: [
@@ -47,13 +48,15 @@ import { PipeTiempo } from './shared/pipes/PipeTiempo';
     ExplorarComponent,
     MapaCircuitosComponent,
     ResultadosComponent,
-    PipeTiempo
+    PipeTiempo,
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     AlertModule,
+    FormsModule,
     ReactiveFormsModule,
     NgbModule,
     LeafletModule,

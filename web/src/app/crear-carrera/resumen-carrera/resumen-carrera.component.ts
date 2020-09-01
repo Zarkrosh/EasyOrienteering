@@ -1,5 +1,5 @@
-import { Component, OnInit, ElementRef, ViewChild, ViewChildren, QueryList } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, ElementRef, ViewChild, ViewChildren, QueryList, Injectable } from '@angular/core';
+import { NgbModal, NgbDateStruct, NgbDateAdapter, NgbDateParserFormatter, NgbCalendar, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AlertService } from 'src/app/alert';
 import { AppSettings, Carrera, Control, Recorrido } from 'src/app/shared/app.model';
@@ -8,10 +8,67 @@ import { DataService } from 'src/app/shared/data.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { EditorUbicacionComponent } from '../editores/editor-ubicacion/editor-ubicacion.component';
 
+/**
+ * This Service handles how the date is represented in scripts i.e. ngModel.
+ */
+@Injectable()
+export class CustomAdapter extends NgbDateAdapter<string> {
+
+  readonly DELIMITER = '-';
+
+  fromModel(value: string | null): NgbDateStruct | null {
+    if (value) {
+      let date = value.split(this.DELIMITER);
+      return {
+        day : parseInt(date[0], 10),
+        month : parseInt(date[1], 10),
+        year : parseInt(date[2], 10)
+      };
+    }
+    return null;
+  }
+
+  toModel(date: NgbDateStruct | null): string | null {
+    return date ? date.day + this.DELIMITER + date.month + this.DELIMITER + date.year : null;
+  }
+}
+
+/**
+ * This Service handles how the date is rendered and parsed from keyboard i.e. in the bound input field.
+ */
+@Injectable()
+export class CustomDateParserFormatter extends NgbDateParserFormatter {
+
+  readonly DELIMITER = '/';
+
+  parse(value: string): NgbDateStruct | null {
+    if (value) {
+      let date = value.split(this.DELIMITER);
+      return {
+        day : parseInt(date[0], 10),
+        month : parseInt(date[1], 10),
+        year : parseInt(date[2], 10)
+      };
+    }
+    return null;
+  }
+
+  format(date: NgbDateStruct | null): string {
+    return date ? date.day + this.DELIMITER + date.month + this.DELIMITER + date.year : '';
+  }
+}
+
 @Component({
   selector: 'app-resumen-carrera',
   templateUrl: './resumen-carrera.component.html',
-  styleUrls: ['./resumen-carrera.component.scss']
+  styleUrls: ['./resumen-carrera.component.scss'],
+
+  // NOTE: For this example we are only providing current component, but probably
+  // NOTE: you will want to provide your main App Module
+  providers: [
+    {provide: NgbDateAdapter, useClass: CustomAdapter},
+    {provide: NgbDateParserFormatter, useClass: CustomDateParserFormatter}
+  ]
 })
 export class ResumenCarreraComponent implements OnInit {
 
@@ -22,6 +79,8 @@ export class ResumenCarreraComponent implements OnInit {
   readonly PRIV_PRIVADA = "privada";
   readonly MODALIDAD_TRAZADO = Carrera.MOD_TRAZADO;
   readonly MODALIDAD_SCORE = Carrera.MOD_SCORE;
+  readonly TIPO_CIRCUITO = Carrera.TIPO_CIRCUITO;
+  readonly TIPO_EVENTO = Carrera.TIPO_EVENTO;
 
   private editorUbicacion: EditorUbicacionComponent;
   @ViewChild('editorUbicacion', {static: false}) set content(content: EditorUbicacionComponent) {
@@ -34,14 +93,19 @@ export class ResumenCarreraComponent implements OnInit {
       }
     }
   }
+
+
+  // Modales
   @ViewChild('modalBorrador', {static: true}) modalBorrador: ElementRef<NgbModal>;
   @ViewChild('modalBorrarCarrera', {static: true}) modalBorrarCarrera: ElementRef<NgbModal>;
   @ViewChild('modalBorrarMapa', {static: true}) modalBorrarMapa: ElementRef<NgbModal>;
+  activeModal: NgbModalRef;
 
   // Datos de carrera
   carreraForm: FormGroup;
   carrera: Carrera;
   controles: Control[];
+  fecha: NgbDateStruct;
 
   tipoVista: string;
   titulo: string;
@@ -63,7 +127,9 @@ export class ResumenCarreraComponent implements OnInit {
     private clienteApi: ClienteApiService,
     private data: DataService,
     private formBuilder: FormBuilder,
-    private route: ActivatedRoute) {
+    private route: ActivatedRoute,
+    private ngbCalendar: NgbCalendar,
+    private dateAdapter: NgbDateAdapter<string>) {
     
     //this.mapas = new Map();
     this.errorCarga = this.borrandoCarrera = false;
@@ -76,8 +142,10 @@ export class ResumenCarreraComponent implements OnInit {
       tipo: [Carrera.TIPO_EVENTO, Validators.required],
       modalidad: [Carrera.MOD_TRAZADO, Validators.required],
       visibilidad: [this.PRIV_PUBLICA, Validators.required],
+      fecha: [''],
       notas: ['']
     });
+
 
     if(window.location.toString().indexOf(this.TIPO_EDITAR) > -1) {
       // Edición de carrera
@@ -137,6 +205,7 @@ export class ResumenCarreraComponent implements OnInit {
             this.f.tipo.setValue(this.carrera.tipo);
             this.f.modalidad.setValue(this.carrera.modalidad);
             this.f.visibilidad.setValue((this.carrera.privada) ? 'privada' : 'publica');
+            this.f.fecha.setValue(this.carrera.fecha);
             this.f.notas.setValue(this.carrera.notas);
             this.actualizaListaControles();
 
@@ -162,9 +231,17 @@ export class ResumenCarreraComponent implements OnInit {
     // TODO Diferenciar entre creación y edición
     //  Si es creación, se envían todos los datos (formulario, mapas, etc)
     //  Si es edición, se envían los datos modificados (?) 
-
+    
     // Evitar envío de mapas innecesarios (cambio de modalidad, etc)
 
+    this.carrera.nombre = this.f.nombre.value;
+    this.carrera.tipo = this.f.tipo.value;
+    this.carrera.modalidad = this.f.modalidad.value;
+    this.carrera.privada = (this.f.visibilidad.value == "privada") ? true : false;
+    this.carrera.fecha = this.f.fecha.value;
+    this.carrera.notas = this.f.notas.value;
+    this.carrera.latitud = this.editorUbicacion.latitudElegida;
+    this.carrera.longitud = this.editorUbicacion.longitudElegida;
     this.clienteApi.createCarrera(this.carrera).subscribe(
       resp => {
         if(resp.status == 201) {
@@ -193,11 +270,12 @@ export class ResumenCarreraComponent implements OnInit {
   /**
    * Guarda un borrador con los datos actuales de los formularios.
    */
-  guardaDatosCarrera() {
+  guardaDatosCarreraBorrador() {
     this.carrera.nombre = this.f.nombre.value;
     this.carrera.tipo = this.f.tipo.value;
     this.carrera.modalidad = this.f.modalidad.value;
     this.carrera.privada = (this.f.visibilidad.value == "privada") ? true : false;
+    this.carrera.fecha = this.f.fecha.value;
     this.carrera.notas = this.f.notas.value;
     this.carrera.latitud = this.editorUbicacion.latitudElegida;
     this.carrera.longitud = this.editorUbicacion.longitudElegida;
@@ -225,6 +303,7 @@ export class ResumenCarreraComponent implements OnInit {
         this.f.tipo.setValue(this.carrera.tipo);
         this.f.modalidad.setValue(this.carrera.modalidad);
         this.f.visibilidad.setValue((this.carrera.privada) ? 'privada' : 'publica');
+        this.f.fecha.setValue(this.carrera.fecha);
         this.f.notas.setValue(this.carrera.notas);
         this.actualizaListaControles();
       } catch (e) {
@@ -234,6 +313,8 @@ export class ResumenCarreraComponent implements OnInit {
       }
     } else {
       // Descarta el borrador y crea una nueva
+      this.data.setMapaBase(null);
+      this.data.setMapasTrazados(null);
       this.nuevaCarreraVacia();
     }
   }
@@ -332,18 +413,18 @@ export class ResumenCarreraComponent implements OnInit {
   }
 
   /**
-   * Navega a la vista de edición de recorridos.
+   * Navega a la vista de creación de recorridos.
    */
-  editarRecorridos() {
-    this.guardaDatosCarrera();
+  crearRecorridos() {
+    this.guardaDatosCarreraBorrador();
     this.router.navigate(['/crear', 'recorridos']);
   }
 
   /**
-   * Navega a la vista de edición de controles.
+   * Navega a la vista de creación de controles.
    */
-  editarControles() {
-    this.guardaDatosCarrera();
+  crearControles() {
+    this.guardaDatosCarreraBorrador();
     this.router.navigate(['/crear', 'controles']);
   }
   

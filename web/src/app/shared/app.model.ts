@@ -8,6 +8,8 @@ export class AppSettings {
     public static readonly MARCA_AGUA_CONTROLES = "easyorienteering.com";
     public static readonly NOMBRE_RECORRIDO_SCORE = "Controles";
     public static readonly NUMERO_RESULTADOS_BUSQUEDA = 20;
+    public static readonly CODIGO_SALIDA = "SALIDA";
+    public static readonly CODIGO_META = "META";
 }
 
 export class Usuario {
@@ -30,7 +32,7 @@ export class Carrera {
     nombre: string;
     organizador: Usuario;
     recorridos: Recorrido[];
-    controles: Map<any, any>;
+    controles: Map<string, Control>;
     tipo: string;
     modalidad: string;
     latitud: number;
@@ -38,14 +40,13 @@ export class Carrera {
     privada: boolean;
     notas: string;
     fecha: Date;
-    creada: boolean; // True si la carrera existe en el sistema
-                     // False cuando se está creando
+    soloRecorridos: boolean; // Interno
 
     constructor() {
         this.nombre = this.tipo = this.modalidad = this.notas = "";
         this.recorridos = [];
         this.controles = new Map();
-        this.creada = this.privada = false;
+        this.privada = false;
         this.id = this.organizador = this.latitud = this.longitud = this.fecha = null;
     }
 }
@@ -72,7 +73,7 @@ export class Control {
 export class Recorrido {
     id: Number;
     nombre: string;
-    trazado: string[];
+    trazado: string[]; // Sin incluir salida/meta
     mapa: string; // Mapa en B64 "data:image/jpeg;base64, ..."
 
     constructor(nombre: string) {

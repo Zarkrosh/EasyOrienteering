@@ -5,7 +5,7 @@
     max-height: 700px;
     border: 2px solid black;
     white-space: nowrap;
-    overflow-x: scroll;
+    overflow-x: auto;
     overflow-y: auto;
 }
 .tabla-resultados thead {
@@ -54,4 +54,10 @@
 .parcial-podio {
     color: rgb(46, 46, 255);
     font-weight: bold;
+}
+
+
+.sin-resultados {
+    margin: 20% 0;
+    text-align: center;
 }

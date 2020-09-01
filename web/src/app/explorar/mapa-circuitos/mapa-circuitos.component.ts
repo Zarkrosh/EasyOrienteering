@@ -71,9 +71,13 @@ export class MapaCircuitosComponent implements OnInit {
           console.log(resp);
         }
       }, err => {
-        let mensaje = "Se produjo un error";
-        if(typeof err.error === 'string') mensaje += ": " + err.error;
-        this.alertService.error(mensaje, this.alertOptions);
+        if(err.status == 504) {
+          this.alertService.error("No hay conexión con el servidor", this.alertOptions);
+        } else {
+          let mensaje = "Se produjo un error";
+          if(typeof err.error === 'string') mensaje += ": " + err.error;
+          this.alertService.error(mensaje, this.alertOptions);
+        }
         console.log(err);
       }
     );

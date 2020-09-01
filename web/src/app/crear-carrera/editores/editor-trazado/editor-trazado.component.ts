@@ -1,7 +1,8 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Recorrido, Control, Coordenadas } from '../../../shared/app.model';
+import { Component, OnInit, ViewChild, ElementRef, Input, SimpleChanges } from '@angular/core';
+import { Recorrido, Control, Coordenadas, AppSettings } from '../../../shared/app.model';
 import { AlertService } from '../../../alert';
 import { SharedEditorService } from '../shared-editor.service';
+import { EditorRecorridosComponent } from '../editor-recorridos/editor-recorridos.component';
 
 @Component({
   selector: 'editor-trazado',
@@ -67,7 +68,6 @@ export class EditorTrazadoComponent implements OnInit {
   // Ratón
   clicking: boolean;
   moviendoMapa: boolean;
-  moviendoControl: boolean;
   dragX: number;
   dragY: number;
   mapX: number; // TEST
@@ -76,7 +76,10 @@ export class EditorTrazadoComponent implements OnInit {
   canvY: number; // TEST
 
   // Modelo compartido
-  controles: Map<string, Control>; // TODO Buscar mejor alternativa de tipo
+  @Input()
+  controles: Map<string, Control>;
+
+  @Input()
   recorridoActual: Recorrido = null;
 
   // Alertas
@@ -90,58 +93,76 @@ export class EditorTrazadoComponent implements OnInit {
     private el: ElementRef) { }
 
   ngOnInit() {
-    this.clicking = this.moviendoControl = this.moviendoMapa = false;
+    this.clicking = this.moviendoMapa = false;
     this.imgMapa = this.CODIGO_CONTROL_MARCADO = null;
     this.offsetX = this.offsetY = 0;
     this.MARKER_STATE = Control.TIPO_SALIDA;
-
-    
-    this.cargaMapaAutomatico(); // DEBUG Para no tener que estar cargándolo a mano
-
     this.setupObservadores();
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if(changes['controles']) {
+
+    }
+    if(changes['recorridoActual']) {
+      if(this.contextTrazado && this.contextMarcador) {
+        this.redibujaTrazado();
+        this.actualizaMarcador();
+      }
+    }
+  }
+
+  ngAfterViewInit() {
+    //this.cargaMapaAutomatico(); // DEBUG Para no tener que estar cargándolo a mano
+  }
+
   setupObservadores() {
-    // Controlador de cambio del mapa
-    this.sharedData.mapaBase.subscribe((nMapa) => {
-      if(nMapa !== null) {
-        // TODO Copiar del automático
+    // Controlador de cambio de los controles
+    /*
+    this.sharedData.controles.subscribe((nControles) => {
+      if(nControles !== null) {
+        console.log("[TRAZADOR] Actualizando controles");
+        console.log(nControles);
+        this.controles = nControles;
       }
     });
-
-    // Controlador de cambio de los controles
-    this.sharedData.controles.subscribe((nControles) => {
-      this.controles = nControles;
-    });
-
+    
     // Controlador de cambio del recorrido
     this.sharedData.recorridoActual.subscribe((nRecorrido) => {
       if(nRecorrido != null) {
         this.recorridoActual = nRecorrido;
-        this.redibujaTrazado();
-        this.actualizaMarcador();
+        if(this.contextTrazado && this.contextMarcador) {
+          this.redibujaTrazado();
+          this.actualizaMarcador();
+        }
+      }
+    });
+    */
+    // Controlador de cambio de mapa base
+    this.sharedData.mapaBase.subscribe((nMapa) => {
+      if(nMapa != null && nMapa.length > 0) {
+        console.log("[TRAZADOR] Cargando mapa");
+        this.cargaMapa(nMapa);
       }
     });
 
-    // Controlador de confirmación de borrado de control
-    this.sharedData.controlBorradoConf.subscribe((tipo) => {
-      if(tipo === Control.TIPO_SALIDA) {
-        this.seleccionaSalida();
-      } else if(tipo === Control.TIPO_CONTROL) {
-        this.seleccionaControl();
-      } else if(tipo === Control.TIPO_META) {
-        this.seleccionaMeta();
-      }
+  }
 
-      //this.redibujaMarcador
-    });
+  confirmaBorrado(tipo: string) {
+    if(tipo === Control.TIPO_SALIDA) {
+      this.seleccionaSalida();
+    } else if(tipo === Control.TIPO_CONTROL) {
+      this.seleccionaControl();
+    } else if(tipo === Control.TIPO_META) {
+      this.seleccionaMeta();
+    }
   }
   
 
   /**
    * Configura los lienzos del editor
    */
-  setupCanvas(porImagen: boolean) {
+  setupCanvas() {
     // Evita menú contextual del lienzo superior (click derecho) 
     this.canvasMarcador.nativeElement.oncontextmenu = function(e) { return false; }; 
 
@@ -149,18 +170,14 @@ export class EditorTrazadoComponent implements OnInit {
         this.canvasTrazado.nativeElement.getContext && 
         this.canvasMarcador.nativeElement.getContext) {
       // Lienzos iniciados correctamente
-      
-      if(porImagen) {
-        // TEST: canvas con el mismo tamaño que la imagen
-        this.updateCanvasDims2(this.canvasMapa.nativeElement, this.imgMapa.width, this.imgMapa.height);
-        this.updateCanvasDims2(this.canvasTrazado.nativeElement, this.imgMapa.width, this.imgMapa.height);
-        this.updateCanvasDims(this.canvasMarcador.nativeElement);
-      } else {
-        // Actualiza las dimensiones reales según las visuales
-        this.updateCanvasDims(this.canvasMapa.nativeElement);
-        this.updateCanvasDims(this.canvasTrazado.nativeElement);
-        this.updateCanvasDims(this.canvasMarcador.nativeElement);
-      }
+      // Ajusta tamaños según imagen o visual
+      this.setCanvasDims(this.canvasMapa.nativeElement, this.imgMapa.width, this.imgMapa.height);
+      this.setCanvasDims(this.canvasTrazado.nativeElement, this.imgMapa.width, this.imgMapa.height);
+      let parent = this.canvasMarcador.nativeElement.parentNode.parentElement;
+      let dimX = parent.offsetWidth;
+      let dimY = parent.offsetHeight;
+      this.setCanvasDims(this.canvasMarcador.nativeElement, dimX, dimY);
+
 
       // Configura los contextos
       this.contextMapa = this.canvasMapa.nativeElement.getContext('2d');
@@ -215,17 +232,14 @@ export class EditorTrazadoComponent implements OnInit {
 
   actualizaMarcador() {
     this.habilitaMarcadores(true);
-    if(this.recorridoActual == null || this.recorridoActual.trazado.length == 0) {
+    if(this.recorridoActual == null || (this.recorridoActual.trazado.length == 0 && !this.controles.has(AppSettings.CODIGO_SALIDA))) {
       this.seleccionaSalida();
     } else {
+      this.seleccionaControl();
       let ultimoControl = this.controles.get(this.recorridoActual.trazado[this.recorridoActual.trazado.length - 1]);
-      if(ultimoControl != null) {
-        if(ultimoControl.tipo == Control.TIPO_META) {
-          // Recorrido completado, no se permite añadir más controles
-          this.habilitaMarcadores(false);
-        } else {
-          this.seleccionaControl();
-        }
+      if(ultimoControl != null && ultimoControl.tipo == Control.TIPO_META) {
+        // Recorrido completado, no se permite añadir más controles
+        this.habilitaMarcadores(false);
       }
     }
   }
@@ -250,6 +264,10 @@ export class EditorTrazadoComponent implements OnInit {
 
   getCanvasMapaBase() {
     return this.canvasMapa;
+  }
+
+  getImagenMapaBase(): string {
+    return this.imgMapa.src;
   }
 
 
@@ -372,15 +390,20 @@ export class EditorTrazadoComponent implements OnInit {
             }
           } else {
             // Nuevo control (ya sea en un recorrido o en general)
-            this.sharedData.anadirControl(new Control(null, this.MARKER_STATE, rCoords));
-          }
-
-          if(this.MARKER_STATE === Control.TIPO_SALIDA) {
-            // Cambia automáticamente a control
-            this.seleccionaControl();
-          } else if(this.recorridoActual != null && this.MARKER_STATE === Control.TIPO_META) {
-            // Ha acabado un recorrido, se deshabilita la adición de nuevos
-            this.habilitaMarcadores(false);
+            if(this.MARKER_STATE === Control.TIPO_SALIDA && this.controles.has(AppSettings.CODIGO_SALIDA)) {
+              // No puede añadir dos salidas
+            } else if(this.MARKER_STATE === Control.TIPO_META && this.controles.has(AppSettings.CODIGO_META)) {
+              // No puede añadir dos metas
+            } else {
+              this.sharedData.anadirControl(new Control(null, this.MARKER_STATE, rCoords));
+              if(this.MARKER_STATE === Control.TIPO_SALIDA) {
+                // Cambia automáticamente a control
+                this.seleccionaControl();
+              } else if(this.recorridoActual != null && this.MARKER_STATE === Control.TIPO_META) {
+                // Ha acabado un recorrido, se deshabilita la adición de nuevos
+                //this.habilitaMarcadores(false);
+              }
+            }
           }
 
           this.redibujaTrazado();
@@ -465,7 +488,7 @@ export class EditorTrazadoComponent implements OnInit {
     this.imgMapa.width = this.imgMapaOrig.width * scale;
     this.imgMapa.height = this.imgMapaOrig.height * scale;
     this.actualizaLimites(); // Actualiza los nuevos límites
-    this.setupCanvas(true);  // Reajusta los lienzos
+    this.setupCanvas();  // Reajusta los lienzos
     this.redibujaMapa();     // Redibuja el mapa
     this.redibujaTrazado();  // Redibuja el trazado
   }
@@ -676,6 +699,8 @@ export class EditorTrazadoComponent implements OnInit {
 
   /* Redibuja los elementos del recorrido */
   redibujaTrazado() {
+    if(!this.controles) return;
+
     // Borra el trazado anterior
     this.borraTrazado();
 
@@ -705,13 +730,13 @@ export class EditorTrazadoComponent implements OnInit {
               break;
             case Control.TIPO_CONTROL:
               this.dibujaControl(coords, this.contextTrazado, false);
+              // Dibuja al lado el código
+              this.dibujaNumero(null, control, null, codigo, false, this.contextTrazado);
               break;
             case Control.TIPO_META:
               this.dibujaMeta(coords, this.contextTrazado, false);
               break;
           }
-          // Dibuja al lado el código
-          this.dibujaNumero(null, control, null, codigo, false, this.contextTrazado);
         }
       });
     }
@@ -954,14 +979,14 @@ export class EditorTrazadoComponent implements OnInit {
 
   /* Resetea las configuraciones del sistema de drag/click */
   resetConfiguracionRaton() {
-    this.clicking = this.moviendoMapa = this.moviendoControl = false;
+    this.clicking = this.moviendoMapa = false;
     this.vistaMapa.nativeElement.style.cursor = "none";
   }
 
   /* Al redimensionarse, los lienzos son afectados por lo que se recarga su configuración. */
   onResize(event) {
     if(this.imgMapa) {
-      this.setupCanvas(true);
+      this.setupCanvas();
       this.redibujaMapa();
       this.redibujaTrazado();
     }
@@ -980,15 +1005,7 @@ export class EditorTrazadoComponent implements OnInit {
     this.NUMBER_DISTANCE    = 6 * this.MM_UNIT;
   }
 
-  /* Actualiza las dimensiones reales del lienzo según las de su vista actual */
-  updateCanvasDims(canvas) {
-    var rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-  }
-
-  // TEST
-  updateCanvasDims2(canvas, width, height) {
+  setCanvasDims(canvas, width, height) {
     canvas.width = width;
     canvas.height = height;
   }
@@ -1036,10 +1053,10 @@ export class EditorTrazadoComponent implements OnInit {
 
   cambiaTamanoElementos() {
     this.MM_UNIT_ORI = this.selectorTamano.nativeElement.valueAsNumber;
-    console.log("[*] Nueva medida: " + this.MM_UNIT_ORI);
+    console.log(this.canvasMarcador);
+    console.log(this.contextMarcador);
     this.actualizaMetricas();
     this.redibujaTrazado();
-    this.redibujaMapa();
   }
 
 
@@ -1055,7 +1072,7 @@ export class EditorTrazadoComponent implements OnInit {
       this.desplazaCanvas(); // Actualiza posiciones de los canvas
 
       // TEST
-      this.setupCanvas(true);
+      this.setupCanvas();
       this.redibujaMapa();
       this.redibujaTrazado();
 
@@ -1094,9 +1111,12 @@ export class EditorTrazadoComponent implements OnInit {
       this.desplazaCanvas(); // Actualiza posiciones de los canvas
 
       // TEST
-      this.setupCanvas(true);
+      this.setupCanvas();
       this.redibujaMapa();
       this.redibujaTrazado();
+
+      //this.updateCanvasDims(this.canvasMarcador.nativeElement);
+      //this.setupCanvas(false);
     });
 
     this.imgMapa.src = "assets/img/sample-map.jpg";

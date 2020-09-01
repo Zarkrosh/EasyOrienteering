@@ -6,7 +6,7 @@ import { Recorrido, Control, Coordenadas, Pair } from '../../shared/app.model';
   providedIn: 'root'
 })
 export class SharedEditorService {
-  private _mapaBase = new BehaviorSubject<File>(null);
+  private _mapaBase = new BehaviorSubject<string>(null);
   mapaBase = this._mapaBase.asObservable();
 
   private _recorridoActual = new BehaviorSubject<Recorrido>(null);
@@ -20,10 +20,6 @@ export class SharedEditorService {
   
   private _controlBorrado = new BehaviorSubject<Control>(null);
   controlBorrado = this._controlBorrado.asObservable();
-  // Confirmación de control borrado
-  private _controlBorradoConf = new BehaviorSubject<string>(null);
-  controlBorradoConf = this._controlBorradoConf.asObservable();
-
   constructor() { }
 
   /**
@@ -34,8 +30,8 @@ export class SharedEditorService {
     this._mapaBase.next(mapa);
   }
 
-  actualizaControles(controles: Map<string, Control>) {
-    this._controles.next(controles);
+  setControles(controles: Map<string, Control>) {
+    //this._controles.next(controles);
   }
 
   /**
@@ -43,8 +39,8 @@ export class SharedEditorService {
    * que se muestren todos los controles.
    * @param recorrido Nuevo recorrido o null
    */
-  actualizaRecorrido(recorrido: Recorrido) {
-    this._recorridoActual.next(recorrido);
+  setRecorridoActual(recorrido: Recorrido) {
+    //this._recorridoActual.next(recorrido);
   }
 
   /**
@@ -63,11 +59,4 @@ export class SharedEditorService {
     this._controlBorrado.next(control);
   }
 
-  /**
-   * Confirma el borrado de un control del tipo especificado.
-   * @param tipo Tipo de control
-   */
-  confirmaBorrado(tipo) {
-    this._controlBorradoConf.next(tipo);
-  }
 }

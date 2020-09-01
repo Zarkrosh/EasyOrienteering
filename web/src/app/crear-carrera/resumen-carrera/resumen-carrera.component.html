@@ -79,6 +79,21 @@
                                 </div>
                             </td>
                         </tr>
+                        <tr *ngIf="f.tipo.value === TIPO_EVENTO">
+                            <td>Fecha</td>
+                            <td>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd/mm/yyyy"
+                                        formControlName="fecha" ngbDatepicker #d="ngbDatepicker" (click)="d.toggle()">
+
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
+                                            <i class="fa fa-calendar"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
                         <tr>
                             <td>Notas</td>
                         </tr>
@@ -102,7 +117,7 @@
             <!-- Lista de recorridos -->
             <div class="header-seccion">
                 <h2>Recorridos</h2>
-                <button *ngIf="carrera.recorridos.length > 0 && tipoVista == TIPO_CREAR" class="btn-editar" (click)="editarRecorridos()">Editar</button>
+                <button *ngIf="carrera.recorridos.length > 0 && tipoVista == TIPO_CREAR" class="btn-editar" (click)="crearRecorridos()">Editar</button>
             </div>
             <div id="lista-recorridos">
                 <div *ngFor="let recorrido of carrera.recorridos" class="recorrido">
@@ -113,7 +128,7 @@
             </div>
 
             <!-- Si no hay ningún recorrido -->
-            <button *ngIf="carrera.recorridos.length === 0" class="btn btn-primary btn-sin-algo" (click)="editarRecorridos()">
+            <button *ngIf="carrera.recorridos.length === 0" class="btn btn-primary btn-sin-algo" (click)="crearRecorridos()">
                 <i class="fa fa-plus"></i>
                 Crear recorridos
             </button>
@@ -147,7 +162,7 @@
             <!-- Lista de controles-->
             <div class="header-seccion">
                 <h2>Controles</h2>
-                <button *ngIf="controles.length > 0" class="btn-editar" (click)="editarControles()">Editar</button>
+                <button *ngIf="controles.length > 0" class="btn-editar" (click)="crearControles()">Editar</button>
             </div>
             <div id="lista-controles">
                 <div *ngFor="let control of controles" class="detalle-control">
@@ -156,9 +171,9 @@
             </div>
 
             <!-- Si no hay ningún control -->
-            <button *ngIf="controles.length === 0" class="btn btn-primary btn-sin-algo" (click)="editarControles()">
+            <button *ngIf="controles.length === 0" class="btn btn-primary btn-sin-algo" (click)="crearControles()">
                 <i class="fa fa-plus"></i>
-                Añadir controles
+                Crear controles
             </button>
 
             <!-- Mapa -->
@@ -240,3 +255,21 @@
         <button type="button" class="btn btn-danger"    (click)="confirmaBorrarMapa(true)">Borrar mapa</button>
     </div>
 </ng-template>
+
+
+
+<!-- Diálogo de confirmación de edición 
+<ng-template #modalConfEdicion let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿Estás seguro de que quieres editar los {{(f.modalidad.value === MODALIDAD_SCORE) ? "controles" : "recorridos"}}?</h5>
+        <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Si el mapa ha sido generado con el trazador de esta página, puedes volver a generarlo volviendo a guardar los recorridos.</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="activeModal.close()" ngbAutofocus>Cancelar</button>
+        <button type="button" class="btn btn-danger"    (click)="confirmaBorrarMapa(true)">Borrar mapa</button>
+    </div>
+</ng-template>
+-->

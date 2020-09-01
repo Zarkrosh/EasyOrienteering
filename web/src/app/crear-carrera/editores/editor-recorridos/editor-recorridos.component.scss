@@ -28,6 +28,8 @@
 }
 
 #wrapper-recorridos {
+    display: flex;
+    flex-direction: column;
     flex: 1;
 }
 #wrapper-recorridos h3 {
@@ -104,13 +106,13 @@
 .tab-seleccionada span::after {
     background-color: $color-orientacion-dark !important;
 }
-#btn-nuevo-recorrido {
+.btn-nuevo-recorrido {
     color: $color-orientacion;
 }
-#btn-nuevo-recorrido .fa {
+.btn-nuevo-recorrido .fa {
     transition: all .3s ease-out;
 }
-#btn-nuevo-recorrido:hover .fa {
+.btn-nuevo-recorrido:hover .fa {
     transform: rotate(180deg);
     -webkit-transform: rotate(180deg);
 }
@@ -122,19 +124,59 @@ editor-trazado {
 
 
 /*********** LISTA DE RECORRIDOS ***********/
+.header-recorridos {
+    position: relative;
+    width: min-content;
+    margin: auto;
+}
+.header-recorridos button {
+    position: absolute;
+    right: -80px;
+    top: 0px;
+    height: 40px;
+    width: 40px;
+    color: white;
+    background-color: $color-secondary;
+    border: 2px solid black;
+    border-radius: 50%;
+}
+.header-recorridos button i {
+    margin: 0 !important;
+}
 .lista-recorridos {
+    height: 100%;
+    width: 100%;
+    padding-top: 30px;
     display: inline-flex;
     flex-direction: row;
     flex-wrap: wrap;
-}
-.lista-recorridos button {
-
+    justify-content: center;
+    overflow-y: auto;
 }
 .item-recorridos {
-    width: 400px;
-    height: 300px;
+    min-width: 300px;
+    height: 200px;
+    margin: 10px 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: $color-orientacion;
+    border: 2px solid black;
+    border-radius: 30px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    cursor: pointer;
 }
-
+.item-recorridos:hover {
+    background-color: $color-orientacion-light;
+}
+.rec-seleccionado {
+    background-color: white !important;
+    color: black;
+    cursor: default;
+}
 
 
 
@@ -210,6 +252,32 @@ editor-trazado {
     font-size: 1.3em;
     font-weight: bold;
 }
+
+/********* CONTROLES RECORRIDO ***********/
+.controles-recorrido {
+    width: 100%;
+    text-align: center;
+    font-size: 1.4rem;
+}
+.controles-recorrido tr {
+    position: relative;
+}
+.controles-recorrido input {
+    width: 80px;
+    text-align: center;
+}
+.controles-recorrido tr:hover > button {
+    display: block;
+}
+.controles-recorrido button {
+    position: absolute;
+    right: 20px;
+    display: none;
+}
+.controles-recorrido button i {
+    margin: 0;
+}
+
 
 
 /******** INFO CONTROLES ***********/

@@ -2,16 +2,17 @@
     <div id="wrapper-trazador" *ngIf="eleccionTrazado === ELECCION_TRAZAR" #wrapperTrazador>
         <!-- Pestañas de recorridos -->
         <ul id="tabs-recorridos" class="nav nav-tabs">
-            <li [class.tab-seleccionada]="recorridoActual === null" (click)="todosLosControles()" class="noselect"><span>Controles</span></li>
+            <li *ngIf="tipoEdicion === EDICION_CONTROLES" [class.tab-seleccionada]="recorridoActual === null" (click)="todosLosControles()" class="noselect"><span>Controles</span></li>
             <li *ngFor="let nombre of nombresRecorridos" (click)="seleccionaRecorrido(nombre)" 
-                [class.tab-seleccionada]="nombre === recorridoActual" class="noselect"><span >{{nombre}}</span></li>
-            <li id="btn-nuevo-recorrido" *ngIf="recorridos.size < MAX_RECORRIDOS && tipoEdicion === EDICION_RECORRIDOS" (click)="nuevoRecorrido()" class="noselect"><span><i class="fa fa-plus"></i></span></li>
+                [class.tab-seleccionada]="nombre === recorridoActual.nombre" class="noselect"><span >{{nombre}}</span></li>
+            <li *ngIf="recorridos.size < MAX_RECORRIDOS && tipoEdicion === EDICION_RECORRIDOS" (click)="nuevoRecorrido()" class="btn-nuevo-recorrido noselect"><span><i class="fa fa-plus"></i></span></li>
         </ul>
 
         <div id="trazador">
 
             <!-- Editor de trazados -->
-            <editor-trazado #trazador>
+            <editor-trazado #trazador
+                [controles]="controles" [recorridoActual]="recorridoActual">
 
             </editor-trazado>
 
@@ -29,11 +30,15 @@
     </div>
 
     <div id="wrapper-recorridos" *ngIf="eleccionTrazado === ELECCION_SOLO_RECORRIDOS" #wrapperRecorridos>
-        <h3>Recorridos</h3>
+        <div class="header-recorridos">
+            <h3>Recorridos</h3>
+            <button class="btn-nuevo-recorrido" (click)="nuevoRecorrido()"><i class="fa fa-plus"></i></button>
+        </div>
         <div class="lista-recorridos">
-            <li *ngFor="let nombre of nombresRecorridos" (click)="seleccionaRecorrido(nombre)"
-                [class.rec-seleccionado]="nombre === recorridoActual" class="item-recorridos noselect"><span >{{nombre}}</span></li>
-            <button (click)="nuevoRecorrido()"><i class="fa fa-plus"></i></button>
+            <div *ngFor="let nombre of nombresRecorridos" (click)="seleccionaRecorrido(nombre)"
+                [class.rec-seleccionado]="nombre === recorridoActual.nombre" class="item-recorridos noselect">
+                <span>{{nombre}}</span>
+            </div>
         </div>
     </div>
 
@@ -43,22 +48,39 @@
         <div class="info-lateral">
 
             <div *ngIf="tipoEdicion === EDICION_RECORRIDOS">
-                <div id="acciones-recorrido" *ngIf="recorridoActual">
+                <div id="acciones-recorrido" *ngIf="recorridoActual !== null">
                     <button id="btn-editar-nombre-recorrido" class="btn" (click)="editarNombreRecorrido(!editandoNombreRecorrido)">
                         <i *ngIf="!editandoNombreRecorrido" class="fa fa-edit"></i>
                         <i *ngIf="editandoNombreRecorrido" class="fa fa-save"></i>
                     </button>
-                    <input #nombreRecorrido id="nombre-recorrido" value="{{recorridoActual}}" 
+                    <input #nombreRecorrido id="nombre-recorrido" value="{{recorridoActual.nombre}}" 
                         [class.noselect]="!editandoNombreRecorrido" [readonly]="!editandoNombreRecorrido" type="text"
                         (dblclick)="editarNombreRecorrido(true)" (keyup.enter)="editarNombreRecorrido(false)">
                     <button id="btn-borrar-recorrido"  class="btn" (click)="borrarRecorrido()"><i class="fa fa-trash"></i></button>
                 </div>
-                <table class="descripcion-controles">
+                
+                <!-- Tabla de trazados -->
+                <table class="descripcion-controles" *ngIf="eleccionTrazado === ELECCION_TRAZAR">
                     <tbody>
                         <ng-container *ngIf="recorridoActual !== null">
-                            <tr *ngFor="let c of recorridos.get(recorridoActual).trazado; let i = index"
-                                class="entrada-descripcion">{{i}} - {{c}}</tr>
-                            <span *ngIf="recorridos.get(recorridoActual).trazado.length === 0">Sin controles</span>
+                            <tr *ngFor="let c of recorridoActual.trazado; let i = index"
+                                class="entrada-descripcion">{{(c != CODIGO_SALIDA && c != CODIGO_META) ? i + " - " : ""}}{{c}}</tr>
+                            <span *ngIf="recorridoActual.trazado.length === 0">Sin controles</span>
+                        </ng-container>
+                    </tbody>
+                </table>
+
+                <!-- Tabla de controles de recorrido-->
+                <table *ngIf="eleccionTrazado === ELECCION_SOLO_RECORRIDOS" class="controles-recorrido">
+                    <tbody>
+                        <ng-container *ngIf="recorridoActual !== null">
+                            <tr><td>SALIDA</td></tr>
+                            <tr *ngFor="let c of recorridoActual.trazado; let i = index">
+                                <td>{{i+1}} - {{c}}</td>
+                                <button class="btn btn-danger" (click)="borrarControlRecorrido(i)"><i class="fa fa-times"></i></button>
+                            </tr>
+                            <input *ngIf="recorridoActual.trazado.length < MAX_CONTROLES_RECORRIDO" (keyup)="keyUpInputControl($event)"/>
+                            <tr><td>META</td></tr>
                         </ng-container>
                     </tbody>
                 </table>

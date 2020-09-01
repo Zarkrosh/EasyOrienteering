@@ -12,8 +12,8 @@ import { WizardCarreraComponent } from './crear-carrera/wizard-carrera/wizard-ca
 import { EditorRecorridosComponent } from './crear-carrera/editores/editor-recorridos/editor-recorridos.component';
 import { ResumenCarreraComponent } from './crear-carrera/resumen-carrera/resumen-carrera.component';
 import { ExplorarComponent } from './explorar/explorar.component';
-import { MapaCircuitosComponent } from './explorar/mapa-circuitos/mapa-circuitos.component';
 import { ResultadosComponent } from './vista-carrera/resultados/resultados.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 
 const routes: Routes = [
@@ -24,15 +24,16 @@ const routes: Routes = [
   {path: 'perfil', component: PerfilComponent},
   {path: 'easyorienteering', component: QueEsComponent},
   {path: 'explorar', component: ExplorarComponent},
-  {path: 'crear/wizard', component: WizardCarreraComponent},
+  //{path: 'crear/wizard', component: WizardCarreraComponent},
+  {path: 'crear/nueva', component: ResumenCarreraComponent},
   {path: 'crear/recorridos', component: EditorRecorridosComponent},
   {path: 'crear/controles', component: EditorRecorridosComponent},
-  {path: 'crear/nueva', component: ResumenCarreraComponent},
   {path: 'crear', component: ResumenCarreraComponent},
   {path: 'editar/:id', component: ResumenCarreraComponent},
   {path: 'carreras/:id', component: VistaCarreraComponent},
   {path: 'carreras/:id/qr', component: GenerarQRComponent},
-  {path: 'resultados/:id', component: ResultadosComponent}
+  {path: 'resultados/:id', component: ResultadosComponent},
+  {path: '**', component: NotFoundComponent}
 ];
 
 @NgModule({

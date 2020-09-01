@@ -42,7 +42,7 @@ export class ResultadosComponent implements OnInit {
     protected alertService: AlertService) { }
 
   ngOnInit() {
-    this.modalidad = this.idCarrera = this.recorrido = this.cabecerasTrazado = null;
+    this.modalidad = this.idCarrera = this.recorrido = this.cabecerasTrazado = this.resultados = null;
     this.errorCarga = this.grabbing = false;
 
     this.cargaResultadosRecorrido();
@@ -179,7 +179,7 @@ export class ResultadosComponent implements OnInit {
       let acumuladosOrdenados: number[][] = [];
       for(let set of setsAcumulados) acumuladosOrdenados.push(Array.from(set).sort((a, b) => (a - b)));
       // Actualiza posiciones y diferencias
-      let tiempoGanador = resultados[0].tiempoTotal;
+      let tiempoGanador = (resultados.length > 0) ? resultados[0].tiempoTotal : null;
       for(let resultadoUsuario of resultados) {
           let i = 0;
           for(let parcial of resultadoUsuario.parciales) {
