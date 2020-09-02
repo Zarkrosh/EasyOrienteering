@@ -1,5 +1,6 @@
 package com.hergomsoft.easyoapi.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Date;
@@ -30,6 +31,8 @@ public class Carrera implements IdEntity {
     public static final int MAX_LEN_NOMBRE = 64;
     public static final int MIN_LEN_NOMBRE = 5;
     public static final int MAX_LEN_NOTAS = 1000;
+    public static final String CODIGO_SALIDA = "SALIDA";
+    public static final String CODIGO_META = "META";
     
     public enum Tipo {EVENTO, CIRCUITO};
     public enum Modalidad {TRAZADO, SCORE};
@@ -72,10 +75,11 @@ public class Carrera implements IdEntity {
     private String notas;
     
     @Temporal(TemporalType.DATE)
-    @Column(name = "FECHA", nullable = false)
+    @Column(name = "FECHA", nullable = true)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date fecha;
     
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name="CARRERA_ID", referencedColumnName="ID")
     private List<Recorrido> recorridos;
     
@@ -88,7 +92,7 @@ public class Carrera implements IdEntity {
 
     public Carrera(String nombre, Tipo tipo, Modalidad modalidad, Usuario organizador, 
             Float latitud, Float longitud, boolean privada, List<Recorrido> recorridos, 
-            Map<String, Control> controles, String notas, Date fecha) {
+            Map<String, Control> controles, String notas) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.modalidad = modalidad;
@@ -99,7 +103,7 @@ public class Carrera implements IdEntity {
         this.recorridos = recorridos;
         this.controles = controles;
         this.notas = notas;
-        this.fecha = fecha;
+        this.fecha = null;
     }
 
     public Long getId() {

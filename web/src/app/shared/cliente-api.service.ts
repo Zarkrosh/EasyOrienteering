@@ -80,7 +80,12 @@ export class ClienteApiService {
     return this.http.post<any>(url, carrera, {observe: 'response', headers: cabeceras});
   }
 
-  // TODO editCarrera(carrera: Carrera)
+  editCarrera(carrera: Carrera): Observable<HttpResponse<any>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + carrera.id;
+    // Cabeceras
+    const cabeceras = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<any>(url, carrera, {observe: 'response', headers: cabeceras});
+  }
 
   deleteCarrera(idCarrera: number): Observable<HttpResponse<any>> {
     let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + idCarrera;
@@ -111,9 +116,14 @@ export class ClienteApiService {
     return this.http.get<Carrera[]>(url, {params: params, observe: 'response'});
   }
 
+  getMapaRecorrido(idRecorrido: number): Observable<HttpResponse<any>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + 'mapa/' + idRecorrido;
+    return this.http.get(url, {observe: 'response', responseType: 'blob'});
+  }
+
 
   /******************* RESULTADOS *******************/
-  getRegistrosRecorrido(idRecorrido: number):  Observable<HttpResponse<RegistrosRecorridoResponse>> {
+  getRegistrosRecorrido(idRecorrido: number): Observable<HttpResponse<RegistrosRecorridoResponse>> {
     let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_REGISTROS + idRecorrido;
     return this.http.get<RegistrosRecorridoResponse>(url, {observe: 'response'});
   }

@@ -52,7 +52,7 @@ public class DatosPrueba {
     final Date MAX_RANDOM_DATE = new Date(LocalDateTime.of(2020, 7, 1, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
     final int MIN_CONTROLES = 10;
     final int MAX_CONTROLES = 40;
-    final int MIN_CONTROLES_RECORRIDO = 8;
+    final int MIN_CONTROLES_RECORRIDO = 10;
     final int MAX_CONTROLES_RECORRIDO = 24;
     final int MAX_RECORRIDOS = 6;
     final float PROBABILIDAD_EVENTO_PRIVADO = 0.3f;
@@ -60,8 +60,8 @@ public class DatosPrueba {
     final float PROBABILIDAD_COORDENADAS_EVENTO = 0.8f;
     final int MIN_CORREDORES_RESULTADOS = 5;
     final int MAX_CORREDORES_RESULTADOS = 20;
-    final int MIN_TIEMPO_PARCIAL = 60;
-    final int MAX_TIEMPO_PARCIAL = 1000;
+    final int MIN_TIEMPO_PARCIAL = 30;
+    final int MAX_TIEMPO_PARCIAL = 400;
     final float MAX_DESVIACION_PARCIAL = 0.5f;
     
     final String[] prefijosEventos = {
@@ -207,7 +207,9 @@ public class DatosPrueba {
             }
         }
 
-        return new Carrera(nombre, tipoCarrera, modalidad, organizador, latitud, longitud, privada, recorridos, controles, notas, fecha);
+        Carrera carrera = new Carrera(nombre, tipoCarrera, modalidad, organizador, latitud, longitud, privada, recorridos, controles, notas);
+        carrera.setFecha(fecha);
+        return carrera;
     }
     
     public String getNombreCarreraAleatorio(String poblacion, boolean esCircuito) {

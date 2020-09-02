@@ -182,7 +182,7 @@ export class ResumenCarreraComponent implements OnInit {
 
     // TODO Asíncrono para ediciones y restauraciones de borrador
     this.data.mapasTrazados.subscribe(mapas => {
-      if(this.carrera) {
+      if(this.carrera && mapas) {
         for(let recorrido of this.carrera.recorridos) {
           recorrido.mapa = mapas.get(recorrido.nombre);
         }
@@ -232,7 +232,16 @@ export class ResumenCarreraComponent implements OnInit {
     //  Si es creación, se envían todos los datos (formulario, mapas, etc)
     //  Si es edición, se envían los datos modificados (?) 
     
-    // Evitar envío de mapas innecesarios (cambio de modalidad, etc)
+    // Evita envío innecesario de mapas y errores
+    for(let recorrido of this.carrera.recorridos) {
+      
+      if(recorrido.mapa == true) {
+        //recorrido.mapa = ""; // Indica que no se ha modificado
+        recorrido.mapa = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="; // En blanco
+      }
+      // Si es null es porque se ha borrado, se deja así
+      // Si no es null ni true, es porque se ha asignado un nuevo mapa, se deja así
+    }
 
     this.carrera.nombre = this.f.nombre.value;
     this.carrera.tipo = this.f.tipo.value;
@@ -242,28 +251,60 @@ export class ResumenCarreraComponent implements OnInit {
     this.carrera.notas = this.f.notas.value;
     this.carrera.latitud = this.editorUbicacion.latitudElegida;
     this.carrera.longitud = this.editorUbicacion.longitudElegida;
-    this.clienteApi.createCarrera(this.carrera).subscribe(
-      resp => {
-        if(resp.status == 201) {
-          // Carrera creada
-          this.alertService.success("Carrera creada con éxito", this.alertOptions);
-          this.router.navigate(['carreras', resp.body.id]);
-        } else {
-          // Error
-          this.alertService.error("No se pudo crear la carrera");
-          console.log(resp);
+
+    if(this.tipoVista == this.TIPO_CREAR) {
+      this.clienteApi.createCarrera(this.carrera).subscribe(
+        resp => {
+          if(resp.status == 201) {
+            // Carrera creada
+            this.alertService.success("Carrera creada con éxito", this.alertOptions);
+            this.router.navigate(['carreras', resp.body.id]);
+          } else {
+            // Error
+            this.alertService.error("No se pudo crear la carrera");
+            console.log(resp);
+          }
+        },
+        err => {
+          if(err.status == 504) {
+            this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
+          } else {
+            let mensaje = "Error al crear la carrera";
+            if(typeof err.error === 'string') mensaje += ": " + err.error;
+            this.alertService.error(mensaje, this.alertOptions);
+            console.log(err);
+          }
         }
-      },
-      err => {
-        let mensaje = "Error al crear la carrera";
-        if(typeof err.error === 'string') mensaje += ": " + err.error;
-        this.alertService.error(mensaje, this.alertOptions);
-        console.log(err);
-      }
-    );
+      );
+    } else {
+      this.clienteApi.editCarrera(this.carrera).subscribe(
+        resp => {
+          if(resp.status == 200) {
+            // Carrera editada
+            this.alertService.success("Carrera editada con éxito", this.alertOptions);
+            this.router.navigate(['carreras', this.carrera.id]);
+          } else {
+            // Error
+            this.alertService.error("No se pudo editar la carrera");
+            console.log(resp);
+          }
+        },
+        err => {
+          if(err.status == 504) {
+            this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
+          } else {
+            let mensaje = "Error al editar la carrera";
+            if(typeof err.error === 'string') mensaje += ": " + err.error;
+            this.alertService.error(mensaje, this.alertOptions);
+            console.log(err);
+          }
+        }
+      );
+    }
+    
 
     // Elimina el borrador
-    //localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA); 
+    //localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA); // TODO descomentar
   }
 
 
@@ -359,11 +400,14 @@ export class ResumenCarreraComponent implements OnInit {
           }
 
         }, err => {
-          let mensaje = "No se pudo borrar la carrera";
-          if(typeof err.error === 'string') mensaje += ": " + err.error;
-          this.alertService.error(mensaje, this.alertOptions);
-          this.borrandoCarrera = false;
-          console.log(err);
+          if(err.status == 504) {
+            this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
+          } else {
+            let mensaje = "No se pudo borrar la carrera";
+            if(typeof err.error === 'string') mensaje += ": " + err.error;
+            this.alertService.error(mensaje, this.alertOptions);
+            console.log(err);
+          }
         }
       );
     }
@@ -380,7 +424,6 @@ export class ResumenCarreraComponent implements OnInit {
 
   confirmaBorrarMapa(borrar: boolean): void {
     if(borrar && this.indiceRecorridoBorradoMapa !== null) {
-      console.log("Borrando mapa indice "+ this.indiceRecorridoBorradoMapa);
       this.carrera.recorridos[this.indiceRecorridoBorradoMapa].mapa = null;
     }
 
@@ -402,6 +445,41 @@ export class ResumenCarreraComponent implements OnInit {
         recorrido.mapa = src;
       });
       reader.readAsDataURL(fileInput.target.files[0]);
+    }
+  }
+
+  /**
+   * Descarga el mapa para un recorrido.
+   * @param recorrido Recorrido
+   */
+  descargarMapa(recorrido: Recorrido) {
+    if(recorrido !== null) {
+      this.clienteApi.getMapaRecorrido(recorrido.id).subscribe(
+        resp => {
+          let reader = new FileReader();
+          reader.addEventListener("load", () => {
+            let rec = this.carrera.recorridos[this.carrera.recorridos.indexOf(recorrido)];
+            rec.mapa = reader.result;
+          }, false);
+
+          if (resp.body) {
+            reader.readAsDataURL(resp.body);
+          }
+        }, err => {
+          if(err.status == 504) {
+            this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
+          } else if(err.status == 404) {
+            this.alertService.error("Este recorrido no tiene mapa.", this.alertOptions);
+          }else {
+            let mensaje = "No se pudo descargar el mapa";
+            if(typeof err.error === 'string') mensaje += ": " + err.error;
+            this.alertService.error(mensaje, this.alertOptions);
+            console.log(err);
+          }
+        }
+      );
+    } else {
+      this.alertService.error("No se puede descargar este mapa", this.alertOptions);
     }
   }
 

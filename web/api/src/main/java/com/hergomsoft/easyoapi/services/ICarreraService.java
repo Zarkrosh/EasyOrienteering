@@ -41,17 +41,11 @@ public interface ICarreraService {
     Carrera saveCarrera(Carrera carrera);
     
     /**
-     * Actualiza los datos básicos de una carrera, sin crear/actualizar
-     * las referencias a otras tablas.
-     * @param carrera Carrera a editar
-     */
-    void editDatosCarrera(Carrera carrera);
-    
-    /**
      * Actualiza todos los datos de una carrera en la base de datos.
-     * @param carrera Carrera a editar
+     * @param anterior Carrera anterior
+     * @param nueva Carrera editada
      */
-    void editCarrera(Carrera carrera);
+    void editCarrera(Carrera anterior, Carrera nueva);
     
     /**
      * Borra la carrera especificada de la base de datos.

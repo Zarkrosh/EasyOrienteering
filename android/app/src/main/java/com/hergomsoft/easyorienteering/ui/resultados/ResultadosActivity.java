@@ -138,17 +138,16 @@ public class ResultadosActivity extends BackableActivity {
                 long tAcum = 0;
                 List<ParcialUsuario> parciales = new ArrayList<>();
                 Map<String, Integer> puntosRegistrados = new HashMap<>();
-                if(modalidad == Carrera.Modalidad.LINEA) {
+                if(modalidad == Carrera.Modalidad.TRAZADO) {
                     // LINEA
                     if(ru.getRegistros().size() < trazado.length) tipo = ResultadoUsuario.Tipo.PENDIENTE;
                     for(int i = 1; i < ru.getRegistros().size(); i++) {
                         Date dPri = ru.getRegistros().get(i-1).getFecha();
                         Date dSec = ru.getRegistros().get(i).getFecha();
-                        Long tParcial = null;
                         if(dPri != null && dSec != null) {
                             long tPri = dPri.getTime() / 1000; // Segundos
                             long tSec = dSec.getTime() / 1000; // Segundos
-                            tParcial = tSec - tPri;
+                            long tParcial = tSec - tPri;
                             tAcum += tParcial;
                             parciales.add(new ParcialUsuario(tParcial, tAcum));
                             // Añade a los set correspondientes
@@ -192,7 +191,7 @@ public class ResultadosActivity extends BackableActivity {
                 resultados.add(res);
             }
 
-            if(modalidad == Carrera.Modalidad.LINEA) {
+            if(modalidad == Carrera.Modalidad.TRAZADO) {
                 // Ordena lista por tiempo total y tipo
                 Collections.sort(resultados, new Comparator<ResultadoUsuario>() {
                     @Override
@@ -272,7 +271,7 @@ public class ResultadosActivity extends BackableActivity {
         if(resultados.size() > 0) {
             // Cabecera
             TableRow cabecera;
-            if(modalidad == Carrera.Modalidad.LINEA) {
+            if(modalidad == Carrera.Modalidad.TRAZADO) {
                 // LINEA
                 cabecera = (TableRow) getLayoutInflater().inflate(R.layout.item_resultados_linea, null);
                 TextView tvCabeceraDiferencia = cabecera.findViewById(R.id.item_resultados_diferencia);
@@ -294,7 +293,7 @@ public class ResultadosActivity extends BackableActivity {
             float tamLetra = (float) getResources().getDimension(R.dimen.tamLetraItemResultados) / getResources().getDisplayMetrics().density;
             for(int i = 0; i < trazado.length - 1; i++) {
                 String text;
-                if(modalidad == Carrera.Modalidad.LINEA) {
+                if(modalidad == Carrera.Modalidad.TRAZADO) {
                     // LINEA (tramos)
                     if(i == 0) {
                         // Salida -> Primer control
@@ -327,7 +326,7 @@ public class ResultadosActivity extends BackableActivity {
                 TableRow row;
                 TextView tvDiferencia = null;
                 TextView tvPuntuacion = null;
-                if(modalidad == Carrera.Modalidad.LINEA) {
+                if(modalidad == Carrera.Modalidad.TRAZADO) {
                     // LINEA
                     row = (TableRow) getLayoutInflater().inflate(R.layout.item_resultados_linea, null);
                     tvDiferencia = row.findViewById(R.id.item_resultados_diferencia);
@@ -370,7 +369,7 @@ public class ResultadosActivity extends BackableActivity {
                 tvPosicion.setText(sPosicion);
                 tvTiempoTotal.setText(sTiempoTotal);
 
-                if(modalidad == Carrera.Modalidad.LINEA) {
+                if(modalidad == Carrera.Modalidad.TRAZADO) {
                     // LINEA -> Parciales
                     for(ParcialUsuario p : r.getParciales()) {
                         final LinearLayout llParcial = (LinearLayout) getLayoutInflater().inflate(R.layout.item_parcial, null);

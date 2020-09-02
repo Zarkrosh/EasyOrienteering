@@ -1,10 +1,8 @@
 package com.hergomsoft.easyorienteering.data.repositories;
 
-import android.app.Application;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -20,9 +18,7 @@ import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Registro;
-import com.hergomsoft.easyorienteering.data.model.Usuario;
 import com.hergomsoft.easyorienteering.util.AppExecutors;
-import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.NetworkBoundResource;
 import com.hergomsoft.easyorienteering.util.Resource;
 import com.hergomsoft.easyorienteering.util.SingleLiveEvent;
@@ -253,6 +249,27 @@ public class RegistroRepository extends ApiRepository {
 
     public LiveData<Resource<RegistrosRecorridoResponse>> getRegistrosRecorrido(long idRecorrido) {
         return new NetworkBoundResource<RegistrosRecorridoResponse, RegistrosRecorridoResponse>(AppExecutors.getInstance(), false) {
+            /*
+            @Override
+            protected void saveCallResult(@NonNull RegistrosRecorridoResponse item) {
+                item.setTimestamp((int)(System.currentTimeMillis() / 1000));
+                usuarioDAO.insertUsuario(item);
+            }
+
+            @NonNull
+            @Override
+            protected LiveData<RegistrosRecorridoResponse> loadFromDb() {
+                return usuarioDAO.getUsuario(idRecorrido);
+            }
+
+
+            @Override
+            protected boolean shouldFetch(@Nullable RegistrosRecorridoResponse data) {
+                int currentTimeSecs = (int) (System.currentTimeMillis() / 1000);
+                if(data == null || data.getTimestamp() == null) return true;
+                return currentTimeSecs - data.getTimestamp() >= Constants.REFRESH_USUARIO_TIME;
+            } */
+
             @NonNull
             @Override
             protected LiveData<ApiResponse<RegistrosRecorridoResponse>> createCall() {
@@ -291,7 +308,7 @@ public class RegistroRepository extends ApiRepository {
 
     private void actualizaSiguienteControl() {
         // Carga siguiente control
-        if(carreraActual.getModalidad().equals(Carrera.Modalidad.LINEA)) {
+        if(carreraActual.getModalidad().equals(Carrera.Modalidad.TRAZADO)) {
             // LINEA
             String[] trazado = recorridoActual.getTrazado();
             if(registroList.size() < trazado.length) {

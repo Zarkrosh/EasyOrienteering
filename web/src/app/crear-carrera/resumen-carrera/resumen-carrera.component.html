@@ -139,7 +139,7 @@
                 <div id="lista-mapas">
                     <div *ngFor="let recorrido of carrera.recorridos">
                         <h4>{{recorrido.nombre}}</h4>
-                        <img *ngIf="recorrido.mapa" src={{recorrido.mapa}} />
+                        <img *ngIf="recorrido.mapa && recorrido.mapa != true && recorrido.mapa != false" src={{recorrido.mapa}} />
                         <button *ngIf="recorrido.mapa" class="btn btn-danger btn-borrar-mapa" (click)="clickBotonBorrarMapa(recorrido)"><i class="fa fa-times"></i></button>
 
                         <ng-container *ngIf="!recorrido.mapa">
@@ -149,6 +149,13 @@
                                 Añadir mapa
                             </label>
                         </ng-container>
+
+
+                        <button *ngIf="recorrido.mapa == true"
+                            class="btn btn-secondary btn-sin-algo" (click)="descargarMapa(recorrido)">
+                            <i class="fa fa-download"></i>
+                            Descargar mapa
+                        </button>
                     </div>
                 </div>
             </ng-container>

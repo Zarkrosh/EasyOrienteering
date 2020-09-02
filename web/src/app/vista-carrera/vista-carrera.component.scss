@@ -67,6 +67,7 @@ $color-item-privado: #a200ff;
 .notas {
     margin-left: 24px;
     text-align: justify;
+    white-space: pre-wrap; // Saltos de línea visibles
 }
 
 

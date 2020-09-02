@@ -74,13 +74,14 @@
                 <table *ngIf="eleccionTrazado === ELECCION_SOLO_RECORRIDOS" class="controles-recorrido">
                     <tbody>
                         <ng-container *ngIf="recorridoActual !== null">
-                            <tr><td>SALIDA</td></tr>
-                            <tr *ngFor="let c of recorridoActual.trazado; let i = index">
+                            <tr><td>{{CODIGO_SALIDA}}</td></tr>
+                            <tr *ngFor="let c of recorridoActual.trazado | slice:1:recorridoActual.trazado.length-1; let i = index">
                                 <td>{{i+1}} - {{c}}</td>
-                                <button class="btn btn-danger" (click)="borrarControlRecorrido(i)"><i class="fa fa-times"></i></button>
+                                <button *ngIf="c != CODIGO_SALIDA && c != CODIGO_META" class="btn btn-danger" (click)="borrarControlRecorrido(c)"><i class="fa fa-times"></i></button>
                             </tr>
-                            <input *ngIf="recorridoActual.trazado.length < MAX_CONTROLES_RECORRIDO" (keyup)="keyUpInputControl($event)"/>
-                            <tr><td>META</td></tr>
+                            <input *ngIf="recorridoActual.trazado.length < MAX_CONTROLES_RECORRIDO" 
+                                (keyup)="keyUpInputControl($event)" (keydown)="keyDownInputControl($event)"/>
+                            <tr><td>{{CODIGO_META}}</td></tr>
                         </ng-container>
                     </tbody>
                 </table>

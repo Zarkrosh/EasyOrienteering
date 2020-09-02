@@ -15,7 +15,7 @@ import java.util.Map;
 public class Carrera {
 
     public enum Tipo {EVENTO, CIRCUITO};
-    public enum Modalidad {LINEA, SCORE};
+    public enum Modalidad {TRAZADO, SCORE};
 
     @PrimaryKey
     @Expose

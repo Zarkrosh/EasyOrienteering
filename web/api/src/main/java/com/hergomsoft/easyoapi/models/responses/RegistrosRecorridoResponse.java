@@ -10,6 +10,7 @@ import java.util.Map;
 public class RegistrosRecorridoResponse {
     
     private final Carrera.Modalidad modalidad;
+    private final long idCarrera;
     private final Recorrido recorrido;
     private final Map<String, Integer> puntuacionesControles;
     private final List<RegistrosUsuario> registrosUsuarios;
@@ -17,6 +18,7 @@ public class RegistrosRecorridoResponse {
     public RegistrosRecorridoResponse(Recorrido recorrido, List<RegistrosUsuario> registrosUsuarios) {
         this.recorrido = recorrido;
         this.registrosUsuarios = registrosUsuarios;
+        this.idCarrera = recorrido.getCarrera().getId();
         this.modalidad = recorrido.getCarrera().getModalidad();
         this.puntuacionesControles = new HashMap<>();
         for(Control c : recorrido.getCarrera().getControles().values()) {
@@ -26,6 +28,10 @@ public class RegistrosRecorridoResponse {
 
     public Carrera.Modalidad getModalidad() {
         return modalidad;
+    }
+
+    public long getIdCarrera() {
+        return idCarrera;
     }
 
     public Recorrido getRecorrido() {

@@ -32,7 +32,7 @@ export class Carrera {
     nombre: string;
     organizador: Usuario;
     recorridos: Recorrido[];
-    controles: Map<string, Control>;
+    controles: Map<any, any>;
     tipo: string;
     modalidad: string;
     latitud: number;
@@ -71,10 +71,10 @@ export class Control {
 }
 
 export class Recorrido {
-    id: Number;
+    id: number;
     nombre: string;
     trazado: string[]; // Sin incluir salida/meta
-    mapa: string; // Mapa en B64 "data:image/jpeg;base64, ..."
+    mapa: any; // Mapa en B64 "data:image/jpeg;base64, ..." o true/false para indicar presencia
 
     constructor(nombre: string) {
         this.nombre = nombre;

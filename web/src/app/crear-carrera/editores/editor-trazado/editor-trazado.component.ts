@@ -117,27 +117,6 @@ export class EditorTrazadoComponent implements OnInit {
   }
 
   setupObservadores() {
-    // Controlador de cambio de los controles
-    /*
-    this.sharedData.controles.subscribe((nControles) => {
-      if(nControles !== null) {
-        console.log("[TRAZADOR] Actualizando controles");
-        console.log(nControles);
-        this.controles = nControles;
-      }
-    });
-    
-    // Controlador de cambio del recorrido
-    this.sharedData.recorridoActual.subscribe((nRecorrido) => {
-      if(nRecorrido != null) {
-        this.recorridoActual = nRecorrido;
-        if(this.contextTrazado && this.contextMarcador) {
-          this.redibujaTrazado();
-          this.actualizaMarcador();
-        }
-      }
-    });
-    */
     // Controlador de cambio de mapa base
     this.sharedData.mapaBase.subscribe((nMapa) => {
       if(nMapa != null && nMapa.length > 0) {
@@ -156,6 +135,7 @@ export class EditorTrazadoComponent implements OnInit {
     } else if(tipo === Control.TIPO_META) {
       this.seleccionaMeta();
     }
+    this.actualizaMarcador();
   }
   
 
@@ -388,6 +368,8 @@ export class EditorTrazadoComponent implements OnInit {
             if(this.controles.get(this.CODIGO_CONTROL_MARCADO).tipo == Control.TIPO_META) {
               this.habilitaMarcadores(false);
             }
+            
+            this.redibujaTrazado();
           } else {
             // Nuevo control (ya sea en un recorrido o en general)
             if(this.MARKER_STATE === Control.TIPO_SALIDA && this.controles.has(AppSettings.CODIGO_SALIDA)) {
@@ -401,12 +383,12 @@ export class EditorTrazadoComponent implements OnInit {
                 this.seleccionaControl();
               } else if(this.recorridoActual != null && this.MARKER_STATE === Control.TIPO_META) {
                 // Ha acabado un recorrido, se deshabilita la adición de nuevos
-                //this.habilitaMarcadores(false);
+                this.habilitaMarcadores(false);
               }
             }
+            
+            this.redibujaTrazado();
           }
-
-          this.redibujaTrazado();
         }
       }
     } else if(evento.which === 2) {
@@ -658,7 +640,7 @@ export class EditorTrazadoComponent implements OnInit {
    *                      LIENZO DE TRAZADO                           *    
    ********************************************************************/
 
-  dibujaTrazado(context: CanvasRenderingContext2D, trazado, controles) {
+  dibujaTrazado(context: CanvasRenderingContext2D, trazado: string[], controles: Map<string, Control>) {
     if(trazado.length === 1) {
       var primerControl = controles.get(trazado[0]);
       let coords = this.getCoordenadasCanvasTrazado(primerControl.coords);                // CHECK llamada externa
@@ -1075,9 +1057,7 @@ export class EditorTrazadoComponent implements OnInit {
       this.setupCanvas();
       this.redibujaMapa();
       this.redibujaTrazado();
-
-      //this.updateCanvasDims(this.canvasMarcador.nativeElement);
-      //this.setupCanvas(false);
+      this.actualizaMarcador();
     });
 
     this.imgMapa.src = srcImagenMapa;

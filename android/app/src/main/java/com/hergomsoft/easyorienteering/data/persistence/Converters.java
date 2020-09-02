@@ -1,7 +1,6 @@
 package com.hergomsoft.easyorienteering.data.persistence;
 
 import androidx.room.TypeConverter;
-import androidx.room.TypeConverters;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -53,8 +52,8 @@ public class Converters {
 
     @TypeConverter
     public static Carrera.Modalidad toModalidad(String valor) {
-        if(valor.contentEquals(Carrera.Modalidad.LINEA.name())) {
-            return Carrera.Modalidad.LINEA;
+        if(valor.contentEquals(Carrera.Modalidad.TRAZADO.name())) {
+            return Carrera.Modalidad.TRAZADO;
         } else if(valor.contentEquals(Carrera.Modalidad.SCORE.name())) {
             return Carrera.Modalidad.SCORE;
         }

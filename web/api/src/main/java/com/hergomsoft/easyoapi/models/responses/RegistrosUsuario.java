@@ -5,8 +5,8 @@ import com.hergomsoft.easyoapi.models.Usuario;
 import java.util.List;
 
 public class RegistrosUsuario {
-    private Usuario usuario;
-    private List<Registro> registros;
+    private final Usuario usuario;
+    private final List<Registro> registros;
 
     public RegistrosUsuario(Usuario usuario, List<Registro> registros) {
         this.usuario = usuario;
