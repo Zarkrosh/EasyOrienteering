@@ -1,8 +1,11 @@
 package com.hergomsoft.easyoapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -17,9 +20,9 @@ import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "controles")
-public class Control {
+public class Control implements IdEntity {
     
-    public enum TIPO {SALIDA, CONTROL, META};
+    public enum Tipo {SALIDA, CONTROL, META};
     
     @JsonIgnore
     @Id
@@ -33,19 +36,31 @@ public class Control {
     @Type(type = "com.hergomsoft.easyoapi.models.EnumTypesPostgres")
     @Column(name = "TIPO")
     @Enumerated(EnumType.STRING)
-    private TIPO tipo;
+    private Tipo tipo;
     
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinColumn(name="CARRERA_ID")
     private Carrera carrera;
+    
+    @Column(name = "PUNTUACION")
+    private Integer puntuacion;
+    
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "x", column = @Column(name = "COORD_X", nullable = true)),
+        @AttributeOverride(name = "y", column = @Column(name = "COORD_Y", nullable = true))
+    })
+    private Coordenadas coords;
+    
 
     public Control() {}
 
-    public Control(String codigo, TIPO tipo, Carrera carrera) {
+    public Control(String codigo, Tipo tipo, Integer puntuacion, Coordenadas coords) {
         this.codigo = codigo;
         this.tipo = tipo;
-        this.carrera = carrera;
+        this.puntuacion = puntuacion;
+        this.coords = coords;
     }
 
     public Long getId() {
@@ -64,11 +79,11 @@ public class Control {
         this.codigo = codigo;
     }
 
-    public TIPO getTipo() {
+    public Tipo getTipo() {
         return tipo;
     }
 
-    public void setTipo(TIPO tipo) {
+    public void setTipo(Tipo tipo) {
         this.tipo = tipo;
     }
 
@@ -78,6 +93,22 @@ public class Control {
 
     public void setCarrera(Carrera carrera) {
         this.carrera = carrera;
+    }
+
+    public Integer getPuntuacion() {
+        return puntuacion;
+    }
+
+    public void setPuntuacion(Integer puntuacion) {
+        this.puntuacion = puntuacion;
+    }
+
+    public Coordenadas getCoords() {
+        return coords;
+    }
+
+    public void setCoords(Coordenadas coords) {
+        this.coords = coords;
     }
     
     @Override

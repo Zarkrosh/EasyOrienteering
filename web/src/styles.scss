@@ -1,7 +1,16 @@
+@import "~leaflet/dist/leaflet.css";
+
+$max-width-content: 1400px;
+$umbral-width: 1000px;
+
 $color-orientacion: #F76D22;
 $color-orientacion-light: rgba($color-orientacion, 0.8);
 $color-orientacion-dark: #ce5d21;
 $color-exito: #66CC00;
+$color-secondary: #007bff;
+$color-secondary-light: rgba($color-secondary, 0.8);
+$color-secondary-dark: #0061c9;
+
 
 alert {
     position: fixed;
@@ -11,6 +20,11 @@ alert {
     bottom: 40px;
     font-size: 1.3em;
     z-index: 9000;
+}
+
+// Iconos FontAwesome
+.fa {
+    margin-right: 6px;
 }
 
 .flex-content-end {
@@ -23,21 +37,188 @@ alert {
 }
 .btn-primary:hover {
     background-color: $color-orientacion-light;
+    border-color: rgba($color-orientacion-light, 0.8);
 }
 .btn-primary:not(:disabled):active {
     background-color: $color-orientacion-dark;
 }
 .btn-primary:focus {
+    background-color: $color-orientacion-dark;
     box-shadow: 0 0 0 0.2rem rgba($color-orientacion, 0.5);
 }
+.btn-primary:not(:disabled):not(.disabled):active:focus {
+    background-color: $color-orientacion-dark;
+    box-shadow: 0 0 0 0.2rem rgba($color-orientacion, 0.5);
+}
+.btn-secondary {
+    background-color: $color-secondary;
+    border-color: $color-secondary;
+}
+.btn-secondary:hover {
+    background-color: $color-secondary-light;
+    border-color: rgba($color-secondary-light, 0.8);
+}
+.btn-secondary:not(:disabled):active {
+    background-color: $color-secondary-dark;
+}
+.btn-secondary:focus {
+    box-shadow: 0 0 0 0.2rem rgba($color-secondary, 0.5);
+}
+.btn-secondary:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 0.2rem rgba($color-secondary, 0.5);
+}
 
-#footer-web {
+.easyo-container {
+    position: relative;
+    width: $max-width-content;
+    margin: 50px auto;
+    border-radius: 20px;
+    box-shadow: 2px 2px #AAA7;
+    padding: 40px 80px;
+    background-color: white;
+    overflow: hidden;
+}
+
+.easyo-container > h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.btns-cabecera button {
+    position: absolute;
+    top: 0;
+    padding: 10px 20px;
+}
+.btn-cabecera-izda {
+    left: 0;
+}
+.btn-cabecera-dcha {
+    right: 0;
+}
+
+
+/**** MENSAJE DE CARGA ****/
+.wrapper-cargando {
+    width: 100%;
+    min-height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.btn-reintentar {
+    margin: 35px auto 0 auto;
+    display: block;
+}
+
+
+/**** POPUPS LEAFLET ****/
+.info-popup {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: column;
+    font-size: 1rem;
+    text-align: center;
+}
+.info-popup h4 {
+    font-size: 1.3rem;
+}
+.info-popup table {
+    width: 100%;
+    margin: 10px auto;
+}
+.info-popup a {
+    width: max-content; // Ajusta ancho al botón
+    margin: 20px auto 0 auto;
+    color: white !important;
+    text-decoration: none !important;
+    text-align: center;
+}
+
+
+.footer-web {
     width: 100%;
     height: 200px;
-    margin-top: 40px;
     background-color: grey;
 }
 
+
+/**** CODIGOS QR EN PDF ****/
+.pagina-pdf {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    margin: 20px auto;
+    background-color: white;
+    box-shadow: 0 0 7px 7px #00000069;
+}
+.pagina-pdf h1 {
+    padding-top: 30px;
+    text-align: center;
+    font-size: 1.6rem;
+}
+
+.lista-controles {
+    width: 100%;
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.control {
+    position: relative;
+    margin: 40px 60px;
+    font-weight: bold;
+    font-size: x-large;
+    text-align: center;
+}
+.control-QR {
+    width: min-content;
+    height: min-content;
+    margin: 0 auto;
+}
+.control-marca-agua {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    font-size: 0.7rem;
+    color: gray;
+}
+/**************************/
+
+
+/**** DIALOGO MODAL ****/
+.modal-fit .modal-dialog {
+    width: min-content !important;
+    max-width: none !important;
+}
+
+
+.oculto {
+    visibility: hidden;
+}
+
+// Basado en código de https://loading.io/css/
+.lds-baliza {
+    display: block;
+    border: 3vh solid white;
+    border-color: white $color-orientacion $color-orientacion white;
+}
+.lds-baliza-wrapper {
+    width: min-content;
+    height: min-content;
+    margin: auto;
+    border: 2px solid black;
+    animation: lds-baliza 1.5s infinite;
+}
+@keyframes lds-baliza {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(720deg);
+    }
+}
+  
 
 // https://stackoverflow.com/questions/3779534/how-do-i-disable-text-selection-with-css-or-javascript
 .noselect {
@@ -48,4 +229,18 @@ alert {
           -ms-user-select: none; /* Internet Explorer/Edge */
               user-select: none; /* Non-prefixed version, currently
                                     supported by Chrome and Opera */
+}
+
+
+@media only screen and (max-width: $umbral-width) {
+    .easyo-container {
+        max-width: 100%;
+        border-radius: 0;
+    }
+}
+
+@media only screen and (min-width: $umbral-width) {
+    .easyo-container {
+        max-width: 90%;
+    }
 }

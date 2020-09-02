@@ -1,0 +1,54 @@
+@import "../../styles.scss";
+
+.custom-select {
+    margin-left: 10px;
+}
+
+.form-busqueda {
+    margin: 0 auto;
+}
+.form-busqueda button {
+    margin-left: 20px;
+}
+
+.wrapper-resultados {
+    display: flex;
+    min-height: 400px;
+}
+
+.mensaje-resultados {
+    margin: auto;
+    text-align: center;
+}
+
+.tableFixHead { 
+    width: 100%;
+    height: 700px;
+    margin: 30px 10px;
+    overflow-y: auto;  
+}
+.tableFixHead thead th { 
+    position: sticky; 
+    top: 0; 
+}
+.resultados-busqueda {
+    text-align: center;
+}
+.resultados-busqueda tr:hover {
+    cursor: pointer;
+}
+
+.row-cargando:hover {
+    cursor: default !important;
+    background-color: inherit !important;
+}
+.spinner-border {
+    color: $color-orientacion;
+}
+
+#mapa-circuitos {
+    width: 100%;
+    max-width: 1000px;
+    height: 600px;
+    margin: 0 auto;
+}

@@ -1,0 +1,43 @@
+@import "../../styles.scss";
+
+.easyo-container {
+    padding: 0;
+}
+
+.wrapper-inicio {
+    display: inline-flex;
+    width: 100%;
+}
+
+.contenido-inicio {
+    width: 100%;
+    min-height: 300px;
+}
+
+.lateral-inicio {
+    min-width: 400px;
+    background-color: $color-orientacion;
+    text-align: center;
+    color: white;
+    padding: 0 30px;
+}
+.lateral-inicio h3 {
+    margin-top: 50px;
+    font-weight: bold;
+}
+.lateral-inicio p {
+    margin: 40px 0 60px 0;
+}
+.lateral-inicio button {
+    margin-bottom: 30px;
+    padding: 5px 10px;
+    font-size: 1.3em;
+    color: white;
+    background-color: transparent;
+    border: 1px solid white;
+    transition: .2s all;
+}
+.lateral-inicio button:hover {
+    color: $color-orientacion;
+    background-color: white;
+}

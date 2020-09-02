@@ -1,0 +1,282 @@
+<div class="easyo-container text-center">
+    <ng-container *ngIf="carrera">
+        <div class="btns-cabecera" *ngIf="tipoVista === TIPO_EDITAR">
+            <button class="btn btn-info btn-cabecera-izda" (click)="clickBotonVolver()">Volver a carrera</button>
+            <button class="btn btn-danger btn-cabecera-dcha" (click)="clickBotonBorrarCarrera()" [disabled]="borrandoCarrera">
+                <span *ngIf="borrandoCarrera" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Borrar carrera
+            </button>
+        </div>
+
+        <h1><u>{{titulo}}</u></h1>
+
+        <div class="header-seccion header-resumen">
+            <!-- Datos principales de la carrera -->
+            <form [formGroup]="carreraForm" class="form-datos">
+                <table class="tabla-datos">
+                    <col width="40%">
+                    <tbody>
+                        <tr>
+                            <td>Nombre</td>
+                            <td>
+                                <input id="nombre" type="text " formControlName="nombre" class="form-control form-nombre" minlength="5" maxlength="50">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tipo</td>
+                            <td>
+                                <div class="datos-selector">
+                                    <label>
+                                        <input type="radio" formControlName="tipo" value="EVENTO" class="form-control selector-opcion" required />
+                                        <div class="selector-opcion-cont noselect">
+                                            <span>Evento</span>
+                                        </div>
+                                    </label>
+                                    <label>
+                                        <input type="radio" formControlName="tipo" value="CIRCUITO" class="form-control selector-opcion"/>
+                                        <div class="selector-opcion-cont noselect">
+                                            <span>Circuito</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Modalidad</td>
+                            <td>
+                                <div class="datos-selector">
+                                    <label>
+                                        <input type="radio" formControlName="modalidad" value="TRAZADO" class="form-control selector-opcion" required/>
+                                        <div class="selector-opcion-cont noselect">
+                                            <span>Trazado</span>
+                                        </div>
+                                    </label>
+                                    <label>
+                                        <input type="radio" formControlName="modalidad" value="SCORE" class="form-control selector-opcion"/>
+                                        <div class="selector-opcion-cont noselect">
+                                            <span>Score</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Visibilidad</td>
+                            <td>
+                                <div class="datos-selector">
+                                    <label>
+                                        <input type="radio" formControlName="visibilidad" value="{{PRIV_PUBLICA}}" class="form-control selector-opcion" required/>
+                                        <div class="selector-opcion-cont noselect">
+                                            <span>Pública</span>
+                                        </div>
+                                    </label>
+                                    <label>
+                                        <input type="radio" formControlName="visibilidad" value="{{PRIV_PRIVADA}}" class="form-control selector-opcion" />
+                                        <div class="selector-opcion-cont noselect">
+                                            <span>Privada</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngIf="f.tipo.value === TIPO_EVENTO">
+                            <td>Fecha</td>
+                            <td>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd/mm/yyyy"
+                                        formControlName="fecha" ngbDatepicker #d="ngbDatepicker" (click)="d.toggle()">
+
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
+                                            <i class="fa fa-calendar"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Notas</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="form-notas">
+                                <textarea rows="3" formControlName="notas" placeholder="Información importante para los corredores (acceso, ubicación, contacto...)" maxlength="1000"></textarea>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+
+            <!-- Ubicación de la carrera -->
+            <app-editor-ubicacion #editorUbicacion></app-editor-ubicacion>
+        </div>
+
+
+        <!-- Carrera trazada -->
+        <ng-container *ngIf="f.modalidad.value === MODALIDAD_TRAZADO">
+
+            <!-- Lista de recorridos -->
+            <div class="header-seccion">
+                <h2>Recorridos</h2>
+                <button *ngIf="carrera.recorridos.length > 0 && tipoVista == TIPO_CREAR" class="btn-editar" (click)="crearRecorridos()">Editar</button>
+            </div>
+            <div id="lista-recorridos">
+                <div *ngFor="let recorrido of carrera.recorridos" class="recorrido">
+                    <span class="nombre-recorrido">{{recorrido.nombre}}</span>
+                    <!-- Lista de controles -->
+                    <span *ngFor="let control of recorrido.trazado" class="control-recorrido"><b>{{control}}</b></span>
+                </div>
+            </div>
+
+            <!-- Si no hay ningún recorrido -->
+            <button *ngIf="carrera.recorridos.length === 0" class="btn btn-primary btn-sin-algo" (click)="crearRecorridos()">
+                <i class="fa fa-plus"></i>
+                Crear recorridos
+            </button>
+
+            <!-- Mapas -->
+            <ng-container *ngIf="carrera.recorridos.length > 0">
+                <h2 class="header-seccion">Mapas</h2>
+                <div id="lista-mapas">
+                    <div *ngFor="let recorrido of carrera.recorridos">
+                        <h4>{{recorrido.nombre}}</h4>
+                        <img *ngIf="recorrido.mapa && recorrido.mapa != true && recorrido.mapa != false" src={{recorrido.mapa}} />
+                        <button *ngIf="recorrido.mapa" class="btn btn-danger btn-borrar-mapa" (click)="clickBotonBorrarMapa(recorrido)"><i class="fa fa-times"></i></button>
+
+                        <ng-container *ngIf="!recorrido.mapa">
+                            <label class="btn btn-primary btn-sin-algo">
+                                <input class="btn btn-primary "
+                                    type="file" accept="image/*" (change)="procesaCargaMapa($event, recorrido)">
+                                Añadir mapa
+                            </label>
+                        </ng-container>
+
+
+                        <button *ngIf="recorrido.mapa == true"
+                            class="btn btn-secondary btn-sin-algo" (click)="descargarMapa(recorrido)">
+                            <i class="fa fa-download"></i>
+                            Descargar mapa
+                        </button>
+                    </div>
+                </div>
+            </ng-container>
+            
+        </ng-container>
+
+
+        <!-- Carrera score -->
+        <ng-container *ngIf="f.modalidad.value === MODALIDAD_SCORE">
+
+            <!-- Lista de controles-->
+            <div class="header-seccion">
+                <h2>Controles</h2>
+                <button *ngIf="controles.length > 0" class="btn-editar" (click)="crearControles()">Editar</button>
+            </div>
+            <div id="lista-controles">
+                <div *ngFor="let control of controles" class="detalle-control">
+                    <b>{{control.codigo}}</b> ({{control.puntuacion}} puntos)
+                </div>
+            </div>
+
+            <!-- Si no hay ningún control -->
+            <button *ngIf="controles.length === 0" class="btn btn-primary btn-sin-algo" (click)="crearControles()">
+                <i class="fa fa-plus"></i>
+                Crear controles
+            </button>
+
+            <!-- Mapa -->
+            <ng-container *ngIf="controles.length > 0 && carrera.recorridos.length > 0">
+                <h2 class="header-seccion">Mapa</h2>
+                <div *ngIf="carrera.recorridos[0].mapa" id="lista-mapas">
+                    <img src={{carrera.recorridos[0].mapa}} />
+                </div>
+                <div *ngIf="!carrera.recorridos[0].mapa">
+                    <button class="btn btn-primary btn-sin-algo">
+                        <i class="fa fa-plus"></i>
+                        Añadir mapa
+                    </button>
+                </div>
+            </ng-container>
+
+        </ng-container>
+
+
+        <button class="btn btn-secondary btn-crear" (click)="guardaCarrera()" [disabled]="!carreraForm.valid">Guardar</button>
+
+    </ng-container>
+
+
+    <div *ngIf="!carrera" class="wrapper-cargando">
+        <div class="lds-baliza-wrapper" *ngIf="!errorCarga">
+            <div class="lds-baliza"></div>
+        </div>
+        <div *ngIf="errorCarga">
+            <h1>Ocurrió un error :(</h1>
+            <button class="btn btn-primary btn-reintentar" (click)="refresh()">Volver a intentar</button>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Diálogo de restauración de borrador de carrera -->
+<ng-template #modalBorrador let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿Restaurar borrador de carrera?</h5>
+        <button type="button" class="close" (click)="restauraBorrador(false)" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Parece que no acabaste de crear una carrera anteriormente, ¿quieres continuar con su creación?<br><br>Se cargará de nuevo toda la configuración que elegiste:<br>TODO Añadir detalles del borrador en el diálogo</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger"  (click)="restauraBorrador(false)" ngbAutofocus>Descartar</button>
+        <button type="button" class="btn btn-success" (click)="restauraBorrador(true)">Restaurar</button>
+    </div>
+</ng-template>
+
+<!-- Diálogo de confirmación de borrado de carrera -->
+<ng-template #modalBorrarCarrera let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿Estás seguro de que quieres borrar la carrera?</h5>
+        <button type="button" class="close" (click)="confirmaBorrarCarrera(false)" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Tras borrar la carrera se perderán todos los datos y no se podrán recuperar.<br><br>Piénsalo bien ☹</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="confirmaBorrarCarrera(false)" ngbAutofocus>Cancelar</button>
+        <button type="button" class="btn btn-danger"    (click)="confirmaBorrarCarrera(true)">Borrar carrera</button>
+    </div>
+</ng-template>
+
+<!-- Diálogo de confirmación de borrado de mapa -->
+<ng-template #modalBorrarMapa let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿Estás seguro de que quieres borrar el mapa?</h5>
+        <button type="button" class="close" (click)="confirmaBorrarMapa(false)" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Si el mapa ha sido generado con el trazador de esta página, puedes volver a generarlo volviendo a guardar los recorridos.</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="confirmaBorrarMapa(false)" ngbAutofocus>Cancelar</button>
+        <button type="button" class="btn btn-danger"    (click)="confirmaBorrarMapa(true)">Borrar mapa</button>
+    </div>
+</ng-template>
+
+
+
+<!-- Diálogo de confirmación de edición 
+<ng-template #modalConfEdicion let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿Estás seguro de que quieres editar los {{(f.modalidad.value === MODALIDAD_SCORE) ? "controles" : "recorridos"}}?</h5>
+        <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Si el mapa ha sido generado con el trazador de esta página, puedes volver a generarlo volviendo a guardar los recorridos.</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="activeModal.close()" ngbAutofocus>Cancelar</button>
+        <button type="button" class="btn btn-danger"    (click)="confirmaBorrarMapa(true)">Borrar mapa</button>
+    </div>
+</ng-template>
+-->

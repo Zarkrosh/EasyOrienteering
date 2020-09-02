@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.configuracion.ConfiguracionActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Sección superior con foto y datos principales -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="30dp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/conf_foto_perfil"
+                android:layout_width="@dimen/dimImgPerfil"
+                android:layout_height="@dimen/dimImgPerfil"
+                android:adjustViewBounds="true"
+                android:background="@drawable/back_round_button"
+                android:padding="1dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/conf_nombre_usuario"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold"
+                    tools:text="AbelHerrero" />
+
+                <TextView
+                    android:id="@+id/conf_club_usuario"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold"
+                    tools:text="(ORCA)" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Lista de botones de configuración de datos del usuario -->
+        <!-- ¿Foto? -->
+        <Button
+            android:id="@+id/conf_btn_ver_perfil"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:text="@string/conf_ver_perfil"
+            android:background="@drawable/back_boton_configuracion"
+            android:textSize="18sp"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/conf_btn_cambiar_nombre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:text="@string/conf_cambiar_nombre"
+            android:background="@drawable/back_boton_configuracion"
+            android:textSize="18sp"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/conf_btn_cambiar_club"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:text="@string/conf_cambiar_club"
+            android:background="@drawable/back_boton_configuracion"
+            android:textSize="18sp"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/conf_btn_cambiar_contrasena"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:text="@string/conf_cambiar_contrasena"
+            android:background="@drawable/back_boton_configuracion"
+            android:textSize="18sp"
+            android:textAllCaps="false" />
+
+
+
+
+
+
+
+
+
+
+
+        <!-- Utilidades misceláneas -->
+        <Button
+            android:id="@+id/conf_btn_resumen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:text="@string/conf_que_es_easyorienteering"
+            android:background="@drawable/back_boton_configuracion"
+            android:textSize="18sp"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/conf_btn_compartir_app"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:text="@string/conf_compartir_aplicacion"
+            android:background="@drawable/back_boton_configuracion"
+            android:textSize="18sp"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/conf_btn_borrar_cuenta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:text="@string/conf_borrar_cuenta"
+            android:textColor="@color/error"
+            android:background="@drawable/back_boton_configuracion"
+            android:textSize="18sp"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/conf_btn_cerrar_sesion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:text="@string/conf_cerrar_sesion"
+            android:textColor="@color/error"
+            android:background="@drawable/back_boton_configuracion"
+            android:textSize="18sp"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+
+</ScrollView>

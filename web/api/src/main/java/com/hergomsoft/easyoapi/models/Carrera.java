@@ -1,6 +1,9 @@
 package com.hergomsoft.easyoapi.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.CascadeType;
@@ -17,15 +20,22 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "carreras")
-public class Carrera {
-    public static final int MLEN_NOMBRE = 50;
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class Carrera implements IdEntity {
+    public static final int MAX_LEN_NOMBRE = 64;
+    public static final int MIN_LEN_NOMBRE = 5;
+    public static final int MAX_LEN_NOTAS = 1000;
+    public static final String CODIGO_SALIDA = "SALIDA";
+    public static final String CODIGO_META = "META";
     
-    public enum TIPO {EVENTO, CIRCUITO};
-    public enum MODALIDAD {LINEA, SCORE};
+    public enum Tipo {EVENTO, CIRCUITO};
+    public enum Modalidad {TRAZADO, SCORE};
    
     @Id
     @Column(name = "ID", columnDefinition = "serial")
@@ -42,39 +52,58 @@ public class Carrera {
     @Enumerated(EnumType.STRING)
     @Type(type = "com.hergomsoft.easyoapi.models.EnumTypesPostgres")
     @Column(name = "TIPO")
-    private TIPO tipo;
+    private Tipo tipo;
     
     @Enumerated(EnumType.STRING)
     @Type(type = "com.hergomsoft.easyoapi.models.EnumTypesPostgres")
     @Column(name = "MODALIDAD")
-    private MODALIDAD modalidad;
+    private Modalidad modalidad;
     
     @ManyToOne(optional = false)
     private Usuario organizador;
     
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @Column(name = "PRIVADA")
+    private boolean privada;
+    
+    @Column(name = "LATITUD")
+    private Float latitud;
+    
+    @Column(name = "LONGITUD")
+    private Float longitud;
+    
+    @Column(name = "NOTAS")
+    private String notas;
+    
+    @Temporal(TemporalType.DATE)
+    @Column(name = "FECHA", nullable = true)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private Date fecha;
+    
+    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name="CARRERA_ID", referencedColumnName="ID")
     private List<Recorrido> recorridos;
     
-    // No se utiliza cascada porque da error debido a la clave foránea del ID de carrera
-    // usado como clave primaria conjunta
+    // No se utiliza cascada
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "carrera")
     @MapKey(name = "codigo")
     private Map<String, Control> controles;
-    
-    // PENDIENTES
-    //private List<Resultado> resultados;
 
     public Carrera() {}
 
-    public Carrera(String secret, String nombre, TIPO tipo, MODALIDAD modalidad, Usuario organizador, List<Recorrido> recorridos, Map<String, Control> controles) {
-        this.secret = secret;
+    public Carrera(String nombre, Tipo tipo, Modalidad modalidad, Usuario organizador, 
+            Float latitud, Float longitud, boolean privada, List<Recorrido> recorridos, 
+            Map<String, Control> controles, String notas) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.modalidad = modalidad;
         this.organizador = organizador;
+        this.latitud = latitud;
+        this.longitud = longitud;
+        this.privada = privada;
         this.recorridos = recorridos;
         this.controles = controles;
+        this.notas = notas;
+        this.fecha = null;
     }
 
     public Long getId() {
@@ -101,19 +130,19 @@ public class Carrera {
         this.nombre = nombre;
     }
 
-    public TIPO getTipo() {
+    public Tipo getTipo() {
         return tipo;
     }
 
-    public void setTipo(TIPO tipo) {
+    public void setTipo(Tipo tipo) {
         this.tipo = tipo;
     }
 
-    public MODALIDAD getModalidad() {
+    public Modalidad getModalidad() {
         return modalidad;
     }
 
-    public void setModalidad(MODALIDAD modalidad) {
+    public void setModalidad(Modalidad modalidad) {
         this.modalidad = modalidad;
     }
 
@@ -123,6 +152,50 @@ public class Carrera {
 
     public void setOrganizador(Usuario organizador) {
         this.organizador = organizador;
+    }
+
+    public Float getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(Float latitud) {
+        this.latitud = latitud;
+    }
+
+    public Float getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(Float longitud) {
+        this.longitud = longitud;
+    }
+    
+    public boolean tieneUbicacion() {
+        return latitud != null && longitud != null;
+    }
+
+    public boolean isPrivada() {
+        return privada;
+    }
+
+    public void setPrivada(boolean privada) {
+        this.privada = privada;
+    }
+
+    public String getNotas() {
+        return notas;
+    }
+
+    public void setNotas(String notas) {
+        this.notas = notas;
+    }
+
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
     }
 
     public List<Recorrido> getRecorridos() {

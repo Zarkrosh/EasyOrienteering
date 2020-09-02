@@ -21,8 +21,10 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.ui.BackableActivity;
-import com.hergomsoft.easyorienteering.ui.VisualUtils;
+import com.hergomsoft.easyorienteering.data.model.ConexionState;
+import com.hergomsoft.easyorienteering.util.BackableActivity;
+import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
+import com.hergomsoft.easyorienteering.util.Utils;
 
 public class RegisterActivity extends BackableActivity {
 
@@ -91,14 +93,14 @@ public class RegisterActivity extends BackableActivity {
                     if(registerFormState.getPasswordConfError()) {
                         // Las contraseñas no coinciden
                         // Muestra imagen de error
-                        confirmPass.setImageDrawable(getResources().getDrawable(R.drawable.incorrect));
+                        confirmPass.setImageDrawable(getResources().getDrawable(R.drawable.img_incorrect));
                         inputPasswordConf.setError(getString(R.string.registro_pass_no_coinciden));
                         passConfError = true;
 
                     } else if(!inputPasswordConf.getText().toString().isEmpty()) {
                         // Las contraseñas coinciden
                         // Muestra imagen correcta
-                        confirmPass.setImageDrawable(getResources().getDrawable(R.drawable.correct));
+                        confirmPass.setImageDrawable(getResources().getDrawable(R.drawable.img_correct));
                         passConfError = false;
 
                     } else {
@@ -109,29 +111,29 @@ public class RegisterActivity extends BackableActivity {
         });
 
         // Muestra el diálogo de registro (o no) y sus mensajes
-        viewModel.getRegisterState().observe(this, new Observer<RegisterState>() {
+        viewModel.getRegisterState().observe(this, new Observer<ConexionState>() {
             @Override
-            public void onChanged(RegisterState registerResult) {
+            public void onChanged(ConexionState registerResult) {
                 switch (registerResult.getEstado()) {
-                    case RegisterState.ESTADO_REGISTRANDO:
+                    case ConexionState.ESTADO_CARGANDO:
                         dialog.muestraMensajeRegistrando();
                         break;
-                    case RegisterState.ESTADO_EXITO_PRE:
+                    case ConexionState.ESTADO_EXITO_PRE:
                         // Muestra que el registro ha sido exitoso
                         dialog.muestraMensajeExito();
                         break;
-                    case RegisterState.ESTADO_EXITO_FIN:
+                    case ConexionState.ESTADO_EXITO_FIN:
                         // Tras registro exitoso redirige a la pantalla principal
-                        //startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
-                        dialog.dismiss(); // TODO Borrar
+                        startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
+                        finish();
                         break;
-                    case RegisterState.ESTADO_ERROR:
+                    case ConexionState.ESTADO_ERROR:
                         Integer idMensaje = registerResult.getMensaje();
                         String mensaje = "";
                         if(idMensaje != null) mensaje = getString(idMensaje);
                         dialog.muestraMensajeError(mensaje);
                         break;
-                    case RegisterState.ESTADO_OCULTO:
+                    case ConexionState.ESTADO_OCULTO:
                     default:
                         dialog.dismiss();
                 }
@@ -214,7 +216,7 @@ public class RegisterActivity extends BackableActivity {
             @Override
             public void onClick(View v) {
                 // Oculta teclado
-                VisualUtils.hideKeyboard(activity);
+                Utils.hideKeyboard(activity);
 
                 Toast.makeText(RegisterActivity.this, "[TODO] Registrando cuenta...", Toast.LENGTH_SHORT).show();
                 viewModel.register(inputEmail.getText().toString(),

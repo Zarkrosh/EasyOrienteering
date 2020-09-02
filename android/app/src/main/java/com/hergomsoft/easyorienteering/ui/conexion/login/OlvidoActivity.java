@@ -1,6 +1,7 @@
 package com.hergomsoft.easyorienteering.ui.conexion.login;
 
 import android.app.Activity;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,10 +12,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.model.Utils;
-import com.hergomsoft.easyorienteering.ui.BackableActivity;
-import com.hergomsoft.easyorienteering.ui.VisualUtils;
+import com.hergomsoft.easyorienteering.util.Constants;
+import com.hergomsoft.easyorienteering.util.Utils;
+import com.hergomsoft.easyorienteering.util.BackableActivity;
 
 public class OlvidoActivity extends BackableActivity {
 
@@ -37,8 +40,12 @@ public class OlvidoActivity extends BackableActivity {
         textResultado = findViewById(R.id.olvidoResultado);
         btnEnviar = findViewById(R.id.olvidoEnviar);
 
+        // Color del spinner circular
+        progress.getIndeterminateDrawable()
+                .setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN );
+
         // Carga valor del login
-        String emailNombre = getIntent().getStringExtra(LoginActivity.ARG_EMAIL_NOMBRE);
+        String emailNombre = getIntent().getStringExtra(Constants.EXTRA_EMAIL_NOMBRE);
         if(emailNombre != null) {
             inputEmailNombre.setText(emailNombre.trim());
             String value = inputEmailNombre.getText().toString().trim();
@@ -64,7 +71,7 @@ public class OlvidoActivity extends BackableActivity {
             @Override
             public void onClick(View v) {
                 // Oculta el teclado y el botón de envío
-                VisualUtils.hideKeyboard(activity);
+                Utils.hideKeyboard(activity);
                 btnEnviar.setVisibility(View.GONE);
                 // Muestra el indicador de carga
                 progress.setVisibility(View.VISIBLE);

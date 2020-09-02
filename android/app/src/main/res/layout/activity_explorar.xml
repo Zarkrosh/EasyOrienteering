@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.explorar.ExplorarActivity">
+
+    <ViewSwitcher
+        android:id="@+id/explorar_switcher"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Cuadro de búsqueda y resultados de carreras -->
+        <com.hergomsoft.easyorienteering.components.ListaCarrerasComponent
+            android:id="@+id/explorar_lista_carreras"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Vista de mapa -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <org.osmdroid.views.MapView
+                android:id="@+id/explorar_mapa"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ViewSwitcher>
+
+    <!-- Boton de alternado entre las vistas -->
+    <ImageButton
+        android:id="@+id/explorar_btn_cambio_vista"
+        android:layout_width="@dimen/tamBotonSwitch"
+        android:layout_height="@dimen/tamBotonSwitch"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/shape_btn_scan"
+        android:padding="15dp"
+        android:src="@drawable/img_gps"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

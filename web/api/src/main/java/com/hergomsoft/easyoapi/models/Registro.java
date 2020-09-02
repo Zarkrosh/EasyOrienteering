@@ -1,6 +1,9 @@
 package com.hergomsoft.easyoapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hergomsoft.easyoapi.models.serializers.ControlSoloCodigoSerializer;
+import com.hergomsoft.easyoapi.models.serializers.IdEntityToIdSerializer;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,7 +18,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "registros")
-public class Registro {
+public class Registro implements IdEntity {
     
     @JsonIgnore
     @Id
@@ -23,34 +26,39 @@ public class Registro {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @JsonSerialize(using = IdEntityToIdSerializer.class)
     @ManyToOne(optional = false)
     private Usuario corredor;
     
+    @JsonSerialize(using = ControlSoloCodigoSerializer.class)
     @ManyToOne(optional = false)
     private Control control;
     
+    @JsonSerialize(using = IdEntityToIdSerializer.class)
     @ManyToOne(optional = false)
     private Recorrido recorrido;
     
-    @CreationTimestamp
+    //@CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "FECHA", insertable = false)
+    @Column(name = "FECHA")
     private Date fecha;
 
     public Registro() {
     }
 
-    public Registro(Usuario corredor, Control control, Recorrido recorrido, Date fecha) {
+    public Registro(Usuario corredor, Control control, Recorrido recorrido) {
         this.corredor = corredor;
         this.control = control;
         this.recorrido = recorrido;
-        this.fecha = fecha;
+        this.fecha = null;
     }
-
+    
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

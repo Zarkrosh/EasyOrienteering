@@ -1,0 +1,188 @@
+<div id="wrapper" [style.visibility]="(eleccionTrazado !== null) ? 'visible' : 'hidden'">
+    <div id="wrapper-trazador" *ngIf="eleccionTrazado === ELECCION_TRAZAR" #wrapperTrazador>
+        <!-- Pestañas de recorridos -->
+        <ul id="tabs-recorridos" class="nav nav-tabs">
+            <li *ngIf="tipoEdicion === EDICION_CONTROLES" [class.tab-seleccionada]="recorridoActual === null" (click)="todosLosControles()" class="noselect"><span>Controles</span></li>
+            <li *ngFor="let nombre of nombresRecorridos" (click)="seleccionaRecorrido(nombre)" 
+                [class.tab-seleccionada]="nombre === recorridoActual.nombre" class="noselect"><span >{{nombre}}</span></li>
+            <li *ngIf="recorridos.size < MAX_RECORRIDOS && tipoEdicion === EDICION_RECORRIDOS" (click)="nuevoRecorrido()" class="btn-nuevo-recorrido noselect"><span><i class="fa fa-plus"></i></span></li>
+        </ul>
+
+        <div id="trazador">
+
+            <!-- Editor de trazados -->
+            <editor-trazado #trazador
+                [controles]="controles" [recorridoActual]="recorridoActual">
+
+            </editor-trazado>
+
+            <!-- Importación PurplePen 
+            <input #inputPurplePen id="input-purplepen" type="file" class="inputfile" (change)="importarPurplePen($event)">
+            <label id="label-importar-purplepen" for="input-purplepen" class="btn btn-primary">Importar desde PurplePen</label>
+            -->
+
+            <!-- Selección de imagen de mapa base -->
+            <input #inputMapa id="input-mapa" type="file" class="inputfile" (change)="cargarMapa($event)">
+            <label *ngIf="!trazador.imgMapa" id="label-seleccionar-mapa" for="input-mapa" class="btn btn-primary">Seleccionar mapa base</label>
+            
+        </div>        
+        
+    </div>
+
+    <div id="wrapper-recorridos" *ngIf="eleccionTrazado === ELECCION_SOLO_RECORRIDOS" #wrapperRecorridos>
+        <div class="header-recorridos">
+            <h3>Recorridos</h3>
+            <button class="btn-nuevo-recorrido" (click)="nuevoRecorrido()"><i class="fa fa-plus"></i></button>
+        </div>
+        <div class="lista-recorridos">
+            <div *ngFor="let nombre of nombresRecorridos" (click)="seleccionaRecorrido(nombre)"
+                [class.rec-seleccionado]="nombre === recorridoActual.nombre" class="item-recorridos noselect">
+                <span>{{nombre}}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra lateral -->
+    <div id="barra-lateral">
+
+        <div class="info-lateral">
+
+            <div *ngIf="tipoEdicion === EDICION_RECORRIDOS">
+                <div id="acciones-recorrido" *ngIf="recorridoActual !== null">
+                    <button id="btn-editar-nombre-recorrido" class="btn" (click)="editarNombreRecorrido(!editandoNombreRecorrido)">
+                        <i *ngIf="!editandoNombreRecorrido" class="fa fa-edit"></i>
+                        <i *ngIf="editandoNombreRecorrido" class="fa fa-save"></i>
+                    </button>
+                    <input #nombreRecorrido id="nombre-recorrido" value="{{recorridoActual.nombre}}" 
+                        [class.noselect]="!editandoNombreRecorrido" [readonly]="!editandoNombreRecorrido" type="text"
+                        (dblclick)="editarNombreRecorrido(true)" (keyup.enter)="editarNombreRecorrido(false)">
+                    <button id="btn-borrar-recorrido"  class="btn" (click)="borrarRecorrido()"><i class="fa fa-trash"></i></button>
+                </div>
+                
+                <!-- Tabla de trazados -->
+                <table class="descripcion-controles" *ngIf="eleccionTrazado === ELECCION_TRAZAR">
+                    <tbody>
+                        <ng-container *ngIf="recorridoActual !== null">
+                            <tr *ngFor="let c of recorridoActual.trazado; let i = index"
+                                class="entrada-descripcion">{{(c != CODIGO_SALIDA && c != CODIGO_META) ? i + " - " : ""}}{{c}}</tr>
+                            <span *ngIf="recorridoActual.trazado.length === 0">Sin controles</span>
+                        </ng-container>
+                    </tbody>
+                </table>
+
+                <!-- Tabla de controles de recorrido-->
+                <table *ngIf="eleccionTrazado === ELECCION_SOLO_RECORRIDOS" class="controles-recorrido">
+                    <tbody>
+                        <ng-container *ngIf="recorridoActual !== null">
+                            <tr><td>{{CODIGO_SALIDA}}</td></tr>
+                            <tr *ngFor="let c of recorridoActual.trazado | slice:1:recorridoActual.trazado.length-1; let i = index">
+                                <td>{{i+1}} - {{c}}</td>
+                                <button *ngIf="c != CODIGO_SALIDA && c != CODIGO_META" class="btn btn-danger" (click)="borrarControlRecorrido(c)"><i class="fa fa-times"></i></button>
+                            </tr>
+                            <input *ngIf="recorridoActual.trazado.length < MAX_CONTROLES_RECORRIDO" 
+                                (keyup)="keyUpInputControl($event)" (keydown)="keyDownInputControl($event)"/>
+                            <tr><td>{{CODIGO_META}}</td></tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+
+            <div *ngIf="tipoEdicion === EDICION_CONTROLES" class="info-controles">
+                <h4>Lista de controles</h4>
+                <table class="tabla-info-controles">
+                    <col width="50%">
+                    <col width="50%">
+                    <thead>
+                        <tr>
+                            <td>Control</td>
+                            <td>Puntuación</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let c of listaControlesOrdenados">
+                            <td>{{c.codigo}}</td>
+                            <td class="puntuacion-control">
+                                <button class="puntuacion-control-btn" (click)="decPuntuacionControl(c)" tabindex="-1"><i class="fa fa-minus"></i></button>
+                                <input type="number" class="puntuacion-control-valor" value={{c.puntuacion}} (change)="cambiaPuntuacionControl(c, $event)" />
+                                <button class="puntuacion-control-btn" (click)="incPuntuacionControl(c)" tabindex="-1"><i class="fa fa-plus"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="wrapper-botones">
+            <button id="btn-cancelar" class="btn btn-danger" (click)="clickCancelar()">Cancelar</button>
+            <button id="btn-guardar" class="btn btn-primary" (click)="guardar()">Guardar {{(tipoEdicion)}}</button>
+        </div>
+    </div>
+</div>
+
+<!-- Diálogo de confirmación de borrado de control -->
+<ng-template #modalControl let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿De verdad quieres borrar el control?</h5>
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Este control se utiliza en otros recorridos ☹</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" ngbAutofocus (click)="activeModal.close()">Cancelar</button>
+        <button id="btn-confirmar-borrar" type="button" class="btn btn-danger" (click)="borrarControlConfirmado()">Borrar</button>
+    </div>
+</ng-template>
+
+<!-- Diálogo de confirmación de borrado de recorrido -->
+<ng-template #modalRecorrido let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿De verdad quieres borrar el recorrido actual?</h5>
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">No podrás recuperarlo después ☹</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" ngbAutofocus (click)="activeModal.close()">Cancelar</button>
+        <button id="btn-confirmar-borrar" type="button" class="btn btn-danger" (click)="borrarRecorridoConfirmado()">Borrar</button>
+    </div>
+</ng-template>
+
+<!-- Diálogo de elección de tipo de creación -->
+<ng-template #modalEleccionInicial let-modal>
+
+    <div class="modal-body">
+        <h2 class="text-center">¿Cómo lo quieres organizar?</h2>
+        <div class="wrapper-elecciones">
+            <div class="selector-eleccion" (click)="activeModal.close(ELECCION_SOLO_RECORRIDOS)">
+                <span class="titulo-eleccion">Solo recorridos</span>
+                <span class="texto-eleccion">Crea los recorridos que necesites sin tener que trazar nada</span>
+                <span class="texto-aclaracion"><i>* Podrás subir tus propios mapas tras generar los recorridos</i></span>
+            </div>
+            <div class="selector-eleccion" (click)="activeModal.close(ELECCION_TRAZAR)">
+                <span class="titulo-eleccion">Trazar recorridos</span>
+                <span class="texto-eleccion">Utiliza el trazador web y una imagen como mapa base para trazar tus recorridos</span>
+                <span class="texto-aclaracion"><i>* Se generarán imágenes de los mapas para cada recorrido cuando acabes</i></span>
+            </div>
+        </div>
+    </div>
+
+</ng-template>
+
+<!-- Diálogo de confirmación de cancelado -->
+<ng-template #modalCancelar let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿De verdad quieres salir?</h5>
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Perderás todos los cambios ☹</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" ngbAutofocus (click)="activeModal.close()">Volver</button>
+        <button id="btn-confirmar-borrar" type="button" class="btn btn-danger" (click)="cancelar()">Salir</button>
+    </div>
+</ng-template>
+

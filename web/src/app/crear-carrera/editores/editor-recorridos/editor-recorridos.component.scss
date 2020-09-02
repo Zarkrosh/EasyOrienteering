@@ -1,0 +1,440 @@
+@import "../../../../styles.scss";
+
+/*********** LAYOUT GENERAL ***********/
+#wrapper {
+    width: 100%;
+    display: inline-flex;
+    padding: 30px 15px;
+    background-color: white;
+}
+
+#wrapper-trazador {
+    flex-grow: 1;
+    min-width: 600px;
+    min-height: 600px;
+    margin-right: 50px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+#trazador {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border: 2px solid black;
+    border-radius: 20px;
+}
+
+#wrapper-recorridos {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+#wrapper-recorridos h3 {
+    text-align: center;
+}
+
+#barra-lateral {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+}
+
+/*********** LISTA DE RECORRIDOS (TABS) ***********/
+#tabs-recorridos {
+    margin-left: 20px;
+}
+#tabs-recorridos li {
+    float: left;
+    margin: 0 .5em 0 0;
+    cursor: pointer;
+}
+#tabs-recorridos span {
+    position: relative;
+    background: $color-orientacion;
+    padding: .7em 1.5em;
+    float: left;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    text-shadow: 0 1px 0 rgba(255,255,255,.8);
+    border-radius: 5px 0 0 0;
+    box-shadow: 0 2px 2px rgba(0,0,0,.4);
+}
+#tabs-recorridos span:hover,
+#tabs-recorridos span:hover::after,
+#tabs-recorridos span:focus,
+#tabs-recorridos span:focus::after {
+  background: #fff;
+}
+#tabs-recorridos span:focus {
+    outline: 0;
+}
+#tabs-recorridos span::after {
+    content:'';
+    position:absolute;
+    z-index: 1;
+    top: 0;
+    right: -.5em;
+    bottom: 0;
+    width: 1em;
+    background: $color-orientacion;
+    box-shadow: 2px 2px 2px rgba(0,0,0,.4);
+    transform: skew(10deg);
+    border-radius: 0 5px 0 0;
+}
+#tabs-recorridos #current span,
+#tabs-recorridos #current span::after {
+    background: red;
+    z-index: 3;
+}
+.tab-seleccionada * {
+    background-color: $color-orientacion-dark !important;
+    /*
+    background: #fff;
+    padding: 2em;
+    height: 220px;*/
+    position: relative;
+    z-index: 2;
+    border-radius: 0 5px 5px 5px;
+    box-shadow: 0 -2px 3px -2px rgba(0, 0, 0, .5);
+    cursor: auto !important;
+}
+.tab-seleccionada span::after {
+    background-color: $color-orientacion-dark !important;
+}
+.btn-nuevo-recorrido {
+    color: $color-orientacion;
+}
+.btn-nuevo-recorrido .fa {
+    transition: all .3s ease-out;
+}
+.btn-nuevo-recorrido:hover .fa {
+    transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+}
+
+editor-trazado {
+    width: 100%;
+    height: 100%;
+}
+
+
+/*********** LISTA DE RECORRIDOS ***********/
+.header-recorridos {
+    position: relative;
+    width: min-content;
+    margin: auto;
+}
+.header-recorridos button {
+    position: absolute;
+    right: -80px;
+    top: 0px;
+    height: 40px;
+    width: 40px;
+    color: white;
+    background-color: $color-secondary;
+    border: 2px solid black;
+    border-radius: 50%;
+}
+.header-recorridos button i {
+    margin: 0 !important;
+}
+.lista-recorridos {
+    height: 100%;
+    width: 100%;
+    padding-top: 30px;
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow-y: auto;
+}
+.item-recorridos {
+    min-width: 300px;
+    height: 200px;
+    margin: 10px 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 30px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: black;
+    text-align: center;
+    cursor: pointer;
+}
+.item-recorridos:hover {
+    background-color: $color-orientacion-light;
+}
+.rec-seleccionado {
+    background-color: $color-orientacion !important;
+    color: white;
+    cursor: default;
+    border-style: dashed;
+}
+
+
+
+
+
+
+
+.info-lateral {
+    height: 400px; // Actúa como min-height con el grow 
+    flex-grow: 1;
+    margin-bottom: 20px;
+    border: 2px solid black;
+    overflow-y: scroll;
+}
+
+/*********** INFO RECORRIDO ***********/
+#acciones-recorrido {
+    display: inline-flex;
+    border-bottom: 2px solid black;
+}
+#acciones-recorrido button {
+    width: 15%;
+    font-size: 1.5em;
+}
+#acciones-recorrido button:focus {
+    box-shadow: none;
+    //color: $color-orientacion-dark;
+    // Al soltar no se quita el color
+}
+#acciones-recorrido .fa {
+    transition: all .3s ease-out;
+}
+
+#btn-editar-nombre-recorrido {
+    color: dodgerblue;
+}
+#btn-editar-nombre-recorrido:hover .fa {
+    transform: scale(1.2);
+    -webkit-transform: scale(1.2);
+}
+
+#nombre-recorrido {
+    width: 70%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.5em;
+    border: 2px solid black;
+    border-top: none;
+    border-bottom: none;
+    background-color: #eee;
+}
+#nombre-recorrido[readonly] {
+    color: inherit;
+    background: transparent;
+    border: none !important;
+    cursor: default;
+}
+
+#btn-borrar-recorrido {
+    color: red;
+}
+#btn-borrar-recorrido:hover .fa {
+    transform: scale(1.2);
+    -webkit-transform: scale(1.2);
+}
+
+.descripcion-controles {
+    width: 100%;
+    text-align: center;
+    overflow-y: scroll;
+}
+.entrada-descripcion {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+/********* CONTROLES RECORRIDO ***********/
+.controles-recorrido {
+    width: 100%;
+    text-align: center;
+    font-size: 1.4rem;
+}
+.controles-recorrido tr {
+    position: relative;
+}
+.controles-recorrido input {
+    width: 80px;
+    text-align: center;
+}
+.controles-recorrido tr:hover > button {
+    display: block;
+}
+.controles-recorrido button {
+    position: absolute;
+    right: 20px;
+    display: none;
+}
+.controles-recorrido button i {
+    margin: 0;
+}
+
+
+
+/******** INFO CONTROLES ***********/
+.info-controles h4 {
+    margin-bottom: 0;
+    padding: 8px 0;
+    font-size: 1.4rem;
+    text-align: center;
+    border-bottom: 2px solid black;
+}
+.tabla-info-controles {
+    width: 100%;
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-align: center;
+}
+.tabla-info-controles thead {
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-bottom: 2px solid black;
+}
+.puntuacion-control {
+    display: inline-flex;
+}
+.puntuacion-control-btn {
+    border: 2px solid black;
+}
+.puntuacion-control-btn i {
+    margin: 0;
+}
+.puntuacion-control-btn:focus {
+    outline: none;
+}
+.puntuacion-control-valor {
+    width: 3rem;
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    border-left: none;
+    border-right: none;
+    text-align: center;
+    appearance: textfield;
+}
+.puntuacion-control-valor:focus {
+    outline: none;
+}
+
+
+/*********** BOTÓN IMPORTAR PURPLE PEN ***********/
+#label-importar-purplepen {
+    background-color: purple;
+    border-color: purple;
+    padding: 10px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif, fontawesome;
+    font-weight: bold;
+    cursor: pointer;
+}
+#label-importar-purplepen:before {
+    margin-right: 10px;
+    content: "\f07c";
+}
+
+/*********** BOTÓN SELECCIONAR MAPA BASE ***********/
+#label-seleccionar-mapa {
+    position: absolute;
+    background-color: limegreen;
+    border-color: limegreen;
+    padding: 10px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif, fontawesome;
+    font-weight: bold;
+    cursor: pointer;
+}
+#label-seleccionar-mapa:before {
+    margin-right: 10px;
+    content: "\f279";
+}
+
+/* Oculta la parte fea del input file */
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+.inputfile + label * {
+	pointer-events: none;
+}
+
+.wrapper-botones {
+    margin-top: 20px;
+    display: inline-flex;
+    flex-direction: row;
+    justify-items: center;
+}
+/*********** BOTÓN GUARDAR RECORRIDOS ***********/
+#btn-guardar {
+    margin-left: 20%;
+    font-size: large;
+    font-weight: bold;
+    flex:1;
+}
+
+
+
+/*********** DIALOGO DE ELECCION ***********/
+.wrapper-elecciones {
+    width: 100%;
+    display: inline-flex;
+    justify-items: center;
+}
+.selector-eleccion {
+    width: 300px;
+    height: 300px;
+    margin: 30px 50px;
+    display: inline-flex;
+    flex-direction: column;
+    padding: 10px 20px;
+    border: 2px solid black;
+    border-radius: 20px;
+    color: black;
+    cursor: pointer;
+    transition: .3s background-color;
+}
+.selector-eleccion:hover {
+    background-color: $color-orientacion;
+    color: white;
+}
+.recorrido:hover .overlay-recorrido{
+    opacity: 1;
+}
+
+.titulo-eleccion {
+    width: 100%;
+    margin: 0 5px;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 1.3rem;
+    text-align: center;
+}
+.texto-eleccion {
+    text-align: center;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.texto-aclaracion {
+    text-align: center;
+    font-size: 1rem;
+}
+
+
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/

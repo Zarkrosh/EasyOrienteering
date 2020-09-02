@@ -2,6 +2,11 @@
 
 $nav-link-interspacing: 15px;
 
+.main-container {
+    //background: #EEE url("http://TODO") center center repeat fixed;
+    background-color: #EEE;
+}
+
 nav {
     background-color: $color-orientacion !important;
 }
@@ -25,6 +30,7 @@ nav .container-fluid {
     font-size: larger;
     color: white !important;
     font-weight: bold;
+    outline: none;
 }
 
 
@@ -41,4 +47,3 @@ nav .container-fluid {
 .btn-registro {
     background-color: darkmagenta;
 }
-

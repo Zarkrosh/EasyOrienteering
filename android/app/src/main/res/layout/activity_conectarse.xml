@@ -28,7 +28,7 @@
             <ImageView
                 android:layout_width="45dp"
                 android:layout_height="56dp"
-                android:src="@drawable/google" />
+                android:src="@drawable/img_google" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -72,6 +72,7 @@
             android:textSize="20sp"
             android:textColor="@android:color/black"
             app:layout_constraintTop_toBottomOf="@+id/conectarseEmailNombre"
+            app:layout_constraintStart_toStartOf="parent"
             tools:layout_editor_absoluteX="0dp" />
 
         <EditText
@@ -97,47 +98,60 @@
             app:layout_constraintTop_toBottomOf="@+id/conectarsePassword"
             tools:layout_editor_absoluteX="49dp" />
 
-        <Button
-            android:id="@+id/btnConectar"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:layout_gravity="start"
-            android:layout_marginTop="24dp"
-            android:enabled="false"
-            android:text="@string/login_conectar"
-            android:textSize="30sp"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:background="@drawable/button_appearance"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/conectarseOlvido" />
-
-        <ProgressBar
-            android:id="@+id/loading"
-            android:layout_width="82dp"
-            android:layout_height="72dp"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-        <TextView
-            android:id="@+id/conectarseOlvido"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="56dp"
-            android:text="@string/login_olvidaste_password"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/holo_blue_light"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/conectarseError" />
+            android:paddingTop="40dp"
+            app:layout_constraintTop_toBottomOf="@+id/conectarseError"
+            tools:layout_editor_absoluteX="40dp">
+
+            <ProgressBar
+                android:id="@+id/loading"
+                android:layout_width="82dp"
+                android:layout_height="72dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                style="?android:attr/progressBarStyle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <TextView
+                android:id="@+id/conectarseOlvido"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:gravity="center"
+                android:text="@string/login_olvidaste_password"
+                android:textColor="@android:color/holo_blue_light"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@id/btnConectar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <Button
+                android:id="@+id/btnConectar"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="start"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="0dp"
+                android:background="@drawable/button_appearance"
+                android:enabled="false"
+                android:text="@string/login_conectar"
+                android:textColor="@android:color/white"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

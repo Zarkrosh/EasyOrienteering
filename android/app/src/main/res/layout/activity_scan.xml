@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.scan.ScanActivity"
+    android:keepScreenOn="true">
+
+    <!-- Intercambiador entre la vista de escaneo y de mapa -->
+    <ViewSwitcher
+        android:id="@+id/scan_switcher"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+        <!-- Vista de escaneo de QR -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <SurfaceView android:id="@+id/scan_cameraView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </SurfaceView>
+
+            <TextView android:id="@+id/scan_mensaje"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:text="@string/scan_escanea_triangulo"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+
+            <!-- DEBUG Nº ESCANEOS -->
+            <TextView
+                android:id="@+id/testContador"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginBottom="40dp"
+                android:textSize="25sp"
+                android:textColor="@android:color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+        <!-- Vista de mapa -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/scan_cl_vista_mapa"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+                android:id="@+id/scan_vista_mapa"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <ProgressBar
+                android:id="@+id/scan_progress_mapa"
+                android:layout_width="@dimen/tamProgressDialogoCarga"
+                android:layout_height="@dimen/tamProgressDialogoCarga"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/scan_vista_mapa"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/scan_error_mapa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:text="@string/scan_no_hay_mapa"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/scan_progress_mapa"
+                tools:text="Error al cargar el mapa" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </ViewSwitcher>
+
+    <!-- Boton de alternado entre las vistas -->
+    <ImageButton
+        android:id="@+id/scan_btn_switch"
+        android:layout_width="@dimen/tamBotonSwitch"
+        android:layout_height="@dimen/tamBotonSwitch"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/shape_btn_scan"
+        android:padding="15dp"
+        android:src="@drawable/img_qr"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

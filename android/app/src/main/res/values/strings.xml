@@ -8,6 +8,17 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
+    <!-- Comunes -->
+    <string name="error">Error</string>
+    <string name="error_inesperado">Error inesperado</string>
+    <string name="cargando_datos">Cargando datos…</string>
+
+
+    <!-- Permisos -->
+    <string name="permiso_requerido">Se requiere este permiso para el funcionamiento de la aplicación</string>
+    <string name="permiso_necesario">Permiso necesario</string>
+    <string name="permiso_camara">Se necesita acceso a la cámara</string>
+
     <!-- Resumen -->
     <string name="resumenTitulo">Resumen</string>
     <string name="resumenOmitir">OMITIR</string>
@@ -50,7 +61,7 @@
     <string name="registro_pass_largo">Al menos 8 letras</string>
     <string name="registro_pass_no_coinciden">Las contraseñas no coinciden</string>
     <string name="registro_registrar">REGISTRAR CUENTA</string>
-    <string name="registro_registrando">Registrando...</string>
+    <string name="registro_registrando">Registrando…</string>
     <string name="registro_registrada">Cuenta registrada</string>
     <string name="registro_error">Error al registrar</string>
     <string name="registro_error2">Comprueba tu conexión</string>
@@ -68,5 +79,83 @@
     <string name="olvido_enviar">ENVIAR</string>
     <string name="olvido_listo">Listo. Recibirás un correo si existe el usuario con el email o nombre introducido</string>
     <string name="olvido_error">Ocurrió un error. Comprueba tu conexión e inténtalo de nuevo</string>
+
+    <!-- Pantalla principal -->
+    <string name="home_mis_carreras">Mis carreras</string>
+    <string name="home_explorar">Explorar</string>
+    <string name="home_unirme">Unirme a evento</string>
+
+    <!-- Pantalla de escaneo -->
+    <string name="scan_error_es_control">Has escaneado un control, debes escanear un triángulo de salida</string>
+    <string name="scan_error_es_meta">Has escaneado una meta, debes escanear un triángulo de salida</string>
+    <string name="scan_error_es_desconocido">Este QR no pertenece a esta aplicación</string>
+    <string name="scan_error_ya_corrido">Ya has corrido este recorrido</string>
+    <string name="scan_error_ya_registrado">Ya has registrado este control</string>
+    <string name="scan_error_corriendo">Ya estás corriendo un recorrido</string>
+    <string name="scan_error_inesperado">Ha ocurrido un error inesperado. Vuélvelo a intentar de nuevo</string>
+    <string name="scan_conf_titulo">Inicio de recorrido</string>
+    <string name="scan_conf_mensaje">En cuanto aceptes comenzará a contar el tiempo y se te mostrará el mapa</string>
+    <string name="scan_pendiente_titulo">Tienes un recorrido pendiente</string>
+    <string name="scan_pendiente_mensaje">Aún no has acabado el recorrido <b>%1$s</b> de la carrera <b>%2$s</b>. ¿Deseas reanudar o abandonar?</string>
+    <string name="scan_pendiente_reanudar">Reanudar</string>
+    <string name="scan_pendiente_abandonar">Abandonar</string>
+    <string name="scan_escanea_triangulo">Escanea un triángulo de salida</string>
+    <string name="scan_btn_vista_scan">SCAN</string>
+    <string name="scan_btn_vista_mapa">MAPA</string>
+    <string name="scan_cargando_mapa">Cargando mapa…</string>
+    <string name="scan_no_hay_mapa">No hay mapa</string>
+    <!-- Diálogo de carga -->
+    <string name="scan_carga_pendiente">Comprobando carrera pendiente…</string>
+    <string name="scan_carga_inicio">Iniciando recorrido…</string>
+    <string name="scan_carga_abandono">Abandonando recorrido…</string>
+    <string name="scan_carga_abandonado">Recorrido abandonado</string>
+    <string name="scan_carga_registrando">Registrando control…</string>
+    <string name="scan_recorrido_acabado">Recorrido finalizado</string>
+
+
+    <!-- Mis carreras -->
+    <string name="mis_carreras_participadas">Participadas</string>
+    <string name="mis_carreras_organizadas">Organizadas</string>
+
+
+    <!-- Detalles de carrera -->
+    <string name="detalles_carrera">Detalles de carrera</string>
+    <string name="detalles_carrera_error_id">ID de carrera inválido</string>
+    <string name="detalles_carrera_cargando">Cargando carrera…</string>
+
+
+    <!-- Configuración -->
+    <string name="conf_configuracion">Configuración</string>
+    <string name="conf_ver_perfil">Ver perfil público</string>
+    <string name="conf_cambiar_nombre">Cambiar nombre</string>
+    <string name="conf_cambiar_club">Cambiar club</string>
+    <string name="conf_cambiar_contrasena">Cambiar contraseña</string>
+    <string name="conf_que_es_easyorienteering">¿Qué es EasyOrienteering?</string>
+    <string name="conf_compartir_aplicacion">Compartir aplicación</string>
+    <string name="conf_borrar_cuenta">Borrar cuenta</string>
+    <string name="conf_cerrar_sesion">Cerrar sesión</string>
+    <string name="conf_nuevo_nombre">Nuevo nombre</string>
+    <string name="conf_nuevo_club">Nuevo club</string>
+    <string name="conf_cambiando_nombre">Cambiando nombre…</string>
+    <string name="conf_resp_nombre_cambiado">Nombre cambiado con éxito</string>
+    <string name="conf_cambiando_club">Cambiando club…</string>
+    <string name="conf_resp_club_cambiado">Club cambiado con éxito</string>
+
+
+    <!-- Perfil de usuario -->
+    <string name="perfil_miembro_desde">Miembro desde el %1$s</string>
+
+    <!-- Resultados -->
+    <string name="resultados_resultados">Resultados %1$s</string>
+    <string name="resultados_cargando">Cargando resultados…</string>
+    <string name="resultados_posicion">Pos.</string>
+    <string name="resultados_nombre_club">Nombre\nClub</string>
+    <string name="resultados_puntuacion">Puntuación</string>
+    <string name="resultados_tiempo_total">Tiempo total</string>
+    <string name="resultados_diferencia">Diferencia</string>
+    <string name="resultados_abandonado">Abandona</string>
+    <string name="resultados_pendiente">Pendiente</string>
+    <string name="resultados_sin_resultados">No hay resultados</string>
+
 
 </resources>

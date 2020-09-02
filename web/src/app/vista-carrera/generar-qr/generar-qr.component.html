@@ -1,0 +1,50 @@
+<div class="easyo-container">
+
+    <ng-container *ngIf="carrera">
+
+        <div class="botones-cabecera">
+            <button class="btn btn-secondary btn-volver" (click)="volver()">
+                <i class="fa fa-arrow-left"></i>
+                Volver a carrera
+            </button>
+
+
+            <button class="btn btn-secondary btn-descargar-pdf" (click)="descargarPDF()" [disabled]="generandoPDF">
+                Descargar PDF
+                <span *ngIf="generandoPDF" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            </button>
+        </div>
+
+        <h1>Controles <i>"{{carrera.nombre}}"</i></h1>
+        
+        <!-- TODO 
+        <h2>Configuración</h2>
+        
+            - Tamaño QR
+            - Tamaño código control / nombre recorrido
+            - Distancia QR / texto
+            - Formato folio de impresión (A3/4/5...)
+        -->
+
+
+        <h2>Previsualización PDF</h2>
+        <div id="vista-pdf" #vistaPDF>
+
+        </div>
+                
+    </ng-container>
+
+
+    <ng-container *ngIf="!carrera">
+        <div class="wrapper-cargando">
+            <div class="lds-baliza-wrapper" *ngIf="!errorCarga">
+                <div class="lds-baliza"></div>
+            </div>
+            <div *ngIf="errorCarga">
+                <h1>Ocurrió un error :(</h1>
+                <button class="btn btn-primary btn-reintentar" (click)="refresh()">Volver a intentar</button>
+            </div>
+        </div>
+    </ng-container>
+
+</div>

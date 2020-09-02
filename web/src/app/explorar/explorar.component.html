@@ -1,0 +1,102 @@
+<div class="easyo-container">
+    <div class="btns-cabecera">
+        <button type="button" class="btn btn-info btn-cabecera-dcha" (click)="muestraMapaCircuitos(true)">Mapa de circuitos permanentes</button>
+    </div>
+
+    <h1>Explorar carreras</h1>
+
+    <form [formGroup]="busquedaForm" class="form-inline" (submit)="buscarCarreras()">
+
+        <table class="text-center form-busqueda ">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Modalidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input class="form-control" formControlName="nombre" type="text" placeholder="Buscar carreras" aria-label="Buscar carreras">
+                    </td>
+                    <td>
+                        <select class="custom-select" formControlName="tipo">
+                            <option value="" selected>Cualquiera</option>
+                            <option value="EVENTO"><b>Evento</b></option>
+                            <option value="CIRCUITO">Circuito</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="custom-select" formControlName="modalidad">
+                            <option value="" selected>Cualquiera</option>
+                            <option value="TRAZADO"><b>Trazado</b></option>
+                            <option value="SCORE">Score</option>
+                        </select>
+                    </td>
+                    <!-- TODO Participadas/Organizadas-->
+                    <td>
+                        <button class="btn btn-primary" [disabled]="busquedaForm.invalid || buscando">Buscar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </form>
+
+    <div class="wrapper-resultados">
+        <h3 *ngIf="!buscando && resultados && resultados.length === 0" class="mensaje-resultados">No hay resultados</h3>
+        <div class="lds-baliza-wrapper" *ngIf="buscando && resultados.length === 0">
+            <div class="lds-baliza"></div>
+        </div>
+
+        <div *ngIf="resultados && resultados.length > 0" class="tableFixHead" 
+                infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="20"
+                (scrolled)="onScroll()" [scrollWindow]="false">
+                
+            <table class="table table-hover resultados-busqueda">
+        
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Modalidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let carrera of resultados" (click)="verCarrera(carrera.id)">
+                        <td>{{carrera.fecha}}</td>
+                        <td class="text-left">{{carrera.nombre}}</td>
+                        <td>{{carrera.tipo}}</td>
+                        <td>{{carrera.modalidad}}</td>
+                    </tr>
+
+                    <tr *ngIf="buscando && resultados.length > 0" class="row-cargando">
+                        <td colspan="4">
+                            <span class="spinner-border" role="status" aria-hidden="true"></span>
+                        </td>
+                    </tr>
+                </tbody>
+                
+            </table>
+        </div>
+    </div>
+    
+</div>
+
+<!-- Diálogo con mapa de circuitos -->
+<ng-template #modalMapaCircuitos let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Circuitos permanentes de orientación</h5>
+        <button type="button" class="close" (click)="muestraMapaCircuitos(false)" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <app-mapa-circuitos></app-mapa-circuitos>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="muestraMapaCircuitos(false)" ngbAutofocus>Cerrar</button>
+    </div>
+</ng-template>

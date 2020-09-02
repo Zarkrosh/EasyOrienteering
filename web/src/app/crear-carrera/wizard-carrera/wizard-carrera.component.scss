@@ -1,0 +1,67 @@
+@import "../../../styles.scss";
+
+.formHeader {
+    margin: 40px 0;
+    text-align: center;
+}
+
+#carreraForm {
+    text-align: center;
+}
+
+.selector-opcion {
+    display: none;
+}
+.selector-opcion:checked + .selector-opcion-cont {
+    background-color: $color-orientacion;
+    color: black !important;
+    cursor: initial !important;
+}
+
+.selector-opcion-cont {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 200px;
+    height: 200px;
+    margin: auto 40px;
+    border: 2px solid black;
+    border-radius: 20%;
+    text-align: center;
+    font-weight: bold;
+    font-size: large;
+    transition: .3s all;
+}
+
+.selector-opcion-cont:hover {
+    background-color: $color-orientacion-light;
+    color: white;
+    cursor: pointer;
+}
+
+.btn-siguiente {
+    display: inline-flex;
+    margin: 20px 0;
+    padding: 10px 50px;
+    border: 2px solid black;
+    border-radius: 15px;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-decoration: none;
+    color: black;
+    background-color: white;
+    transition: .3s all;
+}
+
+.btn-siguiente:hover {
+    background-color: $color-orientacion-light;
+    cursor: pointer;
+}
+
+#nombre {
+    display: inline;
+    max-width: 400px;
+    margin-bottom: 40px;
+    font-size: large;
+    text-align: center;
+}

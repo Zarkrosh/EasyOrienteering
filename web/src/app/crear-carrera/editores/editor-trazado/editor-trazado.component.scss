@@ -1,0 +1,151 @@
+@import "../../../../styles.scss";
+
+/* DEBUG PURPOSES */
+#debug-info {
+    position: absolute;
+    width: 90%;
+    display: inline-flex;
+    background-color: gainsboro;
+    padding: 10px;
+    z-index: 15;
+}
+#debug-info span {
+    margin-right: 20px;
+}
+
+
+
+#vista-mapa {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.grabbable {
+    cursor: grab !important;
+}
+
+#mensaje-falta-mapa {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: gainsboro;
+    text-align: center;
+    z-index: 10;
+    cursor: auto;
+}
+#mensaje-falta-mapa span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: black;
+    font-weight: bold;
+    font-size: 2em;
+}
+
+/*********** LIENZOS ***********/
+#vista-mapa canvas {
+    position: absolute;
+}
+#canvas-mapa {
+    z-index: 1;
+}
+#canvas-trazado {
+    z-index: 2;
+}
+#canvas-marcador {
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+}
+
+/*********** SELECTORES DE TIPO DE CONTROL ***********/
+#selector-tipo {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    z-index: 4;
+}
+#selector-tipo > * {
+    display: block;
+}
+#selector-tipo input {
+    display: none;
+}
+#selector-tipo input:checked + .tipo-punto {
+    background: greenyellow !important;
+}
+#selector-tipo label {
+    margin-bottom: 0;
+}
+.tipo-punto {
+    margin-bottom: 5px;
+    border: 1px solid black;
+    border-radius: 2px;
+    padding: 5px;
+    background: white;
+}
+.tipo-punto:hover {
+    background: gainsboro;
+    cursor: pointer;
+}
+
+/*********** DESLIZADOR DE TAMAÑO DE ELEMENTOS ***********/
+.wrapper-slider-tamano {
+    position: absolute;
+    width: 15%;
+    top: 20px;
+    right: 100px;
+    z-index: 4;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    background-color: white;
+    cursor: default;
+}
+
+.slider-tamano {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+.slider-tamano:hover {
+    opacity: 1;
+}
+
+.slider-tamano::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: $color-orientacion;
+    cursor: pointer;
+}
+.slider-tamano::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: $color-orientacion;
+    cursor: pointer;
+}
+
+
+
+
+
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/
+/***********  ***********/

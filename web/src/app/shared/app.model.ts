@@ -1,10 +1,21 @@
+import { Timestamp } from 'rxjs/internal/operators/timestamp';
+
 export class AppSettings {
     public static readonly LOCAL_STORAGE_CARRERA = "carrera";
+    public static readonly CANVAS_MAPAS_RESOLUCION: number = 0.8;
+    public static readonly SEPARADOR_QR = "|";
+    public static readonly TAM_LADO_QR = 200;
+    public static readonly MARCA_AGUA_CONTROLES = "easyorienteering.com";
+    public static readonly NOMBRE_RECORRIDO_SCORE = "Controles";
+    public static readonly NUMERO_RESULTADOS_BUSQUEDA = 20;
+    public static readonly CODIGO_SALIDA = "SALIDA";
+    public static readonly CODIGO_META = "META";
 }
 
 export class Usuario {
     id: number;
-    username: string;
+    nombre: string;
+    club: string;
     email: string;
     fecharegistro: Date;
 }
@@ -14,28 +25,30 @@ export class Carrera {
     public static readonly TIPO_EVENTO = "EVENTO"; 
     public static readonly TIPO_CIRCUITO = "CIRCUITO"; 
     // Modalidades
-    public static readonly MOD_TRAZADO = "LINEA"; 
+    public static readonly MOD_TRAZADO = "TRAZADO"; 
     public static readonly MOD_SCORE = "SCORE"; 
     
     id: number;
     nombre: string;
+    organizador: Usuario;
     recorridos: Recorrido[];
     controles: Map<any, any>;
     tipo: string;
     modalidad: string;
-    creada: boolean; // True si la carrera existe en el sistema
-                     // False cuando se está creando
-    
-    constructor(nombre: string, recorridos: Recorrido[], controles: Map<any, any>,
-                tipo: string, modalidad: string, creada: boolean) {
-        this.nombre = nombre;
-        this.recorridos = recorridos;
-        this.controles = controles;
-        this.tipo = tipo;
-        this.modalidad = modalidad;
-        this.creada = creada;
-    }
+    latitud: number;
+    longitud: number;
+    privada: boolean;
+    notas: string;
+    fecha: Date;
+    soloRecorridos: boolean; // Interno
 
+    constructor() {
+        this.nombre = this.tipo = this.modalidad = this.notas = "";
+        this.recorridos = [];
+        this.controles = new Map();
+        this.privada = false;
+        this.id = this.organizador = this.latitud = this.longitud = this.fecha = null;
+    }
 }
 
 export class Control {
@@ -47,17 +60,21 @@ export class Control {
     codigo: string;
     tipo: string;
     coords: Coordenadas;
+    puntuacion: number;
 
-    constructor(tipo: string, coords: Coordenadas) {
-        this.codigo = null;
+    constructor(codigo: string, tipo: string, coords: Coordenadas) {
+        this.codigo = codigo;
         this.tipo = tipo;
         this.coords = coords;
+        this.puntuacion = 0;
     }
 }
 
 export class Recorrido {
+    id: number;
     nombre: string;
-    trazado: string[];
+    trazado: string[]; // Sin incluir salida/meta
+    mapa: any; // Mapa en B64 "data:image/jpeg;base64, ..." o true/false para indicar presencia
 
     constructor(nombre: string) {
         this.nombre = nombre;
@@ -82,5 +99,73 @@ export class Pair<T, U> {
     constructor(k: T, v: U) {
         this.key = k;
         this.value = v;
+    }
+}
+
+export class Registro {
+    id: number;
+    corredor: number;  // ID
+    control: string;   // Codigo
+    recorrido: number; // ID
+    fecha: string;
+}
+
+export class RegistrosUsuario {
+    usuario: Usuario;
+    registros: Registro[];
+}
+
+export class RegistrosRecorridoResponse {
+    modalidad: string;
+    idCarrera: number;
+    recorrido: Recorrido;
+    puntuacionesControles: Map<string, number>;
+    registrosUsuarios: RegistrosUsuario[];
+}
+
+export class ResultadoUsuario {
+    public static readonly TIPO_OK = "OK";
+    public static readonly TIPO_PENDIENTE = "PENDIENTE";
+    public static readonly TIPO_ABANDONADO = "ABANDONADO";
+    public static readonly ORDEN_TIPOS = [ResultadoUsuario.TIPO_OK, ResultadoUsuario.TIPO_PENDIENTE, ResultadoUsuario.TIPO_ABANDONADO];
+
+    idUsuario: number;
+    posicion: number;
+    nombre: string;
+    club: string;
+    tiempoTotal: number;
+    diferenciaGanador: number;
+    tipo: string;
+    parciales: ParcialUsuario[];
+    puntosRegistrados: Map<string, number>;
+
+    constructor(idUsuario: number, nombre: string, club: string, tiempoTotal: number, tipo: string) {
+        this.idUsuario = idUsuario;
+        this.nombre = nombre;
+        this.club = club;
+        this.tiempoTotal = tiempoTotal;
+        this.tipo = tipo;
+    }
+
+    getPuntuacion(): number {
+        let puntuacion = 0;
+        if(this.puntosRegistrados) {
+            for(let punt of this.puntosRegistrados.values()) {
+                puntuacion += punt;
+            }
+        }
+        return puntuacion;
+    }
+}
+
+export class ParcialUsuario {
+    tiempoParcial: number;
+    tiempoAcumulado: number;
+    posicionParcial: number;
+    posicionAcumulada: number;
+
+    constructor(tiempoParcial: number, tiempoAcumulado: number) {
+        this.tiempoParcial = tiempoParcial;
+        this.tiempoAcumulado = tiempoAcumulado;
     }
 }

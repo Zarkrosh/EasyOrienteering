@@ -6,17 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.resumen.ResumenActivity">
 
-    <Button
-        android:id="@+id/resumenOmitir"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:background="@null"
-        android:text="@string/resumenOmitir"
-        android:textColor="@android:color/darker_gray"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/resumenPager"
         android:layout_width="match_parent"
@@ -39,5 +28,16 @@
         app:tabIndicatorHeight="0dp"
         app:tabMaxWidth="@dimen/puntosMaxWidth"
         app:layout_constraintBottom_toBottomOf="@+id/resumenPager" />
+
+    <Button
+        android:id="@+id/resumenOmitir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:background="@null"
+        android:text="@string/resumenOmitir"
+        android:textColor="@android:color/darker_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

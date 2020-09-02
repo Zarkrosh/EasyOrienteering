@@ -2,24 +2,36 @@ package com.hergomsoft.easyoapi.services;
 
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Control;
+import com.hergomsoft.easyoapi.models.Recorrido;
+import com.hergomsoft.easyoapi.models.Usuario;
+import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
 import com.hergomsoft.easyoapi.repository.CarreraRepository;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import com.hergomsoft.easyoapi.repository.ControlRepository;
+import com.hergomsoft.easyoapi.repository.RecorridoRepository;
+import com.hergomsoft.easyoapi.utils.Utils;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
-import javax.xml.bind.DatatypeConverter;
+import java.util.TreeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CarreraService implements ICarreraService {
 
     @Autowired
     private CarreraRepository repoCarrera;
+    @Autowired
+    private RecorridoRepository repoRecorrido;
+    @Autowired
+    private ControlRepository repoControl;
     
     @Value("${easyo.carreras.secretgeneral}")
     private String secretCarreras; // Secreto guardado en el servidor
@@ -30,13 +42,24 @@ public class CarreraService implements ICarreraService {
     }
     
     @Override
+    public List<CarreraSimplificada> buscaCarreras(long idUsuario, String nombre, String tipo, String modalidad, Pageable pageable) {
+        int offset = pageable.getPageSize() * pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        List<Carrera> carreras = repoCarrera.buscaCarreras(idUsuario, nombre.toUpperCase(), tipo.toUpperCase(), modalidad.toUpperCase(), offset, size);
+        List<CarreraSimplificada> simplificadas = new ArrayList<>();
+        for(Carrera c : carreras) simplificadas.add(new CarreraSimplificada(c));
+        return simplificadas;
+    }
+    
+    @Override
     public Carrera getCarrera(long id) {
         try {
             Optional<Carrera> res = repoCarrera.findById(id);
             return (res.isPresent()) ? res.get() : null;
         } catch(Exception e) {
             System.out.println("[!] Error al obtener la carrera con id " + id);
-            return null;
+            System.out.println(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al obtener la carrera");
         }
     }
 
@@ -45,28 +68,64 @@ public class CarreraService implements ICarreraService {
         if(carrera != null) {
             // Genera el secret para la carrera mediante el hash MD5 de la concatenación
             // del secret del servidor con una cadena aleatoria generada de su mismo largo.
-            String rand = cadenaAleatoria(secretCarreras.length());
-            String secret = md5(secretCarreras + rand);
+            String rand = Utils.cadenaAleatoria(secretCarreras.length());
+            String secret = Utils.md5(secretCarreras + rand);
             carrera.setSecret(secret);
-            return guardaCarrera(carrera);
+            
+            // Comprueba que los datos de la carrera son válidos
+            checkDatosCarrera(carrera);
+
+            // TODO Evita guardar mapas en edición si no se han modificado (si son nulls).
+
+            // Guarda la carrera general
+            Carrera res = repoCarrera.save(carrera);
+            // Luego guarda los recorridos y controles que no son guardados en cascada
+            List<Recorrido> gRecorridos = new ArrayList<>();
+            for(Recorrido r : carrera.getRecorridos()) {
+                gRecorridos.add(repoRecorrido.save(r));
+            }
+            res.setRecorridos(gRecorridos);
+            Map<String, Control> gControles = new HashMap<>();
+            for(Control c : carrera.getControles().values()) {
+                c.setCarrera(res);
+                gControles.put(c.getCodigo(), repoControl.save(c));
+            }
+            res.setControles(gControles);
+            return res;
         } else {
             throw new IllegalArgumentException("La carrera a guardar no puede ser null");
         }
     }
 
     @Override
-    public void editCarrera(Carrera carrera) {
-        if(carrera != null && carrera.getId() != null) {
-            Carrera prev = getCarrera(carrera.getId());
-            if(prev != null) {
+    public void editCarrera(Carrera anterior, Carrera nueva) {
+        if(nueva != null && nueva.getId() != null) {
+            if(anterior != null) {
+                nueva.setId(anterior.getId());
+                nueva.setSecret(anterior.getSecret());
                 // Comprueba datos válidos
-                // TODO
+                checkDatosCarrera(nueva);
+                repoCarrera.save(nueva);
                 
-                // Borra la carrera anterior y sus datos asociados
-                repoCarrera.deleteById(carrera.getId());
-                // TODO: analizar optimización de destrucción de los recorridos
-                // Guarda la carrera actualizada
-                guardaCarrera(carrera);
+                // ¿Cambios en mapas?
+                //    Vacío para indicar que no se ha cambiado
+                //    Nulo para indicar que se ha borrado
+                for(Recorrido rec : nueva.getRecorridos()) {
+                    if(rec.getId() != null) {
+                        if(rec.getMapa() == null) {
+                            // Mapa borrado
+                            // TODO
+                        } else {
+                            // TODO
+                        }
+                    }
+                }
+                
+                /*
+                NOTAS:
+                    - Solo se actualizan los mapas de los recorridos si es necesario.
+                    - No se actualizan los controles.
+                */
             } else {
                 // No existe ninguna carrera con ese ID
             }
@@ -101,74 +160,106 @@ public class CarreraService implements ICarreraService {
     }
     
     @Override
-    public Map<String, String> getSecretosCarrera(Carrera carrera) {
-        Map<String, String> res = new HashMap<>();
+    public Map<String, String> getControlesConSecretosCarrera(Carrera carrera) {
+        Map<String, String> res = new TreeMap<>();
         
-        // Itera por los controles calculando su secreto
+        // Itera los recorridos
+        for(Recorrido recorrido : carrera.getRecorridos()) {
+            // Salida: INICIO|<ID-RECORRIDO>|<SECRETO-CONTROL> 
+            String secreto = getSecretoRecorrido(recorrido);
+            res.put(recorrido.getNombre(), String.format("INICIO|%d|%s", recorrido.getId(), secreto));
+        }
+        
+        // Itera los controles
         for(Control control : carrera.getControles().values()) {
-            String secreto = getSecretoControl(control);
-            res.put(control.getCodigo(), secreto);
+            if(control.getTipo() != Control.Tipo.SALIDA) {
+                // Resto : <CODIGO-CONTROL>|<SECRETO-CONTROL>
+                String secreto = getSecretoControl(control);
+                res.put(control.getCodigo(), String.format("%s|%s", control.getCodigo(), secreto));
+            }
         }
-        
-        return res;
-    }
-    
-    private Carrera guardaCarrera(Carrera carrera) {
-        // Primero guarda la carrera general
-        Carrera res = repoCarrera.save(carrera);
-        // Luego guarda los controles que no son guardados debido al problema
-        // asociado al uso de la clave foránea del ID de la carrera.
-        for(Control c : carrera.getControles().values()) {
-            repoCarrera.insertaControl(c.getCodigo(), res.getId(), c.getTipo().name());
-        }
-        res.setControles(carrera.getControles());
         
         return res;
     }
     
     @Override
+    public String getSecretoRecorrido(Recorrido recorrido) {
+        return Utils.md5(recorrido.getNombre()+ recorrido.getCarrera().getSecret());
+    }
+    
+    @Override
     public String getSecretoControl(Control control) {
-        return md5(control.getCodigo() + control.getCarrera().getSecret());
+        return Utils.md5(control.getCodigo() + control.getCarrera().getSecret());
+    }
+    
+    @Override
+    public List<Carrera> getCarrerasParticipadasUsuario(Usuario usuario) {
+        return repoCarrera.getCarrerasCorridasUsuario(usuario.getId());
+    }
+
+    @Override
+    public List<Carrera> getCarrerasOrganizadasUsuario(Usuario usuario) {
+        return repoCarrera.findByOrganizadorId(usuario.getId());
+    }
+    
+    @Override
+    public Recorrido getRecorrido(long id) {
+        try {
+            Optional<Recorrido> res = repoRecorrido.findById(id);
+            return (res.isPresent()) ? res.get() : null;
+        } catch(Exception e) {
+            System.out.println("[!] Error al obtener el recorrido con id " + id);
+            System.out.println(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al obtener el recorrido");
+        }
     }
     
     /**
-     * Genera una cadena aleatoria del tamaño especificado.
-     * Creds: https://www.baeldung.com/java-random-string
-     * @param n Tamaño de la cadena
-     * @return Cadena aleatoria de  tamaño n
+     * Realiza una comprobación y corrección de los datos de la carrera.
+     * @param carrera Carrera a comprobar
      */
-    private String cadenaAleatoria(int n) {
-        int leftLimit = 48; // '0'
-        int rightLimit = 122; // 'z'
-        Random random = new Random();
-
-        String generatedString = random.ints(leftLimit, rightLimit + 1)
-          .limit(n)
-          .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-          .toString();
-
-        return generatedString;
-    }
-    
-    /**
-     * Devuelve el hash MD5 de la cadena especificada.
-     * Creds: https://www.baeldung.com/java-md5
-     * @param cadena Cadena a computar
-     * @return MD5 de la cadena
-     */
-    private String md5(String cadena) {
-        if(cadena != null) {
-            String res = null;
-            try {
-                MessageDigest md = MessageDigest.getInstance("MD5");
-                md.update(cadena.getBytes());
-                byte[] digest = md.digest();
-                res = DatatypeConverter.printHexBinary(digest).toUpperCase();
-            } catch (NoSuchAlgorithmException e) {}
-
-            return res;
+    private void checkDatosCarrera(Carrera carrera) {
+        // Comprobaciones generales
+        String nombre = carrera.getNombre().trim();
+        if(nombre.length() >= Carrera.MIN_LEN_NOMBRE && nombre.length() <= Carrera.MAX_LEN_NOMBRE) {
+            carrera.setNombre(nombre);
         } else {
-            throw new IllegalArgumentException("Error al obtener el MD5. La cadena no puede ser null.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("La longitud del nombre debe comprender entre %d y %d caracteres.", Carrera.MIN_LEN_NOMBRE, Carrera.MAX_LEN_NOMBRE));
+        }
+        String notas = (carrera.getNotas() != null) ? carrera.getNotas().trim() : "";
+        if(notas.length() > Carrera.MAX_LEN_NOTAS) notas = notas.substring(0, Carrera.MAX_LEN_NOTAS);
+        carrera.setNotas(notas);
+        
+        if(carrera.getControles() == null || carrera.getControles().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No hay controles.");
+        } if(carrera.getControles().get(Carrera.CODIGO_SALIDA) == null ||
+                carrera.getControles().get(Carrera.CODIGO_META) == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe haber por lo menos una salida y una meta.");    
+        }
+        
+        // Comprobaciones relativas al tipo
+        if(carrera.getTipo() == Carrera.Tipo.EVENTO) {
+            // EVENTO
+            if(carrera.getFecha() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Se debe indicar la fecha del evento.");
+            } 
+        } else {
+            // CIRCUITO
+            // Ubicacion obligatoria
+        }
+        
+        // Comprobaciones relativas a la modalidad
+        if(carrera.getModalidad() == Carrera.Modalidad.TRAZADO) {
+            // TRAZADO
+            if(carrera.getRecorridos() == null || carrera.getRecorridos().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe haber por lo menos un recorrido.");
+            }
+            
+            
+            // Los controles no tienen puntuación
+            for(Control c : carrera.getControles().values()) c.setPuntuacion(0);
+        } else {
+            // SCORE
         }
     }
     

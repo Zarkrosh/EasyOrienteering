@@ -5,9 +5,15 @@ import { LoginComponent } from './auth/login/login.component';
 import { PerfilComponent } from './perfil/perfil.component';
 import { RegistroComponent } from './auth/registro/registro.component';
 import { OlvidoComponent } from './auth/olvido/olvido.component';
-import { CreacionCarreraComponent } from './creacion-carrera/creacion-carrera.component';
-import { EditorRecorridosComponent } from './editor/editor-recorridos/editor-recorridos.component';
 import { VistaCarreraComponent } from './vista-carrera/vista-carrera.component';
+import { QueEsComponent } from './que-es/que-es.component';
+import { GenerarQRComponent } from './vista-carrera/generar-qr/generar-qr.component';
+import { WizardCarreraComponent } from './crear-carrera/wizard-carrera/wizard-carrera.component';
+import { EditorRecorridosComponent } from './crear-carrera/editores/editor-recorridos/editor-recorridos.component';
+import { ResumenCarreraComponent } from './crear-carrera/resumen-carrera/resumen-carrera.component';
+import { ExplorarComponent } from './explorar/explorar.component';
+import { ResultadosComponent } from './vista-carrera/resultados/resultados.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 
 const routes: Routes = [
@@ -16,9 +22,18 @@ const routes: Routes = [
   {path: 'registro', component: RegistroComponent},
   {path: 'olvido', component: OlvidoComponent},
   {path: 'perfil', component: PerfilComponent},
-  {path: 'carreras/crear', component: CreacionCarreraComponent},
-  {path: 'carreras/crear/recorridos', component: EditorRecorridosComponent},
-  {path: 'carreras/:id', component: VistaCarreraComponent}
+  {path: 'easyorienteering', component: QueEsComponent},
+  {path: 'explorar', component: ExplorarComponent},
+  //{path: 'crear/wizard', component: WizardCarreraComponent},
+  {path: 'crear/nueva', component: ResumenCarreraComponent},
+  {path: 'crear/recorridos', component: EditorRecorridosComponent},
+  {path: 'crear/controles', component: EditorRecorridosComponent},
+  {path: 'crear', component: ResumenCarreraComponent},
+  {path: 'editar/:id', component: ResumenCarreraComponent},
+  {path: 'carreras/:id', component: VistaCarreraComponent},
+  {path: 'carreras/:id/qr', component: GenerarQRComponent},
+  {path: 'resultados/:id', component: ResultadosComponent},
+  {path: '**', component: NotFoundComponent}
 ];
 
 @NgModule({

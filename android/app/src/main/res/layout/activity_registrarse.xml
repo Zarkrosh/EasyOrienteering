@@ -174,7 +174,7 @@
                 android:layout_weight="0.1"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/help"
+                android:src="@drawable/img_help"
                 android:background="@null"
                 app:layout_constraintBottom_toBottomOf="@+id/registrarseAcepto"
                 app:layout_constraintStart_toEndOf="@+id/registrarseAcepto"

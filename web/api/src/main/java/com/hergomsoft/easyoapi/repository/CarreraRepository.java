@@ -1,9 +1,8 @@
 package com.hergomsoft.easyoapi.repository;
 
 import com.hergomsoft.easyoapi.models.Carrera;
-import javax.transaction.Transactional;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,14 +11,35 @@ import org.springframework.stereotype.Repository;
 public interface CarreraRepository extends JpaRepository<Carrera, Long> {
     
     /**
-     * Inserta el control especificado para una carrera.
-     * @param codigo Código del control
-     * @param idCarrera ID de la carrera a la que pertenece
-     * @param tipo Tipo de control
+     * Devuelve las carreras que ha corrido el usuario especificado.
+     * @param idUsuario ID del usuario
+     * @return Carreras corridas por el usuario
      */
-    @Modifying
-    @Transactional
-    @Query(value = "INSERT INTO CONTROLES(CODIGO, CARRERA_ID, TIPO) VALUES (:codigo, :idCarrera, :tipo)", nativeQuery = true)
-    public void insertaControl(@Param("codigo") String codigo, @Param("idCarrera") long idCarrera, @Param("tipo") String tipo);
+    @Query(value = "SELECT * FROM carreras WHERE id IN (SELECT carrera_id FROM registros r INNER JOIN controles c ON r.control_id = c.id WHERE corredor_id = :idUsuario and tipo = 'META')", nativeQuery = true)
+    public List<Carrera> getCarrerasCorridasUsuario(@Param("idUsuario") long idUsuario);
+    
+    /**
+     * Devuelve las carreras que ha organizado el usuario especificado.
+     * @param idUsuario ID del usuario
+     * @return Carreras organizadas por el usuario
+     */
+    public List<Carrera> findByOrganizadorId(long idUsuario);
+    
+    /**
+     * Devuelve las carreras que validan los campos de búsqueda.Para realizar una 
+     * búsqueda independiente de la capitalización, se deben pasar los parámetros en mayúsculas.
+     * @param idUsuario ID del usuario que realiza la petición
+     * @param nombre Nombre de la carrera 
+     * @param tipo Tipo de la carrera 
+     * @param modalidad Modalidad de la carrera
+     * @param offset Desplazamiento de paginación
+     * @param numero Número de resultados
+     * @return Carreras resultantes
+     */
+    @Query(value = "SELECT * FROM carreras WHERE UPPER(nombre) LIKE %:nombre% AND tipo\\:\\:text LIKE %:tipo% AND modalidad\\:\\:text LIKE %:modalidad% "
+            + "AND (privada IS FALSE OR organizador_id = :idUsuario) ORDER BY fecha DESC, id DESC OFFSET :offset LIMIT :numero",
+           nativeQuery = true)
+    public List<Carrera> buscaCarreras(@Param("idUsuario") long idUsuario, @Param("nombre") String nombre, @Param("tipo") String tipo, 
+            @Param("modalidad") String modalidad, @Param("offset") int offset, @Param("numero") int numero);
     
 }

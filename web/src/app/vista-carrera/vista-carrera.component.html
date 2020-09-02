@@ -1,11 +1,69 @@
-<div id="wrap-vista-carrera">
-    <h1>Vista carrera</h1>
+<div class="easyo-container">
+    <ng-container *ngIf="carrera;else cargando">
 
-    <h2>Lista de controles</h2>
-    <div id="lista-controles">
-        <div class="control" *ngFor="let control of controles">{{control.codigo}}
-            <div [attr.id]="'QR-' + control.codigo" class="qr-control"></div>
+        <!-- Botones de descarga y edición -->
+        <div class="botones-carrera">
+            <a href="/api/carreras/{{carrera.id}}/mapas" class="btn btn-secondary"><i class="fa fa-map"></i> Descargar mapas</a>
+            <button class="btn btn-secondary" (click)="generarQR()"><i class="fa fa-qrcode"></i> Generar controles QR</button>
+            <button class="btn btn-primary" (click)="editarCarrera()"><i class="fa fa-edit"></i> Editar carrera</button>
         </div>
-    </div>
+
+        <div class="parte-superior-carrera">
+            <div class="datos-carrera">
+                <span class="nombre-carrera">{{carrera.nombre}}</span>
+                <div class="items-datos">
+                    <span class="tipo-carrera">{{carrera.tipo}}</span>
+                    <span class="modalidad-carrera">{{carrera.modalidad}}</span>
+                    <ng-container *ngIf="carrera.privada">
+                        <span class="carrera-privada">PRIVADA</span>
+                    </ng-container>
+                    <ng-container *ngIf="!carrera.privada">
+                        <span class="carrera-publica">PÚBLICA</span>
+                    </ng-container>
+                </div>
+                
+                <p class="organizador"><b>Organizador:</b>  <a href="/usuarios/{{carrera.organizador.id}}">{{getOrganizador()}}</a></p>
+                <p *ngIf="carrera.notas && carrera.notas.length > 0" class="notas-titulo"><b>Notas:</b></p>
+                <div *ngIf="carrera.notas && carrera.notas.length > 0" class="notas">
+                    <p *ngFor="let parrafo of carrera.notas.split('\\n')">{{parrafo}}</p>   
+                </div>
+            </div>
+    
+            <div class="ubicacion">
+                <h1>Ubicación</h1>
+                <div #mapaUbicacion id="mapa-ubicacion" class="ubicacion-mapa" [style.cursor]="(marcarUbicacion) ? 'crosshair' : auto"></div>
+            </div>
+        </div>
+
+        
+
+        <div class="recorridos">
+            <h1>Recorridos</h1>
+            <div class="lista-recorridos">
+                <div *ngFor="let recorrido of carrera.recorridos" class="recorrido">
+                    <div class="datos-recorrido">
+                        <span class="nombre-recorrido"><b>{{recorrido.nombre}}</b></span>
+                        <span class="numero-corredores">18</span>
+                        <span class="numero-controles">12</span>
+                    </div>
+                    <a class="overlay-recorrido" (click)="verResultados(recorrido.id)">
+                        <span>Ver resultados</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-template #cargando>
+        <div class="wrapper-cargando">
+            <div class="lds-baliza-wrapper" *ngIf="!errorCarga">
+                <div class="lds-baliza"></div>
+            </div>
+            <div *ngIf="errorCarga">
+                <h1>Ocurrió un error :(</h1>
+                <button class="btn btn-primary btn-reintentar" (click)="refresh()">Volver a intentar</button>
+            </div>
+        </div>
+    </ng-template>
     
 </div>

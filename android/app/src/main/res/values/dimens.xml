@@ -12,8 +12,15 @@
     <dimen name="tamTitulo">30sp</dimen>
     <dimen name="tamContenido">22sp</dimen>
 
-    <!-- Registro -->
-    <dimen name="tamIndicadorDialogoRegistro">120dp</dimen>
+    <!-- Diálogo de carga -->
+    <dimen name="tamProgressDialogoCarga">120dp</dimen>
+
+    <!-- Home -->
+    <dimen name="dimImgPerfil">70dp</dimen>
+    <dimen name="tamLetraHomeBotones">22sp</dimen>
+    <dimen name="margHomeBotones">40dp</dimen>
+    <dimen name="widWeightHomeBotones">.7</dimen>
+    <dimen name="padHomeBotones">20dp</dimen>
 
     <dimen name="margin_lados_conectarse">30dp</dimen>
     <dimen name="altoTitulos">56dp</dimen>
@@ -22,5 +29,17 @@
     <dimen name="padTopPrincipales">20dp</dimen>
     <dimen name="padBotPrincipales">20dp</dimen>
     <dimen name="altoBotonesPoliticas">60dp</dimen>
+
+
+    <!-- Vista escaneo/mapa -->
+    <dimen name="tamBotonSwitch">80dp</dimen>
+
+    <!-- Lista recorridos -->
+    <dimen name="radiusBotonRecorrido">10dp</dimen>
+
+    <!-- Resultados -->
+    <dimen name="tamLetraItemResultados">16sp</dimen>
+    <dimen name="marginStartItemResultados">10dp</dimen>
+
 
 </resources>

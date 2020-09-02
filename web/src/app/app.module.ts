@@ -4,18 +4,30 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { InicioComponent } from './inicio/inicio.component';
 import { PerfilComponent } from './perfil/perfil.component';
 import { AlertModule } from './alert';
 import { LoginComponent } from './auth/login/login.component';
 import { RegistroComponent } from './auth/registro/registro.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { OlvidoComponent } from './auth/olvido/olvido.component';
-import { CreacionCarreraComponent } from './creacion-carrera/creacion-carrera.component';
-import { EditorRecorridosComponent } from './editor/editor-recorridos/editor-recorridos.component';
-import { EditorTrazadoComponent } from './editor/editor-trazado/editor-trazado.component';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { WizardCarreraComponent } from './crear-carrera/wizard-carrera/wizard-carrera.component';
+import { EditorRecorridosComponent } from './crear-carrera/editores/editor-recorridos/editor-recorridos.component';
+import { EditorTrazadoComponent } from './crear-carrera/editores/editor-trazado/editor-trazado.component';
 import { VistaCarreraComponent } from './vista-carrera/vista-carrera.component';
+import { ResumenCarreraComponent } from './crear-carrera/resumen-carrera/resumen-carrera.component';
+import { QueEsComponent } from './que-es/que-es.component';
+import { GenerarQRComponent } from './vista-carrera/generar-qr/generar-qr.component';
+import { EditorUbicacionComponent } from './crear-carrera/editores/editor-ubicacion/editor-ubicacion.component';
+import { ExplorarComponent } from './explorar/explorar.component';
+import { MapaCircuitosComponent } from './explorar/mapa-circuitos/mapa-circuitos.component';
+import { DatePipe } from '@angular/common';
+import { ResultadosComponent } from './vista-carrera/resultados/resultados.component';
+import { PipeTiempo } from './shared/pipes/PipeTiempo';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 @NgModule({
   declarations: [
@@ -25,20 +37,32 @@ import { VistaCarreraComponent } from './vista-carrera/vista-carrera.component';
     PerfilComponent,
     RegistroComponent,
     OlvidoComponent,
-    CreacionCarreraComponent,
+    WizardCarreraComponent,
     EditorRecorridosComponent,
     EditorTrazadoComponent,
-    VistaCarreraComponent
+    VistaCarreraComponent,
+    ResumenCarreraComponent,
+    QueEsComponent,
+    GenerarQRComponent,
+    EditorUbicacionComponent,
+    ExplorarComponent,
+    MapaCircuitosComponent,
+    ResultadosComponent,
+    PipeTiempo,
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     AlertModule,
+    FormsModule,
     ReactiveFormsModule,
-    NgbModule
+    NgbModule,
+    LeafletModule,
+    InfiniteScrollModule
   ],
-  providers: [],
+  providers: [DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
