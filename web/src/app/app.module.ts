@@ -28,6 +28,7 @@ import { DatePipe } from '@angular/common';
 import { ResultadosComponent } from './vista-carrera/resultados/resultados.component';
 import { PipeTiempo } from './shared/pipes/PipeTiempo';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { PipeFechaBonita } from './shared/pipes/PipeFechaBonita';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { NotFoundComponent } from './not-found/not-found.component';
     MapaCircuitosComponent,
     ResultadosComponent,
     PipeTiempo,
+    PipeFechaBonita,
     NotFoundComponent
   ],
   imports: [

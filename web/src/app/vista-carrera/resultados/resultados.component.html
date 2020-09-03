@@ -33,7 +33,9 @@
                 <tr>
                     <td rowspan="2">{{resultado.posicion}}</td>
                     <td class="text-left resultado-nombre">{{resultado.nombre}}</td>
-                    <td><b>{{resultado.tiempoTotal | tiempo}}</b></td>
+                    
+                    <td *ngIf="resultado.tipo === TIPO_OK"><b>{{resultado.tiempoTotal | tiempo}}</b></td>
+                    <td rowspan=2 *ngIf="resultado.tipo !== TIPO_OK" class="marca-pendiente">PENDIENTE</td>
 
                     <ng-template ngFor let-parcial [ngForOf]="resultado.parciales">
                         <td [ngClass]="{'parcial-primero': parcial.posicionParcial === 1, 'parcial-podio': parcial.posicionParcial <= 3}">
@@ -57,7 +59,7 @@
                 </tr>
                 <tr class="fila-inferior">
                     <td class="text-left resultado-nombre">{{resultado.club}}</td>
-                    <td>{{resultado.diferenciaGanador | tiempo:'+'}}</td>
+                    <td *ngIf="resultado.tipo === TIPO_OK"><b>{{resultado.diferenciaGanador | tiempo:'+'}}</b></td>
 
                     <ng-template ngFor let-parcial [ngForOf]="resultado.parciales">
                         <td [ngClass]="{'parcial-primero': parcial.posicionAcumulada === 1, 'parcial-podio': parcial.posicionAcumulada <= 3}">

@@ -45,7 +45,8 @@ public class UsuarioService implements IUsuarioService {
     @Override
     public Usuario getUsuarioPeticion() {
         // TODO: extraer del método de autenticación
-        return getUsuario(3); // TEST ANDROID
+        //return getUsuario(3); // TEST ANDROID
+        return getUsuario(4); // TEST 
     }
 
 }

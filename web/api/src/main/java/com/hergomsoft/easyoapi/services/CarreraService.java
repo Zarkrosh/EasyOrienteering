@@ -2,25 +2,25 @@ package com.hergomsoft.easyoapi.services;
 
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Control;
+import com.hergomsoft.easyoapi.models.Participacion;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
 import com.hergomsoft.easyoapi.repository.CarreraRepository;
-import com.hergomsoft.easyoapi.repository.ControlRepository;
 import com.hergomsoft.easyoapi.repository.RecorridoRepository;
 import com.hergomsoft.easyoapi.utils.Utils;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -30,8 +30,10 @@ public class CarreraService implements ICarreraService {
     private CarreraRepository repoCarrera;
     @Autowired
     private RecorridoRepository repoRecorrido;
+    
+    
     @Autowired
-    private ControlRepository repoControl;
+    private IParticipacionService participacionesService;
     
     @Value("${easyo.carreras.secretgeneral}")
     private String secretCarreras; // Secreto guardado en el servidor
@@ -82,15 +84,17 @@ public class CarreraService implements ICarreraService {
             // Luego guarda los recorridos y controles que no son guardados en cascada
             List<Recorrido> gRecorridos = new ArrayList<>();
             for(Recorrido r : carrera.getRecorridos()) {
+                r.setCarrera(res);
                 gRecorridos.add(repoRecorrido.save(r));
             }
             res.setRecorridos(gRecorridos);
+            /*
             Map<String, Control> gControles = new HashMap<>();
             for(Control c : carrera.getControles().values()) {
-                c.setCarrera(res);
                 gControles.put(c.getCodigo(), repoControl.save(c));
             }
             res.setControles(gControles);
+            */
             return res;
         } else {
             throw new IllegalArgumentException("La carrera a guardar no puede ser null");
@@ -155,8 +159,8 @@ public class CarreraService implements ICarreraService {
     }
     
     @Override
-    public boolean checkSecretoControl(String secreto, Control control) {
-        return secreto.contentEquals(getSecretoControl(control));
+    public boolean checkSecretoControl(String secreto, Control control, Carrera carrera) {
+        return secreto.contentEquals(getSecretoControl(control, carrera));
     }
     
     @Override
@@ -174,7 +178,7 @@ public class CarreraService implements ICarreraService {
         for(Control control : carrera.getControles().values()) {
             if(control.getTipo() != Control.Tipo.SALIDA) {
                 // Resto : <CODIGO-CONTROL>|<SECRETO-CONTROL>
-                String secreto = getSecretoControl(control);
+                String secreto = getSecretoControl(control, carrera);
                 res.put(control.getCodigo(), String.format("%s|%s", control.getCodigo(), secreto));
             }
         }
@@ -188,13 +192,16 @@ public class CarreraService implements ICarreraService {
     }
     
     @Override
-    public String getSecretoControl(Control control) {
-        return Utils.md5(control.getCodigo() + control.getCarrera().getSecret());
+    public String getSecretoControl(Control control, Carrera carrera) {
+        return Utils.md5(control.getCodigo() + carrera.getSecret());
     }
     
     @Override
     public List<Carrera> getCarrerasParticipadasUsuario(Usuario usuario) {
-        return repoCarrera.getCarrerasCorridasUsuario(usuario.getId());
+        List<Participacion> participaciones = participacionesService.getParticipacionesUsuario(usuario);
+        Set<Carrera> set = new HashSet<>();
+        for(Participacion p : participaciones) set.add(p.getRecorrido().getCarrera());
+        return new ArrayList<>(set);
     }
 
     @Override
@@ -219,7 +226,8 @@ public class CarreraService implements ICarreraService {
      * @param carrera Carrera a comprobar
      */
     private void checkDatosCarrera(Carrera carrera) {
-        // Comprobaciones generales
+        // Trimming
+        for(Control c : carrera.getControles().values()) c.setCodigo(c.getCodigo().trim());
         String nombre = carrera.getNombre().trim();
         if(nombre.length() >= Carrera.MIN_LEN_NOMBRE && nombre.length() <= Carrera.MAX_LEN_NOMBRE) {
             carrera.setNombre(nombre);
@@ -232,10 +240,12 @@ public class CarreraService implements ICarreraService {
         
         if(carrera.getControles() == null || carrera.getControles().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No hay controles.");
-        } if(carrera.getControles().get(Carrera.CODIGO_SALIDA) == null ||
+        }
+        if(carrera.getControles().get(Carrera.CODIGO_SALIDA) == null ||
                 carrera.getControles().get(Carrera.CODIGO_META) == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe haber por lo menos una salida y una meta.");    
         }
+        
         
         // Comprobaciones relativas al tipo
         if(carrera.getTipo() == Carrera.Tipo.EVENTO) {

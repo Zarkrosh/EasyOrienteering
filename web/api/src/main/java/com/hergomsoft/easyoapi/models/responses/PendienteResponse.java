@@ -1,18 +1,18 @@
 package com.hergomsoft.easyoapi.models.responses;
 
 import com.hergomsoft.easyoapi.models.Carrera;
-import com.hergomsoft.easyoapi.models.Registro;
+import com.hergomsoft.easyoapi.models.Participacion;
 import java.io.Serializable;
 
 public class PendienteResponse implements Serializable {
     private final Carrera carrera;
     private final long idRecorrido;
-    private final Registro[] registros;
+    private final Participacion participacion;
 
-    public PendienteResponse(Carrera carrera, long idRecorrido, Registro[] registros) {
+    public PendienteResponse(Carrera carrera, long idRecorrido, Participacion participacion) {
         this.carrera = carrera;
         this.idRecorrido = idRecorrido;
-        this.registros = registros;
+        this.participacion = participacion;
     }
 
     public Carrera getCarrera() {
@@ -23,8 +23,8 @@ public class PendienteResponse implements Serializable {
         return idRecorrido;
     }
 
-    public Registro[] getRegistros() {
-        return registros;
+    public Participacion getParticipacion() {
+        return participacion;
     }
     
 }

@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { AlertService } from 'src/app/alert';
 import { ClienteApiService } from 'src/app/shared/cliente-api.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { RegistrosRecorridoResponse, Recorrido, ResultadoUsuario, ParcialUsuario, Carrera } from 'src/app/shared/app.model';
+import { Recorrido, ResultadoUsuario, ParcialUsuario, Carrera, ParticipacionesRecorridoResponse } from 'src/app/shared/app.model';
 
 @Component({
   selector: 'app-resultados',
@@ -12,6 +12,11 @@ import { RegistrosRecorridoResponse, Recorrido, ResultadoUsuario, ParcialUsuario
 export class ResultadosComponent implements OnInit {
   readonly MOD_TRAZADO = Carrera.MOD_TRAZADO;
   readonly MOD_SCORE = Carrera.MOD_SCORE;
+
+  // Tipos resultados
+  readonly TIPO_OK = ResultadoUsuario.TIPO_OK;
+  readonly TIPO_PENDIENTE = ResultadoUsuario.TIPO_PENDIENTE;
+  readonly TIPO_ABANDONADO = ResultadoUsuario.TIPO_ABANDONADO;
 
   private tablaResultados: ElementRef<HTMLTableElement>;
   @ViewChild('tablaResultados', {static: false}) set content(content: ElementRef) {
@@ -53,7 +58,7 @@ export class ResultadosComponent implements OnInit {
     this.route.params.subscribe(routeParams => {
       let idRecorrido = +routeParams['id'];
       // Obtiene los registros de los participantes del recorrido
-      this.clienteApi.getRegistrosRecorrido(idRecorrido).subscribe(
+      this.clienteApi.getParticipacionesRecorrido(idRecorrido).subscribe(
         resp => {
           if(resp.status == 200) {
             this.idCarrera = resp.body.idCarrera;
@@ -76,7 +81,7 @@ export class ResultadosComponent implements OnInit {
     })
   }
 
-  generaResultados(respuesta: RegistrosRecorridoResponse): void {
+  generaResultados(respuesta: ParticipacionesRecorridoResponse): void {
     this.recorrido = respuesta.recorrido;
     this.modalidad = respuesta.modalidad;
     let trazado = this.recorrido.trazado;
@@ -88,19 +93,21 @@ export class ResultadosComponent implements OnInit {
     let setsAcumulados: Set<number>[] = [];
     for(let i = 0; i < trazado.length - 1; i++) setsAcumulados.push(new Set());
 
-    for(let registrosUsuario of respuesta.registrosUsuarios) {
-      let corredor = registrosUsuario.usuario;
+    for(let participacion of respuesta.participaciones) {
+      let corredor = participacion.corredor;
+      let registros = participacion.registros;
       let tipoResultado = ResultadoUsuario.TIPO_OK;
+      if(participacion.abandonado) tipoResultado = ResultadoUsuario.TIPO_ABANDONADO;
+      else if(participacion.pendiente) tipoResultado = ResultadoUsuario.TIPO_PENDIENTE;
       let tiempoAcumulado = 0; // Segundos
       let parcialesUsuario: ParcialUsuario[] = [];
       let puntosRegistrados = new Map<string, number>();
 
       if(this.modalidad === Carrera.MOD_TRAZADO) {
         // TRAZADO
-        if(registrosUsuario.registros.length < trazado.length) tipoResultado = ResultadoUsuario.TIPO_PENDIENTE;
-        for(let i = 1; i < registrosUsuario.registros.length; i++) {
-          let dPri = new Date(registrosUsuario.registros[i-1].fecha);
-          let dSec = new Date(registrosUsuario.registros[i].fecha);
+        for(let i = 1; i < registros.length; i++) {
+          let dPri = new Date(registros[i-1].fecha);
+          let dSec = new Date(registros[i].fecha);
           if(dPri !== null && dSec !== null) {
             let tiempoParcial = dSec.getTime() / 1000 - dPri.getTime() / 1000;
             tiempoAcumulado += tiempoParcial;
@@ -114,29 +121,24 @@ export class ResultadosComponent implements OnInit {
         }
       } else {
         // SCORE
-        let pendiente: boolean = true;
-        let abandonado: boolean = false;
         let controlMeta = trazado[trazado.length - 1]; // El último control es la meta
-        for(let registro of registrosUsuario.registros) {
-            let codigoControl: string = registro.control
+        for(let registro of registros) {
+            let codigoControl: string = registro.control;
             if(registro.fecha !== null) {
                 let puntuacion = respuesta.puntuacionesControles.get(codigoControl);
                 if(puntuacion !== null) {
                     puntosRegistrados.set(codigoControl, puntuacion);
-                    if(codigoControl === controlMeta) pendiente = false;
                 } else {
                     // No debería ocurrir
                 }
             } else {
-                // Recorrido abandonado
-                abandonado = true;
+              // Recorrido abandonado
+              tipoResultado = ResultadoUsuario.TIPO_ABANDONADO;
             }
         }
 
-        if(abandonado) tipoResultado = ResultadoUsuario.TIPO_ABANDONADO;
-        else if(pendiente) tipoResultado = ResultadoUsuario.TIPO_PENDIENTE;
-        tiempoAcumulado = new Date(registrosUsuario.registros[registrosUsuario.registros.length - 1].fecha).getTime() / 1000
-                - new Date(registrosUsuario.registros[0].fecha).getTime() / 1000;
+        tiempoAcumulado = new Date(registros[registros.length - 1].fecha).getTime() / 1000
+                - new Date(registros[0].fecha).getTime() / 1000;
       }
 
       let resultadoUsuario = new ResultadoUsuario(corredor.id, corredor.nombre, corredor.club, tiempoAcumulado, tipoResultado);
@@ -152,6 +154,7 @@ export class ResultadosComponent implements OnInit {
       }
       // Ordena lista por tiempo total y tipo
       resultados.sort(function(r1, r2) {
+        debugger;
         // Comparación entre tipos
         let c = ResultadoUsuario.ORDEN_TIPOS.indexOf(r1.tipo) - ResultadoUsuario.ORDEN_TIPOS.indexOf(r2.tipo); 
         if(c === 0) {
@@ -166,6 +169,10 @@ export class ResultadosComponent implements OnInit {
             default:
               // Ordenados según número de controles completados: más controles -> antes
               c = r1.parciales.length - r2.parciales.length;
+              if(c === 0) {
+                // Ordenados por tiempo ascendente
+                c = r1.tiempoTotal - r2.tiempoTotal;
+              }
               break;
           }
         }

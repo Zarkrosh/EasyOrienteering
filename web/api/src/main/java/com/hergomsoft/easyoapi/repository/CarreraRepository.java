@@ -9,15 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CarreraRepository extends JpaRepository<Carrera, Long> {
-    
-    /**
-     * Devuelve las carreras que ha corrido el usuario especificado.
-     * @param idUsuario ID del usuario
-     * @return Carreras corridas por el usuario
-     */
-    @Query(value = "SELECT * FROM carreras WHERE id IN (SELECT carrera_id FROM registros r INNER JOIN controles c ON r.control_id = c.id WHERE corredor_id = :idUsuario and tipo = 'META')", nativeQuery = true)
-    public List<Carrera> getCarrerasCorridasUsuario(@Param("idUsuario") long idUsuario);
-    
+
     /**
      * Devuelve las carreras que ha organizado el usuario especificado.
      * @param idUsuario ID del usuario

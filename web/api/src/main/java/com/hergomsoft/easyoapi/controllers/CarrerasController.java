@@ -4,26 +4,21 @@ package com.hergomsoft.easyoapi.controllers;
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
-import com.hergomsoft.easyoapi.models.requests.UbicacionRequest;
 import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
-import com.hergomsoft.easyoapi.services.CarreraService;
-import com.hergomsoft.easyoapi.services.UsuarioService;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import com.hergomsoft.easyoapi.services.ICarreraService;
+import com.hergomsoft.easyoapi.services.IParticipacionService;
+import com.hergomsoft.easyoapi.services.IUsuarioService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,23 +38,30 @@ import org.springframework.web.server.ResponseStatusException;
 public class CarrerasController {
     
     @Autowired
-    private CarreraService carrerasService;
+    private ICarreraService carrerasService;
     
     @Autowired
-    private UsuarioService usuariosService;
+    private IUsuarioService usuariosService;
+    
+    @Autowired
+    private IParticipacionService participacionesService;
     
     @GetMapping("/participadas")
-    public List<Carrera> getCarrerasParticipadasUsuario() {
+    public List<CarreraSimplificada> getCarrerasParticipadasUsuario() {
         Usuario usuario = usuariosService.getUsuarioPeticion();
         List<Carrera> participadas = carrerasService.getCarrerasParticipadasUsuario(usuario);
-        return participadas;
+        List<CarreraSimplificada> simplificadas = new ArrayList<>();
+        for(Carrera c : participadas) simplificadas.add(new CarreraSimplificada(c));
+        return simplificadas;
     }
     
     @GetMapping("/organizadas")
-    public List<Carrera> getCarrerasOrganizadasUsuario() {
+    public List<CarreraSimplificada> getCarrerasOrganizadasUsuario() {
         Usuario usuario = usuariosService.getUsuarioPeticion();
         List<Carrera> organizadas = carrerasService.getCarrerasOrganizadasUsuario(usuario);
-        return organizadas;
+        List<CarreraSimplificada> simplificadas = new ArrayList<>();
+        for(Carrera c : organizadas) simplificadas.add(new CarreraSimplificada(c));
+        return simplificadas;
     }
     
     @GetMapping("/buscar")
@@ -75,69 +77,68 @@ public class CarrerasController {
         return carrerasService.buscaCarreras(idUsuario, nombre, tipo, modalidad, pageable);
     }
     
-    @GetMapping("/{idCarrera}/mapas")
-    public void getMapasCarrera(@PathVariable long idCarrera, HttpServletResponse response) {
-        // TODO Restricción solo usuario organizador
-        Carrera carrera = getCarrera(idCarrera);
-        response.setContentType("application/zip");
-        response.setHeader("Content-Disposition", "attachment; filename=mapas.zip");
-
-        try (ZipOutputStream zippedOut = new ZipOutputStream(response.getOutputStream())) {
-            for(Recorrido r : carrera.getRecorridos()) {
-                ZipEntry e = new ZipEntry(r.getNombre() + ".jpg");
-                byte[] mapa = r.getMapa();
-                e.setSize(mapa.length);
-                e.setTime(System.currentTimeMillis());
-                zippedOut.putNextEntry(e);
-                // And the content of the resource:
-                StreamUtils.copy(mapa, zippedOut);
-                zippedOut.closeEntry();
-            }
-            
-            zippedOut.finish();
-        } catch (Exception e) {
-            // Do something with Exception
-        }   
-    }
-    
-    @GetMapping("/mapa/{idRecorrido}")
-    public void getMapaRecorrido(@PathVariable long idRecorrido, HttpServletResponse response) {
-        // TODO Restricciones de descarga (solo participantes, organizador...)
-        Recorrido rec = carrerasService.getRecorrido(idRecorrido);
-        if(rec != null) {
-            if(rec.getMapa() != null) {
-                try {
-                    response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-                    IOUtils.copy(new ByteArrayInputStream(rec.getMapa()), response.getOutputStream());
-                } catch (IOException ex) {
-                    Logger.getLogger(CarrerasController.class.getName()).log(Level.SEVERE, null, ex);
-                    throw new ResponseStatusException(
-                        HttpStatus.INTERNAL_SERVER_ERROR, "Error al obtener el mapa");
+    @GetMapping("/{idCarrera}")
+    public Carrera getCarrera(@PathVariable long idCarrera) {
+        // TODO Si es privada solo pueden verlas los participantes y el organizador
+        Carrera res = carrerasService.getCarrera(idCarrera);
+        if(res != null) {
+            if(res.isPrivada()) {
+                // ¿Puede ver la carrera?
+                boolean permiso = false;
+                Usuario usuario = usuariosService.getUsuarioPeticion();
+                if(Objects.equals(usuario.getId(), res.getOrganizador().getId())) {
+                    // Es el organizador, puede acceder
+                    permiso = true;
+                } else if(participacionesService.haParticipadoEnCarrera(usuario, res)) {
+                    // Participante, puede acceder
+                    permiso = true;
                 }
-            } else {
-                // No tiene mapa -> 404
-                throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "El recorrido no tiene mapa");
+                
+                if(!permiso) {
+                    // No tiene permiso -> 403
+                    throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN, "Carrera privada: solo pueden ver la carrera los participantes y el organizador.");
+                }
             }
         } else {
-            // No existe -> 404
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "No existe ningún recorrido con ese ID");
-        }
-        
-    }
-    
-    @GetMapping("/{id}")
-    public Carrera getCarrera(@PathVariable long id) {
-        // TODO Si es privada solo pueden verlas los participantes y el organizador
-        Carrera res = carrerasService.getCarrera(id);
-        if(res == null) {
             // No existe -> 404
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "No existe ninguna carrera con ese ID");
-        } else {
-            return res;
         }
+        
+        return res;
+    }
+    
+    @GetMapping("/{idCarrera}/mapas")
+    public void getMapasCarrera(@PathVariable long idCarrera, HttpServletResponse response) {
+        Carrera carrera = getCarrera(idCarrera);
+        Usuario usuario = usuariosService.getUsuarioPeticion();
+        if(Objects.equals(usuario.getId(), carrera.getId())) {
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition", "attachment; filename=mapas.zip");
+
+            try (ZipOutputStream zippedOut = new ZipOutputStream(response.getOutputStream())) {
+                for(Recorrido r : carrera.getRecorridos()) {
+                    ZipEntry e = new ZipEntry(r.getNombre() + ".jpg");
+                    byte[] mapa = r.getMapa();
+                    e.setSize(mapa.length);
+                    e.setTime(System.currentTimeMillis());
+                    zippedOut.putNextEntry(e);
+                    StreamUtils.copy(mapa, zippedOut);
+                    zippedOut.closeEntry();
+                }
+
+                zippedOut.finish();
+            } catch (Exception e) {
+                // Error inesperado
+                throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, "Se ha producido un error al obtener los mapas.");
+            }  
+        } else {
+            // No tiene permiso -> 403
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, "Solo puede descargar los mapas el organizador.");
+        } 
     }
 
     @PostMapping("")
@@ -181,7 +182,7 @@ public class CarrerasController {
     
     @GetMapping("/{id}/qr")
     public Map<String, String> getControlesQRCarrera(@PathVariable long id) {
-        Map<String, String> res = new TreeMap<>();
+        Map<String, String> res;
         
         Usuario usuario = usuariosService.getUsuarioPeticion();
         Carrera carrera = getCarrera(id);

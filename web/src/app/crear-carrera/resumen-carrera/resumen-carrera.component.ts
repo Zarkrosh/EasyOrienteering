@@ -7,6 +7,7 @@ import { ClienteApiService } from 'src/app/shared/cliente-api.service';
 import { DataService } from 'src/app/shared/data.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { EditorUbicacionComponent } from '../editores/editor-ubicacion/editor-ubicacion.component';
+import { NgbDateStructAdapter } from '@ng-bootstrap/ng-bootstrap/datepicker/adapters/ngb-date-adapter';
 
 /**
  * This Service handles how the date is represented in scripts i.e. ngModel.
@@ -39,7 +40,7 @@ export class CustomAdapter extends NgbDateAdapter<string> {
 @Injectable()
 export class CustomDateParserFormatter extends NgbDateParserFormatter {
 
-  readonly DELIMITER = '/';
+  public readonly DELIMITER = '/';
 
   parse(value: string): NgbDateStruct | null {
     if (value) {
@@ -137,15 +138,16 @@ export class ResumenCarreraComponent implements OnInit {
   }
 
   ngOnInit() {
+    let today = new Date();
+    let todayDate = today.getUTCDate() + "-" + (today.getUTCMonth()+1) + "-" + today.getUTCFullYear();
     this.carreraForm = this.formBuilder.group({
       nombre: ['', Validators.required],
       tipo: [Carrera.TIPO_EVENTO, Validators.required],
       modalidad: [Carrera.MOD_TRAZADO, Validators.required],
       visibilidad: [this.PRIV_PUBLICA, Validators.required],
-      fecha: [''],
+      fecha: [todayDate],
       notas: ['']
     });
-
 
     if(window.location.toString().indexOf(this.TIPO_EDITAR) > -1) {
       // Edición de carrera

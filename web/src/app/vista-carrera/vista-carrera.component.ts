@@ -12,14 +12,18 @@ import * as L from 'leaflet';
 })
 export class VistaCarreraComponent implements OnInit {
 
+  readonly CARRERA_TIPO_EVENTO = Carrera.TIPO_EVENTO;
+  readonly CARRERA_TIPO_CIRCUITO = Carrera.TIPO_CIRCUITO;
+
   // Alertas
-  optionsAlerts = {
+  alertOptions = {
     autoClose: true,
     keepAfterRouteChange: false
   };
 
   carrera: Carrera;
   errorCarga: boolean;
+  errorPrivada: boolean;
 
   // Ubicación
   @ViewChildren('mapaUbicacion') queryMapa: QueryList<ElementRef>;
@@ -35,7 +39,7 @@ export class VistaCarreraComponent implements OnInit {
 
   ngOnInit() {
     this.carrera = null;
-    this.errorCarga = false;
+    this.errorCarga = this.errorPrivada = false;
 
     this.cargaDatosCarrera();
   }
@@ -55,16 +59,21 @@ export class VistaCarreraComponent implements OnInit {
           if(resp.status == 200) {
             this.carrera = resp.body;
           } else {
-            this.alertService.error("Error al obtener la carrera", this.optionsAlerts);
+            this.alertService.error("Error al obtener la carrera", this.alertOptions);
             this.errorCarga = true;
           }
         }, err => {
-          if(err.status == 404) {
-            this.alertService.error("No existe ninguna carrera con ese ID", this.optionsAlerts);
-          } else if(err.status == 504) {
-            this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.optionsAlerts);
+          if(err.status == 504) {
+            this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
+          } else if(err.status == 404) {
+            this.alertService.error("No existe ninguna carrera con ese ID", this.alertOptions);
+          } else if(err.status == 403) {
+            this.errorPrivada = true;
           } else {
-            this.alertService.error("Error al obtener la carrera: " + JSON.stringify(err), this.optionsAlerts);
+            let mensaje = "Error al obtener la carrera"
+            if(typeof err.error === 'string') mensaje += ": " + err.error;
+            this.alertService.error(mensaje, this.alertOptions);
+            console.log(err);
           }
           this.errorCarga = true;
         }

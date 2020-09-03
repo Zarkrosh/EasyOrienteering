@@ -68,9 +68,10 @@ alert {
     box-shadow: 0 0 0 0.2rem rgba($color-secondary, 0.5);
 }
 
-.easyo-container {
+.easyo-container-fit, .easyo-container {
     position: relative;
     width: $max-width-content;
+    min-height: 600px;
     margin: 50px auto;
     border-radius: 20px;
     box-shadow: 2px 2px #AAA7;
@@ -82,6 +83,11 @@ alert {
 .easyo-container > h1 {
     text-align: center;
     margin-bottom: 30px;
+}
+
+.easyo-container-fit {
+    min-height: 0 !important;
+    padding: 0 !important;
 }
 
 .btns-cabecera button {
@@ -104,6 +110,7 @@ alert {
     display: flex;
     justify-content: center;
     align-items: center;
+    text-align: center;
 }
 .btn-reintentar {
     margin: 35px auto 0 auto;

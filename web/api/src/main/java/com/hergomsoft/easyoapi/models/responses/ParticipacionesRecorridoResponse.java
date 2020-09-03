@@ -2,22 +2,23 @@ package com.hergomsoft.easyoapi.models.responses;
 
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Control;
+import com.hergomsoft.easyoapi.models.Participacion;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RegistrosRecorridoResponse {
+public class ParticipacionesRecorridoResponse {
     
     private final Carrera.Modalidad modalidad;
     private final long idCarrera;
     private final Recorrido recorrido;
     private final Map<String, Integer> puntuacionesControles;
-    private final List<RegistrosUsuario> registrosUsuarios;
+    private final List<Participacion> participaciones;
 
-    public RegistrosRecorridoResponse(Recorrido recorrido, List<RegistrosUsuario> registrosUsuarios) {
+    public ParticipacionesRecorridoResponse(Recorrido recorrido, List<Participacion> participaciones) {
         this.recorrido = recorrido;
-        this.registrosUsuarios = registrosUsuarios;
+        this.participaciones = participaciones;
         this.idCarrera = recorrido.getCarrera().getId();
         this.modalidad = recorrido.getCarrera().getModalidad();
         this.puntuacionesControles = new HashMap<>();
@@ -42,8 +43,8 @@ public class RegistrosRecorridoResponse {
         return puntuacionesControles;
     }
 
-    public List<RegistrosUsuario> getRegistrosUsuarios() {
-        return registrosUsuarios;
+    public List<Participacion> getParticipaciones() {
+        return participaciones;
     }
     
 }

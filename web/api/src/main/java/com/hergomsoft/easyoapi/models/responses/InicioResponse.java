@@ -9,10 +9,10 @@ public class InicioResponse {
     private Carrera carrera;
     private Recorrido recorrido;
 
-    public InicioResponse(Registro registro, Carrera carrera, Recorrido recorrido) {
+    public InicioResponse(Registro registro, Recorrido recorrido) {
         this.registro = registro;
-        this.carrera = carrera;
         this.recorrido = recorrido;
+        this.carrera = recorrido.getCarrera();
     }
 
     public Registro getRegistro() {

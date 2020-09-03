@@ -71,9 +71,10 @@ public interface ICarreraService {
      * Devuelve true si el secreto proporcionado coincide con el calculado para el control.
      * @param secreto Secreto proporcionado
      * @param control Control de una carrera
+     * @param carrera Carrera
      * @return True si los secretos coinciden, false si no
      */
-    boolean checkSecretoControl(String secreto, Control control);
+    boolean checkSecretoControl(String secreto, Control control, Carrera carrera);
     
     /**
      * Devuelve un mapa con los secretos de los controles de una casrrera, los cuales 
@@ -98,9 +99,10 @@ public interface ICarreraService {
      * a la que pertenece. Su generación es el MD5 de la concatenación del código del
      * control con el secreto de la carrera.
      * @param control Control del cual obtener el secreto
+     * @param carrera Carrera
      * @return Secreto del control
      */
-    String getSecretoControl(Control control);
+    String getSecretoControl(Control control, Carrera carrera);
     
     /**
      * Devuelve una lista con las carreras que ha corrido el usuario especificado.

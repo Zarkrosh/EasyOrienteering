@@ -3,11 +3,14 @@ package com.hergomsoft.easyoapi.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -79,14 +82,15 @@ public class Carrera implements IdEntity {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date fecha;
     
-    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name="CARRERA_ID", referencedColumnName="ID")
-    private List<Recorrido> recorridos;
+    @OneToMany(mappedBy = "carrera", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Recorrido> recorridos = new ArrayList<>();
     
     // No se utiliza cascada
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "carrera")
-    @MapKey(name = "codigo")
-    private Map<String, Control> controles;
+    //@OneToMany(fetch = FetchType.EAGER, mappedBy = "carrera")
+    //@MapKey(name = "codigo")
+    @Type(type = "json")
+    @Column(name = "CONTROLES", columnDefinition = "json")
+    private Map<String, Control> controles = new HashMap<>();
 
     public Carrera() {}
 
@@ -106,10 +110,12 @@ public class Carrera implements IdEntity {
         this.fecha = null;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

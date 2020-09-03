@@ -14,7 +14,8 @@ public class RegistroRequest {
     public static final String ERROR_YA_ACABADO         = "REG-6"; // No quedan más controles por registrar
     public static final String ERROR_YA_REGISTRADO      = "REG-7"; // El usuario ya registrado el control (SCORE)
     public static final String ERROR_SECRETO            = "REG-8"; // El secreto proporcionado no es correcto
-    public static final String ERROR_OTRA_CARRERA       = "REG-9"; // El usuario no está corriendo esta carrera
+    public static final String ERROR_OTRO_RECORRIDO     = "REG-9"; // El usuario no está corriendo este recorrido
+    public static final String ERROR_ES_ORGANIZADOR     = "REG-10"; // El usuario es el organizador de la carrera
     
     @NotNull
     private String codigo; // Código del control

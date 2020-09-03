@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Carrera, RegistrosRecorridoResponse } from './app.model';
+import { Carrera, ParticipacionesRecorridoResponse } from './app.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ export class ClienteApiService {
   // URL base de la API
   private static readonly BASE_URL = '/api/';
   private static readonly BASE_CARRERAS = 'carreras/';
-  private static readonly BASE_REGISTROS = 'registros/';
+  private static readonly BASE_RECORRIDOS = 'recorridos/';
   // Autenticación
   private static readonly API_LOGIN = 'login/';
   private static readonly API_REGISTRO = 'registro/';
@@ -123,9 +123,9 @@ export class ClienteApiService {
 
 
   /******************* RESULTADOS *******************/
-  getRegistrosRecorrido(idRecorrido: number): Observable<HttpResponse<RegistrosRecorridoResponse>> {
-    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_REGISTROS + idRecorrido;
-    return this.http.get<RegistrosRecorridoResponse>(url, {observe: 'response'});
+  getParticipacionesRecorrido(idRecorrido: number): Observable<HttpResponse<ParticipacionesRecorridoResponse>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_RECORRIDOS + idRecorrido;
+    return this.http.get<ParticipacionesRecorridoResponse>(url, {observe: 'response'});
   }
 
 }

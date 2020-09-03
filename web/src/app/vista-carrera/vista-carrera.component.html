@@ -23,13 +23,15 @@
                 </div>
                 
                 <p class="organizador"><b>Organizador:</b>  <a href="/usuarios/{{carrera.organizador.id}}">{{getOrganizador()}}</a></p>
+                <p *ngIf="carrera.tipo === CARRERA_TIPO_CIRCUITO && carrera.fecha"><b>Fecha de creación:</b> {{carrera.fecha | fechaBonita}}</p>
+                <p *ngIf="carrera.tipo === CARRERA_TIPO_EVENTO && carrera.fecha"><b>Fecha:</b> {{carrera.fecha | fechaBonita}}</p>
                 <p *ngIf="carrera.notas && carrera.notas.length > 0" class="notas-titulo"><b>Notas:</b></p>
                 <div *ngIf="carrera.notas && carrera.notas.length > 0" class="notas">
                     <p *ngFor="let parrafo of carrera.notas.split('\\n')">{{parrafo}}</p>   
                 </div>
             </div>
     
-            <div class="ubicacion">
+            <div class="ubicacion" *ngIf="carrera.latitud">
                 <h1>Ubicación</h1>
                 <div #mapaUbicacion id="mapa-ubicacion" class="ubicacion-mapa" [style.cursor]="(marcarUbicacion) ? 'crosshair' : auto"></div>
             </div>
@@ -59,9 +61,14 @@
             <div class="lds-baliza-wrapper" *ngIf="!errorCarga">
                 <div class="lds-baliza"></div>
             </div>
-            <div *ngIf="errorCarga">
+            <div *ngIf="errorCarga && !errorPrivada">
                 <h1>Ocurrió un error :(</h1>
                 <button class="btn btn-primary btn-reintentar" (click)="refresh()">Volver a intentar</button>
+            </div>
+            <div *ngIf="errorPrivada">
+                <h1>Carrera privada</h1>
+                <img src="../../assets/img/privada.png" />
+                <p>Solo el organizador y los participantes pueden ver esta carrera.</p>
             </div>
         </div>
     </ng-template>

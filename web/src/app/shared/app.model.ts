@@ -102,25 +102,26 @@ export class Pair<T, U> {
     }
 }
 
+
 export class Registro {
-    id: number;
-    corredor: number;  // ID
     control: string;   // Codigo
-    recorrido: number; // ID
     fecha: string;
 }
 
-export class RegistrosUsuario {
-    usuario: Usuario;
+export class Participacion {
+    fechaInicio: string;
     registros: Registro[];
+    abandonado: boolean;
+    pendiente: boolean;
+    corredor: Usuario;
 }
 
-export class RegistrosRecorridoResponse {
+export class ParticipacionesRecorridoResponse {
     modalidad: string;
     idCarrera: number;
     recorrido: Recorrido;
     puntuacionesControles: Map<string, number>;
-    registrosUsuarios: RegistrosUsuario[];
+    participaciones: Participacion[];
 }
 
 export class ResultadoUsuario {

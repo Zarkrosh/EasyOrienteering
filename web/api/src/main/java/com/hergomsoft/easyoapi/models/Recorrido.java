@@ -5,23 +5,26 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hergomsoft.easyoapi.models.serializers.MapaDeserializer;
 import com.hergomsoft.easyoapi.models.serializers.MapaSerializer;
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 
+@TypeDefs({
+    @TypeDef(name = "json", typeClass = JsonStringType.class),
+})
 @Entity
 @Table(name = "recorridos")
 public class Recorrido implements IdEntity, Serializable {
@@ -39,12 +42,8 @@ public class Recorrido implements IdEntity, Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Carrera carrera;
     
-    @ElementCollection
-    @JoinTable(name = "CONTROLES_RECORRIDO", 
-        joinColumns = @JoinColumn(name = "RECORRIDO_ID")
-    )
-    @OrderColumn(name = "ORDEN")
-    @Column(name = "CONTROL_CODIGO")
+    @Type(type = "json")
+    @Column(name = "TRAZADO", columnDefinition = "json")
     private List<String> trazado; // Salida - Controles intermedios* - Meta
 
     @JsonSerialize(using = MapaSerializer.class)

@@ -21,6 +21,8 @@ export class EditorRecorridosComponent implements OnInit {
   readonly EDICION_CONTROLES: string = "controles";
   readonly EDICION_RECORRIDOS: string = "recorridos";
   tipoEdicion: string;
+  // Regexp numérica
+  readonly REGEXP_NUMERICA = /^\d+$/;
 
   // Plantillas de códigos de salida/control/meta
   CONTROL_MIN_CODE: number = 31;
@@ -701,6 +703,14 @@ export class EditorRecorridosComponent implements OnInit {
           codigo = codigo.substring(0, 10);
           if(codigo.length >= 2) {
             if(codigo !== this.CODIGO_SALIDA && codigo !== this.CODIGO_META) {
+              if(this.REGEXP_NUMERICA.test(codigo)) {
+                // Los controles numéricos deben tener un valor > 30
+                if(parseInt(codigo) <= 30) {
+                  this.alertService.error("Los códigos de control numéricos deben ser > 30.", this.alertOptions);
+                  return;
+                }
+              }
+
               // TODO ¿Alguna validación más?
               if(this.recorridoActual.trazado.length === 0 || this.recorridoActual.trazado[this.recorridoActual.trazado.length-1] !== codigo) {
                 if(!this.controles.get(codigo)) {
@@ -731,6 +741,7 @@ export class EditorRecorridosComponent implements OnInit {
   }
 
   keyDownInputControl(evento: any): boolean {
+    // BUGGED
     if(evento.key === "Backspace" && evento.target.value.length == 0) {
       // BACKSPACE: borra el último control
       let aBorrar = this.recorridoActual.trazado[this.recorridoActual.trazado.length-1];
