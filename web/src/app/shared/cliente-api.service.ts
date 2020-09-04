@@ -117,7 +117,7 @@ export class ClienteApiService {
   }
 
   getMapaRecorrido(idRecorrido: number): Observable<HttpResponse<any>> {
-    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + 'mapa/' + idRecorrido;
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_RECORRIDOS + 'mapa/' + idRecorrido;
     return this.http.get(url, {observe: 'response', responseType: 'blob'});
   }
 

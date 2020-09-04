@@ -1,5 +1,6 @@
 package com.hergomsoft.easyoapi.models.responses;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
@@ -15,6 +16,7 @@ public class CarreraSimplificada {
     private Usuario organizador;
     private Float latitud;
     private Float longitud;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private Date fecha;
     private List<Recorrido> recorridos;
     

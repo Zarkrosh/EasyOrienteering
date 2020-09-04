@@ -132,7 +132,7 @@ export class EditorRecorridosComponent implements OnInit {
       this.cargaCarrera();
     } catch (e) {
       // Error al cargar la carrera, borra y redirige a la creación
-      this.alertService.error("Error al cargar los datos de la carrera :(", this.alertOptions);
+      this.alertService.error("Error al cargar los datos de la carrera ☹", this.alertOptions);
       console.log(e);
       localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA);
       this.router.navigate(['/crear', 'nueva']);
@@ -141,9 +141,9 @@ export class EditorRecorridosComponent implements OnInit {
     
     // Controlador de adición de control
     this.dataEditores.nuevoControl.subscribe((control) => {
-      console.log("[RECORRIDOS] Nueva petición de control:");
-      console.log(control);
       if(control !== null) {
+        console.log("[RECORRIDOS] Nueva petición de control:");
+        console.log(control);
         if(this.controles.size < this.MAX_CONTROLES_CARRERA) {
           if(control.tipo === Control.TIPO_SALIDA && this.controles.has(this.CODIGO_SALIDA)) {
             this.alertService.error("Solo puede haber una salida por carrera.", this.alertOptions);
@@ -354,7 +354,7 @@ export class EditorRecorridosComponent implements OnInit {
       }
 
       // Guarda los mapas en el servicio de datos compartido
-      this.data.setMapaBase(this.trazador.getImagenMapaBase());
+      this.data.setMapaBase(this.trazador.getImagenMapaBase()); // TODO esto afecta al trazador, depurar
       this.data.setMapasTrazados(mapasTrazados);
     } else {
       // ELECCION_SOLO_RECORRIDOS
@@ -366,10 +366,6 @@ export class EditorRecorridosComponent implements OnInit {
     let mensaje = "Recorridos guardados";
     if(this.tipoEdicion === this.EDICION_CONTROLES) mensaje = "Controles guardados";
     this.alertService.success(mensaje, this.alertOptions);
-    // Borra datos
-    this.data.setMapaBase(null);
-    this.data.setMapasTrazados(null);
-    // Redirige al resumen de carrera
     this.router.navigate(['/crear']);
   }
 
@@ -467,7 +463,7 @@ export class EditorRecorridosComponent implements OnInit {
    * @param nombre Nombre del recorrido seleccionado
    */
   seleccionaRecorrido(nombre: string) {
-    if(this.recorridoActual === null || this.recorridoActual.nombre !== nombre) {
+    if(!this.recorridoActual || this.recorridoActual.nombre !== nombre) {
       this.recorridoActual = this.recorridos.get(nombre);
       this.dataEditores.setRecorridoActual(this.recorridoActual);
     }
@@ -505,24 +501,25 @@ export class EditorRecorridosComponent implements OnInit {
   /**
    * Habilita/deshabilita la edición del nombre de un recorrido.
    * Si se deshabilita, se actualiza el nombre del recorrido.
-   * @param valor True para habilitar la edición, false para guardar el nombre
+   * @param editar True para habilitar la edición, false para guardar el nombre
    */
-  editarNombreRecorrido(valor: boolean) {
-    let nuevoNombre = this.nombreRecorrido.nativeElement.value;
-    if(!valor && this.recorridoActual !== null && this.recorridoActual.nombre !== nuevoNombre) {
-      if(nuevoNombre.trim().length > 0) {
+  editarNombreRecorrido(editar: boolean) {
+    let nuevoNombre = this.nombreRecorrido.nativeElement.value.trim();
+    if(!editar && this.recorridoActual !== null && this.recorridoActual.nombre !== nuevoNombre) {
+      if(nuevoNombre.length > 0) {
         if(!this.recorridos.has(nuevoNombre)) {
           // Se actualiza el nombre del recorrido
-          let recorrido = this.recorridos.get(this.recorridoActual.nombre);
+          let prevNombre = this.recorridoActual.nombre;
+          let recorrido = this.recorridos.get(prevNombre);
+          this.recorridos.delete(prevNombre); // Borra la entrada en el mapa con el nombre anterior
           recorrido.nombre = nuevoNombre;
-          this.recorridos.delete(this.recorridoActual.nombre);
-          this.recorridos.set(nuevoNombre, recorrido);
+          this.recorridos.set(nuevoNombre, recorrido); // Inserta la nueva entrada con el nuevo nombre
           // Actualiza el nombre también en el array de optimización de nombres
-          let index = this.nombresRecorridos.indexOf(this.recorridoActual.nombre);
+          let index = this.nombresRecorridos.indexOf(prevNombre);
           this.nombresRecorridos[index] = nuevoNombre;
           // Vuelve a seleccionar el recorrido
           this.seleccionaRecorrido(nuevoNombre);
-          this.editandoNombreRecorrido = valor;
+          this.editandoNombreRecorrido = editar;
         } else {
           // Otro recorrido tiene ese nombre
           this.alertService.error("Ya existe un recorrido con ese nombre", this.alertOptions);
@@ -532,7 +529,7 @@ export class EditorRecorridosComponent implements OnInit {
         this.alertService.error("El nombre no puede estar vacío", this.alertOptions);
       }
     } else {
-      this.editandoNombreRecorrido = valor;
+      this.editandoNombreRecorrido = editar;
     }
   }
 
@@ -741,10 +738,9 @@ export class EditorRecorridosComponent implements OnInit {
   }
 
   keyDownInputControl(evento: any): boolean {
-    // BUGGED
     if(evento.key === "Backspace" && evento.target.value.length == 0) {
-      // BACKSPACE: borra el último control
-      let aBorrar = this.recorridoActual.trazado[this.recorridoActual.trazado.length-1];
+      // BACKSPACE: borra el penúltimo control (la meta no puede borrarla)
+      let aBorrar = this.recorridoActual.trazado[this.recorridoActual.trazado.length-2];
       if(this.controles.get(aBorrar).tipo == Control.TIPO_CONTROL) {
         this.borrarControl(this.controles.get(aBorrar), false);
         evento.target.value = aBorrar;

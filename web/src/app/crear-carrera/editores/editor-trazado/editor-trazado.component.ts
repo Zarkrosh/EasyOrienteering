@@ -89,8 +89,7 @@ export class EditorTrazadoComponent implements OnInit {
   };
 
   constructor(private sharedData: SharedEditorService,
-    protected alertService: AlertService,
-    private el: ElementRef) { }
+    protected alertService: AlertService) { }
 
   ngOnInit() {
     this.clicking = this.moviendoMapa = false;
@@ -391,12 +390,6 @@ export class EditorTrazadoComponent implements OnInit {
           }
         }
       }
-    } else if(evento.which === 2) {
-      // Click central -> alterna marcador
-      if(this.MARKER_STATE == Control.TIPO_SALIDA) this.seleccionaControl();
-      else if(this.MARKER_STATE == Control.TIPO_CONTROL) this.seleccionaMeta();
-      else if(this.MARKER_STATE == Control.TIPO_META) this.seleccionaSalida();
-      this.redibujaMarcador(fCoords);
     } else if(evento.which === 3) {
       // Click derecho -> elimina el último control, o el marcado
       if(this.recorridoActual === null && this.CODIGO_CONTROL_MARCADO) {
@@ -1035,8 +1028,6 @@ export class EditorTrazadoComponent implements OnInit {
 
   cambiaTamanoElementos() {
     this.MM_UNIT_ORI = this.selectorTamano.nativeElement.valueAsNumber;
-    console.log(this.canvasMarcador);
-    console.log(this.contextMarcador);
     this.actualizaMetricas();
     this.redibujaTrazado();
   }

@@ -11,7 +11,6 @@ $color-secondary: #007bff;
 $color-secondary-light: rgba($color-secondary, 0.8);
 $color-secondary-dark: #0061c9;
 
-
 alert {
     position: fixed;
     width: 25%;
@@ -94,12 +93,15 @@ alert {
     position: absolute;
     top: 0;
     padding: 10px 20px;
+    border: 2px solid black;
 }
 .btn-cabecera-izda {
     left: 0;
+    border-top-left-radius: 20px;
 }
 .btn-cabecera-dcha {
     right: 0;
+    border-top-right-radius: 20px;
 }
 
 
@@ -193,10 +195,19 @@ alert {
 /**************************/
 
 
-/**** DIALOGO MODAL ****/
+/**** DIALOGO MODAL AJUSTADO ****/
 .modal-fit .modal-dialog {
     width: min-content !important;
     max-width: none !important;
+}
+
+/**** DIALOGO MODAL MAPA ****/
+.modal-mapa .modal-dialog {
+    width: min-content !important;
+    max-width: none !important;
+}
+.modal-mapa img {
+    max-height: 800px;
 }
 
 

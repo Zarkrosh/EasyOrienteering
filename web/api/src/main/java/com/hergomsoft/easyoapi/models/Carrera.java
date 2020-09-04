@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -18,9 +17,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -34,8 +31,6 @@ public class Carrera implements IdEntity {
     public static final int MAX_LEN_NOMBRE = 64;
     public static final int MIN_LEN_NOMBRE = 5;
     public static final int MAX_LEN_NOTAS = 1000;
-    public static final String CODIGO_SALIDA = "SALIDA";
-    public static final String CODIGO_META = "META";
     
     public enum Tipo {EVENTO, CIRCUITO};
     public enum Modalidad {TRAZADO, SCORE};
@@ -79,7 +74,7 @@ public class Carrera implements IdEntity {
     
     @Temporal(TemporalType.DATE)
     @Column(name = "FECHA", nullable = true)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private Date fecha;
     
     @OneToMany(mappedBy = "carrera", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)

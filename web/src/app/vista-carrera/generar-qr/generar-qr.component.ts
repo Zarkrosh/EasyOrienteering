@@ -91,9 +91,8 @@ export class GenerarQRComponent implements OnInit {
       });
     }
 
-    //pdfMake.createPdf(docDefinition).open(); // Debug más rápido
-    pdfMake.createPdf(docDefinition).download();
-    this.generandoPDF = false;
+    //pdfMake.createPdf(docDefinition).open(filename, () => this.generandoPDF = false); // Debug más rápido
+    pdfMake.createPdf(docDefinition).download(filename, () => this.generandoPDF = false);
   }
 
 

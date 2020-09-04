@@ -10,6 +10,7 @@ import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.services.CarreraService;
 import com.hergomsoft.easyoapi.services.ParticipacionService;
 import com.hergomsoft.easyoapi.services.UsuarioService;
+import com.hergomsoft.easyoapi.utils.Constants;
 import com.hergomsoft.easyoapi.utils.Utils;
 import com.thedeanda.lorem.LoremIpsum;
 import java.io.BufferedReader;
@@ -218,8 +219,8 @@ public class DatosPrueba {
         Map<String, Control> controles = new HashMap<>();
         Coordenadas coordsFake = null;
         int nControles = getIntAleatorio(MIN_CONTROLES, MAX_CONTROLES);
-        controles.put(Carrera.CODIGO_SALIDA, new Control(Carrera.CODIGO_SALIDA, Control.Tipo.SALIDA, 0, coordsFake));
-        controles.put(Carrera.CODIGO_META, new Control(Carrera.CODIGO_META, Control.Tipo.META, 0, coordsFake));
+        controles.put(Constants.CODIGO_SALIDA, new Control(Constants.CODIGO_SALIDA, Control.Tipo.SALIDA, 0, coordsFake));
+        controles.put(Constants.CODIGO_META, new Control(Constants.CODIGO_META, Control.Tipo.META, 0, coordsFake));
         for(int j = 0; j < nControles; j++) {
             String codigo = Integer.toString(j + 31);
             int puntuacion = (modalidad == Carrera.Modalidad.SCORE) ? (j + 31) / 10 : 0;
@@ -230,8 +231,8 @@ public class DatosPrueba {
         List<Recorrido> recorridos = new ArrayList<>();
         if(modalidad == Carrera.Modalidad.TRAZADO) {
             Set<String> setCodigosControles = new HashSet<>(controles.keySet());
-            setCodigosControles.remove(Carrera.CODIGO_SALIDA);
-            setCodigosControles.remove(Carrera.CODIGO_META);
+            setCodigosControles.remove(Constants.CODIGO_SALIDA);
+            setCodigosControles.remove(Constants.CODIGO_META);
             String[] codigosControles = new String[setCodigosControles.size()];
             setCodigosControles.toArray(codigosControles);
 
@@ -241,12 +242,12 @@ public class DatosPrueba {
                 int nControlesRec = getIntAleatorio(MIN_CONTROLES_RECORRIDO, MAX_CONTROLES_RECORRIDO);
                 nControlesRec = Math.min(nControlesRec, codigosControles.length);
                 List<String> trazado = new ArrayList<>();
-                trazado.add(Carrera.CODIGO_SALIDA);
+                trazado.add(Constants.CODIGO_SALIDA);
                 aleatoriza(codigosControles);
                 for(int k = 0; k < nControlesRec; k++) {
                     trazado.add(codigosControles[k]);
                 }
-                trazado.add(Carrera.CODIGO_META);
+                trazado.add(Constants.CODIGO_META);
                 recorridos.add(new Recorrido(nombreRecorrido, trazado, null));
             }
         }

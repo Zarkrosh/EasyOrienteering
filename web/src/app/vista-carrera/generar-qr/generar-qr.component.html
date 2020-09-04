@@ -2,14 +2,14 @@
 
     <ng-container *ngIf="carrera">
 
-        <div class="botones-cabecera">
-            <button class="btn btn-secondary btn-volver" (click)="volver()">
+        <div class="btns-cabecera">
+            <button class="btn btn-secondary btn-cabecera-izda" (click)="volver()">
                 <i class="fa fa-arrow-left"></i>
                 Volver a carrera
             </button>
 
 
-            <button class="btn btn-secondary btn-descargar-pdf" (click)="descargarPDF()" [disabled]="generandoPDF">
+            <button class="btn btn-danger btn-cabecera-dcha btn-pdf" (click)="descargarPDF()" [disabled]="generandoPDF">
                 Descargar PDF
                 <span *ngIf="generandoPDF" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             </button>
@@ -41,7 +41,7 @@
                 <div class="lds-baliza"></div>
             </div>
             <div *ngIf="errorCarga">
-                <h1>Ocurrió un error :(</h1>
+                <h1>Ocurrió un error ☹</h1>
                 <button class="btn btn-primary btn-reintentar" (click)="refresh()">Volver a intentar</button>
             </div>
         </div>

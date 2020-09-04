@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
+import { LeafletMarkerClusterModule } from '@asymmetrik/ngx-leaflet-markercluster';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { InicioComponent } from './inicio/inicio.component';
@@ -62,6 +63,7 @@ import { PipeFechaBonita } from './shared/pipes/PipeFechaBonita';
     ReactiveFormsModule,
     NgbModule,
     LeafletModule,
+    LeafletMarkerClusterModule, 
     InfiniteScrollModule
   ],
   providers: [DatePipe],

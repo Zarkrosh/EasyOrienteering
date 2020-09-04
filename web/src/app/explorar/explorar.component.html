@@ -1,6 +1,8 @@
 <div class="easyo-container">
     <div class="btns-cabecera">
-        <button type="button" class="btn btn-info btn-cabecera-dcha" (click)="muestraMapaCircuitos(true)">Mapa de circuitos permanentes</button>
+        <button type="button" class="btn btn-info btn-cabecera-dcha" (click)="muestraMapaCircuitos(true)">
+            <i class="fa fa-map-marker"></i>
+            Mapa de circuitos permanentes</button>
     </div>
 
     <h1>Explorar carreras</h1>
@@ -88,7 +90,7 @@
 <!-- Diálogo con mapa de circuitos -->
 <ng-template #modalMapaCircuitos let-modal>
     <div class="modal-header">
-        <h5 class="modal-title">Circuitos permanentes de orientación</h5>
+        <h5 class="modal-title titulo-centrado">Circuitos permanentes de orientación</h5>
         <button type="button" class="close" (click)="muestraMapaCircuitos(false)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>

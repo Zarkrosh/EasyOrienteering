@@ -8,19 +8,27 @@ import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
 import com.hergomsoft.easyoapi.repository.CarreraRepository;
 import com.hergomsoft.easyoapi.repository.RecorridoRepository;
+import com.hergomsoft.easyoapi.utils.Constants;
 import com.hergomsoft.easyoapi.utils.Utils;
+import com.hergomsoft.easyoapi.utils.Validators;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -167,20 +175,26 @@ public class CarreraService implements ICarreraService {
     public Map<String, String> getControlesConSecretosCarrera(Carrera carrera) {
         Map<String, String> res = new TreeMap<>();
         
-        // Itera los recorridos
-        for(Recorrido recorrido : carrera.getRecorridos()) {
-            // Salida: INICIO|<ID-RECORRIDO>|<SECRETO-CONTROL> 
-            String secreto = getSecretoRecorrido(recorrido);
-            res.put(recorrido.getNombre(), String.format("INICIO|%d|%s", recorrido.getId(), secreto));
-        }
-        
-        // Itera los controles
+        // Itera los controles (excepto salida)
+        Control salida = null;
         for(Control control : carrera.getControles().values()) {
             if(control.getTipo() != Control.Tipo.SALIDA) {
                 // Resto : <CODIGO-CONTROL>|<SECRETO-CONTROL>
                 String secreto = getSecretoControl(control, carrera);
-                res.put(control.getCodigo(), String.format("%s|%s", control.getCodigo(), secreto));
+                res.put(control.getCodigo(), String.format(Constants.FORMATO_QR_CONTROl, control.getCodigo(), secreto));
+            } else {
+                salida = control;
             }
+        }
+        
+        if(salida == null) throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al generar los controles.");
+        // TODO Tomar medidas correctivas
+        
+        // Itera los recorridos
+        for(Recorrido recorrido : carrera.getRecorridos()) {
+            // Salida: <CODIGO-SALIDA>|<ID-RECORRIDO>|<SECRETO-CONTROL> 
+            String secreto = getSecretoRecorrido(recorrido);
+            res.put(recorrido.getNombre(), String.format(Constants.FORMATO_QR_SALIDA, salida.getCodigo(), recorrido.getId(), secreto));
         }
         
         return res;
@@ -226,8 +240,6 @@ public class CarreraService implements ICarreraService {
      * @param carrera Carrera a comprobar
      */
     private void checkDatosCarrera(Carrera carrera) {
-        // Trimming
-        for(Control c : carrera.getControles().values()) c.setCodigo(c.getCodigo().trim());
         String nombre = carrera.getNombre().trim();
         if(nombre.length() >= Carrera.MIN_LEN_NOMBRE && nombre.length() <= Carrera.MAX_LEN_NOMBRE) {
             carrera.setNombre(nombre);
@@ -238,21 +250,52 @@ public class CarreraService implements ICarreraService {
         if(notas.length() > Carrera.MAX_LEN_NOTAS) notas = notas.substring(0, Carrera.MAX_LEN_NOTAS);
         carrera.setNotas(notas);
         
-        if(carrera.getControles() == null || carrera.getControles().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No hay controles.");
+        // Fecha (no puede ser anterior a la de hoy ni posterior a la de hoy dentro de un año)
+        Date fecha = carrera.getFecha();
+        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+        int mes = calendar.get(Calendar.MONTH) + 1;
+        int ano = calendar.get(Calendar.YEAR);
+        Date minFecha = new Date(LocalDateTime.of(ano, mes, dia, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
+        Date maxFecha = new Date(LocalDateTime.of(ano + 1, mes, dia, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
+        if(fecha != null && (fecha.before(minFecha) || fecha.after(maxFecha)))
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "La fecha debe ser como mínimo hoy y como máximo el año que viene.");
+        
+        // Controles
+        if(carrera.getControles() == null || carrera.getControles().isEmpty()) 
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No hay controles.");
+        if(carrera.getControles().get(Constants.CODIGO_SALIDA) == null || carrera.getControles().get(Constants.CODIGO_META) == null)
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Debe haber por lo menos una salida y una meta.");    
+        
+        int nSalidas = 0;
+        int nMetas = 0;
+        for(Control c : carrera.getControles().values()) {
+            if(c.getTipo() == Control.Tipo.SALIDA) nSalidas++;
+            else if(c.getTipo() == Control.Tipo.META) nMetas++;
+            
+            // Código
+            String codigo = c.getCodigo().trim();
+            if(codigo.isEmpty())
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No puede haber códigos de control vacíos.");
+            if(!Validators.checkCaracteresCodigo(codigo))
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Los códigos de control solo pueden ser alfanuméricos.");
+            if(c.getTipo() != Control.Tipo.SALIDA && codigo.contentEquals(Constants.CODIGO_SALIDA)) 
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, String.format("No se puede utilizar el código \"%s\" en controles que no son de salida.", Constants.CODIGO_SALIDA));
+            if(c.getTipo() != Control.Tipo.META && codigo.contentEquals(Constants.CODIGO_META)) 
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, String.format("No se puede utilizar el código \"%s\" en controles que no son de meta.", Constants.CODIGO_META));
+            
+            c.setCodigo(codigo);
         }
-        if(carrera.getControles().get(Carrera.CODIGO_SALIDA) == null ||
-                carrera.getControles().get(Carrera.CODIGO_META) == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe haber por lo menos una salida y una meta.");    
-        }
+        if(nSalidas != 1) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Debe existir una única salida.");
+        if(nMetas != 1) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Debe existir una única meta.");
+        
         
         
         // Comprobaciones relativas al tipo
         if(carrera.getTipo() == Carrera.Tipo.EVENTO) {
             // EVENTO
-            if(carrera.getFecha() == null) {
+            if(fecha == null)
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Se debe indicar la fecha del evento.");
-            } 
         } else {
             // CIRCUITO
             // Ubicacion obligatoria
@@ -261,11 +304,8 @@ public class CarreraService implements ICarreraService {
         // Comprobaciones relativas a la modalidad
         if(carrera.getModalidad() == Carrera.Modalidad.TRAZADO) {
             // TRAZADO
-            if(carrera.getRecorridos() == null || carrera.getRecorridos().isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe haber por lo menos un recorrido.");
-            }
-            
-            
+            if(carrera.getRecorridos() == null || carrera.getRecorridos().isEmpty())
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe haber por lo menos un recorrido.");      
             // Los controles no tienen puntuación
             for(Control c : carrera.getControles().values()) c.setPuntuacion(0);
         } else {

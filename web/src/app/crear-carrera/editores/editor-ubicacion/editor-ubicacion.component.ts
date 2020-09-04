@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import * as L from 'leaflet';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-editor-ubicacion',
@@ -25,7 +26,12 @@ export class EditorUbicacionComponent implements OnInit {
   latitudElegida: number;
   longitudElegida: number;
 
-  constructor() {
+  // Modal
+  @ViewChild('modalBorrarUbicacion', {static: true}) modalBorrarUbicacion: ElementRef<NgbModal>;
+  activeModal: NgbModalRef;
+
+  constructor(private modalService: NgbModal) {
+    this.latitudElegida = this.longitudElegida = this.latitudTemporal = this.longitudTemporal = null;
     this.editandoUbicacion = this.marcarUbicacion = false;
     this.mensajeUbicacion = "";
   }
@@ -111,6 +117,7 @@ export class EditorUbicacionComponent implements OnInit {
   }
 
   setMarcadorUbicacion(latitud: number, longitud: number) {
+    this.mapaUbicacion.scrollWheelZoom.enable();
     this.latitudTemporal = latitud;
     this.longitudTemporal = longitud;
     // Borra posible marcador anterior y añade el nuevo
@@ -141,6 +148,16 @@ export class EditorUbicacionComponent implements OnInit {
 
   finalizarEdicion() {
     this.editandoUbicacion = this.marcarUbicacion = false;
+  }
+
+  borrarUbicacion(): void {
+    this.activeModal = this.modalService.open(this.modalBorrarUbicacion, {centered: true, size: 'lg'});
+  }
+
+  confirmaBorrarUbicacion(): void {
+    this.activeModal.close();
+    this.latitudElegida = this.longitudElegida = this.latitudTemporal = this.longitudTemporal = null;
+    this.capaMarcador.clearLayers();
   }
 
 }

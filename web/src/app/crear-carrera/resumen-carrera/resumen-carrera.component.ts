@@ -7,7 +7,6 @@ import { ClienteApiService } from 'src/app/shared/cliente-api.service';
 import { DataService } from 'src/app/shared/data.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { EditorUbicacionComponent } from '../editores/editor-ubicacion/editor-ubicacion.component';
-import { NgbDateStructAdapter } from '@ng-bootstrap/ng-bootstrap/datepicker/adapters/ngb-date-adapter';
 
 /**
  * This Service handles how the date is represented in scripts i.e. ngModel.
@@ -100,18 +99,24 @@ export class ResumenCarreraComponent implements OnInit {
   @ViewChild('modalBorrador', {static: true}) modalBorrador: ElementRef<NgbModal>;
   @ViewChild('modalBorrarCarrera', {static: true}) modalBorrarCarrera: ElementRef<NgbModal>;
   @ViewChild('modalBorrarMapa', {static: true}) modalBorrarMapa: ElementRef<NgbModal>;
+  @ViewChild('modalCancelarEdicion', {static: true}) modalCancelarEdicion: ElementRef<NgbModal>;
+  @ViewChild('modalVisualizacionMapa', {static: true}) modalVisualizacionMapa: ElementRef<NgbModal>;
   activeModal: NgbModalRef;
 
   // Datos de carrera
   carreraForm: FormGroup;
   carrera: Carrera;
   controles: Control[];
-  fecha: NgbDateStruct;
+  
+  // Selector de fecha
+  minDate: NgbDateStruct;
+  maxDate: NgbDateStruct;
 
   tipoVista: string;
   titulo: string;
 
   errorCarga: boolean;
+  guardandoCarrera: boolean;
   borrandoCarrera: boolean;
   indiceRecorridoBorradoMapa: number;
 
@@ -128,18 +133,28 @@ export class ResumenCarreraComponent implements OnInit {
     private clienteApi: ClienteApiService,
     private data: DataService,
     private formBuilder: FormBuilder,
-    private route: ActivatedRoute,
-    private ngbCalendar: NgbCalendar,
-    private dateAdapter: NgbDateAdapter<string>) {
+    private route: ActivatedRoute) {
     
-    //this.mapas = new Map();
-    this.errorCarga = this.borrandoCarrera = false;
+    this.errorCarga = this.borrandoCarrera = this.guardandoCarrera = false;
     this.controles = [];
   }
 
   ngOnInit() {
     let today = new Date();
     let todayDate = today.getUTCDate() + "-" + (today.getUTCMonth()+1) + "-" + today.getUTCFullYear();
+    // Fecha mínima de selección
+    this.minDate = {
+      day: today.getUTCDate(),
+      month: today.getUTCMonth()+1,
+      year: today.getUTCFullYear()
+    };
+    // Fecha máxima de selección
+    this.maxDate = {
+      day: today.getUTCDate(),
+      month: today.getUTCMonth()+1,
+      year: today.getUTCFullYear()+1
+    };
+
     this.carreraForm = this.formBuilder.group({
       nombre: ['', Validators.required],
       tipo: [Carrera.TIPO_EVENTO, Validators.required],
@@ -171,7 +186,7 @@ export class ResumenCarreraComponent implements OnInit {
         if(localStorage.getItem(AppSettings.LOCAL_STORAGE_CARRERA) !== null) {
           // Se notifica al usuario 
           // Las opciones de backdrop y keyboard son para evitar cerrar al clicar fuera o pulsar Escape
-          this.modalService.open(this.modalBorrador, {centered: true, size: 'lg', backdrop : 'static', keyboard : false});
+          this.activeModal = this.modalService.open(this.modalBorrador, {centered: true, size: 'lg', backdrop : 'static', keyboard : false});
         } else {
           // Crea una nueva carrera vacía
           this.nuevaCarreraVacia();
@@ -184,7 +199,7 @@ export class ResumenCarreraComponent implements OnInit {
 
     // TODO Asíncrono para ediciones y restauraciones de borrador
     this.data.mapasTrazados.subscribe(mapas => {
-      if(this.carrera && mapas) {
+      if(this.carrera && mapas && mapas.size > 0) {
         for(let recorrido of this.carrera.recorridos) {
           recorrido.mapa = mapas.get(recorrido.nombre);
         }
@@ -230,6 +245,7 @@ export class ResumenCarreraComponent implements OnInit {
 
 
   guardaCarrera() {
+    this.guardandoCarrera = true;
     // TODO Diferenciar entre creación y edición
     //  Si es creación, se envían todos los datos (formulario, mapas, etc)
     //  Si es edición, se envían los datos modificados (?) 
@@ -257,6 +273,7 @@ export class ResumenCarreraComponent implements OnInit {
     if(this.tipoVista == this.TIPO_CREAR) {
       this.clienteApi.createCarrera(this.carrera).subscribe(
         resp => {
+          this.guardandoCarrera = false;
           if(resp.status == 201) {
             // Carrera creada
             this.alertService.success("Carrera creada con éxito", this.alertOptions);
@@ -268,6 +285,7 @@ export class ResumenCarreraComponent implements OnInit {
           }
         },
         err => {
+          this.guardandoCarrera = false;
           if(err.status == 504) {
             this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
           } else {
@@ -281,6 +299,7 @@ export class ResumenCarreraComponent implements OnInit {
     } else {
       this.clienteApi.editCarrera(this.carrera).subscribe(
         resp => {
+          this.guardandoCarrera = false;
           if(resp.status == 200) {
             // Carrera editada
             this.alertService.success("Carrera editada con éxito", this.alertOptions);
@@ -292,6 +311,7 @@ export class ResumenCarreraComponent implements OnInit {
           }
         },
         err => {
+          this.guardandoCarrera = false;
           if(err.status == 504) {
             this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
           } else {
@@ -352,7 +372,7 @@ export class ResumenCarreraComponent implements OnInit {
       } catch (e) {
         console.log(e);
         this.alertService.error("Error al restaurar el borrador.", this.alertOptions);
-        //this.nuevaCarreraVacia();
+        //this.nuevaCarreraVacia(); // TODO Descomentar
       }
     } else {
       // Descarta el borrador y crea una nueva
@@ -381,55 +401,54 @@ export class ResumenCarreraComponent implements OnInit {
    */
   clickBotonBorrarCarrera() {
     // Muestra el diálogo de confirmación de borrado
-    this.modalService.open(this.modalBorrarCarrera, {centered: true, size: 'lg'});
+    this.activeModal = this.modalService.open(this.modalBorrarCarrera, {centered: true, size: 'lg'});
   }
 
   /**
    * Confirma el borrado de la carrera.
    */
-  confirmaBorrarCarrera(borrar: boolean) {
-    if(borrar) {
-      this.borrandoCarrera = true;
-      this.clienteApi.deleteCarrera(this.carrera.id).subscribe(
-        resp => {
-          this.borrandoCarrera = false;
-          if(resp.status == 200) {
-            this.alertService.success("Se ha borrado la carrera", this.alertOptions);
-            this.router.navigate(['/explorar']);
-          } else {
-            // ?
-            console.log(resp);
-          }
-
-        }, err => {
-          if(err.status == 504) {
-            this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
-          } else {
-            let mensaje = "No se pudo borrar la carrera";
-            if(typeof err.error === 'string') mensaje += ": " + err.error;
-            this.alertService.error(mensaje, this.alertOptions);
-            console.log(err);
-          }
+  confirmaBorrarCarrera() {
+    this.borrandoCarrera = true;
+    this.clienteApi.deleteCarrera(this.carrera.id).subscribe(
+      resp => {
+        this.borrandoCarrera = false;
+        if(resp.status == 200) {
+          this.alertService.success("Se ha borrado la carrera", this.alertOptions);
+          this.router.navigate(['/explorar']);
+        } else {
+          // ?
+          console.log(resp);
         }
-      );
-    }
+
+      }, err => {
+        this.borrandoCarrera = false;
+        if(err.status == 504) {
+          this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
+        } else {
+          let mensaje = "No se pudo borrar la carrera";
+          if(typeof err.error === 'string') mensaje += ": " + err.error;
+          this.alertService.error(mensaje, this.alertOptions);
+          console.log(err);
+        }
+      }
+    );
     
-    this.modalService.dismissAll();
+    this.activeModal.close();
   }
 
   clickBotonBorrarMapa(recorrido: Recorrido): void {
     if(recorrido) {
       this.indiceRecorridoBorradoMapa = this.carrera.recorridos.indexOf(recorrido);
-      this.modalService.open(this.modalBorrarMapa, {centered: true, size: 'lg'});
+      this.activeModal = this.modalService.open(this.modalBorrarMapa, {centered: true, size: 'lg'});
     }
   }
 
-  confirmaBorrarMapa(borrar: boolean): void {
-    if(borrar && this.indiceRecorridoBorradoMapa !== null) {
+  confirmaBorrarMapa(): void {
+    if(this.indiceRecorridoBorradoMapa !== null) {
       this.carrera.recorridos[this.indiceRecorridoBorradoMapa].mapa = null;
     }
 
-    this.modalService.dismissAll();
+    this.activeModal.close();
   }
 
   /**
@@ -472,7 +491,9 @@ export class ResumenCarreraComponent implements OnInit {
             this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
           } else if(err.status == 404) {
             this.alertService.error("Este recorrido no tiene mapa.", this.alertOptions);
-          }else {
+          }else if(err.status == 403) {
+            this.alertService.error("No tienes permiso para descargar el mapa.", this.alertOptions);
+          } else {
             let mensaje = "No se pudo descargar el mapa";
             if(typeof err.error === 'string') mensaje += ": " + err.error;
             this.alertService.error(mensaje, this.alertOptions);
@@ -485,11 +506,26 @@ export class ResumenCarreraComponent implements OnInit {
     }
   }
 
+  visualizarMapa(src: string): void {
+    this.activeModal = this.modalService.open(this.modalVisualizacionMapa, {centered: true, windowClass: 'modal-mapa'});
+    (document.getElementById("img-visualizacion") as HTMLImageElement).src = src;
+  }
+
   /**
    * Maneja click en el botón de volver a la carrera.
+   * Muestra diálogo de confirmación.
    */
   clickBotonVolver() {
+    this.activeModal = this.modalService.open(this.modalCancelarEdicion, {centered: true, size: 'lg'});
+  }
+
+  /**
+   * Vuelve a la vista de la carrera.
+   */
+  cancelarEdicion() {
+    this.activeModal.close();
     if(this.carrera.id) this.router.navigate(['/carreras', this.carrera.id]);
+    else this.router.navigate(['/explorar']);
   }
 
   /**

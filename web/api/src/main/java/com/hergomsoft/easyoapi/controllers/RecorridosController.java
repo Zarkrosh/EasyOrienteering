@@ -60,34 +60,6 @@ public class RecorridosController {
         }
     }
       
-    @PostMapping("/abandonar/{idRecorrido}")
-    public AbandonoResponse abandonarRecorrido(@PathVariable long idRecorrido) {
-        AbandonoResponse res = new AbandonoResponse(false, "");
-        
-        Usuario corredor = usuariosService.getUsuarioPeticion();
-        Recorrido recorrido = participacionesService.getRecorridoPendiente(corredor);
-        if(recorrido != null) {
-            // Tiene un recorrido pendiente de acabar
-            if(recorrido.getId().equals(idRecorrido)) {
-                // Petición de abandono válida
-                try {
-                    participacionesService.abandonaRecorridoUsuario(corredor, recorrido);
-                    res.setAbandonado(true);
-                } catch(MessageException e) {
-                    res.setError(e.getMessage());
-                }
-            } else {
-                // Petición de abandono inválida
-                res.setError("Este no es el recorrido que tienes pendiente");
-            }
-        } else {
-            // No tiene ningún recorrido pendiente de acabar
-            res.setError("No tienes ningún recorrido pendiente por acabar");
-        }
-        
-        return res;
-    }
-
     @PostMapping("/iniciar/{idRecorrido}")
     public InicioResponse iniciarRecorrido(@PathVariable long idRecorrido, @Valid @RequestBody RegistroRequest peticion) {
         Registro registro = null;
@@ -143,6 +115,34 @@ public class RecorridosController {
         return new InicioResponse(registro, recorrido);
     }
     
+    @PostMapping("/abandonar/{idRecorrido}")
+    public AbandonoResponse abandonarRecorrido(@PathVariable long idRecorrido) {
+        AbandonoResponse res = new AbandonoResponse(false, "");
+        
+        Usuario corredor = usuariosService.getUsuarioPeticion();
+        Recorrido recorrido = participacionesService.getRecorridoPendiente(corredor);
+        if(recorrido != null) {
+            // Tiene un recorrido pendiente de acabar
+            if(recorrido.getId().equals(idRecorrido)) {
+                // Petición de abandono válida
+                try {
+                    participacionesService.abandonaRecorridoUsuario(corredor, recorrido);
+                    res.setAbandonado(true);
+                } catch(MessageException e) {
+                    res.setError(e.getMessage());
+                }
+            } else {
+                // Petición de abandono inválida
+                res.setError("Este no es el recorrido que tienes pendiente");
+            }
+        } else {
+            // No tiene ningún recorrido pendiente de acabar
+            res.setError("No tienes ningún recorrido pendiente por acabar");
+        }
+        
+        return res;
+    }
+
     @PostMapping("/{idRecorrido}")
     public Registro registrarPasoControl(@PathVariable long idRecorrido, @Valid @RequestBody RegistroRequest peticion) {
         Registro resultado = null;
@@ -245,6 +245,7 @@ public class RecorridosController {
                 permiso = true;
             }
             
+            permiso = true; // DEBUG
             if(permiso) {
                 if(rec.getMapa() != null) {
                     try {
