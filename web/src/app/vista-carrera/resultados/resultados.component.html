@@ -1,6 +1,8 @@
 <div class="easyo-container">
     <div class="btns-cabecera">
-        <button *ngIf="idCarrera" class="btn btn-info btn-cabecera-izda" (click)="clickBotonVolver()">Volver a carrera</button>
+        <button *ngIf="idCarrera" class="btn btn-info btn-cabecera-izda btn-volver" (click)="clickBotonVolver()">Volver a carrera</button>
+        <button *ngIf="idCarrera" class="btn btn-primary btn-cabecera-dcha btn-actualizar" (click)="clickBotonActualizar()">Actualizar
+        </button>
     </div>
 
     <h1>Resultados <i>{{(recorrido) ?  recorrido.nombre : ""}}</i></h1>
@@ -13,16 +15,11 @@
                 <th class="resultado-nombre-club">Nombre</th>
                 <th rowspan="2">Tiempo</th>
 
-                <th rowspan="2" colspan="2" *ngFor="let cabecera of cabecerasTrazado" class="cabecera-trazado">{{cabecera}}</th> <!-- TEST -->
-
-
-                <ng-template *ngIf="modalidad === MOD_TRAZADO">
-                    <th *ngFor="let codigo of recorrido.trazado">{{codigo}}</th>
-                </ng-template>
-                <ng-template *ngIf="modalidad === MOD_SCORE">
+                <th rowspan="2" colspan="2" *ngFor="let cabecera of cabecerasTrazado" class="cabecera-trazado">{{cabecera}}</th> 
+                <ng-container *ngIf="modalidad === MOD_SCORE">
                     <th rowspan="2">Puntuación</th>
-                    <!-- TODO Controles ordenados de menor a mayor (sin salida, meta al final) -->
-                </ng-template>
+                    <th rowspan="2" *ngFor="let codigo of listaControles">{{codigo}}</th>
+                </ng-container>
             </tr>
             <tr>
                 <th class="resultado-nombre-club">Club</th>
@@ -34,8 +31,9 @@
                     <td rowspan="2">{{resultado.posicion}}</td>
                     <td class="text-left resultado-nombre">{{resultado.nombre}}</td>
                     
-                    <td *ngIf="resultado.tipo === TIPO_OK"><b>{{resultado.tiempoTotal | tiempo}}</b></td>
-                    <td rowspan=2 *ngIf="resultado.tipo !== TIPO_OK" class="marca-pendiente">PENDIENTE</td>
+                    <td *ngIf="resultado.tipo === TIPO_OK" [attr.rowspan]="(modalidad === MOD_TRAZADO) ? '1' : '2'"><b>{{resultado.tiempoTotal | tiempo}}</b></td>
+                    <td rowspan=2 *ngIf="resultado.tipo === TIPO_PENDIENTE" class="marca-tipo-resultado marca-pendiente">PENDIENTE</td>
+                    <td rowspan=2 *ngIf="resultado.tipo === TIPO_ABANDONADO" class="marca-tipo-resultado marca-abandona">ABANDONA</td>
 
                     <ng-template ngFor let-parcial [ngForOf]="resultado.parciales">
                         <td [ngClass]="{'parcial-primero': parcial.posicionParcial === 1, 'parcial-podio': parcial.posicionParcial <= 3}">
@@ -43,6 +41,7 @@
                         <td [ngClass]="{'parcial-primero': parcial.posicionParcial === 1, 'parcial-podio': parcial.posicionParcial <= 3}"
                             class="resultado-posicion">({{parcial.posicionParcial}})</td>
                     </ng-template>
+
                     <!--
                     <ng-template *ngIf="modalidad === MOD_TRAZADO">
                         <td *ngFor="let parcial of resultado.parciales">
@@ -52,14 +51,17 @@
                             </div>
                         </td>
                     </ng-template>-->
-                    <ng-template *ngIf="modalidad === MOD_SCORE">
+                    <ng-container *ngIf="modalidad === MOD_SCORE">
                         <!-- TODO Puntuación total -->
-                        <!-- TODO Controles registrados -->
-                    </ng-template>
+                        <td rowspan="2"><b>{{resultado.puntuacion}}</b></td>
+                        <td rowspan="2" *ngFor="let picado of resultado.puntosRegistrados">
+                            <span class="marca-picado" *ngIf="picado"></span>
+                        </td>
+                    </ng-container>
                 </tr>
                 <tr class="fila-inferior">
-                    <td class="text-left resultado-nombre">{{resultado.club}}</td>
-                    <td *ngIf="resultado.tipo === TIPO_OK"><b>{{resultado.diferenciaGanador | tiempo:'+'}}</b></td>
+                    <td class="text-left resultado-nombre">{{(resultado.club.length > 0) ? resultado.club : '&nbsp;'}}</td>
+                    <td *ngIf="resultado.tipo === TIPO_OK && modalidad === MOD_TRAZADO"><b>{{resultado.diferenciaGanador | tiempo:'+'}}</b></td>
 
                     <ng-template ngFor let-parcial [ngForOf]="resultado.parciales">
                         <td [ngClass]="{'parcial-primero': parcial.posicionAcumulada === 1, 'parcial-podio': parcial.posicionAcumulada <= 3}">
@@ -74,4 +76,16 @@
 
     
     <h3 *ngIf="resultados && resultados.length === 0" class="sin-resultados">No hay resultados (aún)</h3>
+
+    <ng-container *ngIf="resultados === null">
+        <div class="wrapper-cargando">
+            <div class="lds-baliza-wrapper" *ngIf="!errorCarga">
+                <div class="lds-baliza"></div>
+            </div>
+            <div *ngIf="errorCarga">
+                <h1>Ocurrió un error ☹</h1>
+                <button class="btn btn-primary btn-reintentar" (click)="clickBotonActualizar()">Volver a intentar</button>
+            </div>
+        </div>
+    </ng-container>
 </div>

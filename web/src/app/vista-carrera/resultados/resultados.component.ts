@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { AlertService } from 'src/app/alert';
 import { ClienteApiService } from 'src/app/shared/cliente-api.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Recorrido, ResultadoUsuario, ParcialUsuario, Carrera, ParticipacionesRecorridoResponse } from 'src/app/shared/app.model';
+import { Recorrido, ResultadoUsuario, ParcialUsuario, Carrera, ParticipacionesRecorridoResponse, Control } from 'src/app/shared/app.model';
 
 @Component({
   selector: 'app-resultados',
@@ -20,7 +20,6 @@ export class ResultadosComponent implements OnInit {
 
   private tablaResultados: ElementRef<HTMLTableElement>;
   @ViewChild('tablaResultados', {static: false}) set content(content: ElementRef) {
-    console.log(content);
     if(content) {
       this.tablaResultados = content;
     }
@@ -34,9 +33,10 @@ export class ResultadosComponent implements OnInit {
   grabbing: boolean;
   errorCarga: boolean;
   cabecerasTrazado: string[];
+  listaControles: string[];
 
   // Alertas
-  optionsAlerts = {
+  alertOptions = {
     autoClose: true,
     keepAfterRouteChange: false
   };
@@ -47,7 +47,7 @@ export class ResultadosComponent implements OnInit {
     protected alertService: AlertService) { }
 
   ngOnInit() {
-    this.modalidad = this.idCarrera = this.recorrido = this.cabecerasTrazado = this.resultados = null;
+    this.modalidad = this.idCarrera = this.recorrido = this.cabecerasTrazado = this.resultados = this.listaControles = null;
     this.errorCarga = this.grabbing = false;
 
     this.cargaResultadosRecorrido();
@@ -55,6 +55,7 @@ export class ResultadosComponent implements OnInit {
 
 
   cargaResultadosRecorrido(): void {
+    this.resultados = null;
     this.route.params.subscribe(routeParams => {
       let idRecorrido = +routeParams['id'];
       // Obtiene los registros de los participantes del recorrido
@@ -64,16 +65,19 @@ export class ResultadosComponent implements OnInit {
             this.idCarrera = resp.body.idCarrera;
             this.generaResultados(resp.body);
           } else {
-            this.alertService.error("Error al obtener los resultados", this.optionsAlerts);
+            this.alertService.error("Error al obtener los resultados", this.alertOptions);
             this.errorCarga = true;
           }
         }, err => {
           if(err.status == 404) {
-            this.alertService.error("No existe ningún recorrido con ese ID", this.optionsAlerts);
+            this.alertService.error("No existe ningún recorrido con ese ID", this.alertOptions);
           } else if(err.status == 504) {
-            this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.optionsAlerts);
+            this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
           } else {
-            this.alertService.error("Error al obtener los resultados: " + JSON.stringify(err), this.optionsAlerts);
+            let mensaje = "Error al obtener los resultados"
+            if(typeof err.error === 'string') mensaje += ": " + err.error;
+            this.alertService.error(mensaje, this.alertOptions);
+            console.log(err);
           }
           this.errorCarga = true;
         }
@@ -84,8 +88,14 @@ export class ResultadosComponent implements OnInit {
   generaResultados(respuesta: ParticipacionesRecorridoResponse): void {
     this.recorrido = respuesta.recorrido;
     this.modalidad = respuesta.modalidad;
+    let puntuacionesControles: Map<string, number> = new Map(Object.entries(respuesta.puntuacionesControles));
     let trazado = this.recorrido.trazado;
     let resultados: ResultadoUsuario[] = [];
+    // Lista de controles
+    this.listaControles = [];
+    for(let control of puntuacionesControles.keys()) {
+      if(control !== "SALIDA") this.listaControles.push(control);
+    }
 
     // Sets para calcular los puestos de los tiempos parciales y totales
     let setsParciales: Set<number>[] = [];
@@ -100,8 +110,9 @@ export class ResultadosComponent implements OnInit {
       if(participacion.abandonado) tipoResultado = ResultadoUsuario.TIPO_ABANDONADO;
       else if(participacion.pendiente) tipoResultado = ResultadoUsuario.TIPO_PENDIENTE;
       let tiempoAcumulado = 0; // Segundos
+      let puntuacion = 0;
       let parcialesUsuario: ParcialUsuario[] = [];
-      let puntosRegistrados = new Map<string, number>();
+      let puntosRegistrados = new Array(this.listaControles.length).fill(false);
 
       if(this.modalidad === Carrera.MOD_TRAZADO) {
         // TRAZADO
@@ -121,15 +132,14 @@ export class ResultadosComponent implements OnInit {
         }
       } else {
         // SCORE
-        let controlMeta = trazado[trazado.length - 1]; // El último control es la meta
         for(let registro of registros) {
             let codigoControl: string = registro.control;
             if(registro.fecha !== null) {
-                let puntuacion = respuesta.puntuacionesControles.get(codigoControl);
+                let punt = puntuacionesControles.get(codigoControl);
                 if(puntuacion !== null) {
-                    puntosRegistrados.set(codigoControl, puntuacion);
-                } else {
-                    // No debería ocurrir
+                  puntuacion += punt;
+                  let i = this.listaControles.indexOf(codigoControl);
+                  if(i >= 0) puntosRegistrados[i] = true;
                 }
             } else {
               // Recorrido abandonado
@@ -141,7 +151,7 @@ export class ResultadosComponent implements OnInit {
                 - new Date(registros[0].fecha).getTime() / 1000;
       }
 
-      let resultadoUsuario = new ResultadoUsuario(corredor.id, corredor.nombre, corredor.club, tiempoAcumulado, tipoResultado);
+      let resultadoUsuario = new ResultadoUsuario(corredor.id, corredor.nombre, corredor.club, tiempoAcumulado, puntuacion, tipoResultado);
       resultadoUsuario.parciales = parcialesUsuario;
       resultadoUsuario.puntosRegistrados = puntosRegistrados;
       resultados.push(resultadoUsuario);
@@ -154,7 +164,6 @@ export class ResultadosComponent implements OnInit {
       }
       // Ordena lista por tiempo total y tipo
       resultados.sort(function(r1, r2) {
-        debugger;
         // Comparación entre tipos
         let c = ResultadoUsuario.ORDEN_TIPOS.indexOf(r1.tipo) - ResultadoUsuario.ORDEN_TIPOS.indexOf(r2.tipo); 
         if(c === 0) {
@@ -195,10 +204,14 @@ export class ResultadosComponent implements OnInit {
             i++;
           }
 
-          // La posición final de un usuario es la misma que la acumulada de su último parcial
-                                                                                                                                                        // ¿abandonados?
-          resultadoUsuario.posicion = resultadoUsuario.parciales[resultadoUsuario.parciales.length-1].posicionAcumulada;
-          resultadoUsuario.diferenciaGanador = resultadoUsuario.tiempoTotal - tiempoGanador;
+
+          if(resultadoUsuario.parciales.length != trazado.length-1) {
+            // Pendiente / Abandonado
+          } else {
+            // La posición final de un usuario es la misma que la acumulada de su último parcial
+            resultadoUsuario.posicion = resultadoUsuario.parciales[resultadoUsuario.parciales.length-1].posicionAcumulada;
+            resultadoUsuario.diferenciaGanador = resultadoUsuario.tiempoTotal - tiempoGanador;
+          }
       }
     } else {
       // Ordena lista por puntuación y tiempo
@@ -208,9 +221,9 @@ export class ResultadosComponent implements OnInit {
         if(c === 0) {
           // Mismo tipo. Entre el mismo tipo se usa el mismo criterio (puntuación, tiempo)
           // Ordenados por puntuación descendente
-          c = r1.getPuntuacion() - r1.getPuntuacion();
+          c = r2.puntuacion - r1.puntuacion;
           if(c == 0) {
-              // Misma puntuación, se ordena por tiempo
+              // Misma puntuación, se ordena por tiempo ascendente
               c = r1.tiempoTotal - r2.tiempoTotal;
           }
         }
@@ -224,6 +237,7 @@ export class ResultadosComponent implements OnInit {
       for(let resultadoUsuario of resultados) {
         resultadoUsuario.posicion = posicion++;
       }
+
     }
 
     this.resultados = resultados;
@@ -262,6 +276,10 @@ export class ResultadosComponent implements OnInit {
     this.tablaResultados.nativeElement.style.cursor = 'grab';
     this.tablaResultados.nativeElement.style.removeProperty('user-select');
     this.grabbing = false;
+  }
+
+  clickBotonActualizar(): void {
+    this.cargaResultadosRecorrido();
   }
 
   clickBotonVolver(): void {

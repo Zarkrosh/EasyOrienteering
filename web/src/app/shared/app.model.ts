@@ -136,26 +136,18 @@ export class ResultadoUsuario {
     club: string;
     tiempoTotal: number;
     diferenciaGanador: number;
+    puntuacion: number;
     tipo: string;
     parciales: ParcialUsuario[];
-    puntosRegistrados: Map<string, number>;
+    puntosRegistrados: boolean[];
 
-    constructor(idUsuario: number, nombre: string, club: string, tiempoTotal: number, tipo: string) {
+    constructor(idUsuario: number, nombre: string, club: string, tiempoTotal: number, puntuacion: number, tipo: string) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.club = club;
         this.tiempoTotal = tiempoTotal;
+        this.puntuacion = puntuacion;
         this.tipo = tipo;
-    }
-
-    getPuntuacion(): number {
-        let puntuacion = 0;
-        if(this.puntosRegistrados) {
-            for(let punt of this.puntosRegistrados.values()) {
-                puntuacion += punt;
-            }
-        }
-        return puntuacion;
     }
 }
 

@@ -32,7 +32,7 @@
                                             <span>Evento</span>
                                         </div>
                                     </label>
-                                    <label>
+                                    <label *ngIf="f.visibilidad.value === PRIV_PUBLICA">
                                         <input type="radio" formControlName="tipo" value="CIRCUITO" class="form-control selector-opcion"/>
                                         <div class="selector-opcion-cont noselect">
                                             <span>Circuito</span>
@@ -70,7 +70,7 @@
                                             <span>Pública</span>
                                         </div>
                                     </label>
-                                    <label>
+                                    <label *ngIf="f.tipo.value === TIPO_EVENTO">
                                         <input type="radio" formControlName="visibilidad" value="{{PRIV_PRIVADA}}" class="form-control selector-opcion" />
                                         <div class="selector-opcion-cont noselect">
                                             <span>Privada</span>

@@ -143,7 +143,14 @@ export class GenerarQRComponent implements OnInit {
         height: AppSettings.TAM_LADO_QR,
         quietZone: 20,
         quietZoneColor: 'transparent',
-      }
+        logo: "",
+        logoWidth: 50,
+        logoHeight: 50,
+        logoBackgroundColor: '#ffffff'
+      };
+      if(control.tipo === Control.TIPO_SALIDA) options.logo = "http://localhost:4200/assets/img/salida.png";
+      else if(control.tipo === Control.TIPO_CONTROL) options.logo = "http://localhost:4200/assets/img/control.png";
+      else if(control.tipo === Control.TIPO_META) options.logo = "http://localhost:4200/assets/img/meta.png";
       new QRCode(divQR, options);
 
       // Compone el elemento
@@ -165,14 +172,22 @@ export class GenerarQRComponent implements OnInit {
           if(resp.status == 200) {
             this.carrera = resp.body;
             this.controles = [];
+            let salida = null;
             for(let control of Object.entries(this.carrera.controles)) {
               if(control[1].tipo != Control.TIPO_SALIDA) this.controles.push(control[1]);
+              else salida = control[1];
             }
 
-            // Triángulos de recorridos
-            for(let recorrido of this.carrera.recorridos) {
-              if(recorrido.trazado.length > 0) {
-                this.controles.push(new Control(recorrido.nombre, null, null));
+            // Triángulos de recorridos o score
+            if(this.carrera.modalidad === Carrera.MOD_TRAZADO) {
+              for(let recorrido of this.carrera.recorridos) {
+                if(recorrido.trazado.length > 0) {
+                  this.controles.push(new Control(recorrido.nombre, Control.TIPO_SALIDA, null));
+                }
+              }
+            } else {
+              if(salida !== null) {
+                this.controles.push(new Control("SCORE", Control.TIPO_SALIDA, null));
               }
             }
 

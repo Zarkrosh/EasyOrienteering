@@ -3,8 +3,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({name: 'tiempo'})
 export class PipeTiempo implements PipeTransform {
     transform(value: number, prefix: string = ""): string {
-        let res = prefix;
+        let res = "";
         if(value !== null) {
+            res = prefix;
             let hh = Math.floor(value / 3600);
             value -= hh * 3600;
             let mm = Math.floor(value / 60);

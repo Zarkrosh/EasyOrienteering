@@ -11,6 +11,10 @@ $color-secondary: #007bff;
 $color-secondary-light: rgba($color-secondary, 0.8);
 $color-secondary-dark: #0061c9;
 
+body {
+    background: url("~/assets/img/background.png") center center repeat fixed;
+}
+
 alert {
     position: fixed;
     width: 25%;
@@ -146,7 +150,9 @@ alert {
 
 .footer-web {
     width: 100%;
+    max-width: $max-width-content;
     height: 200px;
+    margin: 0 auto;
     background-color: grey;
 }
 

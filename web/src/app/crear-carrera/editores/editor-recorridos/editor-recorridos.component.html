@@ -157,14 +157,16 @@
         <h2 class="text-center">¿Cómo lo quieres organizar?</h2>
         <div class="wrapper-elecciones">
             <div class="selector-eleccion" (click)="activeModal.close(ELECCION_SOLO_RECORRIDOS)">
-                <span class="titulo-eleccion">Solo recorridos</span>
-                <span class="texto-eleccion">Crea los recorridos que necesites sin tener que trazar nada</span>
-                <span class="texto-aclaracion"><i>* Podrás subir tus propios mapas tras generar los recorridos</i></span>
+                <span class="titulo-eleccion">Solo {{tipoEdicion}}</span>
+                <span class="texto-eleccion">Escribe los {{tipoEdicion}} que necesites sin tener que trazar nada</span>
+                <span class="texto-aclaracion" *ngIf="tipoEdicion === EDICION_RECORRIDOS"><i>* Podrás subir tus propios mapas tras crear los recorridos</i></span>
+                <span class="texto-aclaracion" *ngIf="tipoEdicion === EDICION_CONTROLES"><i>* Podrás subir tu propio mapa tras crear los controles</i></span>
             </div>
             <div class="selector-eleccion" (click)="activeModal.close(ELECCION_TRAZAR)">
-                <span class="titulo-eleccion">Trazar recorridos</span>
-                <span class="texto-eleccion">Utiliza el trazador web y una imagen como mapa base para trazar tus recorridos</span>
-                <span class="texto-aclaracion"><i>* Se generarán imágenes de los mapas para cada recorrido cuando acabes</i></span>
+                <span class="titulo-eleccion">Trazar {{tipoEdicion}}</span>
+                <span class="texto-eleccion">Utiliza el trazador web y una imagen como mapa base para trazar tus {{tipoEdicion}}</span>
+                <span class="texto-aclaracion" *ngIf="tipoEdicion === EDICION_RECORRIDOS"><i>* Se generarán imágenes de los mapas para cada recorrido cuando acabes</i></span>
+                <span class="texto-aclaracion" *ngIf="tipoEdicion === EDICION_CONTROLES"><i>* Se generará una imagen del mapa con todos los controles</i></span>
             </div>
         </div>
     </div>
