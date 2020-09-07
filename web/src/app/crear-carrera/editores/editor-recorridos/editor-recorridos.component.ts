@@ -1,12 +1,13 @@
 import { Component, OnInit, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { AlertService } from '../../../alert';
 import { SharedEditorService } from '../shared-editor.service';
-import { Control, Recorrido, AppSettings, Carrera } from 'src/app/shared/app.model';
+import { Control, Recorrido, AppSettings, Carrera } from 'src/app/_shared/app.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import { EditorTrazadoComponent } from '../editor-trazado/editor-trazado.component';
-import { DataService } from 'src/app/shared/data.service';
+import { DataService } from 'src/app/_services/data.service';
 import { FormBuilder } from '@angular/forms';
+import { FooterService } from 'src/app/_services/footer.service';
 
 @Component({
   selector: 'app-editor-recorridos',
@@ -103,9 +104,11 @@ export class EditorRecorridosComponent implements OnInit {
     private modalService: NgbModal,
     private router: Router,
     private formBuilder: FormBuilder,
-    private data: DataService) { }
+    private data: DataService,
+    private footer: FooterService) { }
 
   ngOnInit() {
+    this.footer.hide();
     this.recorridos = new Map<string, Recorrido>();
     this.controles = new Map<string, Control>();
     this.listaControlesOrdenados = [];

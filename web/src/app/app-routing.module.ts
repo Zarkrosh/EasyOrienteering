@@ -19,6 +19,7 @@ import { NotFoundComponent } from './not-found/not-found.component';
 const routes: Routes = [
   {path: '', component: InicioComponent},
   {path: 'login', component: LoginComponent},
+  {path: 'logout', component: LoginComponent},
   {path: 'registro', component: RegistroComponent},
   {path: 'olvido', component: OlvidoComponent},
   {path: 'perfil', component: PerfilComponent},

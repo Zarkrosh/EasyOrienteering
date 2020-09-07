@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, Input, SimpleChanges } from '@angular/core';
-import { Recorrido, Control, Coordenadas, AppSettings } from '../../../shared/app.model';
+import { Recorrido, Control, Coordenadas, AppSettings } from '../../../_shared/app.model';
 import { AlertService } from '../../../alert';
 import { SharedEditorService } from '../shared-editor.service';
 import { EditorRecorridosComponent } from '../editor-recorridos/editor-recorridos.component';

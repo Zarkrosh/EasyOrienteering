@@ -1,8 +1,9 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, ValidationErrors, AbstractControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from 'src/app/alert';
-import { ClienteApiService } from 'src/app/shared/cliente-api.service';
+import { ClienteApiService } from 'src/app/_services/cliente-api.service';
+import { TokenStorageService } from 'src/app/_services/token-storage.service';
 
 @Component({
   selector: 'app-registro',
@@ -25,20 +26,28 @@ export class RegistroComponent implements OnInit {
       private route: ActivatedRoute,
       private router: Router,
       protected alertService: AlertService,
-      private clienteApi: ClienteApiService) {
-    // Si ya está loggeado redirige al home
-    /*if (this.authenticationService.currentUserValue) {
-        this.router.navigate(['/']);
-    }*/
+      private clienteApi: ClienteApiService,
+      private tokenService: TokenStorageService) {
+    
   }
 
   ngOnInit() {
+    if(this.tokenService.isLoggedIn()) {
+      this.router.navigate(["/perfil"]);
+    }
+
     this.registroForm = this.formBuilder.group({
-      usuario_email: ['', Validators.required],
-      password: ['', Validators.required]
+      email: ['', Validators.required],
+      nombre: ['', Validators.required],
+      club: [''],
+      password: ['', Validators.required],
+      passwordConf: ['', Validators.required]
+    }, {
+      validator: this.checkPasswords 
     });
 
     this.errorNombreEmail = this.errorGenerico = " ";
+    this.registrado = this.cargando = false;
   }
 
   // Para acceder más comodo a los campos del formulario
@@ -48,9 +57,8 @@ export class RegistroComponent implements OnInit {
     if(this.registroForm.invalid) return;
 
     this.errorGenerico = ""; // Quita el posible mensaje de error anterior
-    this.enviado = true;     // Invalida el envío de más peticiones
-
-    this.clienteApi.login(this.f.usuario_email.value, this.f.password.value).subscribe(
+    this.cargando = true;
+    this.clienteApi.register(this.f.nombre.value, this.f.email.value, this.f.club.value, this.f.password.value).subscribe(
       resp => {
         if(resp.status == 200) {
           // Registro exitoso, muestra mensaje de confirmación
@@ -65,6 +73,14 @@ export class RegistroComponent implements OnInit {
         this.cargando = false;
       }
     );
+  }
+
+  
+  checkPasswords(group: FormGroup) {
+    let pass = group.get('password').value;
+    let passwordConf = group.get('passwordConf').value;
+
+    return pass === passwordConf ? null : { notSame: true }     
   }
 
 }

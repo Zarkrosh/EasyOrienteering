@@ -27,9 +27,12 @@ import { ExplorarComponent } from './explorar/explorar.component';
 import { MapaCircuitosComponent } from './explorar/mapa-circuitos/mapa-circuitos.component';
 import { DatePipe } from '@angular/common';
 import { ResultadosComponent } from './vista-carrera/resultados/resultados.component';
-import { PipeTiempo } from './shared/pipes/PipeTiempo';
+import { PipeTiempo } from './_shared/pipes/PipeTiempo';
 import { NotFoundComponent } from './not-found/not-found.component';
-import { PipeFechaBonita } from './shared/pipes/PipeFechaBonita';
+import { PipeFechaBonita } from './_shared/pipes/PipeFechaBonita';
+import { authInterceptorProviders } from './_helpers/AuthInterceptor';
+import { FooterComponent } from './footer/footer.component';
+import { NavbarComponent } from './navbar/navbar.component';
 
 @NgModule({
   declarations: [
@@ -52,7 +55,9 @@ import { PipeFechaBonita } from './shared/pipes/PipeFechaBonita';
     ResultadosComponent,
     PipeTiempo,
     PipeFechaBonita,
-    NotFoundComponent
+    NotFoundComponent,
+    FooterComponent,
+    NavbarComponent
   ],
   imports: [
     BrowserModule,
@@ -66,7 +71,7 @@ import { PipeFechaBonita } from './shared/pipes/PipeFechaBonita';
     LeafletMarkerClusterModule, 
     InfiniteScrollModule
   ],
-  providers: [DatePipe],
+  providers: [DatePipe, authInterceptorProviders],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

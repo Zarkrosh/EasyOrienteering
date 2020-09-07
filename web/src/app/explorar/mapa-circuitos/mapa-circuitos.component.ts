@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ClienteApiService } from 'src/app/shared/cliente-api.service';
-import { Carrera } from 'src/app/shared/app.model';
+import { ClienteApiService } from 'src/app/_services/cliente-api.service';
+import { Carrera } from 'src/app/_shared/app.model';
 import { AlertService } from 'src/app/alert';
 import { DatePipe } from '@angular/common';
 import * as L from 'leaflet';

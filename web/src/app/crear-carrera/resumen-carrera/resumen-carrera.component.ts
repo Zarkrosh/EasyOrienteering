@@ -2,11 +2,12 @@ import { Component, OnInit, ElementRef, ViewChild, ViewChildren, QueryList, Inje
 import { NgbModal, NgbDateStruct, NgbDateAdapter, NgbDateParserFormatter, NgbCalendar, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AlertService } from 'src/app/alert';
-import { AppSettings, Carrera, Control, Recorrido } from 'src/app/shared/app.model';
-import { ClienteApiService } from 'src/app/shared/cliente-api.service';
-import { DataService } from 'src/app/shared/data.service';
+import { AppSettings, Carrera, Control, Recorrido } from 'src/app/_shared/app.model';
+import { ClienteApiService } from 'src/app/_services/cliente-api.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { EditorUbicacionComponent } from '../editores/editor-ubicacion/editor-ubicacion.component';
+import { DataService } from 'src/app/_services/data.service';
+import { FooterService } from 'src/app/_services/footer.service';
 
 /**
  * This Service handles how the date is represented in scripts i.e. ngModel.
@@ -133,13 +134,16 @@ export class ResumenCarreraComponent implements OnInit {
     private clienteApi: ClienteApiService,
     private data: DataService,
     private formBuilder: FormBuilder,
-    private route: ActivatedRoute) {
+    private route: ActivatedRoute,
+    private footer: FooterService) {
     
     this.errorCarga = this.borrandoCarrera = this.guardandoCarrera = false;
     this.controles = [];
   }
 
   ngOnInit() {
+    this.footer.show();
+    
     let today = new Date();
     let todayDate = today.getUTCDate() + "-" + (today.getUTCMonth()+1) + "-" + today.getUTCFullYear();
     // Fecha mínima de selección

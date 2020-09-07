@@ -1,8 +1,9 @@
 import { Component, OnInit, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ClienteApiService } from '../shared/cliente-api.service';
+import { ClienteApiService } from '../_services/cliente-api.service';
 import { AlertService } from '../alert';
-import { Carrera, Usuario } from '../shared/app.model';
+import { Carrera, Usuario } from '../_shared/app.model';
+import { Utils } from '../_shared/utils';
 import * as L from 'leaflet';
 
 @Component({
@@ -63,18 +64,12 @@ export class VistaCarreraComponent implements OnInit {
             this.errorCarga = true;
           }
         }, err => {
-          if(err.status == 504) {
-            this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
-          } else if(err.status == 404) {
-            this.alertService.error("No existe ninguna carrera con ese ID", this.alertOptions);
-          } else if(err.status == 403) {
+          if(err.status == 403) {
             this.errorPrivada = true;
           } else {
-            let mensaje = "Error al obtener la carrera"
-            if(typeof err.error === 'string') mensaje += ": " + err.error;
-            this.alertService.error(mensaje, this.alertOptions);
-            console.log(err);
+            this.alertService.error(Utils.getMensajeError(err, "Error al obtener la carrera"));
           }
+
           this.errorCarga = true;
         }
       );

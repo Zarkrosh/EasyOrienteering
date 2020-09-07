@@ -34,6 +34,7 @@
     "font-awesome": "^4.7.0",
     "html2canvas": "^1.0.0-rc.7",
     "jquery": "^3.5.1",
+    "jwt-decode": "^2.2.0",
     "leaflet": "^1.7.1",
     "leaflet.markercluster": "^1.4.1",
     "ngx-infinite-scroll": "^8.0.0",

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Carrera, ParticipacionesRecorridoResponse } from './app.model';
+import { Carrera, ParticipacionesRecorridoResponse, Usuario } from '../_shared/app.model';
 
 @Injectable({
   providedIn: 'root'
@@ -9,17 +9,19 @@ import { Carrera, ParticipacionesRecorridoResponse } from './app.model';
 export class ClienteApiService {
   // URL base de la API
   private static readonly BASE_URL = '/api/';
+  private static readonly BASE_AUTH = 'auth/';
   private static readonly BASE_CARRERAS = 'carreras/';
   private static readonly BASE_RECORRIDOS = 'recorridos/';
+  private static readonly BASE_USUARIOS = 'usuarios/';
   // Autenticación
   private static readonly API_LOGIN = 'login/';
-  private static readonly API_REGISTRO = 'registro/';
+  private static readonly API_REGISTRO = 'register/';
   
 
   // Parámetros de la API
-  private static readonly PAR_NOMBRE = 'nombre';
+  private static readonly PAR_USERNAME = 'username';
   private static readonly PAR_EMAIL = 'email';
-  private static readonly PAR_NOMBRE_EMAIL = 'nombreEmail';
+  private static readonly PAR_CLUB = 'club';
   private static readonly PAR_PASSWORD = 'password';
 
 
@@ -33,10 +35,10 @@ export class ClienteApiService {
    * @param password Contraseña de la cuenta
    */
   login(nombreEmail: string, password: string) : Observable<HttpResponse<any>> {
-    let url = ClienteApiService.BASE_URL + ClienteApiService.API_LOGIN;
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_AUTH + ClienteApiService.API_LOGIN;
     // Contenido
     var datos = {};
-    datos[ClienteApiService.PAR_NOMBRE_EMAIL] = nombreEmail;
+    datos[ClienteApiService.PAR_USERNAME] = nombreEmail;
     datos[ClienteApiService.PAR_PASSWORD] = password;
     // Cabeceras
     const cabeceras = new HttpHeaders({ 'Content-Type': 'application/json' });
@@ -51,14 +53,16 @@ export class ClienteApiService {
    * Realiza la petición de registro con los datos de un usuario.
    * @param nombre Nombre de usuario
    * @param email Email
+   * @param club Club
    * @param password Contraseña
    */
-  register(nombre: string, email: string, password: string) : Observable<HttpResponse<any>> {
-    let url = ClienteApiService.BASE_URL + ClienteApiService.API_REGISTRO;
+  register(nombre: string, email: string, club: string, password: string) : Observable<HttpResponse<any>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_AUTH + ClienteApiService.API_REGISTRO;
     // Contenido
     var datos = {};
-    datos[ClienteApiService.PAR_NOMBRE] = nombre;
+    datos[ClienteApiService.PAR_USERNAME] = nombre;
     datos[ClienteApiService.PAR_EMAIL] = email;
+    datos[ClienteApiService.PAR_CLUB] = club;
     datos[ClienteApiService.PAR_PASSWORD] = password;
     // Cabeceras
     const cabeceras = new HttpHeaders({ 'Content-Type': 'application/json' });
@@ -97,14 +101,6 @@ export class ClienteApiService {
     return this.http.get<any>(url, {observe: 'response'});
   }
 
-  cambiaUbicacionCarrera(idCarrera: number, latitud: number, longitud: number): Observable<HttpResponse<any>> {
-    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + idCarrera + '/ubicacion';
-    let ubicacion = new Object();
-    ubicacion["latitud"] = latitud;
-    ubicacion["longitud"] = longitud;
-    return this.http.put<any>(url, ubicacion, {observe: 'response'});
-  }
-
   buscaCarreras(nombre: string, tipo: string, modalidad: string, pagina: number, numero: number): Observable<HttpResponse<Carrera[]>> {
     let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + 'buscar';
     let params = new HttpParams();
@@ -121,11 +117,28 @@ export class ClienteApiService {
     return this.http.get(url, {observe: 'response', responseType: 'blob'});
   }
 
+  getCarrerasOrganizadas(): Observable<HttpResponse<Carrera[]>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + 'organizadas';
+    return this.http.get<Carrera[]>(url, {observe: 'response'});
+  }
+
+  getCarrerasParticipadas(): Observable<HttpResponse<Carrera[]>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + 'participadas';
+    return this.http.get<Carrera[]>(url, {observe: 'response'});
+  }
+
 
   /******************* RESULTADOS *******************/
   getParticipacionesRecorrido(idRecorrido: number): Observable<HttpResponse<ParticipacionesRecorridoResponse>> {
     let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_RECORRIDOS + idRecorrido;
     return this.http.get<ParticipacionesRecorridoResponse>(url, {observe: 'response'});
+  }
+
+
+  /******************* USUARIO *******************/
+  getDatosUsuario(): Observable<HttpResponse<Usuario>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_USUARIOS;
+    return this.http.get<Usuario>(url, {observe: 'response'});
   }
 
 }

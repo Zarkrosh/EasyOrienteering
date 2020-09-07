@@ -1,12 +1,14 @@
 @import "../../../styles.scss";
 
-#loginWrapper {
+.auth-wrapper {
     width: 20%;
     min-width: 400px;
-    margin-top: 40px;
+    margin: 60px auto;
     border: 2px solid #000000;
     border-radius: 20px;
     padding: 0;
+    background-color: #fbfbfb;
+    box-shadow: 1px 0px 3px 0px gray;
 }
 
 .formHeader {
@@ -26,13 +28,24 @@ label {
     margin: 20px;
 }
 
+
+.mensaje-error {
+    width: 100%;
+    margin: 20px 0;
+    display: block;
+    padding: 15px 0;
+    text-align: center;
+    color: rgb(90, 0, 0);
+    background-color: rgb(255, 140, 140);
+}
+
 .btn-primary {
     margin-top: 20px;
     background-color: $color-orientacion;
     font-weight: bold;
     font-size: x-large;
     transition: .3s;
-    border: 2px solid black;
+    border: 1px solid black;
 }
 
 .btn-primary:hover {

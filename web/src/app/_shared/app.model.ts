@@ -15,9 +15,10 @@ export class AppSettings {
 export class Usuario {
     id: number;
     nombre: string;
-    club: string;
     email: string;
+    club: string;
     fecharegistro: Date;
+    roles: string[];
 }
 
 export class Carrera {
@@ -162,3 +163,5 @@ export class ParcialUsuario {
         this.tiempoAcumulado = tiempoAcumulado;
     }
 }
+
+

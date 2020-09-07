@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Control, Carrera, AppSettings } from 'src/app/shared/app.model';
+import { Control, Carrera, AppSettings } from 'src/app/_shared/app.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ClienteApiService } from 'src/app/shared/cliente-api.service';
+import { ClienteApiService } from 'src/app/_services/cliente-api.service';
 import { AlertService } from 'src/app/alert';
 import * as QRCode from 'easyqrcodejs';
 import * as html2canvas from 'html2canvas';

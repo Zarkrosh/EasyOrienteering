@@ -108,6 +108,21 @@ alert {
     border-top-right-radius: 20px;
 }
 
+.btns-final button {
+    position: absolute;
+    bottom: 0;
+    padding: 10px 20px;
+    border: 2px solid black;
+}
+.btn-final-izda {
+    left: 0;
+    border-bottom-left-radius: 20px;
+}
+.btn-final-dcha {
+    right: 0;
+    border-bottom-right-radius: 20px;
+}
+
 
 /**** MENSAJE DE CARGA ****/
 .wrapper-cargando {
@@ -148,13 +163,22 @@ alert {
 }
 
 
-.footer-web {
-    width: 100%;
-    max-width: $max-width-content;
-    height: 200px;
-    margin: 0 auto;
-    background-color: grey;
+
+
+
+/**** LOGIN / REGISTRO ****/
+.auth-wrapper {
+    width: 20%;
+    min-width: 400px;
+    margin: 60px auto;
+    border: 2px solid #000000;
+    border-radius: 20px;
+    padding: 0;
+    background-color: #fbfbfb;
+    box-shadow: 1px 0px 3px 0px gray;
 }
+
+
 
 
 /**** CODIGOS QR EN PDF ****/
@@ -201,6 +225,9 @@ alert {
 /**************************/
 
 
+.modal-footer {
+    justify-content: space-between !important;
+}
 /**** DIALOGO MODAL AJUSTADO ****/
 .modal-fit .modal-dialog {
     width: min-content !important;
