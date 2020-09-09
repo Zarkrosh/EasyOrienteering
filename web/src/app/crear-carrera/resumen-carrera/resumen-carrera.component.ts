@@ -8,6 +8,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { EditorUbicacionComponent } from '../editores/editor-ubicacion/editor-ubicacion.component';
 import { DataService } from 'src/app/_services/data.service';
 import { FooterService } from 'src/app/_services/footer.service';
+import { TokenStorageService } from 'src/app/_services/token-storage.service';
 
 /**
  * This Service handles how the date is represented in scripts i.e. ngModel.
@@ -135,7 +136,8 @@ export class ResumenCarreraComponent implements OnInit {
     private data: DataService,
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
-    private footer: FooterService) {
+    private footer: FooterService,
+    private tokenService: TokenStorageService) {
     
     this.errorCarga = this.borrandoCarrera = this.guardandoCarrera = false;
     this.controles = [];
@@ -143,6 +145,10 @@ export class ResumenCarreraComponent implements OnInit {
 
   ngOnInit() {
     this.footer.show();
+
+    if(!this.tokenService.isLoggedIn()) {
+      this.router.navigate(["/logout"]);
+    }
     
     let today = new Date();
     let todayDate = today.getUTCDate() + "-" + (today.getUTCMonth()+1) + "-" + today.getUTCFullYear();
@@ -222,15 +228,19 @@ export class ResumenCarreraComponent implements OnInit {
         resp => {
           if(resp.status == 200) {
             this.carrera = resp.body;
-            this.f.nombre.setValue(this.carrera.nombre);
-            this.f.tipo.setValue(this.carrera.tipo);
-            this.f.modalidad.setValue(this.carrera.modalidad);
-            this.f.visibilidad.setValue((this.carrera.privada) ? 'privada' : 'publica');
-            this.f.fecha.setValue(this.carrera.fecha);
-            this.f.notas.setValue(this.carrera.notas);
-            this.actualizaListaControles();
 
-            // TODO Carga mapas recorrido(s)
+            if(this.carrera.organizador.nombre === this.tokenService.getUser().username) {
+              this.f.nombre.setValue(this.carrera.nombre);
+              this.f.tipo.setValue(this.carrera.tipo);
+              this.f.modalidad.setValue(this.carrera.modalidad);
+              this.f.visibilidad.setValue((this.carrera.privada) ? 'privada' : 'publica');
+              this.f.fecha.setValue(this.carrera.fecha);
+              this.f.notas.setValue(this.carrera.notas);
+              this.actualizaListaControles();
+            } else {
+              this.alertService.error("Solo puede editar la carrera su organizador", this.alertOptions);
+              this.router.navigate(["/carreras", this.carrera.id]);
+            }
           } else {
             this.alertService.error("Error al obtener la carrera", this.alertOptions);
             this.errorCarga = true;
@@ -346,11 +356,8 @@ export class ResumenCarreraComponent implements OnInit {
     this.carrera.notas = this.f.notas.value;
     this.carrera.latitud = this.editorUbicacion.latitudElegida;
     this.carrera.longitud = this.editorUbicacion.longitudElegida;
-    if(this.carrera.modalidad === Carrera.MOD_SCORE) this.carrera.recorridos = [];
-    else {
-      for(let recorrido of this.carrera.recorridos) {
-        recorrido.mapa = null; // Borra mapa para evitar error de espacio de almacenamiento local
-      }
+    for(let recorrido of this.carrera.recorridos) {
+      recorrido.mapa = null; // Borra mapa para evitar error de espacio de almacenamiento local
     }
     
     // Guarda borrador

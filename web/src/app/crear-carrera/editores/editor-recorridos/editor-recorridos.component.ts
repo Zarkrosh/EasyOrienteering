@@ -30,6 +30,8 @@ export class EditorRecorridosComponent implements OnInit {
 
   RECORRIDO_DEFAULT_PRE = "R";
   MAX_RECORRIDOS = 10;
+  MAX_RECORRIDOS_SCORE = 1;
+  MAX_RECORRIDOS_TRAZADO = 10;
   MAX_CONTROLES_RECORRIDO = 32;
   MAX_CONTROLES_CARRERA = 50;
   MAX_PUNTUACION_CONTROL = 100;
@@ -78,13 +80,13 @@ export class EditorRecorridosComponent implements OnInit {
   editandoNombreRecorrido: boolean;
 
   // Diálogos modales
-  readonly ELECCION_SOLO_RECORRIDOS = "RECORRIDOS";
+  readonly ELECCION_NO_TRAZAR = "NO TRAZAR";
   readonly ELECCION_TRAZAR = "TRAZAR";
   @ViewChild('modalControl', {static: true}) modalControl: ElementRef<NgbModal>;
   @ViewChild('modalRecorrido', {static: true}) modalRecorrido: ElementRef<NgbModal>;
   @ViewChild('modalEleccionInicial', {static: true}) modalEleccionInicial: ElementRef<NgbModal>;
   @ViewChild('modalCancelar', {static: true}) modalCancelar: ElementRef<NgbModal>;
-  eleccionTrazado;
+  eleccionTrazar;
   activeModal: NgbModalRef;
   tempControl: Control; // Temporal para la confirmación de borrado
 
@@ -114,7 +116,7 @@ export class EditorRecorridosComponent implements OnInit {
     this.listaControlesOrdenados = [];
     this.recorridoActual = null;
     this.editandoNombreRecorrido = false;
-    this.eleccionTrazado = null;
+    this.eleccionTrazar = null;
   
     // Diferencia entre edición de controles y de recorridos
     //  Controles: para carreras score. Solo se pueden añadir controles en mapa maestro.
@@ -122,9 +124,11 @@ export class EditorRecorridosComponent implements OnInit {
     if(window.location.toString().indexOf(this.EDICION_CONTROLES) > -1) {
       // Edición de controles
       this.tipoEdicion = this.EDICION_CONTROLES;
+      this.MAX_RECORRIDOS = this.MAX_RECORRIDOS_SCORE;
     } else if(window.location.toString().indexOf(this.EDICION_RECORRIDOS) > -1) {
       // Edición de recorridos
       this.tipoEdicion = this.EDICION_RECORRIDOS;
+      this.MAX_RECORRIDOS = this.MAX_RECORRIDOS_TRAZADO;
     } else {
       this.alertService.error("Error al cargar el editor.", this.alertOptions);
       this.router.navigate(["/"]);
@@ -142,6 +146,8 @@ export class EditorRecorridosComponent implements OnInit {
       return;
     }
     
+    
+    this.dataEditores.clearData();
     // Controlador de adición de control
     this.dataEditores.nuevoControl.subscribe((control) => {
       if(control !== null) {
@@ -218,7 +224,7 @@ export class EditorRecorridosComponent implements OnInit {
           this.nombresRecorridos.push(recorrido.nombre);
         });
         this.controles = new Map(Object.entries(this.carrera.controles));
-        this.eleccionTrazado = (this.carrera.soloRecorridos) ? this.ELECCION_SOLO_RECORRIDOS : this.ELECCION_TRAZAR;
+        this.eleccionTrazar = (this.carrera.soloRecorridos) ? this.ELECCION_NO_TRAZAR : this.ELECCION_TRAZAR;
         this.recorridoActual = this.carrera.recorridos[0];
         this.generaListaGlobalControles();
         // Actualiza el modelo compartido con el editor de trazados
@@ -243,14 +249,22 @@ export class EditorRecorridosComponent implements OnInit {
         this.activeModal.result.then(
           (data) => {
             // Close
-            this.eleccionTrazado = data;
-            if(this.eleccionTrazado === this.ELECCION_SOLO_RECORRIDOS) {
+            this.eleccionTrazar = data;
+            if(this.eleccionTrazar === this.ELECCION_NO_TRAZAR) {
               // Añade salida y meta
               this.controles.set(this.CODIGO_SALIDA, new Control(this.CODIGO_SALIDA, Control.TIPO_SALIDA, null));
               this.controles.set(this.CODIGO_META, new Control(this.CODIGO_META, Control.TIPO_META, null));
             }
             if(this.tipoEdicion === this.EDICION_RECORRIDOS) {
               this.nuevoRecorrido();
+            } else {
+              // Recorrido de carrera SCORE
+              let nombre = "SCORE";
+              this.recorridos.set(nombre, new Recorrido(nombre));
+              this.seleccionaRecorrido(nombre);
+              this.nombresRecorridos.push(nombre);
+              this.recorridoActual.trazado.push(this.CODIGO_SALIDA);
+              this.recorridoActual.trazado.push(this.CODIGO_META);
             }
           }, (reason) => {
             if(reason === 0) {
@@ -307,14 +321,9 @@ export class EditorRecorridosComponent implements OnInit {
         this.alertService.error("Debes crear por lo menos un recorrido", this.alertOptions);
         return;
       }
-    } else {
-      // Las carreras score solo tienen un recorrido
-      this.recorridos.clear();
-      this.recorridos.set(AppSettings.NOMBRE_RECORRIDO_SCORE, new Recorrido(AppSettings.NOMBRE_RECORRIDO_SCORE));
-      // TODO Salida meta
     }
 
-    if(this.eleccionTrazado === this.ELECCION_TRAZAR) {
+    if(this.eleccionTrazar === this.ELECCION_TRAZAR) {
       let mapasTrazados: Map<string, string> = new Map();
       let canvasMapa: ElementRef<HTMLCanvasElement> = this.trazador.getCanvasMapaBase();
       if(this.tipoEdicion === this.EDICION_RECORRIDOS) {
@@ -454,14 +463,6 @@ export class EditorRecorridosComponent implements OnInit {
   }
 
   /**
-   * Muestra todos los controles de la carrera.
-   */
-  todosLosControles() {
-    this.recorridoActual = null;
-    this.dataEditores.setRecorridoActual(null);
-  }
-
-  /**
    * Selecciona un recorrido de la lista.
    * @param nombre Nombre del recorrido seleccionado
    */
@@ -493,7 +494,7 @@ export class EditorRecorridosComponent implements OnInit {
         // Asigna el control de salida automáticamente
         this.recorridoActual.trazado.push(this.CODIGO_SALIDA);
       }
-      if(this.eleccionTrazado === this.ELECCION_SOLO_RECORRIDOS && this.controles.has(this.CODIGO_META)) {
+      if(this.eleccionTrazar === this.ELECCION_NO_TRAZAR && this.controles.has(this.CODIGO_META)) {
         this.recorridoActual.trazado.push(this.CODIGO_META);
       }
     } else {
@@ -547,19 +548,20 @@ export class EditorRecorridosComponent implements OnInit {
     this.modalService.dismissAll();
 
     if(this.recorridoActual !== null) {
-      // Borra el nombre del recorrido de la lista de optimización de la vista
-      let index = this.nombresRecorridos.indexOf(this.recorridoActual.nombre);
-      if (index > -1) {
-        this.nombresRecorridos.splice(index, 1);
+      if(this.recorridos.size > 1) {
+        // Borra el nombre del recorrido de la lista de optimización de la vista
+        let index = this.nombresRecorridos.indexOf(this.recorridoActual.nombre);
+        if (index > -1) {
+          this.nombresRecorridos.splice(index, 1);
+        }
+
+        // Borra el recorrido
+        this.recorridos.delete(this.recorridoActual.nombre);
+        this.seleccionaRecorrido(this.nombresRecorridos[0]);
+      } else {
+        this.alertService.error("Debe haber por lo menos un recorrido", this.alertOptions);
       }
-
-      // Borra el recorrido
-      this.recorridos.delete(this.recorridoActual.nombre);
     }
-
-    // Muestra la vista general de controles
-    this.recorridoActual = null;
-    this.dataEditores.setRecorridoActual(null);
   }
 
   /* Confirmación de borrado total de control */
@@ -617,7 +619,7 @@ export class EditorRecorridosComponent implements OnInit {
       //this.sharedData.setRecorridoActual(this.recorridoActual);
     }
 
-    if(this.eleccionTrazado === this.ELECCION_TRAZAR) {
+    if(this.eleccionTrazar === this.ELECCION_TRAZAR) {
       if(this.trazador) this.trazador.confirmaBorrado(control.tipo);
     }
   }
@@ -697,7 +699,7 @@ export class EditorRecorridosComponent implements OnInit {
   keyUpInputControl(evento: any): void {
     if(evento.key === "Enter") {
       // ENTER: añade nuevo control
-      if(this.recorridoActual.trazado.length < this.MAX_CONTROLES_RECORRIDO) {
+      if(this.recorridoActual.trazado.length < this.MAX_CONTROLES_RECORRIDO || this.controles.size < this.MAX_CONTROLES_CARRERA) {
         let codigo: string = evento.target.value.trim();
         if(codigo.length > 0) {
           codigo = codigo.substring(0, 10);
@@ -712,19 +714,34 @@ export class EditorRecorridosComponent implements OnInit {
               }
 
               // TODO ¿Alguna validación más?
-              if(this.recorridoActual.trazado.length === 0 || this.recorridoActual.trazado[this.recorridoActual.trazado.length-1] !== codigo) {
+              if(this.tipoEdicion === this.EDICION_CONTROLES) {
+                // SCORE
                 if(!this.controles.get(codigo)) {
                   // Nuevo control
-                  this.controles.set(codigo, new Control(codigo, Control.TIPO_CONTROL, null));
+                  let control = new Control(codigo, Control.TIPO_CONTROL, null);
+                  control.puntuacion = this.getPuntuacionControl(control);
+                  this.controles.set(codigo, control);
+                  this.actualizaListaGlobalControles(control);
+                  evento.target.value = "";
+                } else {
+                  this.alertService.error("Control ya existente", this.alertOptions); 
                 }
-                // Añade al recorrido en la penúltima posición
-                this.recorridoActual.trazado.splice(this.recorridoActual.trazado.length-1, 0, codigo);
-                if(this.recorridoActual.trazado.length == this.MAX_CONTROLES_RECORRIDO) {
-                  this.alertService.warn("Máximo de controles por recorrido alcanzado.", this.alertOptions);
-                }
-                evento.target.value = "";
               } else {
-                this.alertService.error("Elige otro control.", this.alertOptions);
+                // TRAZADO
+                if(this.recorridoActual.trazado.length === 0 || this.recorridoActual.trazado[this.recorridoActual.trazado.length-1] !== codigo) {
+                  if(!this.controles.get(codigo)) {
+                    // Nuevo control
+                    this.controles.set(codigo, new Control(codigo, Control.TIPO_CONTROL, null));
+                  }
+                  // Añade al recorrido en la penúltima posición
+                  this.recorridoActual.trazado.splice(this.recorridoActual.trazado.length-1, 0, codigo);
+                  if(this.recorridoActual.trazado.length == this.MAX_CONTROLES_RECORRIDO) {
+                    this.alertService.warn("Máximo de controles por recorrido alcanzado.", this.alertOptions);
+                  }
+                  evento.target.value = "";
+                } else {
+                  this.alertService.error("Elige otro control.", this.alertOptions);
+                }
               }
             } else {
               this.alertService.error("Código de control no válido.", this.alertOptions);
@@ -787,23 +804,30 @@ export class EditorRecorridosComponent implements OnInit {
   guardaBorrador() {
     this.carrera.recorridos = Array.from(this.recorridos.values());
 
-    // Genera un set con los controles utilizados
-    let setUtilizados = new Set(["SALIDA", "META"]);
-    for(let rec of this.carrera.recorridos) {
-      for(let con of rec.trazado) {
-        setUtilizados.add(con);
+    let controles = {}; // Si no no se guarda bien en localstorage
+    if(this.tipoEdicion === this.EDICION_RECORRIDOS) {
+      // Genera un set con los controles utilizados
+      let setUtilizados = new Set(["SALIDA", "META"]);
+      for(let rec of this.carrera.recorridos) {
+        for(let con of rec.trazado) {
+          setUtilizados.add(con);
+        }
       }
-    }
-    // Evita guardar los controles que ya no son utilizados
-    // TODO: si hay controles numéricos con valores superiores a los no utilizados, rebajar automáticamente
-    let controles = {}; // Si no no se guarda bien
-    for(let k of this.controles.keys()) {
-      if(setUtilizados.has(k)) {
+      // Evita guardar los controles que ya no son utilizados
+      // TODO: si hay controles numéricos con valores superiores a los no utilizados, rebajar automáticamente
+      
+      for(let k of this.controles.keys()) {
+        if(setUtilizados.has(k)) {
+          controles[k] = this.controles.get(k);
+        }
+      }
+    } else {
+      for(let k of this.controles.keys()) {
         controles[k] = this.controles.get(k);
       }
     }
     this.carrera.controles = controles as Map<any, any>; // Si no no se guarda bien
-    this.carrera.soloRecorridos = this.eleccionTrazado === this.ELECCION_SOLO_RECORRIDOS;
+    this.carrera.soloRecorridos = this.eleccionTrazar === this.ELECCION_NO_TRAZAR;
     localStorage.setItem(AppSettings.LOCAL_STORAGE_CARRERA, JSON.stringify(this.carrera));
   }
 

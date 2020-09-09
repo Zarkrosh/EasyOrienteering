@@ -42,3 +42,13 @@ label {
     color: $color-exito;
     margin: 10px auto;
 }
+
+.mensaje-error {
+    width: 100%;
+    margin: 20px 0;
+    display: block;
+    padding: 15px 0;
+    text-align: center;
+    color: rgb(90, 0, 0);
+    background-color: rgb(255, 140, 140);
+}

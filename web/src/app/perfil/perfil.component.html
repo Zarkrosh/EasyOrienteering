@@ -14,27 +14,51 @@
 
         <div class="datos-usuario px-5 d-flex">
 
+
             <div class="col-sm d-flex">
-                <div class="col-4 mr-5">
 
-                    <h4>Nombre</h4>
-                    <h4 class="mt-5">Club</h4>
-                </div>
 
-                <div class="col-8">
-                    <div class="d-inline-flex">
-                        <input type="text" class="px-2" value="{{usuario.nombre}}" disabled />
-                        <button class="btn btn-primary ml-2"><i class="fa fa-edit m-0"></i></button>
-                    </div>
+                <table class="w-100 text-center">
+                    <tbody>
+                        <tr>
+                            <td><h4>Nombre</h4></td>
+                            <td>
+                                <div class="d-inline-flex">
+                                    <input #editorNombre type="text" class="px-2" value="{{usuario.nombre}}" [readonly]="!editandoNombre"
+                                        (dblclick)="editarNombre(true)" (keyup.enter)="editarNombre(false)" />
+                                    <button *ngIf="!editandoNombre" class="btn btn-primary ml-2" (click)="editarNombre(true)"><i class="fa fa-edit m-0"></i></button>
+                                    <button *ngIf="editandoNombre" class="btn btn-success ml-2" (click)="editarNombre(false)" [disabled]="cambiandoNombre">
+                                        <i *ngIf="!cambiandoNombre" class="fa fa-save m-0"></i>
+                                        <span *ngIf="cambiandoNombre" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
 
-                    <div class="d-inline-flex mt-5">
-                        <input type="text" class="px-2" value="{{usuario.club}}" disabled />
-                        <button class="btn btn-primary ml-2"><i class="fa fa-edit m-0"></i></button>
-                    </div>
-                </div>
+                        <tr>
+                            <td><h4>Club</h4></td>
+                            <td>
+                                <div class="d-inline-flex">
+                                    <input #editorClub type="text" class="px-2" value="{{usuario.club}}" [readonly]="!editandoClub"
+                                        (dblclick)="editarClub(true)" (keyup.enter)="editarClub(false)" />
+                                    <button *ngIf="!editandoClub" class="btn btn-primary ml-2" (click)="editarClub(true)"><i class="fa fa-edit m-0"></i></button>
+                                    <button *ngIf="editandoClub" class="btn btn-success ml-2" (click)="editarClub(false)" [disabled]="cambiandoClub">
+                                        <i *ngIf="!cambiandoClub" class="fa fa-save m-0"></i>
+                                        <span *ngIf="cambiandoClub" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        
+                    </tbody>
+                </table>
+
             </div>
-            <div class="col-sm">
-                <h4>Miembro desde: <span class="h5">{{usuario.fechaRegistro | fechaBonita}}</span></h4>
+            <div class="col-sm text-center pt-4">
+                <h5>Miembro desde el <b class="pl-2">{{usuario.fechaRegistro | fechaBonita}}</b></h5>
+
+                <button class="btn btn-primary mt-4" (click)="clickCambiarPassword()">Cambiar contraseña</button>
             </div>
         </div>
     
@@ -148,5 +172,38 @@
             <i class="fa fa-exclamation-triangle"></i>
             Sayonara, baby
         </button>
+    </div>
+</ng-template>
+
+
+<!-- Diálogo de confirmación de cambio de contraseña -->
+<ng-template #modalCambiarPass let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Cambiar contraseña</h5>
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form id="cambioPassForm" [formGroup]="cambioPassForm">
+            <div class="form-group px-5">
+                <label for="prevPass">Contraseña anterior</label>
+                <input id="prevPass" type="password" formControlName="prevPass" class="form-control" required/>
+            </div>
+            <div class="form-group px-5">
+                <label for="nuevaPass">Contraseña nueva</label>
+                <input id="nuevaPass" type="password" formControlName="nuevaPass" class="form-control" required/>
+            </div>
+            <div class="form-group px-5">
+                <label for="nuevaPassConf">Contraseña nueva (confirmación)</label>
+                <input id="nuevaPassConf" type="password" formControlName="nuevaPassConf" class="form-control" required/>
+            </div>
+
+            <i>La nueva contraseña debe tener al menos 8 caracteres de longitud</i>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="activeModal.close()" ngbAutofocus>Cancelar</button>
+        <button type="submit" class="btn btn-primary"    (click)="cambiarPassword()" [disabled]="cambioPassForm.invalid">Cambiar contraseña</button>
     </div>
 </ng-template>

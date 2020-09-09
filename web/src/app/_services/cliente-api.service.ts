@@ -16,6 +16,7 @@ export class ClienteApiService {
   // Autenticación
   private static readonly API_LOGIN = 'login/';
   private static readonly API_REGISTRO = 'register/';
+  private static readonly API_CAMBIO_PASS = 'change/';
   
 
   // Parámetros de la API
@@ -23,6 +24,9 @@ export class ClienteApiService {
   private static readonly PAR_EMAIL = 'email';
   private static readonly PAR_CLUB = 'club';
   private static readonly PAR_PASSWORD = 'password';
+  private static readonly PAR_PREV_PASS = 'prevPassword';
+  private static readonly PAR_NUEVA_PASS = 'nuevaPassword';
+  private static readonly PAR_CAMBIO = 'cambio';
 
 
   constructor(private http: HttpClient) { }
@@ -64,6 +68,17 @@ export class ClienteApiService {
     datos[ClienteApiService.PAR_EMAIL] = email;
     datos[ClienteApiService.PAR_CLUB] = club;
     datos[ClienteApiService.PAR_PASSWORD] = password;
+    // Cabeceras
+    const cabeceras = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(url, datos, {observe: 'response', headers: cabeceras});
+  }
+
+  cambiaPassword(prevPass: string, nuevaPass: string): Observable<HttpResponse<any>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_AUTH + ClienteApiService.API_CAMBIO_PASS;
+    // Contenido
+    var datos = {};
+    datos[ClienteApiService.PAR_PREV_PASS] = prevPass;
+    datos[ClienteApiService.PAR_NUEVA_PASS] = nuevaPass;
     // Cabeceras
     const cabeceras = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(url, datos, {observe: 'response', headers: cabeceras});
@@ -117,6 +132,11 @@ export class ClienteApiService {
     return this.http.get(url, {observe: 'response', responseType: 'blob'});
   }
 
+  getMapasCarrera(idCarrera: number): Observable<HttpResponse<any>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + idCarrera + '/mapas';
+    return this.http.get(url, {observe: 'response', responseType: 'blob'});
+  }
+
   getCarrerasOrganizadas(): Observable<HttpResponse<Carrera[]>> {
     let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_CARRERAS + 'organizadas';
     return this.http.get<Carrera[]>(url, {observe: 'response'});
@@ -139,6 +159,26 @@ export class ClienteApiService {
   getDatosUsuario(): Observable<HttpResponse<Usuario>> {
     let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_USUARIOS;
     return this.http.get<Usuario>(url, {observe: 'response'});
+  }
+
+  cambiaNombre(nombre: string): Observable<HttpResponse<Usuario>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_USUARIOS + "cambionombre";
+    // Contenido
+    var datos = {};
+    datos[ClienteApiService.PAR_CAMBIO] = nombre;
+    // Cabeceras
+    const cabeceras = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<Usuario>(url, datos, {observe: 'response', headers: cabeceras});
+  }
+  
+  cambiaClub(club: string): Observable<HttpResponse<Usuario>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_USUARIOS + "cambioclub";
+    // Contenido
+    var datos = {};
+    datos[ClienteApiService.PAR_CAMBIO] = club;
+    // Cabeceras
+    const cabeceras = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<Usuario>(url, datos, {observe: 'response', headers: cabeceras});
   }
 
 }

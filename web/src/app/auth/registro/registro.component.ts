@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from 'src/app/alert';
 import { ClienteApiService } from 'src/app/_services/cliente-api.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
+import { Utils } from 'src/app/_shared/utils';
 
 @Component({
   selector: 'app-registro',
@@ -17,7 +18,7 @@ export class RegistroComponent implements OnInit {
   registrado = false;
 
   errorNombreEmail: string;
-  errorGenerico: string;
+  mensajeError: string;
 
   @ViewChild("password", {static: false}) passField: ElementRef;
 
@@ -40,13 +41,13 @@ export class RegistroComponent implements OnInit {
       email: ['', Validators.required],
       nombre: ['', Validators.required],
       club: [''],
-      password: ['', Validators.required],
+      password: ['', Validators.minLength(8)],
       passwordConf: ['', Validators.required]
     }, {
       validator: this.checkPasswords 
     });
 
-    this.errorNombreEmail = this.errorGenerico = " ";
+    this.errorNombreEmail = this.mensajeError = "";
     this.registrado = this.cargando = false;
   }
 
@@ -56,7 +57,7 @@ export class RegistroComponent implements OnInit {
   onSubmit() {
     if(this.registroForm.invalid) return;
 
-    this.errorGenerico = ""; // Quita el posible mensaje de error anterior
+    this.mensajeError = ""; // Quita el posible mensaje de error anterior
     this.cargando = true;
     this.clienteApi.register(this.f.nombre.value, this.f.email.value, this.f.club.value, this.f.password.value).subscribe(
       resp => {
@@ -64,12 +65,12 @@ export class RegistroComponent implements OnInit {
           // Registro exitoso, muestra mensaje de confirmación
           this.registrado = true;
         } else {
-          this.errorGenerico = "'Error' al registrar la cuenta";
+          this.mensajeError = "'Error' al registrar la cuenta";
         }
         this.cargando = false;
       },
       err => {
-        this.errorGenerico = "Error inesperado. Vuélvelo a intentar de nuevo";
+        this.mensajeError = Utils.getMensajeError(err, "");
         this.cargando = false;
       }
     );

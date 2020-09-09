@@ -7,7 +7,7 @@ export class PipeFechaBonita implements PipeTransform {
     readonly MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 
     transform(value: string): string {
-        // Ejemplo de entrada: 03/09/2020 o 03-09-2020
+        // Ejemplo de entrada: 2020-09-03 o 2020/09/03
         let res = value; // Si hay error devuelve lo mismo
         
         let i = 0;
@@ -16,9 +16,9 @@ export class PipeFechaBonita implements PipeTransform {
                 // Se detecta delimitador
                 let campos = value.split(this.DELIMITADORES[i]);
                 if(campos.length == 3) {
-                    let dia = parseInt(campos[0]);
+                    let dia = parseInt(campos[2]);
                     let mes = parseInt(campos[1]);
-                    let anio = parseInt(campos[2]);
+                    let anio = parseInt(campos[0]);
 
                     if(!isNaN(dia) && !isNaN(mes) && !isNaN(anio) &&
                         mes > 0 && mes <= this.MESES.length) {

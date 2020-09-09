@@ -7,6 +7,7 @@ import * as QRCode from 'easyqrcodejs';
 import * as html2canvas from 'html2canvas';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
+import { TokenStorageService } from 'src/app/_services/token-storage.service';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
@@ -42,9 +43,15 @@ export class GenerarQRComponent implements OnInit {
   constructor(private route: ActivatedRoute,
     private router: Router,
     private clienteApi: ClienteApiService,
-    protected alertService: AlertService) { }
+    protected alertService: AlertService,
+    private tokenService: TokenStorageService) { }
 
   ngOnInit() {
+    if(!this.tokenService.isLoggedIn()) {
+      this.router.navigate(["/logout"]);
+      return;
+    }
+
     this.controles = [];
     this.secretos = new Map<string, string>();
     this.generandoPDF = false;

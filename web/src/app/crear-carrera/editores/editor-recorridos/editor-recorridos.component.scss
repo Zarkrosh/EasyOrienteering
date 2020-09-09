@@ -188,12 +188,19 @@ editor-trazado {
 .info-lateral {
     height: 400px; // Actúa como min-height con el grow 
     flex-grow: 1;
+    display: inline-flex;
+    flex-direction: column;
     margin-bottom: 20px;
     border: 2px solid black;
-    overflow-y: scroll;
+    //overflow-y: scroll;
 }
 
 /*********** INFO RECORRIDO ***********/
+.wrapper-recorrido {
+    height: 100%;
+    display: inline-flex;
+    flex-direction: column;
+}
 #acciones-recorrido {
     display: inline-flex;
     border-bottom: 2px solid black;
@@ -255,6 +262,9 @@ editor-trazado {
 }
 
 /********* CONTROLES RECORRIDO ***********/
+.contenido-recorrido {
+    overflow-y: auto;
+}
 .controles-recorrido {
     width: 100%;
     text-align: center;
@@ -282,6 +292,10 @@ editor-trazado {
 
 
 /******** INFO CONTROLES ***********/
+.info-controles {
+    flex: 1;
+    overflow-y: auto;
+}
 .info-controles h4 {
     margin-bottom: 0;
     padding: 8px 0;
@@ -323,6 +337,28 @@ editor-trazado {
 }
 .puntuacion-control-valor:focus {
     outline: none;
+}
+
+.puntuacion-control + button {
+    margin-left: 10px;
+}
+.puntuacion-control + button i {
+    margin: 0;
+}
+
+
+.wrapper-anadir-control {
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-top: 2px solid black;
+    padding: 16px 4px;
+}
+.input-control-score {
+    width: 80px;
+    text-align: center;
+    font-size: 1.5rem;
 }
 
 

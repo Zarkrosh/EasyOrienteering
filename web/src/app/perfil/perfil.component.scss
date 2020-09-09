@@ -4,6 +4,16 @@
     min-height: 200px;
     margin-bottom: 30px;
 }
+.datos-usuario table {
+    border-collapse: separate;
+    border-spacing: 1.5rem;
+}
+.datos-usuario input[readonly] {
+    color: inherit;
+    background: transparent;
+    border: none !important;
+    cursor: default;
+}
 
 .header-carreras {
     width: 100%;
