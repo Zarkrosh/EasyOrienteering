@@ -1,12 +1,12 @@
 package com.hergomsoft.easyoapi.models;
 
-public class Coordenadas {
+public class Coordenada {
     private float x;
     private float y;
 
-    public Coordenadas() {}
+    public Coordenada() {}
     
-    public Coordenadas(float x, float y) {
+    public Coordenada(float x, float y) {
         this.x = x;
         this.y = y;
     }

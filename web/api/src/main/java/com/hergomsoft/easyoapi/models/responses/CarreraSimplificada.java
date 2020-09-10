@@ -16,7 +16,7 @@ public class CarreraSimplificada {
     private Usuario organizador;
     private Float latitud;
     private Float longitud;
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date fecha;
     private List<Recorrido> recorridos;
     

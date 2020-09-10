@@ -1,7 +1,10 @@
 package com.hergomsoft.easyoapi.models;
 
+import com.hergomsoft.easyoapi.models.serializers.IdEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +15,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(	name = "usuarios", 
@@ -27,6 +31,8 @@ public class Usuario implements IdEntity {
     public static final int MINLEN_CLUB = 0;
     public static final int MAXLEN_PASS = 64;
     public static final int MINLEN_PASS = 8;
+    
+    public enum RolUsuario { USUARIO, ADMIN }
     
     @Id
     @Column(name = "ID")
@@ -51,15 +57,20 @@ public class Usuario implements IdEntity {
     @Temporal(TemporalType.DATE)
     @Column(name = "FECHA_REGISTRO", nullable = false)
     private Date fechaRegistro;
+    
+    @Type(type = "json")
+    @Column(name = "ROLES", columnDefinition = "json")
+    private Set<RolUsuario> roles = new HashSet<>();
 
     public Usuario() {}
 
-    public Usuario(String nombre, String email, String club, String password, Date fechaRegistro) {
+    public Usuario(String nombre, String email, String club, String password, Date fechaRegistro, Set<RolUsuario> roles) {
         this.nombre = nombre;
         this.email = email;
         this.club = club;
         this.password = password;
         this.fechaRegistro = fechaRegistro;
+        this.roles = roles;
     }
 
     public Long getId() {
@@ -108,6 +119,14 @@ public class Usuario implements IdEntity {
 
     public void setFechaRegistro(Date fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
+    }
+
+    public Set<RolUsuario> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RolUsuario> roles) {
+        this.roles = roles;
     }
     
 }

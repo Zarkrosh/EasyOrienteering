@@ -7,15 +7,12 @@ public class RegistroRequest {
     // Códigos de error asociados a una petición de registro
     public static final String ERROR_NO_EXISTE_CONTROL  = "REG-0"; // El código de control no se corresponde con ningún control de la carrera
     public static final String ERROR_ESCANEA_SALIDA     = "REG-1"; // Debe escanear una salida primero
-    public static final String ERROR_RECORRIDO_AJENO    = "REG-2"; // El recorrido indicado no pertenece a la carrera
-    public static final String ERROR_YA_CORRIDO         = "REG-3"; // El usuario ya ha corrido este recorrido
-    public static final String ERROR_SALIDA_RECORRIDO   = "REG-4"; // El control de salida no es el inicial del recorrido
-    public static final String ERROR_CONTROL_EQUIVOCADO = "REG-5"; // El control no es el siguiente en su recorrido
-    public static final String ERROR_YA_ACABADO         = "REG-6"; // No quedan más controles por registrar
-    public static final String ERROR_YA_REGISTRADO      = "REG-7"; // El usuario ya registrado el control (SCORE)
-    public static final String ERROR_SECRETO            = "REG-8"; // El secreto proporcionado no es correcto
-    public static final String ERROR_OTRO_RECORRIDO     = "REG-9"; // El usuario no está corriendo este recorrido
-    public static final String ERROR_ES_ORGANIZADOR     = "REG-10"; // El usuario es el organizador de la carrera
+    public static final String ERROR_YA_CORRIDO         = "REG-2"; // El usuario ya ha corrido este recorrido
+    public static final String ERROR_CONTROL_EQUIVOCADO = "REG-3"; // El control no es el siguiente en su recorrido
+    public static final String ERROR_YA_REGISTRADO      = "REG-4"; // El usuario ya registrado el control (SCORE)
+    public static final String ERROR_SECRETO            = "REG-5"; // El secreto proporcionado no es correcto
+    public static final String ERROR_OTRO_RECORRIDO     = "REG-6"; // El usuario no está corriendo este recorrido
+    public static final String ERROR_ES_ORGANIZADOR     = "REG-7"; // El usuario es el organizador de la carrera
     
     @NotNull
     private String codigo; // Código del control

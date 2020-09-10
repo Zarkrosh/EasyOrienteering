@@ -1,4 +1,4 @@
-package com.hergomsoft.easyoapi.repository;
+package com.hergomsoft.easyoapi.repositories;
 
 import com.hergomsoft.easyoapi.models.Recorrido;
 import org.springframework.data.jpa.repository.JpaRepository;

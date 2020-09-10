@@ -7,7 +7,7 @@ import javax.persistence.TemporalType;
 
 public class Registro {
 
-    String control;
+    private String control;
     
     //@CreationTimestamp
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

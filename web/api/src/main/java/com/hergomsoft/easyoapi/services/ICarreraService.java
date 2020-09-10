@@ -26,7 +26,7 @@ public interface ICarreraService {
      */
     List<CarreraSimplificada> buscaCarreras(long idUsuario, String nombre, String tipo, String modalidad, Pageable pageable);
     
-      /**
+    /**
      * Devuelve la carrera con el ID especificado, o null si no existe.
      * @param id Identificador de la carrera
      * @return Carrera o null
@@ -48,24 +48,12 @@ public interface ICarreraService {
     void editCarrera(Carrera anterior, Carrera nueva);
     
     /**
-     * Borra la carrera especificada de la base de datos.
-     * @param carrera Carrera a borrar
-     */
-    void deleteCarrera(Carrera carrera);
-    
-    /**
      * Borra la carrera con el identificador especificado de la base de datos.
      * @param id Identificador de la carrera
      * @return True si ha sido borrada, false si no
      */
     boolean deleteCarrera(long id);
     
-    /**
-     * Devuelve true si existe una carrera con el identificador especificado.
-     * @param id Identificador de la carrera
-     * @return True si existe
-     */
-    boolean existeCarrera(long id);
     
     /**
      * Devuelve true si el secreto proporcionado coincide con el calculado para el control.
@@ -75,6 +63,14 @@ public interface ICarreraService {
      * @return True si los secretos coinciden, false si no
      */
     boolean checkSecretoControl(String secreto, Control control, Carrera carrera);
+    
+    /**
+     * Devuelve true si el secreto proporcionado coincide con el calculado para el recorrido.
+     * @param secreto Secreto proporcionado
+     * @param recorrido Recorrido
+     * @return True si los secretos coinciden, false si no
+     */
+    boolean checkSecretoRecorrido(String secreto, Recorrido recorrido);
     
     /**
      * Devuelve un mapa con los secretos de los controles de una casrrera, los cuales 
@@ -118,10 +114,4 @@ public interface ICarreraService {
      */
     List<Carrera> getCarrerasOrganizadasUsuario(Usuario usuario);
     
-    /**
-     * Devuelve el recorrido con el ID especificado.
-     * @param id ID de recorrido
-     * @return Recorrido
-     */
-    Recorrido getRecorrido(long id);
 }

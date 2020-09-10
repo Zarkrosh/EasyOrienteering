@@ -6,8 +6,7 @@ import com.hergomsoft.easyoapi.models.Participacion;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.models.responses.CarreraSimplificada;
-import com.hergomsoft.easyoapi.repository.CarreraRepository;
-import com.hergomsoft.easyoapi.repository.RecorridoRepository;
+import com.hergomsoft.easyoapi.repositories.CarreraRepository;
 import com.hergomsoft.easyoapi.utils.Constants;
 import com.hergomsoft.easyoapi.utils.Utils;
 import com.hergomsoft.easyoapi.utils.Validators;
@@ -28,34 +27,33 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CarreraService implements ICarreraService {
 
     @Autowired
-    private CarreraRepository repoCarrera;
-    @Autowired
-    private RecorridoRepository repoRecorrido;
-    
+    private CarreraRepository carreraRepository;
     
     @Autowired
-    private IParticipacionService participacionesService;
+    private IRecorridoService recorridoService;
+    
+    @Autowired
+    private IParticipacionService participacionService;
     
     @Value("${easyo.carreras.secretgeneral}")
     private String secretCarreras; // Secreto guardado en el servidor
 
     @Override
     public List<Carrera> findAll() {
-        return (List<Carrera>) repoCarrera.findAll();
+        return (List<Carrera>) carreraRepository.findAll();
     }
     
     @Override
     public List<CarreraSimplificada> buscaCarreras(long idUsuario, String nombre, String tipo, String modalidad, Pageable pageable) {
         int offset = pageable.getPageSize() * pageable.getPageNumber();
         int size = pageable.getPageSize();
-        List<Carrera> carreras = repoCarrera.buscaCarreras(idUsuario, nombre.toUpperCase(), tipo.toUpperCase(), modalidad.toUpperCase(), offset, size);
+        List<Carrera> carreras = carreraRepository.buscaCarreras(idUsuario, nombre.toUpperCase(), tipo.toUpperCase(), modalidad.toUpperCase(), offset, size);
         List<CarreraSimplificada> simplificadas = new ArrayList<>();
         for(Carrera c : carreras) simplificadas.add(new CarreraSimplificada(c));
         return simplificadas;
@@ -64,7 +62,7 @@ public class CarreraService implements ICarreraService {
     @Override
     public Carrera getCarrera(long id) {
         try {
-            Optional<Carrera> res = repoCarrera.findById(id);
+            Optional<Carrera> res = carreraRepository.findById(id);
             return (res.isPresent()) ? res.get() : null;
         } catch(Exception e) {
             System.out.println("[!] Error al obtener la carrera con id " + id);
@@ -88,12 +86,12 @@ public class CarreraService implements ICarreraService {
             // TODO Evita guardar mapas en edición si no se han modificado (si son nulls).
 
             // Guarda la carrera general
-            Carrera res = repoCarrera.save(carrera);
+            Carrera res = carreraRepository.save(carrera);
             // Luego guarda los recorridos y controles que no son guardados en cascada
             List<Recorrido> gRecorridos = new ArrayList<>();
             for(Recorrido r : carrera.getRecorridos()) {
                 r.setCarrera(res);
-                gRecorridos.add(repoRecorrido.save(r));
+                gRecorridos.add(recorridoService.guardaRecorrido(r));
             }
             res.setRecorridos(gRecorridos);
             /*
@@ -117,7 +115,7 @@ public class CarreraService implements ICarreraService {
                 nueva.setSecret(anterior.getSecret());
                 // Comprueba datos válidos
                 checkDatosCarrera(nueva);
-                repoCarrera.save(nueva);
+                carreraRepository.save(nueva);
                 
                 // ¿Cambios en mapas?
                 //    Vacío para indicar que no se ha cambiado
@@ -147,28 +145,23 @@ public class CarreraService implements ICarreraService {
     }
     
     @Override
-    public void deleteCarrera(Carrera carrera) {
-        repoCarrera.delete(carrera);
-    }
-    
-    @Override
     public boolean deleteCarrera(long id) {
-        if(existeCarrera(id)) {
-            repoCarrera.deleteById(id);
+        if(carreraRepository.existsById(id)) {
+            carreraRepository.deleteById(id);
             return true;
         } else {
             return false;
         }
     }
-
-    @Override
-    public boolean existeCarrera(long id) {
-        return repoCarrera.existsById(id);
-    }
     
     @Override
     public boolean checkSecretoControl(String secreto, Control control, Carrera carrera) {
         return secreto.contentEquals(getSecretoControl(control, carrera));
+    }
+    
+    @Override
+    public boolean checkSecretoRecorrido(String secreto, Recorrido recorrido) {
+        return secreto.contentEquals(getSecretoRecorrido(recorrido));
     }
     
     @Override
@@ -181,7 +174,7 @@ public class CarreraService implements ICarreraService {
             if(control.getTipo() != Control.Tipo.SALIDA) {
                 // Resto : <CODIGO-CONTROL>|<SECRETO-CONTROL>
                 String secreto = getSecretoControl(control, carrera);
-                res.put(control.getCodigo(), String.format(Constants.FORMATO_QR_CONTROl, control.getCodigo(), secreto));
+                res.put(control.getCodigo(), String.format(Constants.FORMATO_QR_CONTROL, control.getCodigo(), secreto));
             } else {
                 salida = control;
             }
@@ -212,7 +205,7 @@ public class CarreraService implements ICarreraService {
     
     @Override
     public List<Carrera> getCarrerasParticipadasUsuario(Usuario usuario) {
-        List<Participacion> participaciones = participacionesService.getParticipacionesUsuario(usuario);
+        List<Participacion> participaciones = participacionService.getParticipacionesUsuario(usuario);
         Set<Carrera> set = new HashSet<>();
         for(Participacion p : participaciones) set.add(p.getRecorrido().getCarrera());
         return new ArrayList<>(set);
@@ -220,19 +213,7 @@ public class CarreraService implements ICarreraService {
 
     @Override
     public List<Carrera> getCarrerasOrganizadasUsuario(Usuario usuario) {
-        return repoCarrera.findByOrganizadorId(usuario.getId());
-    }
-    
-    @Override
-    public Recorrido getRecorrido(long id) {
-        try {
-            Optional<Recorrido> res = repoRecorrido.findById(id);
-            return (res.isPresent()) ? res.get() : null;
-        } catch(Exception e) {
-            System.out.println("[!] Error al obtener el recorrido con id " + id);
-            System.out.println(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al obtener el recorrido");
-        }
+        return carreraRepository.findByOrganizadorId(usuario.getId());
     }
     
     /**
@@ -258,8 +239,8 @@ public class CarreraService implements ICarreraService {
         int ano = calendar.get(Calendar.YEAR);
         Date minFecha = new Date(LocalDateTime.of(ano, mes, dia, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
         Date maxFecha = new Date(LocalDateTime.of(ano + 1, mes, dia, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
-        if(fecha != null && (fecha.before(minFecha) || fecha.after(maxFecha)))
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "La fecha debe ser como mínimo hoy y como máximo el año que viene.");
+        //if(fecha != null && (fecha.before(minFecha) || fecha.after(maxFecha)))
+        //    throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "La fecha debe ser como mínimo hoy y como máximo el año que viene.");
         
         // Controles
         if(carrera.getControles() == null || carrera.getControles().isEmpty()) 

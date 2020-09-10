@@ -1,4 +1,4 @@
-package com.hergomsoft.easyoapi.repository;
+package com.hergomsoft.easyoapi.repositories;
 
 import java.util.Optional;
 

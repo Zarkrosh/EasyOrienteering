@@ -1,4 +1,4 @@
-package com.hergomsoft.easyoapi.models;
+package com.hergomsoft.easyoapi.models.serializers;
 
 public interface IdEntity {
     Long id = -1l;

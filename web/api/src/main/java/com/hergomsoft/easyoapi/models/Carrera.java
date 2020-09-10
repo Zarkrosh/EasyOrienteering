@@ -1,5 +1,6 @@
 package com.hergomsoft.easyoapi.models;
 
+import com.hergomsoft.easyoapi.models.serializers.IdEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -28,7 +29,7 @@ import org.hibernate.annotations.Type;
 @Table(name = "carreras")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Carrera implements IdEntity {
-    public static final int MAX_LEN_NOMBRE = 64;
+    public static final int MAX_LEN_NOMBRE = 100;
     public static final int MIN_LEN_NOMBRE = 5;
     public static final int MAX_LEN_NOTAS = 1000;
     
@@ -74,15 +75,12 @@ public class Carrera implements IdEntity {
     
     @Temporal(TemporalType.DATE)
     @Column(name = "FECHA", nullable = true)
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date fecha;
     
     @OneToMany(mappedBy = "carrera", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Recorrido> recorridos = new ArrayList<>();
     
-    // No se utiliza cascada
-    //@OneToMany(fetch = FetchType.EAGER, mappedBy = "carrera")
-    //@MapKey(name = "codigo")
     @Type(type = "json")
     @Column(name = "CONTROLES", columnDefinition = "json")
     private Map<String, Control> controles = new HashMap<>();

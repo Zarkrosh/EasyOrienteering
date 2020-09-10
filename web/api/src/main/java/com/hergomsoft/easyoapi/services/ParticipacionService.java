@@ -4,8 +4,7 @@ import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Participacion;
 import com.hergomsoft.easyoapi.models.Usuario;
-import com.hergomsoft.easyoapi.repository.ParticipacionRepository;
-import com.hergomsoft.easyoapi.repository.RecorridoRepository;
+import com.hergomsoft.easyoapi.repositories.ParticipacionRepository;
 import com.hergomsoft.easyoapi.utils.MessageException;
 import java.util.List;
 import java.util.Objects;
@@ -19,40 +18,39 @@ import org.springframework.web.server.ResponseStatusException;
 public class ParticipacionService implements IParticipacionService {
 
     @Autowired
-    private ParticipacionRepository repoParticipacion;
+    private ParticipacionRepository participacionRepository;
 
     @Autowired
-    private RecorridoRepository repoRecorrido;
+    private RecorridoService recorridoService;
 
     
     @Override
     public List<Participacion> findAll() {
-        return (List<Participacion>) repoParticipacion.findAll();
+        return (List<Participacion>) participacionRepository.findAll();
     }
 
     @Override
     public List<Participacion> getParticipacionesRecorrido(Recorrido recorrido) {
-        return repoParticipacion.findByRecorrido(recorrido);
+        return participacionRepository.findByRecorrido(recorrido);
     }
 
     @Override
     public List<Participacion> getParticipacionesUsuario(Usuario corredor) {
-        return repoParticipacion.findByCorredorOrderByFechaInicioDesc(corredor);
+        return participacionRepository.findByCorredorOrderByFechaInicioDesc(corredor);
     }
 
     @Override
     public Participacion getParticipacionUsuarioRecorrido(Usuario corredor, Recorrido recorrido) {
-        Optional<Participacion> participacion = repoParticipacion.getParticipacionUsuarioRecorrido(corredor.getId(), recorrido.getId());
+        Optional<Participacion> participacion = participacionRepository.getParticipacionUsuarioRecorrido(corredor.getId(), recorrido.getId());
         return (participacion.isPresent()) ? participacion.get() : null;
     }
 
     @Override
     public Recorrido getRecorridoPendiente(Usuario corredor) {
         Recorrido res = null;
-        Optional<Long> idPendiente = repoParticipacion.getRecorridoPendienteCorredor(corredor.getId());
+        Optional<Long> idPendiente = participacionRepository.getRecorridoPendienteCorredor(corredor.getId());
         if(idPendiente.isPresent()) {
-            Optional<Recorrido> rec = repoRecorrido.findById(idPendiente.get());
-            res = (rec.isPresent()) ? rec.get() : null;
+            res = recorridoService.getRecorrido(idPendiente.get());
         }
         
         return res;
@@ -62,7 +60,7 @@ public class ParticipacionService implements IParticipacionService {
     public void abandonaRecorridoUsuario(Usuario corredor, Recorrido recorrido) throws MessageException {
         Recorrido pendiente = getRecorridoPendiente(corredor);
         if(Objects.equals(pendiente.getId(), recorrido.getId())) {
-            repoParticipacion.abandonaRecorrido(corredor.getId(), recorrido.getId());
+            participacionRepository.abandonaRecorrido(corredor.getId(), recorrido.getId());
         } else {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No puedes abandonar un recorrido que no tienes pendiente de acabar.");
         }
@@ -71,7 +69,7 @@ public class ParticipacionService implements IParticipacionService {
     @Override
     public Participacion guardaParticipacion(Participacion participacion) {
         if(participacion != null) {
-            return repoParticipacion.save(participacion);
+            return participacionRepository.save(participacion);
         } else {
             throw new IllegalArgumentException("La participación a guardar no puede ser null");
         }
@@ -79,12 +77,12 @@ public class ParticipacionService implements IParticipacionService {
     
     @Override
     public boolean haParticipadoEnRecorrido(Usuario usuario, Recorrido recorrido) {
-        return repoParticipacion.haParticipadoEnRecorrido(usuario.getId(), recorrido.getId());
+        return participacionRepository.haParticipadoEnRecorrido(usuario.getId(), recorrido.getId());
     }
     
     @Override
     public boolean haParticipadoEnCarrera(Usuario usuario, Carrera carrera) {
-        return repoParticipacion.haParticipadoEnCarrera(usuario.getId(), carrera.getId());
+        return participacionRepository.haParticipadoEnCarrera(usuario.getId(), carrera.getId());
     }
 
 }

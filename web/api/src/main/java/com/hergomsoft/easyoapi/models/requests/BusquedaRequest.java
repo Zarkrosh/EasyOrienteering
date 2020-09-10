@@ -1,14 +1,14 @@
 package com.hergomsoft.easyoapi.models.requests;
 
-public class BusquedaCarrerasRequest {
+public class BusquedaRequest {
     private String nombre;
     private String tipo;
     private String modalidad;
 
-    public BusquedaCarrerasRequest() {
+    public BusquedaRequest() {
     }
 
-    public BusquedaCarrerasRequest(String nombre, String tipo, String modalidad) {
+    public BusquedaRequest(String nombre, String tipo, String modalidad) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.modalidad = modalidad;

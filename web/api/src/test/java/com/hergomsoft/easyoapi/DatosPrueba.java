@@ -2,7 +2,7 @@ package com.hergomsoft.easyoapi;
 
 import com.hergomsoft.easyoapi.models.Carrera;
 import com.hergomsoft.easyoapi.models.Control;
-import com.hergomsoft.easyoapi.models.Coordenadas;
+import com.hergomsoft.easyoapi.models.Coordenada;
 import com.hergomsoft.easyoapi.models.Participacion;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Registro;
@@ -11,7 +11,6 @@ import com.hergomsoft.easyoapi.services.CarreraService;
 import com.hergomsoft.easyoapi.services.ParticipacionService;
 import com.hergomsoft.easyoapi.services.UsuarioService;
 import com.hergomsoft.easyoapi.utils.Constants;
-import com.hergomsoft.easyoapi.utils.Utils;
 import com.thedeanda.lorem.LoremIpsum;
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,6 +33,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.jdbc.Sql;
 
 @SpringBootTest
@@ -44,6 +44,8 @@ public class DatosPrueba {
     CarreraService carrerasService;
     @Autowired
     ParticipacionService participacionService;
+    @Autowired
+    PasswordEncoder encoder;
     
     final int NUMERO_USUARIOS = 100;
     final int NUMERO_CARRERAS_EVENTO = 50;
@@ -56,6 +58,8 @@ public class DatosPrueba {
     final int MAX_CONTROLES = 40;
     final int MIN_CONTROLES_RECORRIDO = 10;
     final int MAX_CONTROLES_RECORRIDO = 24;
+    final int MIN_CONTROLES_SCORE = 8;
+    final int MAX_CONTROLES_SCORE = 16;
     final int MAX_RECORRIDOS = 6;
     final float PROBABILIDAD_EVENTO_PRIVADO = 0.3f;
     final float PROBABILIDAD_NOTAS = 0.7f;
@@ -100,10 +104,12 @@ public class DatosPrueba {
             if(random.nextFloat() <= PROBABILIDAD_CLUB) {
                 club = getStringAleatoria(clubes);
             }
-            String pass = Utils.sha256(Utils.cadenaAleatoria(LARGO_PASSWORD));
+            String pass = encoder.encode(username);
             Date fechaRegistro = new Date(ThreadLocalRandom.current()
                               .nextLong(MIN_RANDOM_DATE.getTime(), MAX_RANDOM_DATE.getTime()));
-            Usuario usuario = new Usuario(username, email, club, pass, fechaRegistro);
+            Set<Usuario.RolUsuario> roles = new HashSet<>();
+            roles.add(Usuario.RolUsuario.USUARIO);
+            Usuario usuario = new Usuario(username, email, club, pass, fechaRegistro, roles);
             usuariosGenerados.add( usuariosService.saveUsuario(usuario) );
         }
         
@@ -166,33 +172,45 @@ public class DatosPrueba {
             } else {
                 // SCORE
                 List<Control> controles = new ArrayList<>(carrera.getControles().values());
+                Recorrido recScore = carrera.getRecorridos().get(0);
                 Collections.shuffle(usuariosGenerados);
                 for(int i = 0; i < numeroCorredores; i++) {
-                    Participacion participacion = new Participacion();
+                    Participacion participacion = new Participacion(usuariosGenerados.get(i), recScore);
                     Collections.shuffle(controles);
                     List<Control> registrados = new ArrayList<>();
                     if(getFloatAleatorio(0, 1) <= PROBABILIDAD_FULL_SCORE) {
                         // Registra todos los controles
-                        registrados = controles;
+                        for(Control c : controles) {
+                            if(c.getTipo() == Control.Tipo.CONTROL) registrados.add(c);
+                        }
                     } else {
                         // Registra algunos controles
                         int numeroRegistrados = getIntAleatorio((int)(controles.size() * MIN_PORCENTAJE_COMPLETITUD_SCORE), controles.size() - 1);
                         for(int j = 0; j < numeroRegistrados; j++) {
-                            registrados.add(controles.get(j));
+                            Control c = controles.get(j);
+                            if(c.getTipo() == Control.Tipo.CONTROL) registrados.add(c);
                         }
                     }
                     
                     // Todos los usuarios registran la salida a la misma hora
-                    // TODO
+                    Registro regSalida = new Registro(Constants.CODIGO_SALIDA, fechaSalida);
+                    participacion.getRegistros().add(regSalida);
                     
-                    // Registran con tiempos aleatorios sus controles + meta
-                    // TODO
-                    
-                    
-                    //corredores.add(usuariosGenerados.get(i));
+                    // Registran con tiempos aleatorios sus controles
+                    long millisAcum = 0;
+                    Collections.shuffle(registrados);
+                    for(Control c : registrados) {
+                        millisAcum += getIntAleatorio(MIN_TIEMPO_PARCIAL, MAX_TIEMPO_PARCIAL) * 1000;
+                        Date fechaRegistro = new Date(fechaSalida.getTime() + millisAcum);
+                        Registro registro = new Registro(c.getCodigo(), fechaRegistro);
+                        participacion.getRegistros().add(registro);
+                    }
+                    // Meta
+                    participacion.getRegistros().add(new Registro(Constants.CODIGO_META, new Date(fechaSalida.getTime() + millisAcum + 20000))); // 20s sprint
+                    participacion.setFechaInicio(participacion.getRegistros().get(0).getFecha());
+                    participacion.setPendiente(false);
+                    participacionService.guardaParticipacion(participacion);
                 }
-                
-                // TODO
             }
         }
     }
@@ -217,8 +235,10 @@ public class DatosPrueba {
         
         // Controles
         Map<String, Control> controles = new HashMap<>();
-        Coordenadas coordsFake = null;
-        int nControles = getIntAleatorio(MIN_CONTROLES, MAX_CONTROLES);
+        Coordenada coordsFake = null;
+        int nControles;
+        if(modalidad == Carrera.Modalidad.SCORE) nControles = getIntAleatorio(MIN_CONTROLES_SCORE, MAX_CONTROLES_SCORE);
+        else nControles = getIntAleatorio(MIN_CONTROLES, MAX_CONTROLES);
         controles.put(Constants.CODIGO_SALIDA, new Control(Constants.CODIGO_SALIDA, Control.Tipo.SALIDA, 0, coordsFake));
         controles.put(Constants.CODIGO_META, new Control(Constants.CODIGO_META, Control.Tipo.META, 0, coordsFake));
         for(int j = 0; j < nControles; j++) {
@@ -250,6 +270,9 @@ public class DatosPrueba {
                 trazado.add(Constants.CODIGO_META);
                 recorridos.add(new Recorrido(nombreRecorrido, trazado, null));
             }
+        } else {
+            // Las carreras SCORE solo tienen un recorrido
+            recorridos.add(new Recorrido(Constants.RECORRIDO_SCORE, new ArrayList<>(), null));
         }
 
         Carrera carrera = new Carrera(nombre, tipoCarrera, modalidad, organizador, latitud, longitud, privada, recorridos, controles, notas);

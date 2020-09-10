@@ -12,9 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.Authentication;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,34 +38,34 @@ import org.springframework.web.server.ResponseStatusException;
 public class CarrerasController {
     
     @Autowired
-    private ICarreraService carrerasService;
+    private ICarreraService carreraService;
     
     @Autowired
-    private IUsuarioService usuariosService;
+    private IUsuarioService usuarioService;
     
     @Autowired
-    private IParticipacionService participacionesService;
+    private IParticipacionService participacionService;
     
     @GetMapping("/participadas")
-    public List<CarreraSimplificada> getCarrerasParticipadasUsuario() {
-        Usuario usuario = usuariosService.getUsuarioPeticion();
-        List<Carrera> participadas = carrerasService.getCarrerasParticipadasUsuario(usuario);
+    public List<CarreraSimplificada> getCarrerasParticipadasUsuario(Authentication authentication) {
+        Usuario usuario = usuarioService.getUsuarioPeticion(authentication);
+        List<Carrera> participadas = carreraService.getCarrerasParticipadasUsuario(usuario);
         List<CarreraSimplificada> simplificadas = new ArrayList<>();
         for(Carrera c : participadas) simplificadas.add(new CarreraSimplificada(c));
         return simplificadas;
     }
     
     @GetMapping("/organizadas")
-    public List<CarreraSimplificada> getCarrerasOrganizadasUsuario() {
-        Usuario usuario = usuariosService.getUsuarioPeticion();
-        List<Carrera> organizadas = carrerasService.getCarrerasOrganizadasUsuario(usuario);
+    public List<CarreraSimplificada> getCarrerasOrganizadasUsuario(Authentication authentication) {
+        Usuario usuario = usuarioService.getUsuarioPeticion(authentication);
+        List<Carrera> organizadas = carreraService.getCarrerasOrganizadasUsuario(usuario);
         List<CarreraSimplificada> simplificadas = new ArrayList<>();
         for(Carrera c : organizadas) simplificadas.add(new CarreraSimplificada(c));
         return simplificadas;
     }
     
     @GetMapping("/buscar")
-    public List<CarreraSimplificada> buscaCarreras(
+    public List<CarreraSimplificada> buscaCarreras(Authentication authentication,
             @Nullable @RequestParam("nombre") String nombre, 
             @Nullable @RequestParam("tipo") String tipo, 
             @Nullable @RequestParam("modalidad") String modalidad,
@@ -75,25 +73,40 @@ public class CarrerasController {
         if(nombre == null) nombre = "";
         if(tipo == null) tipo = "";
         if(modalidad == null) modalidad = "";
-        long idUsuario = usuariosService.getUsuarioPeticion().getId();
-        return carrerasService.buscaCarreras(idUsuario, nombre, tipo, modalidad, pageable);
+        long idUsuario = -1;
+        try {
+            Usuario usuario = null;usuarioService.getUsuarioPeticion(authentication);
+            if(usuario != null) idUsuario = usuario.getId();
+        } catch(ResponseStatusException e) {
+            // No quiero que se tome en cuenta la excepción
+        }
+        return carreraService.buscaCarreras(idUsuario, nombre, tipo, modalidad, pageable);
     }
     
     @GetMapping("/{idCarrera}")
-    public Carrera getCarrera(@PathVariable long idCarrera) {
+    public Carrera getCarrera(Authentication authentication,
+            @PathVariable long idCarrera) {
         // TODO Si es privada solo pueden verlas los participantes y el organizador
-        Carrera res = carrerasService.getCarrera(idCarrera);
+        Carrera res = carreraService.getCarrera(idCarrera);
         if(res != null) {
             if(res.isPrivada()) {
                 // ¿Puede ver la carrera?
                 boolean permiso = false;
-                Usuario usuario = usuariosService.getUsuarioPeticion();
-                if(Objects.equals(usuario.getId(), res.getOrganizador().getId())) {
-                    // Es el organizador, puede acceder
-                    permiso = true;
-                } else if(participacionesService.haParticipadoEnCarrera(usuario, res)) {
-                    // Participante, puede acceder
-                    permiso = true;
+                Usuario usuario = null;
+                try {
+                    usuario = usuarioService.getUsuarioPeticion(authentication);
+                } catch(ResponseStatusException e) {
+                    // No quiero que se tome en cuenta la excepción aquí
+                }
+                
+                if(usuario != null) {
+                    if(Objects.equals(usuario.getId(), res.getOrganizador().getId())) {
+                        // Es el organizador, puede acceder
+                        permiso = true;
+                    } else if(participacionService.haParticipadoEnCarrera(usuario, res)) {
+                        // Participante, puede acceder
+                        permiso = true;
+                    }
                 }
                 
                 if(!permiso) {
@@ -112,30 +125,46 @@ public class CarrerasController {
     }
     
     @GetMapping("/{idCarrera}/mapas")
-    public void getMapasCarrera(@PathVariable long idCarrera, HttpServletResponse response) {
-        Carrera carrera = getCarrera(idCarrera);
-        Usuario usuario = usuariosService.getUsuarioPeticion();
-        if(Objects.equals(usuario.getId(), carrera.getId())) {
-            response.setContentType("application/zip");
-            response.setHeader("Content-Disposition", "attachment; filename=mapas.zip");
+    public void getMapasCarrera(Authentication authentication,
+            @PathVariable long idCarrera, HttpServletResponse response) {
+        
+        Carrera carrera = getCarrera(authentication, idCarrera);
+        Usuario usuario = usuarioService.getUsuarioPeticion(authentication);
+        if(Objects.equals(usuario.getId(), carrera.getOrganizador().getId())) {
+            // Comprueba si tiene mapas
+            boolean hayMapas = false;
+            int i = 0;
+            while(!hayMapas && i < carrera.getRecorridos().size()) {
+                byte[] mapa = carrera.getRecorridos().get(i).getMapa();
+                hayMapas = (mapa != null && mapa.length > 0);
+                i++;
+            }
+            
+            if(hayMapas) {
+                response.setContentType("application/zip");
+                response.setHeader("Content-Disposition", "attachment; filename=mapas.zip");
 
-            try (ZipOutputStream zippedOut = new ZipOutputStream(response.getOutputStream())) {
-                for(Recorrido r : carrera.getRecorridos()) {
-                    ZipEntry e = new ZipEntry(r.getNombre() + ".jpg");
-                    byte[] mapa = r.getMapa();
-                    e.setSize(mapa.length);
-                    e.setTime(System.currentTimeMillis());
-                    zippedOut.putNextEntry(e);
-                    StreamUtils.copy(mapa, zippedOut);
-                    zippedOut.closeEntry();
-                }
+                try (ZipOutputStream zippedOut = new ZipOutputStream(response.getOutputStream())) {
+                    for(Recorrido r : carrera.getRecorridos()) {
+                        ZipEntry e = new ZipEntry(r.getNombre() + ".jpg");
+                        byte[] mapa = r.getMapa();
+                        e.setSize(mapa.length);
+                        e.setTime(System.currentTimeMillis());
+                        zippedOut.putNextEntry(e);
+                        StreamUtils.copy(mapa, zippedOut);
+                        zippedOut.closeEntry();
+                    }
 
-                zippedOut.finish();
-            } catch (Exception e) {
-                // Error inesperado
-                throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR, "Se ha producido un error al obtener los mapas.");
-            }  
+                    zippedOut.finish();
+                } catch (Exception e) {
+                    // Error inesperado
+                    throw new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR, "Se ha producido un error al obtener los mapas.");
+                }  
+            } else {
+                // No hay mapas
+                throw new ResponseStatusException(HttpStatus.NO_CONTENT, "No hay mapas");
+            }
         } else {
             // No tiene permiso -> 403
             throw new ResponseStatusException(
@@ -145,23 +174,24 @@ public class CarrerasController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Carrera nuevaCarrera(@RequestBody Carrera carrera) {
+    public Carrera creaCarrera(Authentication authentication, @RequestBody Carrera carrera) {
         // El creador de la carrera es el usuario que realiza la petición
-        //Usuario org = usuariosService.getUsuarioPeticion();
-        Usuario org = usuariosService.getUsuario(2L); // Usuario de prueba de creación
+        Usuario org = usuarioService.getUsuarioPeticion(authentication);
+        //Usuario org = usuarioService.getUsuario(2L); // Usuario de prueba de creación
         carrera.setOrganizador(org);
         
         // Crea la carrera
-        return carrerasService.saveCarrera(carrera);
+        return carreraService.saveCarrera(carrera);
     }
     
     @PutMapping("/{id}")
-    public void editarCarrera(@RequestBody Carrera carrera, @PathVariable long id) {
-        Usuario usuario = usuariosService.getUsuarioPeticion();
-        Carrera c = getCarrera(id);
+    public void editaCarrera(Authentication authentication,
+            @RequestBody Carrera carrera, @PathVariable long id) {
+        Usuario usuario = usuarioService.getUsuarioPeticion(authentication);
+        Carrera c = getCarrera(authentication, id);
         //if(Objects.equals(usuario.getId(), c.getOrganizador().getId())) {
         if(true) { // DEBUG
-            carrerasService.editCarrera(c, carrera);
+            carreraService.editCarrera(c, carrera);
         } else {
             // No es el organizador de la carrera
             throw new ResponseStatusException(
@@ -170,11 +200,12 @@ public class CarrerasController {
     }
     
     @DeleteMapping("/{id}")
-    public void borrarCarrera(@PathVariable long id) {
-        Usuario usuario = usuariosService.getUsuarioPeticion();
-        Carrera c = getCarrera(id);
+    public void borraCarrera(Authentication authentication,
+            @PathVariable long id) {
+        Usuario usuario = usuarioService.getUsuarioPeticion(authentication);
+        Carrera c = getCarrera(authentication, id);
         if(Objects.equals(usuario.getId(), c.getOrganizador().getId())) {
-            carrerasService.deleteCarrera(id);
+            carreraService.deleteCarrera(id);
         } else {
             // No es el organizador de la carrera
             throw new ResponseStatusException(
@@ -183,15 +214,16 @@ public class CarrerasController {
     }
     
     @GetMapping("/{id}/qr")
-    public Map<String, String> getControlesQRCarrera(@PathVariable long id) {
+    public Map<String, String> getControlesQRCarrera(Authentication authentication,
+            @PathVariable long id) {
         Map<String, String> res;
         
-        Usuario usuario = usuariosService.getUsuarioPeticion();
-        Carrera carrera = getCarrera(id);
+        Usuario usuario = usuarioService.getUsuarioPeticion(authentication);
+        Carrera carrera = getCarrera(authentication, id);
         // Solo es accesible por el organizador de la carrera
         //if(Objects.equals(usuario.getId(), carrera.getOrganizador().getId())) {
         if(true) { // DEBUG
-            res = carrerasService.getControlesConSecretosCarrera(carrera);
+            res = carreraService.getControlesConSecretosCarrera(carrera);
         } else {
             // No es el organizador de la carrera
             throw new ResponseStatusException(

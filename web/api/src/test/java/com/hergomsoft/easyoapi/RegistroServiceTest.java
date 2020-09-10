@@ -60,7 +60,7 @@ public class RegistroServiceTest {
     
     @Test
     void nuevoRecorrido() throws Exception {
-        Usuario usuario = new Usuario("asdf", "asdf", "asfd", "asdf", new Date());
+        Usuario usuario = new Usuario("asdf", "asdf", "asfd", "asdf", new Date(), null);
         List<Recorrido> recorridos = new ArrayList<>();
         List<String> trazado = new ArrayList<>();
         trazado.add("SALIDA");

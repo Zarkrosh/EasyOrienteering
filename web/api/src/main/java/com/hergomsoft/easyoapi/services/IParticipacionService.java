@@ -1,7 +1,6 @@
 package com.hergomsoft.easyoapi.services;
 
 import com.hergomsoft.easyoapi.models.Carrera;
-import com.hergomsoft.easyoapi.models.Control;
 import com.hergomsoft.easyoapi.models.Recorrido;
 import com.hergomsoft.easyoapi.models.Participacion;
 import com.hergomsoft.easyoapi.models.Usuario;
@@ -73,34 +72,5 @@ public interface IParticipacionService {
      * @return True si ha participado, false si no
      */
     boolean haParticipadoEnCarrera(Usuario usuario, Carrera carrera);
-    
-    /**
-     * Devuelve el código del siguiente que tiene que registrar un corredor
-     * en un recorrido en línea. Devuelve null si no quedan más controles por registrar.
-     * @param corredor Usuario corredor
-     * @param recorrido Recorrido
-     * @return Código del control o null
-     
-    String getCodigoSiguienteControlRecorrido(Usuario corredor, Recorrido recorrido);*/
-    
-    /**
-     * Devuelve true si el corredor ha registrado ya el control en una carrera score.
-     * @param corredor Usuario corredor
-     * @param control Control
-     * @param recorrido Recorrido
-     * @return True si ya lo ha registrado, false si no
-    
-    boolean haRegistradoControl(Usuario corredor, Control control, Recorrido recorrido); */
-    
-    /**
-     * Devuelve true si el corredor ha registrado ya alguno de los controles de
-     * un recorrido, y false en caso contrario.
-     * @param corredor Usuario corredor
-     * @param recorrido Recorrido 
-     * @return True o false
-   
-    boolean haCorridoRecorrido(Usuario corredor, Recorrido recorrido);  */
-    
-    
-   
+
 }

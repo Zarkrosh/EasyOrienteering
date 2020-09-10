@@ -8,11 +8,11 @@ public class Control {
     //@Enumerated(EnumType.STRING)
     private Tipo tipo;
     private Integer puntuacion;
-    private Coordenadas coords;
+    private Coordenada coords;
     
     public Control() {}
 
-    public Control(String codigo, Tipo tipo, Integer puntuacion, Coordenadas coords) {
+    public Control(String codigo, Tipo tipo, Integer puntuacion, Coordenada coords) {
         this.codigo = codigo;
         this.tipo = tipo;
         this.puntuacion = puntuacion;
@@ -43,11 +43,11 @@ public class Control {
         this.puntuacion = puntuacion;
     }
 
-    public Coordenadas getCoords() {
+    public Coordenada getCoords() {
         return coords;
     }
 
-    public void setCoords(Coordenadas coords) {
+    public void setCoords(Coordenada coords) {
         this.coords = coords;
     }
     

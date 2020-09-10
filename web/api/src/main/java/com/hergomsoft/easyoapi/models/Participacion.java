@@ -1,5 +1,6 @@
 package com.hergomsoft.easyoapi.models;
 
+import com.hergomsoft.easyoapi.models.serializers.IdEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import java.util.ArrayList;
@@ -40,10 +41,10 @@ public class Participacion implements IdEntity {
     private List<Registro> registros;
     
     @Column(name = "ABANDONADO")
-    private Boolean abandonado;
+    private boolean abandonado;
     
     @Column(name = "PENDIENTE")
-    private Boolean pendiente;
+    private boolean pendiente;
     
     @ManyToOne(optional = false)
     private Usuario corredor;
@@ -89,19 +90,19 @@ public class Participacion implements IdEntity {
         this.registros = registros;
     }
 
-    public Boolean getAbandonado() {
+    public boolean isAbandonado() {
         return abandonado;
     }
 
-    public void setAbandonado(Boolean abandonado) {
+    public void setAbandonado(boolean abandonado) {
         this.abandonado = abandonado;
     }
 
-    public Boolean getPendiente() {
+    public boolean isPendiente() {
         return pendiente;
     }
 
-    public void setPendiente(Boolean pendiente) {
+    public void setPendiente(boolean pendiente) {
         this.pendiente = pendiente;
     }
 
