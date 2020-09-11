@@ -13,12 +13,4 @@ public class RegistroRequest {
         this.codigo = codigo;
         this.secreto = secreto;
     }
-
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public String getSecreto() {
-        return secreto;
-    }
 }

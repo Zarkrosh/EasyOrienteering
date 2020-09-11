@@ -42,7 +42,8 @@ public class SplashActivity extends AppCompatActivity {
         // Comprueba primer inicio de la aplicación
         SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
         Intent intent;
-        boolean primerInicio = prefs.getBoolean(Constants.PREFS_PRIMER_INICIO, true);
+        //boolean primerInicio = prefs.getBoolean(Constants.PREFS_PRIMER_INICIO, true);
+        boolean primerInicio = false; // Bug. Comprobar setter del primer inicio al omitir
         if(primerInicio) {
             intent = new Intent(SplashActivity.this, ResumenActivity.class);
             intent.putExtra(Constants.EXTRA_VOLUNTARIO, false);

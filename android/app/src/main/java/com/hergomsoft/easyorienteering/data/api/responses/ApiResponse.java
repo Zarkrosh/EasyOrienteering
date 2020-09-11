@@ -1,5 +1,7 @@
 package com.hergomsoft.easyorienteering.data.api.responses;
 
+import com.google.gson.JsonSyntaxException;
+
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -19,6 +21,8 @@ public class ApiResponse<T> {
             sError = "No hay conexión con el servidor. Comprueba tu conexión e inténtalo de nuevo";
         } else if(error instanceof SocketTimeoutException) {
             sError = "Tiempo de espera agotado. Inténtalo de nuevo";
+        } else if(error instanceof JsonSyntaxException) {
+            sError = "Ocurrió un error al leer la respuesta del servidor";
         } else if(!error.getMessage().isEmpty()) {
             sError = error.getMessage();
         } else {

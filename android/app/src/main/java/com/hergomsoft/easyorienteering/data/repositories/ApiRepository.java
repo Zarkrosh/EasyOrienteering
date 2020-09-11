@@ -3,6 +3,9 @@ package com.hergomsoft.easyorienteering.data.repositories;
 import androidx.lifecycle.LiveData;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.internal.GsonBuildConfig;
 import com.hergomsoft.easyorienteering.data.api.ApiClient;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
@@ -26,12 +29,15 @@ public abstract class ApiRepository {
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor)
                 .addNetworkInterceptor(new StethoInterceptor())
                 .build();
+        Gson gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd HH:mm:ss")
+                .create();
 
         apiClient = new retrofit2.Retrofit.Builder()
                 .baseUrl(ApiClient.BASE_URL)
                 .client(client)
                 .addCallAdapterFactory(new LiveDataCallAdapterFactory())
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
                 .create(ApiClient.class);
     }
@@ -49,6 +55,7 @@ public abstract class ApiRepository {
             recurso.setError("No se ha podido contactar con el servidor (tiempo expirado)");
         } else {
             // TODO Manejar más errores concretos
+            //   - JSON deserialization
             recurso.setError("Error de conexión desconocido");
         }
 

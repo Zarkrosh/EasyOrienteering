@@ -99,6 +99,8 @@
     <string name="scan_pendiente_mensaje">Aún no has acabado el recorrido <b>%1$s</b> de la carrera <b>%2$s</b>. ¿Deseas reanudar o abandonar?</string>
     <string name="scan_pendiente_reanudar">Reanudar</string>
     <string name="scan_pendiente_abandonar">Abandonar</string>
+    <string name="scan_abandono_titulo">¿Abandonar recorrido?</string>
+    <string name="scan_abandono_seguir">Seguir</string>
     <string name="scan_escanea_triangulo">Escanea un triángulo de salida</string>
     <string name="scan_btn_vista_scan">SCAN</string>
     <string name="scan_btn_vista_mapa">MAPA</string>

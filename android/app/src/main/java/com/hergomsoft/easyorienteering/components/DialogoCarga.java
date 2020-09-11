@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,7 +36,10 @@ public class DialogoCarga extends AlertDialog {
 
     public DialogoCarga(Context context) {
         super(context);
+        init();
+    }
 
+    private void init() {
         View content = LayoutInflater.from(getContext()).inflate(R.layout.dialogo_carga, null);
         setView(content);
 

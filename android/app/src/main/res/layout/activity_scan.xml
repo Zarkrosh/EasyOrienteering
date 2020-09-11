@@ -13,47 +13,88 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-
         <!-- Vista de escaneo de QR -->
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <SurfaceView android:id="@+id/scan_cameraView"
+            <LinearLayout
+                android:id="@+id/scan_llmensaje"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="30dp"
+                android:paddingHorizontal="10dp"
+                android:background="@android:color/white"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/scan_mensaje_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Siguiente control"
+                    android:textColor="@android:color/black"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/scan_mensaje_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="Cualquiera"
+                    android:textColor="@android:color/black"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-            </SurfaceView>
-
-            <TextView android:id="@+id/scan_mensaje"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:text="@string/scan_escanea_triangulo"
-                android:textColor="@android:color/white"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
 
 
-            <!-- DEBUG Nº ESCANEOS -->
-            <TextView
-                android:id="@+id/testContador"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
-                android:layout_marginBottom="40dp"
-                android:textSize="25sp"
-                android:textColor="@android:color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                <SurfaceView android:id="@+id/scan_cameraView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                </SurfaceView>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <!--
+                <TextView android:id="@+id/scan_mensaje"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="40dp"
+                    android:text="@string/scan_escanea_triangulo"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                -->
 
+
+                <!-- DEBUG Nº ESCANEOS -->
+                <TextView
+                    android:id="@+id/testContador"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginBottom="40dp"
+                    android:textSize="25sp"
+                    android:textColor="@android:color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
 
 
         <!-- Vista de mapa -->

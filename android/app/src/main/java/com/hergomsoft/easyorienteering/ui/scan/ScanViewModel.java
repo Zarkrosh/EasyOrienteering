@@ -46,13 +46,12 @@ public class ScanViewModel extends AndroidViewModelConCarga {
 
     // Datos de control escaneado
     private String codigo;
-    private Long idCarrera;
     private Long idRecorrido;
     private String secreto;
+    private String ultimoEscaneado;
 
     // Repositorios
     private RegistroRepository registroRepository;
-    private CarreraRepository carreraRepository;
 
     // LiveDatas
     private LiveData<Recurso<Boolean>> peticionPendiente;
@@ -68,13 +67,13 @@ public class ScanViewModel extends AndroidViewModelConCarga {
     public ScanViewModel(Application app) {
         super(app);
         registroRepository = RegistroRepository.getInstance(app);
-        carreraRepository = CarreraRepository.getInstance(app);
         peticionPendiente = registroRepository.getPendienteResponse();
         registroResponse = registroRepository.getRegistroResponse();
         abandonoResponse = registroRepository.getAbandonoResponse();
         modoVista = new MutableLiveData<>(ModoVista.ESCANEO);
         modoEscaneo = new MutableLiveData<>(ModoEscaneo.INICIO_RECORRIDO);
         mapaResponse = new MediatorLiveData<>();
+        ultimoEscaneado = "";
     }
 
     public LiveData<Recurso<Boolean>> getCarreraPendienteResponse() { return peticionPendiente; }
@@ -90,14 +89,29 @@ public class ScanViewModel extends AndroidViewModelConCarga {
     public Recorrido getRecorridoActual() { return registroRepository.getRecorridoActual(); }
     public LiveData<Control> getSiguienteControl() { return registroRepository.getSiguienteControl(); }
 
+    /**
+     * Devuelve true si el nuevo escaneo es el mismo que el anterior.
+     * @param nuevoEscaneado Nuevo dato escaneado
+     * @return True si son el mismo, false si no
+     */
+    public boolean checkUltimoEscaneado(String nuevoEscaneado) {
+        boolean res = nuevoEscaneado.contentEquals(ultimoEscaneado);
+        this.ultimoEscaneado = nuevoEscaneado;
+        return res;
+    }
+    public void clearUltimoEscaneado() { this.ultimoEscaneado = ""; }
+
     public void alternarModoVista() {
-        switch (modoVista.getValue()) {
-            case MAPA:
-                modoVista.postValue(ModoVista.ESCANEO);
-                break;
-            case ESCANEO:
-                modoVista.postValue(ModoVista.MAPA);
-                break;
+        if(modoVista.getValue() != null) {
+            switch (modoVista.getValue()) {
+                case MAPA:
+                    modoVista.postValue(ModoVista.ESCANEO);
+                    break;
+                case ESCANEO:
+                default:
+                    modoVista.postValue(ModoVista.MAPA);
+                    break;
+            }
         }
     }
     public void pasaAModoCarrera() {
@@ -119,7 +133,7 @@ public class ScanViewModel extends AndroidViewModelConCarga {
      */
     public void confirmaInicioRecorrido() {
         actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.scan_carga_inicio));
-        registroRepository.iniciaRecorrido(codigo, idCarrera, idRecorrido, secreto);
+        registroRepository.iniciaRecorrido(codigo, idRecorrido, secreto);
     }
 
     public void cargaMapaRecorrido() {
@@ -174,11 +188,16 @@ public class ScanViewModel extends AndroidViewModelConCarga {
      */
     public boolean setDatosEscaneadoInicio(String escaneado) {
         codigo = Utils.getCodigoControlEscaneado(escaneado);
-        idCarrera = Utils.getIdentificadorCarreraEscaneado(escaneado);
         idRecorrido = Utils.getIdentificadorRecorridoEscaneado(escaneado);
         secreto = Utils.getSecretoControlEscaneado(escaneado);
 
-        return codigo != null && idCarrera != null && idRecorrido != null && secreto != null;
+        return codigo != null && idRecorrido != null && secreto != null;
+    }
+
+    public void resetDatos() {
+        registroRepository.resetDatos();
+        modoVista.setValue(ModoVista.ESCANEO);
+        modoEscaneo.setValue(ModoEscaneo.INICIO_RECORRIDO);
     }
 
     /**
