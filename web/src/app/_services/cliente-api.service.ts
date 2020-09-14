@@ -15,6 +15,7 @@ export class ClienteApiService {
   private static readonly BASE_USUARIOS = 'usuarios/';
   // Autenticación
   private static readonly API_LOGIN = 'login/';
+  private static readonly API_LOGOUT = 'logout/';
   private static readonly API_REGISTRO = 'register/';
   private static readonly API_CAMBIO_PASS = 'change/';
   
@@ -49,9 +50,10 @@ export class ClienteApiService {
     return this.http.post<any>(url, datos, {observe: 'response', headers: cabeceras});
   }
 
-  /**
-   * TODO Logout 
-   */
+  logout() : Observable<HttpResponse<any>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_AUTH + ClienteApiService.API_LOGOUT;
+    return this.http.post<any>(url, {observe: 'response'});
+  }
 
   /**
    * Realiza la petición de registro con los datos de un usuario.

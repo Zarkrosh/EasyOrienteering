@@ -24,7 +24,6 @@ export class RegistroComponent implements OnInit {
 
   constructor(
       private formBuilder: FormBuilder,
-      private route: ActivatedRoute,
       private router: Router,
       protected alertService: AlertService,
       private clienteApi: ClienteApiService,
@@ -65,7 +64,7 @@ export class RegistroComponent implements OnInit {
           // Registro exitoso, muestra mensaje de confirmación
           this.registrado = true;
         } else {
-          this.mensajeError = "'Error' al registrar la cuenta";
+          this.mensajeError = "Error al registrar la cuenta";
         }
         this.cargando = false;
       },

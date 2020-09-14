@@ -128,6 +128,7 @@ export class PerfilComponent implements OnInit {
             this.cambiandoNombre = this.editandoNombre = false;
           }, err => {
             this.alertService.error(Utils.getMensajeError(err, ""), this.alertOptions);
+            this.editorNombre.nativeElement.value = this.usuario.nombre;
             this.cambiandoNombre = this.editandoNombre = false;
           }
         );

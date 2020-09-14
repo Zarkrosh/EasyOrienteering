@@ -23,7 +23,6 @@ export class LoginComponent implements OnInit {
 
   constructor(
       private formBuilder: FormBuilder,
-      private route: ActivatedRoute,
       private router: Router,
       protected alertService: AlertService,
       private clienteApi: ClienteApiService,
@@ -33,7 +32,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     if(window.location.toString().indexOf(this.LOGOUT) > -1) {
       // Cierra sesión
-      // TODO Invalidar token en back-end
+      this.clienteApi.logout().subscribe(resp => {});
       this.tokenService.logout();
       this.navbarService.setLoggedInView(false);
       this.router.navigate(["/login"]);

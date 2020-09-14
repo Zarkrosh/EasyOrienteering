@@ -8,8 +8,7 @@ const USER_KEY = 'auth-user';
 })
 export class TokenStorageService {
 
-  logout(): void {
-    // TODO Invalidar token back-end
+  public logout(): void {
     window.localStorage.removeItem(TOKEN_KEY);
     window.localStorage.removeItem(USER_KEY);
   }
