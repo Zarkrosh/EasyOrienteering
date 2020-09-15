@@ -3,7 +3,9 @@ package com.hergomsoft.easyoapi.utils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
+import org.springframework.util.StringUtils;
 
 public class Utils {
     /**
@@ -67,5 +69,20 @@ public class Utils {
         } else {
             throw new IllegalArgumentException("Error al obtener el SHA-256. La cadena no puede ser null.");
         }
+    }
+    
+    /**
+     * Obtiene el token de la petición.
+     * @param request Petición
+     * @return Token (cadena) o null si no hay
+     */
+    public static String parseToken(HttpServletRequest request) {
+        String headerAuth = request.getHeader("Authorization");
+
+        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+            return headerAuth.substring(7, headerAuth.length());
+        }
+
+        return null;
     }
 }

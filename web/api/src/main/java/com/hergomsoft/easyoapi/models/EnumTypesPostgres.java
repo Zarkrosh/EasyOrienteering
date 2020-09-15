@@ -1,4 +1,4 @@
-package com.hergomsoft.easyoapi.models.serializers;
+package com.hergomsoft.easyoapi.models;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
