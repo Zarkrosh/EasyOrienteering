@@ -1,28 +1,24 @@
 package com.hergomsoft.easyorienteering.ui.detallescarrera;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.adapters.RecorridosDetallesAdapter;
-import com.hergomsoft.easyorienteering.data.model.Carrera;
-import com.hergomsoft.easyorienteering.data.model.Recorrido;
-import com.hergomsoft.easyorienteering.data.model.Recurso;
-import com.hergomsoft.easyorienteering.ui.perfil.PerfilActivity;
-import com.hergomsoft.easyorienteering.ui.resultados.ResultadosActivity;
-import com.hergomsoft.easyorienteering.util.BackableActivity;
+import com.hergomsoft.easyorienteering.adapters.OnItemListener;
+import com.hergomsoft.easyorienteering.adapters.RecorridosListAdapter;
 import com.hergomsoft.easyorienteering.components.DialogoCarga;
+import com.hergomsoft.easyorienteering.data.model.Carrera;
+import com.hergomsoft.easyorienteering.util.BackableActivity;
 import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.Resource;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 
 public class DetallesCarreraActivity extends BackableActivity {
@@ -33,9 +29,10 @@ public class DetallesCarreraActivity extends BackableActivity {
     TextView tipoCarrera;
     TextView modalidadCarrera;
     TextView organizadorCarrera;
+    TextView fechaCarrera;
 
-    ListView listaRecorridos;
-    RecorridosDetallesAdapter adapterRecorridos;
+    RecyclerView listaRecorridos;
+    RecorridosListAdapter adapterRecorridos;
 
     DialogoCarga dialogoCarga;
 
@@ -51,26 +48,20 @@ public class DetallesCarreraActivity extends BackableActivity {
         tipoCarrera = findViewById(R.id.detalles_tipo_carrera);
         modalidadCarrera = findViewById(R.id.detalles_modalidad_carrera);
         organizadorCarrera = findViewById(R.id.detalles_organizador_carrera);
-        listaRecorridos = findViewById(R.id.detalles_resultados);
+        fechaCarrera = findViewById(R.id.detalles_fecha_carrera);
+        listaRecorridos = findViewById(R.id.detalles_lista_recorridos);
 
         dialogoCarga = new DialogoCarga(this);
 
-        adapterRecorridos = new RecorridosDetallesAdapter(this, new ArrayList<>());
-        listaRecorridos.setAdapter(adapterRecorridos);
-        listaRecorridos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        adapterRecorridos = new RecorridosListAdapter(new OnItemListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Al clicar en un recorrido se visualizan sus resultados
-                Recorrido seleccionado = (Recorrido) parent.getItemAtPosition(position);
-                if(seleccionado != null) {
-                    Intent i = new Intent(DetallesCarreraActivity.this, ResultadosActivity.class);
-                    i.putExtra(Constants.EXTRA_ID_RECORRIDO, seleccionado.getId());
-                    startActivity(i);
-                } else {
-                    Toast.makeText(DetallesCarreraActivity.this, "Error", Toast.LENGTH_SHORT).show();
-                }
+            public void onItemClick(int position) {
+                Intent intent = new Intent(DetallesCarreraActivity.this, DetallesCarreraActivity.class);
+                intent.putExtra(Constants.EXTRA_ID_RECORRIDO, adapterRecorridos.getRecorridoSeleccionado(position).getId());
+                startActivity(intent);
             }
         });
+        listaRecorridos.setAdapter(adapterRecorridos);
 
         setupDialogoCarga();
         setupObservadores();
@@ -115,16 +106,10 @@ public class DetallesCarreraActivity extends BackableActivity {
                                 tipoCarrera.setText(carrera.getTipo().toString());
                                 modalidadCarrera.setText(carrera.getModalidad().toString());
                                 organizadorCarrera.setText(carrera.getOrganizador().getNombre());
+
+                                DateFormat format = DateFormat.getDateInstance();
+                                fechaCarrera.setText(format.format(carrera.getFecha()));
                                 adapterRecorridos.actualizaRecorridos(carrera.getRecorridos());
-                                // Al clicar en el organizador, se ve su perfil
-                                organizadorCarrera.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Intent i = new Intent(DetallesCarreraActivity.this, PerfilActivity.class);
-                                        i.putExtra(Constants.EXTRA_ID_USUARIO, carrera.getOrganizador().getId());
-                                        startActivity(i);
-                                    }
-                                });
 
                                 viewModel.ocultaDialogoCarga();
                             }

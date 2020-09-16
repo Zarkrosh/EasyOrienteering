@@ -1,15 +1,19 @@
 package com.hergomsoft.easyorienteering.data.repositories;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.hergomsoft.easyorienteering.data.api.requests.CambioRequest;
+import com.hergomsoft.easyorienteering.data.api.requests.LoginRequest;
+import com.hergomsoft.easyorienteering.data.api.requests.RegistroCuentaRequest;
 import com.hergomsoft.easyorienteering.data.api.responses.ApiResponse;
-import com.hergomsoft.easyorienteering.data.model.Recurso;
+import com.hergomsoft.easyorienteering.data.api.responses.LoginResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.MessageResponse;
 import com.hergomsoft.easyorienteering.data.model.Usuario;
 import com.hergomsoft.easyorienteering.data.persistence.EasyODatabase;
 import com.hergomsoft.easyorienteering.data.persistence.UsuarioDAO;
@@ -18,17 +22,24 @@ import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.NetworkBoundResource;
 import com.hergomsoft.easyorienteering.util.Resource;
 import com.hergomsoft.easyorienteering.util.SingleLiveEvent;
+import com.hergomsoft.easyorienteering.util.Utils;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class UsuarioRepository extends ApiRepository {
-    private SingleLiveEvent<Recurso<String>> cambioNombreResponse;
-    private SingleLiveEvent<Recurso<String>> cambioClubResponse;
+    private SingleLiveEvent<Resource<String>> loginState;           // Respuesta de login
+    private SingleLiveEvent<Resource<String>> registerState;        // Respuesta de registro
+    private SingleLiveEvent<Resource<String>> logoutState;          // Respuesta de logout
+    private SingleLiveEvent<Resource<String>> cambioNombreResponse;
+    private SingleLiveEvent<Resource<String>> cambioClubResponse;
 
     private UsuarioDAO usuarioDAO;
+
+    // If user credentials will be cached in local storage, it is recommended it be encrypted
+    private String tokenUsuarioConectado;
+    private Long idUsuarioConectado;
 
     // Singleton
     private static UsuarioRepository instance;
@@ -41,13 +52,23 @@ public class UsuarioRepository extends ApiRepository {
     }
 
     private UsuarioRepository(Context context) {
+        super(context);
         usuarioDAO = EasyODatabase.getInstance(context).getUsuarioDAO();
+        loginState = new SingleLiveEvent<>();
+        registerState = new SingleLiveEvent<>();
+        logoutState = new SingleLiveEvent<>();
         cambioNombreResponse = new SingleLiveEvent<>();
         cambioClubResponse = new SingleLiveEvent<>();
+
+
+        cargaDatosUsuarioConectado();
     }
 
-    public SingleLiveEvent<Recurso<String>> getCambioNombreResponse() { return cambioNombreResponse; }
-    public SingleLiveEvent<Recurso<String>> getCambioClubResponse() { return cambioClubResponse; }
+    public SingleLiveEvent<Resource<String>> getLoginState() { return loginState; }
+    public SingleLiveEvent<Resource<String>> getRegisterState() { return registerState; }
+    public SingleLiveEvent<Resource<String>> getLogoutState() { return logoutState; }
+    public SingleLiveEvent<Resource<String>> getCambioNombreResponse() { return cambioNombreResponse; }
+    public SingleLiveEvent<Resource<String>> getCambioClubResponse() { return cambioClubResponse; }
 
     public LiveData<Resource<Usuario>> getUsuario(long id) {
         return new NetworkBoundResource<Usuario, Usuario>(AppExecutors.getInstance(), true) {
@@ -84,18 +105,26 @@ public class UsuarioRepository extends ApiRepository {
         apiClient.cambiaNombreUsuario(cambio).enqueue(new Callback<Usuario>() {
             @Override
             public void onResponse(Call<Usuario> call, Response<Usuario> response) {
-                Recurso<String> recurso = new Recurso<>();
+                Resource<String> recurso;
                 if(response.isSuccessful() && response.body() != null) {
-                    recurso.setRecurso(response.body().getNombre());
-                    // Actualiza el dato del usuario en la BD local
+                    recurso = Resource.success(response.body().getNombre());
+                    // Actualiza datos del usuario en la BD local
                     AppExecutors.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
                             usuarioDAO.insertUsuario(response.body());
                         }
                     });
+                } else if(response.code() == 400) {
+                    // Datos inválidos
+                    MessageResponse messageResponse = Utils.deserializeMessageResponseFromError(response);
+                    if(messageResponse != null) {
+                        recurso = Resource.error(messageResponse.getMessage(), null);
+                    } else {
+                        recurso = Resource.error("Datos incorrectos", null);
+                    }
                 } else {
-                    recurso.setError("Error al cambiar el nombre");
+                    recurso = Resource.error("Error al cambiar el nombre", null);
                     // TODO Manejar causa error
                 }
 
@@ -114,10 +143,10 @@ public class UsuarioRepository extends ApiRepository {
         apiClient.cambiaClub(cambio).enqueue(new Callback<Usuario>() {
             @Override
             public void onResponse(Call<Usuario> call, Response<Usuario> response) {
-                Recurso<String> recurso = new Recurso<>();
+                Resource<String> recurso;
                 if(response.isSuccessful() && response.body() != null) {
-                    recurso.setRecurso(response.body().getClub());
-                    // Actualiza el dato del usuario en la BD local
+                    recurso = Resource.success(response.body().getClub());
+                    // Actualiza datos del usuario en la BD local
                     AppExecutors.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -125,7 +154,7 @@ public class UsuarioRepository extends ApiRepository {
                         }
                     });
                 } else {
-                    recurso.setError("Error al cambiar el club");
+                    recurso = Resource.error("Error al cambiar el club", null);
                     // TODO Manejar causa error
                 }
 
@@ -142,6 +171,147 @@ public class UsuarioRepository extends ApiRepository {
 
 
 
+
+
+    public boolean isLoggedIn() {
+        return idUsuarioConectado != null;
+    }
+
+    public void logout() {
+
+        apiClient.logoutUsuario().enqueue(new Callback<MessageResponse>() {
+            @Override
+            public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
+                Resource<String> recurso;
+                if(response.isSuccessful()) {
+                    recurso = Resource.success("");
+                    borraDatosUsuarioConectado();
+                } else {
+                    recurso = Resource.error("No se pudo cerrar la sesión", null);
+                }
+
+                logoutState.postValue(recurso);
+            }
+
+            @Override
+            public void onFailure(Call<MessageResponse> call, Throwable t) {
+                logoutState.postValue(Resource.error("No se pudo conectar con el servidor", null));
+            }
+        });
+    }
+
+    public void login(String username, String password) {
+        loginState.postValue(Resource.loading(null));
+
+        LoginRequest request = new LoginRequest(username, password);
+        apiClient.loginUsuario(request).enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                Resource<String> recurso;
+                if(response.isSuccessful()) {
+                    if (response.body() != null) {
+                        LoginResponse resp = response.body();
+                        idUsuarioConectado = resp.getId();
+                        tokenUsuarioConectado = resp.getToken();
+                        guardaDatosUsuario(resp.getId(), resp.getToken());
+                        recurso = Resource.success("");
+                    } else {
+                        recurso = Resource.error("Error inesperado en los datos", null);
+                    }
+                } else if(response.code() == 401) {
+                    // Credenciales inválidas
+                    recurso = Resource.error("Datos incorrectos", null);
+                } else {
+                    // Error desconocido
+                    recurso = Resource.error("Código de respuesta inesperado: " + response.code(), null);
+                }
+
+                loginState.postValue(recurso);
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
+                loginState.postValue(Resource.error("No se pudo conectar con el servidor", null));
+            }
+        });
+    }
+
+    public void register(String username, String email, String club, String password) {
+        registerState.postValue(Resource.loading(null));
+
+        RegistroCuentaRequest request = new RegistroCuentaRequest(username, email, club, password);
+        apiClient.registerUsuario(request).enqueue(new Callback<MessageResponse>() {
+            @Override
+            public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
+                Resource<String> recurso;
+                if(response.isSuccessful()) {
+                    recurso = Resource.success("");
+                } else if(response.code() == 400 || response.code() == 500) {
+                    // Algún dato inválido
+                    MessageResponse messageResponse = Utils.deserializeMessageResponseFromError(response);
+                    if(messageResponse != null) {
+                        recurso = Resource.error(messageResponse.getMessage(), null);
+                    } else {
+                        recurso = Resource.error("Datos incorrectos", null);
+                    }
+                } else {
+                    // Error desconocido
+                    recurso = Resource.error("Código de respuesta inesperado: " + response.code(), null);
+                }
+
+                registerState.postValue(recurso);
+            }
+
+            @Override
+            public void onFailure(Call<MessageResponse> call, Throwable t) {
+                registerState.postValue(Resource.error("No se pudo conectar con el servidor", null));
+            }
+        });
+    }
+
+    public long getIdUsuarioConectado() {
+        return idUsuarioConectado;
+    }
+    public String getTokenUsuarioConectado() {
+        return tokenUsuarioConectado;
+    }
+
+    private void guardaDatosUsuario(Long idUsuario, String tokenUsuario) {
+        this.idUsuarioConectado = idUsuario;
+        this.tokenUsuarioConectado = tokenUsuario;
+        // Guarda los datos en las SharedPreferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong(Constants.PREFS_ID_USUARIO, idUsuario);
+        editor.putString(Constants.PREFS_TOKEN_USUARIO, tokenUsuario);
+        editor.apply();
+    }
+
+    private void cargaDatosUsuarioConectado() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        long id = prefs.getLong(Constants.PREFS_ID_USUARIO, -1);
+        String token = prefs.getString(Constants.PREFS_TOKEN_USUARIO, "");
+        if(id != -1 && !token.isEmpty()) {
+            this.idUsuarioConectado = id;
+            this.tokenUsuarioConectado = token;
+        } else {
+            this.idUsuarioConectado = null;
+            this.tokenUsuarioConectado = null;
+        }
+    }
+
+    private void borraDatosUsuarioConectado() {
+        this.idUsuarioConectado = null;
+        this.tokenUsuarioConectado = null;
+        // Borra los datos de las SharedPreferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(Constants.PREFS_ID_USUARIO);
+        editor.remove(Constants.PREFS_TOKEN_USUARIO);
+        editor.apply();
+    }
+
+
     // TEST
     public void borraDatosUsuarios() {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
@@ -151,10 +321,5 @@ public class UsuarioRepository extends ApiRepository {
             }
         });
 
-    }
-
-    // TODO
-    public long getIdUsuarioConectado() {
-        return Constants.ID_USUARIO_PRUEBA;
     }
 }

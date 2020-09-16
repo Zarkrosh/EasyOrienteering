@@ -3,10 +3,14 @@ package com.hergomsoft.easyorienteering.data.api;
 import androidx.lifecycle.LiveData;
 
 import com.hergomsoft.easyorienteering.data.api.requests.CambioRequest;
+import com.hergomsoft.easyorienteering.data.api.requests.LoginRequest;
+import com.hergomsoft.easyorienteering.data.api.requests.RegistroCuentaRequest;
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroRequest;
 import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.ApiResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.InicioResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.LoginResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.MessageResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.ParticipacionesRecorridoResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
@@ -23,7 +27,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ApiClient {
-    String BASE_URL = "http://192.168.1.69:4200/api/";
+    String BASE_URL = "https://192.168.1.69:4200/api/";
     String MAPA_URL = "recorridos/mapa/"; // + idRecorrido
 
     // CARRERAS
@@ -47,6 +51,14 @@ public interface ApiClient {
     Call<InicioResponse> iniciaRecorrido(@Path("idRecorrido") long idRecorrido, @Body RegistroRequest registro);
     @POST("recorridos/abandonar/{idRecorrido}")
     Call<AbandonoResponse> abandonaRecorrido(@Path("idRecorrido") long idRecorrido);
+
+    // AUTENTICACIÓN
+    @POST("auth/login")
+    Call<LoginResponse> loginUsuario(@Body LoginRequest request);
+    @POST("auth/register")
+    Call<MessageResponse> registerUsuario(@Body RegistroCuentaRequest request);
+    @POST("auth/logout")
+    Call<MessageResponse> logoutUsuario();
 
     // USUARIOS
     @GET("usuarios/{id}")

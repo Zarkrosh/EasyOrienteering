@@ -72,6 +72,7 @@ public class DialogoCarga extends AlertDialog {
             public void onChanged(Integer integer) {
                 switch (integer) {
                     case ESTADO_CARGANDO:
+                        setCancelable(false);
                         progress.setVisibility(View.VISIBLE);
                         imagen.setVisibility(View.INVISIBLE);
                         btnDismiss.setVisibility(View.INVISIBLE);
@@ -81,6 +82,7 @@ public class DialogoCarga extends AlertDialog {
                         show();
                         break;
                     case ESTADO_EXITO:
+                        setCancelable(false);
                         progress.setVisibility(View.INVISIBLE);
                         imagen.setVisibility(View.VISIBLE);
                         btnDismiss.setVisibility(View.INVISIBLE);
@@ -91,6 +93,7 @@ public class DialogoCarga extends AlertDialog {
                         show();
                         break;
                     case ESTADO_ERROR:
+                        setCancelable(true);
                         progress.setVisibility(View.INVISIBLE);
                         imagen.setVisibility(View.VISIBLE);
                         btnDismiss.setVisibility(View.VISIBLE);

@@ -24,6 +24,7 @@
             android:visibility="visible"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="40dp">
+            <!--
 
             <ImageView
                 android:layout_width="45dp"
@@ -39,6 +40,8 @@
                 android:text="@string/conexion_cuenta_google"
                 android:textSize="20sp"
                 android:textColor="@android:color/black" />
+
+                -->
         </LinearLayout>
 
         <TextView

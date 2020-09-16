@@ -14,9 +14,9 @@
         android:layout_height="match_parent"
         android:layout_marginStart="20dp"
         android:gravity="start|center_vertical"
-        android:text="ASDF"
         android:textSize="18sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        tools:text="VI Liga Norte 2020" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -31,9 +31,9 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="ASDF"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="CIRCUITO"  />
 
         <TextView
             android:id="@+id/item_carreras_modalidad"
@@ -41,9 +41,9 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="ASDF"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="TRAZADO"  />
 
     </LinearLayout>
 

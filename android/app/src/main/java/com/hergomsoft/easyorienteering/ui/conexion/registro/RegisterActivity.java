@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -21,15 +22,19 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.data.model.ConexionState;
+import com.hergomsoft.easyorienteering.components.DialogoCarga;
+import com.hergomsoft.easyorienteering.ui.conexion.login.LoginActivity;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
-import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
+import com.hergomsoft.easyorienteering.util.Resource;
 import com.hergomsoft.easyorienteering.util.Utils;
 
 public class RegisterActivity extends BackableActivity {
 
+    private final int TIMEOUT_MENSAJE_EXITO = 2500;
+
     private EditText inputEmail;
     private EditText inputNombre;
+    private EditText inputClub;
     private EditText inputPassword;
     private ImageView fuerzaPass;
     private EditText inputPasswordConf;
@@ -50,12 +55,12 @@ public class RegisterActivity extends BackableActivity {
         super.onCreate(savedInstanceState);
         setTitle(getString(R.string.registro_titulo));
         setContentView(R.layout.activity_registrarse);
-        viewModel = ViewModelProviders.of(this, new RegisterViewModelFactory())
-                .get(RegisterViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(RegisterViewModel.class);
         activity = this;
 
         inputEmail = findViewById(R.id.registrarseEmail);
         inputNombre = findViewById(R.id.registrarseNombre);
+        inputClub = findViewById(R.id.registrarseClub);
         inputPassword = findViewById(R.id.registrarsePassword);
         fuerzaPass = findViewById(R.id.registrarseIndicadorPass);
         inputPasswordConf = findViewById(R.id.registrarsePasswordConf);
@@ -70,6 +75,22 @@ public class RegisterActivity extends BackableActivity {
         btnRegistrar.setEnabled(false); // Deshabilitado por defecto
         passConfError = false;
 
+        setupObservadores();
+        setupDialogoCarga();
+        setupListeners();
+    }
+
+    /**
+     * Configura el diálogo de uso general para operaciones de carga y notificaciones de éxito/error.
+     */
+    private void setupDialogoCarga() {
+        DialogoCarga dialogoCarga = new DialogoCarga(RegisterActivity.this);
+        dialogoCarga.setObservadorEstado(this, viewModel.getEstadoDialogo());
+        dialogoCarga.setObservadorTitulo(this, viewModel.getTituloDialogo());
+        dialogoCarga.setObservadorMensaje(this, viewModel.getMensajeDialogo());
+    }
+
+    private void setupObservadores() {
         // Habilita el envío de los datos si estos son válidos
         viewModel.getRegisterFormState().observe(this, new Observer<RegisterFormState>() {
             @Override
@@ -111,35 +132,37 @@ public class RegisterActivity extends BackableActivity {
         });
 
         // Muestra el diálogo de registro (o no) y sus mensajes
-        viewModel.getRegisterState().observe(this, new Observer<ConexionState>() {
+        viewModel.getRegisterState().observe(this, new Observer<Resource<String>>() {
             @Override
-            public void onChanged(ConexionState registerResult) {
-                switch (registerResult.getEstado()) {
-                    case ConexionState.ESTADO_CARGANDO:
-                        dialog.muestraMensajeRegistrando();
+            public void onChanged(Resource<String> registerResult) {
+                switch (registerResult.status) {
+                    case LOADING:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, getString(R.string.registro_registrando), null);
                         break;
-                    case ConexionState.ESTADO_EXITO_PRE:
+                    case SUCCESS:
                         // Muestra que el registro ha sido exitoso
-                        dialog.muestraMensajeExito();
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO, getString(R.string.registro_registrada), "Ahora puedes entrar a tu cuenta con estos datos");
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                viewModel.ocultaDialogoCarga();
+                                // Tras registro exitoso redirige a la pantalla principal
+                                startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                                finish();
+                            }
+                        }, TIMEOUT_MENSAJE_EXITO);
                         break;
-                    case ConexionState.ESTADO_EXITO_FIN:
-                        // Tras registro exitoso redirige a la pantalla principal
-                        startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
-                        finish();
+                    case ERROR:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.registro_error), registerResult.message);
                         break;
-                    case ConexionState.ESTADO_ERROR:
-                        Integer idMensaje = registerResult.getMensaje();
-                        String mensaje = "";
-                        if(idMensaje != null) mensaje = getString(idMensaje);
-                        dialog.muestraMensajeError(mensaje);
-                        break;
-                    case ConexionState.ESTADO_OCULTO:
                     default:
-                        dialog.dismiss();
+                        viewModel.ocultaDialogoCarga();
                 }
             }
         });
+    }
 
+    private void setupListeners() {
         // Cuando se modifica un campo de datos, se actualiza el modelo
         TextWatcher afterTextChangedListener = new TextWatcher() {
             @Override
@@ -218,9 +241,8 @@ public class RegisterActivity extends BackableActivity {
                 // Oculta teclado
                 Utils.hideKeyboard(activity);
 
-                Toast.makeText(RegisterActivity.this, "[TODO] Registrando cuenta...", Toast.LENGTH_SHORT).show();
-                viewModel.register(inputEmail.getText().toString(),
-                    inputNombre.getText().toString(), inputPassword.getText().toString());
+                viewModel.register(inputEmail.getText().toString(), inputNombre.getText().toString(),
+                        inputClub.getText().toString(), inputPassword.getText().toString());
             }
         });
     }

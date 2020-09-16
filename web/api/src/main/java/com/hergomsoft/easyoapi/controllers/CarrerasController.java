@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -70,6 +72,14 @@ public class CarrerasController {
             @Nullable @RequestParam("tipo") String tipo, 
             @Nullable @RequestParam("modalidad") String modalidad,
             Pageable pageable) {
+        // TEST
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(CarrerasController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
         if(nombre == null) nombre = "";
         if(tipo == null) tipo = "";
         if(modalidad == null) modalidad = "";

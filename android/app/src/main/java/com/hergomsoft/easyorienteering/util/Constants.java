@@ -4,12 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Constants {
-    // TEST TODO Borrar
-    public static final long ID_USUARIO_PRUEBA = 3;
-
     // SharedPreferences
     public static final String PREFS_NAME = "PrefsEasyO";
     public static final String PREFS_PRIMER_INICIO = "priminicio";
+    public static final String PREFS_ID_USUARIO = "idUsuario";
+    public static final String PREFS_TOKEN_USUARIO = "tokenUsuario";
 
     // Extras de intents
     public static final String EXTRA_EMAIL_NOMBRE = "EMAIL_NOMBRE";

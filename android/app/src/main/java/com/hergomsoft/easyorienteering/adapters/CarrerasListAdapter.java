@@ -1,7 +1,5 @@
 package com.hergomsoft.easyorienteering.adapters;
 
-import android.content.Context;
-import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +7,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hergomsoft.easyorienteering.R;
@@ -24,14 +21,14 @@ public class CarrerasListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private final int TIPO_CARGANDO = 1;
 
     private List<Carrera> carreras;
-    private OnCarreraListener carreraListener;
+    private OnItemListener carreraListener;
     private boolean cargando = false;
 
     public static class CarreraViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView nombre, tipo, modalidad;
-        OnCarreraListener carreraListener;
+        OnItemListener carreraListener;
 
-        public CarreraViewHolder(@NonNull View itemView, OnCarreraListener carreraListener) {
+        public CarreraViewHolder(@NonNull View itemView, OnItemListener carreraListener) {
             super(itemView);
             this.carreraListener = carreraListener;
 
@@ -42,14 +39,14 @@ public class CarrerasListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         public void bind(Carrera carrera) {
-            nombre.setText(carrera.getNombre());
-            tipo.setText(carrera.getTipo().name());
-            modalidad.setText(carrera.getModalidad().name());
+            if(carrera.getNombre() != null) nombre.setText(carrera.getNombre());
+            if(carrera.getTipo() != null) tipo.setText(carrera.getTipo().name());
+            if(carrera.getModalidad() != null) modalidad.setText(carrera.getModalidad().name());
         }
 
         @Override
         public void onClick(View v) {
-            carreraListener.onCarreraClick(getAdapterPosition());
+            carreraListener.onItemClick(getAdapterPosition());
         }
     }
 
@@ -63,7 +60,7 @@ public class CarrerasListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
-    public CarrerasListAdapter(OnCarreraListener carreraListener) {
+    public CarrerasListAdapter(OnItemListener carreraListener) {
         this.carreras = new ArrayList<>();
         this.carreraListener = carreraListener;
     }
@@ -89,7 +86,7 @@ public class CarrerasListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if(holder instanceof CarreraViewHolder) {
+        if(holder instanceof CarreraViewHolder && position < carreras.size()) {
             ((CarreraViewHolder) holder).bind(carreras.get(position));
         }
     }

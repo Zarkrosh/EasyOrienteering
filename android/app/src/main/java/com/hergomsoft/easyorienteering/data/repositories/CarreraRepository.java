@@ -40,6 +40,7 @@ public class CarreraRepository extends ApiRepository {
     }
 
     private CarreraRepository(Context context) {
+        super(context);
         carreraDAO = EasyODatabase.getInstance(context).getCarreraDAO();
     }
 

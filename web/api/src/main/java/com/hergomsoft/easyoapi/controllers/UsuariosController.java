@@ -2,11 +2,14 @@ package com.hergomsoft.easyoapi.controllers;
 
 import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.models.requests.CambioRequest;
+import com.hergomsoft.easyoapi.models.responses.MessageResponse;
 import com.hergomsoft.easyoapi.services.UsuarioService;
+import com.hergomsoft.easyoapi.utils.MessageException;
 import com.hergomsoft.easyoapi.utils.Validators;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,7 +57,7 @@ public class UsuariosController {
      * @param cambio Cambio con el nuevo nombre
      */
     @PostMapping("cambionombre")
-    public Usuario cambiaNombreUsuario(Authentication authentication,
+    public ResponseEntity<?> cambiaNombreUsuario(Authentication authentication,
             @Valid @RequestBody CambioRequest cambio) {
         Usuario usuario = usuarioService.getUsuarioPeticion(authentication);
         if(usuario != null) {
@@ -64,23 +67,25 @@ public class UsuariosController {
                     if(!usuarioService.existeNombreUsuario(nombre)) {
                         // Realiza el cambio
                         usuario.setNombre(nombre);
-                        return usuarioService.saveUsuario(usuario);
+                        return ResponseEntity.ok(usuarioService.saveUsuario(usuario));
                     } else {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nombre de usuario ya utilizado");
+                        return ResponseEntity.badRequest().body(new MessageResponse("Nombre de usuario ya utilizado", true));
                     }
                 } else {
                     // Largo no válido
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
-                            String.format("El nombre de usuario debe tener entre %d y %d caracteres.", 
-                                Usuario.MINLEN_NOMBRE, Usuario.MAXLEN_NOMBRE));
+                    return ResponseEntity.badRequest().body(
+                            new MessageResponse(
+                                    String.format("El nombre de usuario debe tener entre %d y %d caracteres.", 
+                                        Usuario.MINLEN_NOMBRE, Usuario.MAXLEN_NOMBRE), true)
+                    );
                 }
             } else {
                 // Nombre de usuario no válido
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nombre de usuario no válido");
+                return ResponseEntity.badRequest().body(new MessageResponse("Nombre de usuario no válido", true));
             }
         } else {
             // Error de autenticación
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         
     }

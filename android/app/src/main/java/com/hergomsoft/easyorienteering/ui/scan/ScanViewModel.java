@@ -54,9 +54,9 @@ public class ScanViewModel extends AndroidViewModelConCarga {
     private RegistroRepository registroRepository;
 
     // LiveDatas
-    private LiveData<Recurso<Boolean>> peticionPendiente;
-    private LiveData<Recurso<Registro>> registroResponse;
-    private LiveData<Recurso<AbandonoResponse>> abandonoResponse;
+    private LiveData<Resource<Boolean>> peticionPendiente;
+    private LiveData<Resource<Registro>> registroResponse;
+    private LiveData<Resource<AbandonoResponse>> abandonoResponse;
     // MutableLiveDatas
     private MutableLiveData<ModoVista> modoVista;
     private MutableLiveData<ModoEscaneo> modoEscaneo;
@@ -76,11 +76,9 @@ public class ScanViewModel extends AndroidViewModelConCarga {
         ultimoEscaneado = "";
     }
 
-    public LiveData<Recurso<Boolean>> getCarreraPendienteResponse() { return peticionPendiente; }
-    public LiveData<Recurso<Registro>> getRegistroResponse() {
-        return registroResponse;
-    }
-    public LiveData<Recurso<AbandonoResponse>> getAbandonoResponse() { return abandonoResponse; }
+    public LiveData<Resource<Boolean>> getCarreraPendienteResponse() { return peticionPendiente; }
+    public LiveData<Resource<Registro>> getRegistroResponse() { return registroResponse; }
+    public LiveData<Resource<AbandonoResponse>> getAbandonoResponse() { return abandonoResponse; }
     public LiveData<Resource<File>> getMapaResponse() { return mapaResponse; }
     public LiveData<ModoVista> getAlternadoVistas() { return modoVista; }
     public LiveData<ModoEscaneo> getModoEscaneo() { return modoEscaneo; }

@@ -102,13 +102,6 @@ public class AuthController {
     
     @PostMapping("/register")
     public ResponseEntity<?> registrarUsuario(@Valid @RequestBody RegistroCuentaRequest signupRequest) {
-        try {
-            // Delay a propósito
-            Thread.sleep(2000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(AuthController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
         // Comprueba de datos de entrada
         String nombre = signupRequest.getUsername().trim();
         String email = signupRequest.getEmail().trim();
@@ -117,17 +110,17 @@ public class AuthController {
         // TODO Comprobar charsets
         if(password.length() < Usuario.MINLEN_PASS) {
             return ResponseEntity.badRequest().body(
-                String.format("La contraseña debe tener al menos %d caracteres", Usuario.MINLEN_PASS)
+                new MessageResponse(String.format("La contraseña debe tener al menos %d caracteres", Usuario.MINLEN_PASS), true)
             );
         }
         
         // Comprueba usuario existente
         if(usuarioService.existeNombreUsuario(nombre)) {
-            return ResponseEntity.badRequest().body("Ya existe un usuario con ese nombre");
+            return ResponseEntity.badRequest().body(new MessageResponse("Ya existe un usuario con ese nombre", true));
         }
         // Comprueba email existente
         if(usuarioService.existeEmail(email)) {
-            return ResponseEntity.badRequest().body("Ya existe una cuenta asociada a este email");
+            return ResponseEntity.badRequest().body(new MessageResponse("Ya existe una cuenta asociada a este email", true));
         }
         
         // Crea cuenta de usuario

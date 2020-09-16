@@ -1,9 +1,5 @@
 package com.hergomsoft.easyorienteering.ui.configuracion;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,14 +13,16 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.data.model.Recurso;
+import com.hergomsoft.easyorienteering.components.DialogoCarga;
 import com.hergomsoft.easyorienteering.data.model.Usuario;
-import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
-import com.hergomsoft.easyorienteering.ui.perfil.PerfilActivity;
+import com.hergomsoft.easyorienteering.ui.conexion.ConexionActivity;
 import com.hergomsoft.easyorienteering.ui.resumen.ResumenActivity;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
-import com.hergomsoft.easyorienteering.components.DialogoCarga;
 import com.hergomsoft.easyorienteering.util.CircleTransform;
 import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.Resource;
@@ -52,7 +50,6 @@ public class ConfiguracionActivity extends BackableActivity {
         btnFotoPerfil = findViewById(R.id.conf_foto_perfil);
         tvNombre = findViewById(R.id.conf_nombre_usuario);
         tvClub = findViewById(R.id.conf_club_usuario);
-        Button btnVerPerfil = findViewById(R.id.conf_btn_ver_perfil);
         Button btnCambiarNombre = findViewById(R.id.conf_btn_cambiar_nombre);
         Button btnCambiarClub = findViewById(R.id.conf_btn_cambiar_club);
         Button btnCambiarContrasena = findViewById(R.id.conf_btn_cambiar_contrasena);
@@ -70,15 +67,6 @@ public class ConfiguracionActivity extends BackableActivity {
         };
 
         btnFotoPerfil.setOnClickListener(todoListener);
-        btnVerPerfil.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Obtener ID usuario conectado
-                Intent i = new Intent(ConfiguracionActivity.this, PerfilActivity.class);
-                i.putExtra(Constants.EXTRA_ID_USUARIO, viewModel.getIdUsuarioConectado());
-                startActivity(i);
-            }
-        });
         btnCambiarNombre.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,7 +90,12 @@ public class ConfiguracionActivity extends BackableActivity {
         });
         btnCompartirApp.setOnClickListener(todoListener);
         btnBorrarCuenta.setOnClickListener(todoListener);
-        btnCerrarSesion.setOnClickListener(todoListener);
+        btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewModel.cerrarSesion();
+            }
+        });
 
         setupDialogos();
         setupObservadores();
@@ -146,7 +139,6 @@ public class ConfiguracionActivity extends BackableActivity {
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getString(R.string.conf_cambiando_nombre));
                 viewModel.realizaCambioNombreUsuario();
                 dialogoCambioNombre.dismiss();
             }
@@ -191,7 +183,6 @@ public class ConfiguracionActivity extends BackableActivity {
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getString(R.string.conf_cambiando_club));
                 viewModel.realizaCambioClub();
                 dialogoCambioClub.dismiss();
             }
@@ -212,10 +203,6 @@ public class ConfiguracionActivity extends BackableActivity {
             public void onChanged(Resource<Usuario> usuarioResource) {
                 if(usuarioResource != null) {
                     switch(usuarioResource.status) {
-                        case LOADING:
-                            viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO,
-                                    "", getString(R.string.cargando_datos));
-                            break;
                         case SUCCESS:
                             if(usuarioResource.data != null) {
                                 viewModel.ocultaResultadoDialogo();
@@ -245,43 +232,76 @@ public class ConfiguracionActivity extends BackableActivity {
         });
 
         // Respuesta a la petición de cambio de nombre
-        viewModel.getCambioNombreResponse().observe(this, new Observer<Recurso<String>>() {
+        viewModel.getCambioNombreResponse().observe(this, new Observer<Resource<String>>() {
             @Override
-            public void onChanged(Recurso<String> cambiado) {
-                if(cambiado.hayError()) {
-                    viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), cambiado.getError());
-                } else {
-                    // El TextView ya se actualiza automáticamente con el observador de los datos del usuario
-                    viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO, "", getString(R.string.conf_resp_nombre_cambiado));
-                    // Tras una pequeña espera oculta el diálogo
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            viewModel.ocultaResultadoDialogo();
-                        }
-                    }, 1500);
+            public void onChanged(Resource<String> cambiado) {
+                switch (cambiado.status) {
+                    case LOADING:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getString(R.string.conf_cambiando_nombre));
+                        break;
+                    case SUCCESS:
+                        // El TextView ya se actualiza automáticamente con el observador de los datos del usuario
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO, "", getString(R.string.conf_resp_nombre_cambiado));
+                        // Tras una pequeña espera oculta el diálogo
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                viewModel.ocultaResultadoDialogo();
+                            }
+                        }, 1500);
+                        break;
+                    case ERROR:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), cambiado.message);
+                        break;
+                    default:
+                        viewModel.ocultaDialogoCarga();
                 }
             }
         });
 
         // Respuesta a la petición de cambio de club
-        viewModel.getCambioClubResponse().observe(this, new Observer<Recurso<String>>() {
+        viewModel.getCambioClubResponse().observe(this, new Observer<Resource<String>>() {
             @Override
-            public void onChanged(Recurso<String> cambiado) {
-                if(cambiado.hayError()) {
-                    viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), cambiado.getError());
-                } else {
-                    // El TextView ya se actualiza automáticamente con el observador de los datos del usuario
-                    viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO, "", getString(R.string.conf_resp_club_cambiado));
-                    // Tras una pequeña espera oculta el diálogo
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            viewModel.ocultaResultadoDialogo();
-                        }
-                    }, 1500);
+            public void onChanged(Resource<String> cambiado) {
+                switch (cambiado.status) {
+                    case SUCCESS:
+                        // El TextView ya se actualiza automáticamente con el observador de los datos del usuario
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO, "", getString(R.string.conf_resp_club_cambiado));
+                        // Tras una pequeña espera oculta el diálogo
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                viewModel.ocultaResultadoDialogo();
+                            }
+                        }, 1500);
+                        break;
+                    case ERROR:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), cambiado.message);
+                        break;
+                    default:
+                        viewModel.ocultaDialogoCarga();
+                }
+            }
+        });
+
+        // Estado de logout
+        viewModel.getEstadoLogout().observe(this, new Observer<Resource<String>>() {
+            @Override
+            public void onChanged(Resource<String> resource) {
+                switch(resource.status) {
+                    case SUCCESS:
+                        // Redirige a la pantalla de conexión
+                        viewModel.ocultaDialogoCarga();
+                        Intent i = new Intent(ConfiguracionActivity.this, ConexionActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Borra histórico
+                        startActivity(i);
+                        finish();
+                        break;
+                    case ERROR:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), resource.message);
+                        break;
                 }
             }
         });

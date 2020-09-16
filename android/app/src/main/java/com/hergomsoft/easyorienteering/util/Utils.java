@@ -7,9 +7,16 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.hergomsoft.easyorienteering.data.api.responses.MessageResponse;
+
+import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+
+import retrofit2.Response;
 
 public final class Utils {
 
@@ -98,6 +105,25 @@ public final class Utils {
     public static int randomInt(int min, int max) {
         return new Random().nextInt((max - min) + 1) + min;
     }
+
+    /**
+     * Deserializa un MessageResponse. Útil para procesar el cuerpo de una petición errónea.
+     * @param response Respuesta con el mensaje de error
+     * @return MessageResponse deserializado
+     */
+    public static MessageResponse deserializeMessageResponseFromError(Response<?> response) {
+        MessageResponse messageResponse = null;
+        Gson gson = new GsonBuilder().create();
+        try {
+            String s = response.errorBody().string();
+            messageResponse = gson.fromJson(s, MessageResponse.class);
+        } catch (Exception e) {
+            Log.d("EASYO", "Error al deserializar");
+        }
+
+        return messageResponse;
+    }
+
 
     /**
      * Convierte una medida en DP a píxeles.

@@ -25,8 +25,7 @@ public class HomeViewModel extends AndroidViewModelConCarga {
 
     public LiveData<Resource<Usuario>> cargaDatosUsuario() {
         // Obtiene el ID del usuario conectado
-        // TODO
-        long idUsuario = Constants.ID_USUARIO_PRUEBA;
+        long idUsuario = usuarioRepository.getIdUsuarioConectado();
         return usuarioRepository.getUsuario(idUsuario);
     }
 }

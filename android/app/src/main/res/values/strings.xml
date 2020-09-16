@@ -51,6 +51,7 @@
     <string name="registro_titulo">Registrar cuenta</string>
     <string name="registro_email">Email</string>
     <string name="registro_nombre">Nombre</string>
+    <string name="registro_club">Club</string>
     <string name="registro_nombre_publico">(este será tu nombre público)</string>
     <string name="registro_password_conf">Contraseña (confirmación)</string>
     <string name="registro_acepto">Acepto las condiciones de uso y la política de tratamiento de estos datos</string>
@@ -63,7 +64,7 @@
     <string name="registro_registrar">REGISTRAR CUENTA</string>
     <string name="registro_registrando">Registrando…</string>
     <string name="registro_registrada">Cuenta registrada</string>
-    <string name="registro_error">Error al registrar</string>
+    <string name="registro_error">Error al registrarte</string>
     <string name="registro_error2">Comprueba tu conexión</string>
 
     <!-- Pantalla de política y condiciones -->
@@ -128,7 +129,6 @@
 
     <!-- Configuración -->
     <string name="conf_configuracion">Configuración</string>
-    <string name="conf_ver_perfil">Ver perfil público</string>
     <string name="conf_cambiar_nombre">Cambiar nombre</string>
     <string name="conf_cambiar_club">Cambiar club</string>
     <string name="conf_cambiar_contrasena">Cambiar contraseña</string>
@@ -142,6 +142,7 @@
     <string name="conf_resp_nombre_cambiado">Nombre cambiado con éxito</string>
     <string name="conf_cambiando_club">Cambiando club…</string>
     <string name="conf_resp_club_cambiado">Club cambiado con éxito</string>
+    <string name="conf_cerrando_sesion">Cerrando sesión…</string>
 
 
     <!-- Perfil de usuario -->

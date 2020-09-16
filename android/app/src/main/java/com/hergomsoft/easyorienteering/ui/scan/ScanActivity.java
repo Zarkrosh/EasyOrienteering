@@ -186,60 +186,67 @@ public class ScanActivity extends AppCompatActivity {
      */
     private void setupObservadores() {
         // Respuesta de carrera pendiente
-        viewModel.getCarreraPendienteResponse().observe(this, new Observer<Recurso<Boolean>>() {
+        viewModel.getCarreraPendienteResponse().observe(this, new Observer<Resource<Boolean>>() {
             @Override
-            public void onChanged(Recurso<Boolean> respuesta) {
-                if(respuesta.hayError()) {
-                    // Ha ocurrido un error
-                    viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), respuesta.getError());
-                } else {
-                    Boolean res = respuesta.getRecurso();
-                    if(res == null) {
-                        // Error inesperado
-                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), "Error inesperado en la respuesta de carrera pendiente");
-                    } else if(res) {
-                        // Tiene una carrera pendiente
-                        muestraDialogoRecorridoPendiente();
-                    } else {
+            public void onChanged(Resource<Boolean> respuesta) {
+                switch (respuesta.status) {
+                    case SUCCESS:
+                        Boolean res = respuesta.data;
+                        if(res == null) {
+                            // Error inesperado
+                            viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), "Error inesperado en la respuesta de carrera pendiente");
+                        } else if(res) {
+                            // Tiene una carrera pendiente
+                            muestraDialogoRecorridoPendiente();
+                        } else {
+                            viewModel.ocultaDialogoCarga();
+                        }
+                        break;
+                    case ERROR:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), respuesta.message);
+                        break;
+                    default:
                         viewModel.ocultaDialogoCarga();
-                    }
                 }
             }
         });
 
         // Respuesta de registro de control
-        viewModel.getRegistroResponse().observe(this, new Observer<Recurso<Registro>>() {
+        viewModel.getRegistroResponse().observe(this, new Observer<Resource<Registro>>() {
             @Override
-            public void onChanged(Recurso<Registro> registroControl) {
-                if(registroControl.hayError()) {
-                    // Error al registrar
-                    viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.registro_error), registroControl.getError());
-                    viewModel.clearUltimoEscaneado();
-                } else {
-                    // Registro con éxito
-                    viewModel.ocultaDialogoCarga();
-                    String codigo = registroControl.getRecurso().getControl();
-                    if(codigo.contentEquals(Constants.CODIGO_SALIDA)) {
-                        viewModel.pasaAModoCarrera();
-                        animacionRegistroControl();
-                    } else if(codigo.contentEquals(Constants.CODIGO_META)) {
-                        animacionRegistroControl();
-                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO, "", getString(R.string.scan_recorrido_acabado));
-                        // Tras un corto tiempo redirige a los resultados del recorrido
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                viewModel.ocultaResultadoDialogo();
-                                viewModel.resetDatos();
-                                Intent i = new Intent(ScanActivity.this, ResultadosActivity.class);
-                                i.putExtra(Constants.EXTRA_ID_RECORRIDO, viewModel.getRecorridoActual().getId());
-                                startActivity(i);
-                            }
-                        }, 2000);
-                    } else {
-                        animacionRegistroControl();
-                    }
+            public void onChanged(Resource<Registro> registroControl) {
+                switch (registroControl.status) {
+                    case SUCCESS:
+                        viewModel.ocultaDialogoCarga();
+                        String codigo = registroControl.data.getControl();
+                        if(codigo.contentEquals(Constants.CODIGO_SALIDA)) {
+                            viewModel.pasaAModoCarrera();
+                            animacionRegistroControl();
+                        } else if(codigo.contentEquals(Constants.CODIGO_META)) {
+                            animacionRegistroControl();
+                            viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO, "", getString(R.string.scan_recorrido_acabado));
+                            // Tras un corto tiempo redirige a los resultados del recorrido
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    viewModel.ocultaResultadoDialogo();
+                                    viewModel.resetDatos();
+                                    Intent i = new Intent(ScanActivity.this, ResultadosActivity.class);
+                                    i.putExtra(Constants.EXTRA_ID_RECORRIDO, viewModel.getRecorridoActual().getId());
+                                    startActivity(i);
+                                }
+                            }, 2000);
+                        } else {
+                            animacionRegistroControl();
+                        }
+                        break;
+                    case ERROR:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.registro_error), registroControl.message);
+                        viewModel.clearUltimoEscaneado();
+                        break;
+                    default:
+                        viewModel.ocultaDialogoCarga();
                 }
             }
         });
@@ -283,27 +290,33 @@ public class ScanActivity extends AppCompatActivity {
         });
 
         // Respuesta de abandono de recorrido
-        viewModel.getAbandonoResponse().observe(this, new Observer<Recurso<AbandonoResponse>>() {
+        viewModel.getAbandonoResponse().observe(this, new Observer<Resource<AbandonoResponse>>() {
             @Override
-            public void onChanged(Recurso<AbandonoResponse> response) {
+            public void onChanged(Resource<AbandonoResponse> response) {
                 setupModoInicioRecorrido();
-                if(response.hayError()) {
-                    viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), response.getError());
-                } else {
-                    AbandonoResponse r = response.getRecurso();
-                    if(r.isAbandonado()) {
-                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO,"", getString(R.string.scan_carga_abandonado));
-                        // Tras unos segundos, oculta el diálogo automáticamente
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                viewModel.ocultaDialogoCarga();
-                            }
-                        }, 2000);
-                    } else {
-                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), r.getError());
-                    }
+                switch (response.status) {
+                    case SUCCESS:
+                        viewModel.ocultaDialogoCarga();
+                        AbandonoResponse r = response.data;
+                        if(r.isAbandonado()) {
+                            viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO,"", getString(R.string.scan_carga_abandonado));
+                            // Tras unos segundos, oculta el diálogo automáticamente
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    viewModel.ocultaDialogoCarga();
+                                }
+                            }, 2000);
+                        } else {
+                            viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), r.getError());
+                        }
+                        break;
+                    case ERROR:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), response.message);
+                        break;
+                    default:
+                        viewModel.ocultaDialogoCarga();
                 }
             }
         });

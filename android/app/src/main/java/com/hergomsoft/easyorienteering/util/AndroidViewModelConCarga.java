@@ -32,8 +32,6 @@ public abstract class AndroidViewModelConCarga extends AndroidViewModel {
         if(estadoDialogo.getValue() == DialogoCarga.ESTADO_CARGANDO) {
             estadoDialogo.postValue(DialogoCarga.ESTADO_OCULTO);
         }
-
-        //
     }
 
     public void ocultaResultadoDialogo() {

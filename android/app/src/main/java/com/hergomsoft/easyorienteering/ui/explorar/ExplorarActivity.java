@@ -70,31 +70,11 @@ public class ExplorarActivity extends BackableActivity {
 
         setupListeners();
         setupMapa();
-        setupObservables();
+        setupObservadores();
+        viewModel.buscaCarreras("", 0);
     }
 
     private void setupListeners() {
-        // Cambios en la lista de carreras
-        viewModel.getCarreras().observe(this, new Observer<Resource<List<Carrera>>>() {
-            @Override
-            public void onChanged(Resource<List<Carrera>> listResource) {
-                if(listResource != null) {
-                    switch (listResource.status) {
-                        case LOADING:
-                            if(viewModel.getNumeroPagina() > 0) listaCarreras.muestraCargaCarrerasFinal();
-                            else listaCarreras.muestraCargaCarrerasGeneral();
-                            break;
-                        case SUCCESS:
-                            listaCarreras.actualizaCarreras(listResource.data);
-                            break;
-                        case ERROR:
-                            listaCarreras.muestraError(listResource.message);
-                            break;
-                    }
-                }
-            }
-        });
-
         // Búsqueda de más elementos al llegar al final del scroll en la lista de resultados
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -129,8 +109,27 @@ public class ExplorarActivity extends BackableActivity {
         });
     }
 
-    private void setupObservables() {
-
+    private void setupObservadores() {
+        // Cambios en la lista de carreras
+        viewModel.getCarreras().observe(this, new Observer<Resource<List<Carrera>>>() {
+            @Override
+            public void onChanged(Resource<List<Carrera>> listResource) {
+                if(listResource != null) {
+                    switch (listResource.status) {
+                        case LOADING:
+                            if(viewModel.getNumeroPagina() > 0) listaCarreras.muestraCargaCarrerasFinal();
+                            else listaCarreras.muestraCargaCarrerasGeneral();
+                            break;
+                        case SUCCESS:
+                            listaCarreras.actualizaCarreras(listResource.data);
+                            break;
+                        case ERROR:
+                            listaCarreras.muestraError(listResource.message);
+                            break;
+                    }
+                }
+            }
+        });
     }
 
     private void buscaCarreras(String nombre) {

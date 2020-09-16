@@ -1,57 +1,33 @@
 package com.hergomsoft.easyorienteering.ui.conexion.login;
 
-import android.os.Handler;
+import android.app.Application;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-import com.hergomsoft.easyorienteering.data.repositories.LoginRepository;
-import com.hergomsoft.easyorienteering.data.model.ConexionState;
-import com.hergomsoft.easyorienteering.data.model.Result;
-import com.hergomsoft.easyorienteering.data.model.Usuario;
 import com.hergomsoft.easyorienteering.R;
+import com.hergomsoft.easyorienteering.data.repositories.UsuarioRepository;
+import com.hergomsoft.easyorienteering.util.AndroidViewModelConCarga;
+import com.hergomsoft.easyorienteering.util.Resource;
 import com.hergomsoft.easyorienteering.util.Utils;
 
-public class LoginViewModel extends ViewModel {
+public class LoginViewModel extends AndroidViewModelConCarga {
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
-    private MutableLiveData<ConexionState> loginState = new MutableLiveData<>();
-    private LoginRepository loginRepository;
 
-    LoginViewModel(LoginRepository loginRepository) {
-        this.loginRepository = loginRepository;
+    UsuarioRepository usuarioRepository;
+
+    public LoginViewModel(Application app) {
+        super(app);
+        this.usuarioRepository = UsuarioRepository.getInstance(app);
     }
 
     LiveData<LoginFormState> getLoginFormState() {
         return loginFormState;
     }
-
-    LiveData<ConexionState> getLoginState() {
-        return loginState;
-    }
+    LiveData<Resource<String>> getLoginState() { return usuarioRepository.getLoginState(); }
 
     public void login(String username, String password) {
-        final ConexionState state = new ConexionState();
-        loginState.setValue(state);
-
-        // TODO Lanzar asíncronamente
-        final Result<Usuario> result = loginRepository.login(username, password);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (result instanceof Result.Success) {
-                    // Indica éxito en el login
-                    state.setEstado(ConexionState.ESTADO_EXITO_FIN);
-                    loginState.setValue(state);
-                } else {
-                    state.setEstado(ConexionState.ESTADO_ERROR);
-                    // Mensaje de error dependiendo del motivo
-                    // TODO
-                    state.setMensaje(R.string.login_incorrecto); // Mientras
-                    loginState.setValue(state);
-                }
-            }
-        }, 3000);
+        usuarioRepository.login(username, password);
     }
 
     public void loginDataChanged(String emailUsername, String password) {

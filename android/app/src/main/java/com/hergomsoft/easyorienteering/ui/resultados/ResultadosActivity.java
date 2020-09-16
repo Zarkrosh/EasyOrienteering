@@ -1,9 +1,5 @@
 package com.hergomsoft.easyorienteering.ui.resultados;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -17,6 +13,9 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.components.DialogoCarga;
 import com.hergomsoft.easyorienteering.data.api.responses.ParticipacionesRecorridoResponse;
@@ -27,7 +26,6 @@ import com.hergomsoft.easyorienteering.data.model.Recorrido;
 import com.hergomsoft.easyorienteering.data.model.Registro;
 import com.hergomsoft.easyorienteering.data.model.ResultadoUsuario;
 import com.hergomsoft.easyorienteering.data.model.Usuario;
-import com.hergomsoft.easyorienteering.ui.perfil.PerfilActivity;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
 import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.Resource;
@@ -339,15 +337,6 @@ public class ResultadosActivity extends BackableActivity {
                 TextView tvTiempoTotal = row.findViewById(R.id.item_resultados_tiempo_total);
                 // Asigna valores
                 tvNombreClub.setText(r.getNombreClub().trim());
-                tvNombreClub.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Al pulsar en un corredor se visualiza su perfil
-                        Intent i = new Intent(ResultadosActivity.this, PerfilActivity.class);
-                        i.putExtra(Constants.EXTRA_ID_USUARIO, r.getIdUsuario());
-                        startActivity(i);
-                    }
-                });
                 String sTiempoTotal;
                 String sPosicion = "";
                 switch (r.getTipo()) {
