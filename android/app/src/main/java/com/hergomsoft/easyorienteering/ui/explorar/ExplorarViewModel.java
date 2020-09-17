@@ -17,6 +17,7 @@ public class ExplorarViewModel extends AndroidViewModelConCarga {
 
     private CarreraRepository carreraRepository;
     private MediatorLiveData<Resource<List<Carrera>>> carreras;
+    private MediatorLiveData<Resource<List<Carrera>>> circuitos;
 
     // Petición
     private boolean realizandoPeticion;
@@ -31,6 +32,7 @@ public class ExplorarViewModel extends AndroidViewModelConCarga {
         super(app);
         carreraRepository = CarreraRepository.getInstance(app);
         carreras = new MediatorLiveData<>();
+        circuitos = new MediatorLiveData<>();
         nombre = "";
         tipo = "";
         modalidad = "";
@@ -56,6 +58,32 @@ public class ExplorarViewModel extends AndroidViewModelConCarga {
             numeroPagina++;
             realizaBusqueda();
         }
+    }
+
+    public void cargaMarcadoresCircuitos() {
+        final LiveData<Resource<List<Carrera>>> repositorySource = carreraRepository.buscaCarreras("", Carrera.Tipo.CIRCUITO.name(), "", Integer.MAX_VALUE);
+        circuitos.addSource(repositorySource, new Observer<Resource<List<Carrera>>>() {
+            @Override
+            public void onChanged(Resource<List<Carrera>> listResource) {
+                if(listResource != null) {
+                    switch (listResource.status) {
+                        case LOADING:
+                            // TODO Mensaje
+                            break;
+                        case SUCCESS:
+                            // TODO Cargar overlays
+                            break;
+                        case ERROR:
+                            // TODO ?
+                            break;
+                    }
+
+                    circuitos.setValue(listResource);
+                } else {
+                    circuitos.removeSource(repositorySource);
+                }
+            }
+        });
     }
 
     private void realizaBusqueda() {

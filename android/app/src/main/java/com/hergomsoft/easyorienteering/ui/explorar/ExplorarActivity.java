@@ -150,6 +150,7 @@ public class ExplorarActivity extends BackableActivity {
         viewSwitcher.setOutAnimation(slide_out_left);
         viewSwitcher.setDisplayedChild(1);
         btnCambioVista.setImageResource(R.drawable.img_search);
+        viewModel.cargaMarcadoresCircuitos();
     }
 
     /**
