@@ -1,9 +1,12 @@
 package com.hergomsoft.easyoapi.models;
 
+import com.hergomsoft.easyoapi.models.serializers.IdEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.CascadeType;
@@ -15,9 +18,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -28,11 +29,9 @@ import org.hibernate.annotations.Type;
 @Table(name = "carreras")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Carrera implements IdEntity {
-    public static final int MAX_LEN_NOMBRE = 64;
+    public static final int MAX_LEN_NOMBRE = 100;
     public static final int MIN_LEN_NOMBRE = 5;
     public static final int MAX_LEN_NOTAS = 1000;
-    public static final String CODIGO_SALIDA = "SALIDA";
-    public static final String CODIGO_META = "META";
     
     public enum Tipo {EVENTO, CIRCUITO};
     public enum Modalidad {TRAZADO, SCORE};
@@ -59,7 +58,7 @@ public class Carrera implements IdEntity {
     @Column(name = "MODALIDAD")
     private Modalidad modalidad;
     
-    @ManyToOne(optional = false)
+    @ManyToOne
     private Usuario organizador;
     
     @Column(name = "PRIVADA")
@@ -76,17 +75,15 @@ public class Carrera implements IdEntity {
     
     @Temporal(TemporalType.DATE)
     @Column(name = "FECHA", nullable = true)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date fecha;
     
-    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name="CARRERA_ID", referencedColumnName="ID")
-    private List<Recorrido> recorridos;
+    @OneToMany(mappedBy = "carrera", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Recorrido> recorridos = new ArrayList<>();
     
-    // No se utiliza cascada
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "carrera")
-    @MapKey(name = "codigo")
-    private Map<String, Control> controles;
+    @Type(type = "json")
+    @Column(name = "CONTROLES", columnDefinition = "json")
+    private Map<String, Control> controles = new HashMap<>();
 
     public Carrera() {}
 
@@ -106,10 +103,12 @@ public class Carrera implements IdEntity {
         this.fecha = null;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

@@ -63,17 +63,6 @@
 
         <!-- Lista de botones de configuración de datos del usuario -->
         <!-- ¿Foto? -->
-        <Button
-            android:id="@+id/conf_btn_ver_perfil"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start|center_vertical"
-            android:paddingStart="25dp"
-            android:paddingEnd="25dp"
-            android:text="@string/conf_ver_perfil"
-            android:background="@drawable/back_boton_configuracion"
-            android:textSize="18sp"
-            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/conf_btn_cambiar_nombre"

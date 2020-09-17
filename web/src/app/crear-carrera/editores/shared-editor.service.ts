@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Recorrido, Control, Coordenadas, Pair } from '../../shared/app.model';
+import { Recorrido, Control, Coordenadas, Pair } from '../../_shared/app.model';
 
 @Injectable({
   providedIn: 'root'
@@ -57,6 +57,21 @@ export class SharedEditorService {
    */
   borrarControl(control: Control) {
     this._controlBorrado.next(control);
+  }
+
+
+
+  clearData() {
+    this._mapaBase = new BehaviorSubject<string>(null);
+    this.mapaBase = this._mapaBase.asObservable();
+    this._recorridoActual = new BehaviorSubject<Recorrido>(null);
+    this.recorridoActual = this._recorridoActual.asObservable();
+    this._controles = new BehaviorSubject<Map<string, Control>>(new Map());
+    this.controles = this._controles.asObservable();
+    this._nuevoControl = new BehaviorSubject<Control>(null);
+    this.nuevoControl = this._nuevoControl.asObservable();
+    this._controlBorrado = new BehaviorSubject<Control>(null);
+    this.controlBorrado = this._controlBorrado.asObservable();
   }
 
 }

@@ -35,6 +35,8 @@ public class HomeActivity extends AppCompatActivity {
     private Button btnExplorar;
     private Button btnUnirme;
 
+    private DialogoCarga dialogoCarga;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +101,7 @@ public class HomeActivity extends AppCompatActivity {
      * Configura el diálogo de uso general para operaciones de carga y notificaciones de éxito/error.
      */
     private void setupDialogoCarga() {
-        DialogoCarga dialogoCarga = new DialogoCarga(this);
+        dialogoCarga = new DialogoCarga(this);
         dialogoCarga.setObservadorEstado(this, viewModel.getEstadoDialogo());
         dialogoCarga.setObservadorTitulo(this, viewModel.getTituloDialogo());
         dialogoCarga.setObservadorMensaje(this, viewModel.getMensajeDialogo());
@@ -139,5 +141,14 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (dialogoCarga != null) {
+            dialogoCarga.dismiss();
+            dialogoCarga = null;
+        }
     }
 }

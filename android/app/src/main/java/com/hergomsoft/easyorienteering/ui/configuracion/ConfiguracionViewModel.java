@@ -4,11 +4,11 @@ import android.app.Application;
 
 import androidx.lifecycle.LiveData;
 
-import com.hergomsoft.easyorienteering.data.model.Recurso;
+import com.hergomsoft.easyorienteering.R;
+import com.hergomsoft.easyorienteering.components.DialogoCarga;
 import com.hergomsoft.easyorienteering.data.model.Usuario;
 import com.hergomsoft.easyorienteering.data.repositories.UsuarioRepository;
 import com.hergomsoft.easyorienteering.util.AndroidViewModelConCarga;
-import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.Resource;
 import com.hergomsoft.easyorienteering.util.SingleLiveEvent;
 
@@ -17,8 +17,8 @@ public class ConfiguracionViewModel extends AndroidViewModelConCarga {
 
     private UsuarioRepository usuarioRepository;
 
-    private SingleLiveEvent<Recurso<String>> cambioNombreResponse;
-    private SingleLiveEvent<Recurso<String>> cambioClubResponse;
+    private SingleLiveEvent<Resource<String>> cambioNombreResponse;
+    private SingleLiveEvent<Resource<String>> cambioClubResponse;
     private SingleLiveEvent<Boolean> envioCambioNombreHabilitado;
 
     private String nuevoNombre;
@@ -32,15 +32,15 @@ public class ConfiguracionViewModel extends AndroidViewModelConCarga {
         envioCambioNombreHabilitado = new SingleLiveEvent<>();
     }
 
-    public SingleLiveEvent<Recurso<String>> getCambioNombreResponse() { return cambioNombreResponse; }
-    public SingleLiveEvent<Recurso<String>> getCambioClubResponse() { return cambioClubResponse; }
+    public SingleLiveEvent<Resource<String>> getCambioNombreResponse() { return cambioNombreResponse; }
+    public SingleLiveEvent<Resource<String>> getCambioClubResponse() { return cambioClubResponse; }
     public SingleLiveEvent<Boolean> getEnvioCambioNombreHabilitado() { return envioCambioNombreHabilitado; }
-    public long getIdUsuarioConectado() { return usuarioRepository.getIdUsuarioConectado(); }
+    public SingleLiveEvent<Resource<String>> getEstadoLogout() { return usuarioRepository.getLogoutState(); }
 
     public LiveData<Resource<Usuario>> cargaDatosUsuario() {
+        actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO,"", getApplication().getApplicationContext().getString(R.string.cargando_datos));
         // Obtiene el ID del usuario conectado
-        // TODO
-        long idUsuario = Constants.ID_USUARIO_PRUEBA;
+        long idUsuario = usuarioRepository.getIdUsuarioConectado();
         return usuarioRepository.getUsuario(idUsuario);
     }
 
@@ -59,9 +59,15 @@ public class ConfiguracionViewModel extends AndroidViewModelConCarga {
     }
 
     public void realizaCambioNombreUsuario() {
+        actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.conf_cambiando_nombre));
         usuarioRepository.cambiaNombreUsuario(nuevoNombre);
     }
     public void realizaCambioClub() {
+        actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.conf_cambiando_club));
         usuarioRepository.cambiaClub(nuevoClub);
+    }
+    public void cerrarSesion() {
+        actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.conf_cerrando_sesion));
+        usuarioRepository.logout();
     }
 }

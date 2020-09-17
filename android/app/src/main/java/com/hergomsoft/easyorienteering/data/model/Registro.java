@@ -6,43 +6,22 @@ import androidx.room.TypeConverters;
 
 import java.util.Date;
 
-//@Entity
-//@TypeConverters(DateConverter.class)
+
 public class Registro {
-    //@PrimaryKey
-    private int id;
-    private Control control;
-    private Recorrido recorrido;
+    private String control;
     private Date fecha;
 
-    public Registro(Control control, Recorrido recorrido, Date fecha) {
+    public Registro(String control, Recorrido recorrido, Date fecha) {
         this.control = control;
-        this.recorrido = recorrido;
         this.fecha = fecha;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Control getControl() {
+    public String getControl() {
         return control;
     }
 
-    public void setControl(Control control) {
+    public void setControl(String control) {
         this.control = control;
-    }
-
-    public Recorrido getRecorrido() {
-        return recorrido;
-    }
-
-    public void setRecorrido(Recorrido recorrido) {
-        this.recorrido = recorrido;
     }
 
     public Date getFecha() {

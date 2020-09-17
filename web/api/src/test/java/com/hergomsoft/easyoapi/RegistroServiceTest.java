@@ -2,8 +2,16 @@ package com.hergomsoft.easyoapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hergomsoft.easyoapi.models.Carrera;
+import com.hergomsoft.easyoapi.models.Control;
+import com.hergomsoft.easyoapi.models.Recorrido;
+import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.models.requests.RegistroRequest;
 import com.hergomsoft.easyoapi.services.CarreraService;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Sql(scripts = {"/db_gen_test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {"/db_gen_datos.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class RegistroServiceTest {
     
     @Autowired
@@ -41,6 +49,39 @@ public class RegistroServiceTest {
         
     }
     
+    @Test
+    void carrera() throws Exception {
+        Carrera carrera = carrerasService.getCarrera(1);
+        for(Recorrido r : carrera.getRecorridos()) {
+            System.out.println(r.getNombre());
+            System.out.println(r.getTrazado());
+        }
+    }
+    
+    @Test
+    void nuevoRecorrido() throws Exception {
+        Usuario usuario = new Usuario("asdf", "asdf", "asfd", "asdf", new Date(), null);
+        List<Recorrido> recorridos = new ArrayList<>();
+        List<String> trazado = new ArrayList<>();
+        trazado.add("SALIDA");
+        trazado.add("31");
+        trazado.add("32");
+        trazado.add("META");
+        recorridos.add(new Recorrido("R1", trazado, null));
+        Map<String, Control> controles = new HashMap<>();
+        controles.put("SALIDA", new Control("SALIDA", Control.Tipo.SALIDA, 0, null));
+        controles.put("31", new Control("31", Control.Tipo.SALIDA, 0, null));
+        controles.put("32", new Control("32", Control.Tipo.SALIDA, 0, null));
+        controles.put("META", new Control("META", Control.Tipo.SALIDA, 0, null));
+        Carrera carrera = new Carrera("Prueba", Carrera.Tipo.EVENTO, Carrera.Modalidad.TRAZADO, usuario, null, null, false, recorridos, controles, "asdf");
+        carrera.setFecha(new Date());
+        this.mvc.perform(post("/api/carreras")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(carrera)))
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+    }
+    
+    /*
     @Test
     void registroCarreraNoExistente() throws Exception {
         RegistroRequest registro = new RegistroRequest("S1", "ignorado", 1L, 1L); // Ignorado todo
@@ -142,5 +183,6 @@ public class RegistroServiceTest {
                 .andExpect(status().is(HttpStatus.UNPROCESSABLE_ENTITY.value()))
                 .andExpect(status().reason(containsString(RegistroRequest.ERROR_YA_CORRIDO))); 
     }
+*/
     
 }

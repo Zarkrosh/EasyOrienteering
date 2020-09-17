@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ClienteApiService } from '../shared/cliente-api.service';
-import { AppSettings, Carrera } from '../shared/app.model';
+import { ClienteApiService } from '../_services/cliente-api.service';
+import { AppSettings, Carrera } from '../_shared/app.model';
 import { Router } from '@angular/router';
 import { AlertService } from '../alert';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';

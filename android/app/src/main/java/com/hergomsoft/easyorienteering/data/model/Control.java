@@ -10,6 +10,10 @@ public class Control {
     private String codigo;
     @Expose
     private Tipo tipo;
+    @Expose
+    private Integer puntuacion;
+    @Expose
+    private Coordenadas coords;
 
     public String getCodigo() {
         return codigo;

@@ -32,6 +32,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="5dp"
             android:inputType="textEmailAddress"
+            android:text="asdf@test.com"
             app:layout_constraintTop_toBottomOf="@+id/textView"
             tools:layout_editor_absoluteX="50dp" />
 
@@ -70,8 +71,29 @@
             android:layout_height="50dp"
             android:layout_marginTop="5dp"
             android:hint="Al menos 3 letras"
+            android:text="Orientador98"
             android:inputType="textEmailAddress"
             app:layout_constraintTop_toBottomOf="@+id/llNombre"
+            tools:layout_editor_absoluteX="50dp" />
+
+        <TextView
+            android:id="@+id/textView14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/registro_club"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/registrarseNombre" />
+
+        <EditText
+            android:id="@+id/registrarseClub"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="5dp"
+            android:inputType="textCapCharacters"
+            android:text="ORCA"
+            app:layout_constraintTop_toBottomOf="@+id/textView14"
             tools:layout_editor_absoluteX="50dp" />
 
         <TextView
@@ -83,7 +105,7 @@
             android:textSize="20sp"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/registrarseNombre" />
+            app:layout_constraintTop_toBottomOf="@+id/registrarseClub" />
 
         <LinearLayout
             android:id="@+id/llPass"
@@ -97,6 +119,7 @@
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"
+                android:text="asdfasdf"
                 android:hint="@string/registro_pass_largo"
                 android:inputType="textPassword"/>
 
@@ -135,6 +158,7 @@
                 android:layout_height="50dp"
                 android:layout_weight="1"
                 android:inputType="textPassword"
+                android:text="asdfasdf"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.717"
                 app:layout_constraintStart_toStartOf="parent" />

@@ -6,6 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeActivity">
 
+    <!-- Imagen de fondo -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/img_orientacion"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true" />
+
     <LinearLayout
         android:id="@+id/home_layoutPerfil"
         android:layout_width="wrap_content"
@@ -13,6 +21,10 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="10dp"
+        android:paddingVertical="10dp"
+        android:background="@drawable/back_round_corners"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:orientation="horizontal">
@@ -47,6 +59,8 @@
         android:padding="@dimen/padHomeBotones"
         android:text="@string/home_mis_carreras"
         android:textSize="@dimen/tamLetraHomeBotones"
+        android:textColor="@android:color/white"
+        android:background="@drawable/back_boton"
         app:layout_constraintBottom_toTopOf="@id/btnExplorar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -60,6 +74,8 @@
         android:padding="@dimen/padHomeBotones"
         android:text="@string/home_explorar"
         android:textSize="@dimen/tamLetraHomeBotones"
+        android:textColor="@android:color/white"
+        android:background="@drawable/back_boton"
         app:layout_constraintBottom_toTopOf="@id/btnUnirme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -74,6 +90,8 @@
         android:padding="@dimen/padHomeBotones"
         android:text="@string/home_unirme"
         android:textSize="@dimen/tamLetraHomeBotones"
+        android:textColor="@android:color/white"
+        android:background="@drawable/back_boton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

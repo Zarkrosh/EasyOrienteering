@@ -1,2 +1,207 @@
-<h1>Página de perfil</h1>
-<p>### TODO ###</p>
+<div class="easyo-container">
+
+    <div class="btns-cabecera" *ngIf="usuario">
+        <button type="button" class="btn btn-danger btn-cabecera-dcha" (click)="cerrarSesion()">
+            Cerrar sesión
+        </button>
+    </div>
+
+
+    <h1>Mi perfil</h1>
+    <ng-container *ngIf="usuario; else cargando">
+
+        <div class="datos-usuario px-5 d-flex">
+
+
+            <div class="col-sm d-flex">
+
+
+                <table class="w-100 text-center">
+                    <tbody>
+                        <tr>
+                            <td><h4>Nombre</h4></td>
+                            <td>
+                                <div class="d-inline-flex">
+                                    <input #editorNombre type="text" class="px-2" value="{{usuario.nombre}}" [readonly]="!editandoNombre"
+                                        (dblclick)="editarNombre(true)" (keyup.enter)="editarNombre(false)" />
+                                    <button *ngIf="!editandoNombre" class="btn btn-primary ml-2" (click)="editarNombre(true)"><i class="fa fa-edit m-0"></i></button>
+                                    <button *ngIf="editandoNombre" class="btn btn-success ml-2" (click)="editarNombre(false)" [disabled]="cambiandoNombre">
+                                        <i *ngIf="!cambiandoNombre" class="fa fa-save m-0"></i>
+                                        <span *ngIf="cambiandoNombre" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td><h4>Club</h4></td>
+                            <td>
+                                <div class="d-inline-flex">
+                                    <input #editorClub type="text" class="px-2" value="{{usuario.club}}" [readonly]="!editandoClub"
+                                        (dblclick)="editarClub(true)" (keyup.enter)="editarClub(false)" />
+                                    <button *ngIf="!editandoClub" class="btn btn-primary ml-2" (click)="editarClub(true)"><i class="fa fa-edit m-0"></i></button>
+                                    <button *ngIf="editandoClub" class="btn btn-success ml-2" (click)="editarClub(false)" [disabled]="cambiandoClub">
+                                        <i *ngIf="!cambiandoClub" class="fa fa-save m-0"></i>
+                                        <span *ngIf="cambiandoClub" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="col-sm text-center pt-4">
+                <h5>Miembro desde el <b class="pl-2">{{usuario.fechaRegistro | fechaBonita}}</b></h5>
+
+                <button class="btn btn-primary mt-4" (click)="clickCambiarPassword()">Cambiar contraseña</button>
+            </div>
+        </div>
+    
+        
+
+        <h3 class="text-center mt-5">Mis carreras</h3>
+        <div class="row">
+            <div class="col-sm text-center">
+
+
+                <div class="header-carreras">
+                    <h4 class="text-center">Organizadas</h4>
+                    <span *ngIf="organizadas">({{organizadas.length}})</span>
+                </div>
+                <div class="wrapper-carreras">
+
+                    <table class="table table-hover">
+                        <tbody>
+                            <tr role="button" class="item-carrera" *ngFor="let carrera of organizadas" [routerLink]="['/carreras', carrera.id]">
+                                <td class="text-truncate">{{carrera.nombre}}</td>
+                                <td>{{carrera.tipo}}</td>
+                                <td>{{carrera.modalidad}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+
+                    <span class="no-hay" *ngIf="organizadas && organizadas.length === 0">No has organizado ninguna carrera</span>
+
+                    <div class="loader-carreras" *ngIf="!organizadas">
+                        <div class="lds-baliza-wrapper">
+                            <div class="lds-baliza"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-sm text-center">
+                <div class="header-carreras">
+                    <h4 class="text-center">Participadas</h4>
+                    <span *ngIf="participadas">({{participadas.length}})</span>
+                </div>
+                <div class="wrapper-carreras">
+                    
+                    <table class="table table-hover">
+                        <tbody>
+                            <tr role="button" class="item-carrera" *ngFor="let carrera of participadas" [routerLink]="['/carreras', carrera.id]">
+                                <td class="text-truncate">{{carrera.nombre}}</td>
+                                <td>{{carrera.tipo}}</td>
+                                <td>{{carrera.modalidad}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+
+                    <span class="no-hay" *ngIf="participadas && participadas.length === 0">No has participado en ninguna carrera</span>
+
+                    <div class="loader-carreras" *ngIf="!participadas">
+                        <div class="lds-baliza-wrapper">
+                            <div class="lds-baliza"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        
+    </ng-container>
+
+    <div class="btns-final" *ngIf="usuario">
+        <button type="button" class="btn btn-danger btn-final-dcha" (click)="clickBorrarCarrera()">
+            <i class="fa fa-exclamation-triangle"></i>
+            Borrar cuenta
+        </button>
+    </div>
+
+    <ng-template #cargando>
+        <div class="wrapper-cargando">
+            <div class="lds-baliza-wrapper" *ngIf="!mensajeErrorCarga">
+                <div class="lds-baliza"></div>
+            </div>
+            <div *ngIf="mensajeErrorCarga">
+                <h2>{{mensajeErrorCarga}} ☹</h2>
+                <button class="btn btn-primary btn-reintentar" (click)="cargaDatosUsuario()">Volver a intentar</button>
+            </div>
+        </div>
+    </ng-template>
+</div>
+
+<!-- Diálogo de confirmación de borrado de cuenta -->
+<ng-template #modalBorrarCuenta let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿Quieres borrar tu cuenta?</h5>
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>No podrás recuperar tu cuenta y desaparecerás de los resultados de los recorridos en los que hayas participado.</p> 
+        <p>Las carreras que hayas creado <b>no se borrarán</b>. Si deseas borrarlas debes hacerlo de forma individual.</p>
+        <br>
+        <h3>¿Estás seguro/a? 😢</h3>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="activeModal.close()" ngbAutofocus>Me quedo</button>
+        <button type="button" class="btn btn-danger"    (click)="confirmaBorrarCuenta()">
+            <i class="fa fa-exclamation-triangle"></i>
+            Sayonara, baby
+        </button>
+    </div>
+</ng-template>
+
+
+<!-- Diálogo de confirmación de cambio de contraseña -->
+<ng-template #modalCambiarPass let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Cambiar contraseña</h5>
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form id="cambioPassForm" [formGroup]="cambioPassForm">
+            <div class="form-group px-5">
+                <label for="prevPass">Contraseña anterior</label>
+                <input id="prevPass" type="password" formControlName="prevPass" class="form-control" required/>
+            </div>
+            <div class="form-group px-5">
+                <label for="nuevaPass">Contraseña nueva</label>
+                <input id="nuevaPass" type="password" formControlName="nuevaPass" class="form-control" required/>
+            </div>
+            <div class="form-group px-5">
+                <label for="nuevaPassConf">Contraseña nueva (confirmación)</label>
+                <input id="nuevaPassConf" type="password" formControlName="nuevaPassConf" class="form-control" required/>
+            </div>
+
+            <i>La nueva contraseña debe tener al menos 8 caracteres de longitud</i>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="activeModal.close()" ngbAutofocus>Cancelar</button>
+        <button type="submit" class="btn btn-primary"    (click)="cambiarPassword()" [disabled]="cambioPassForm.invalid">Cambiar contraseña</button>
+    </div>
+</ng-template>

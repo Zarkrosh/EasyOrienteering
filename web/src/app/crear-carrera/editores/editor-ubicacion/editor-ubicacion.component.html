@@ -1,10 +1,10 @@
 <div class="header-ubicacion">
     <h1>Ubicación</h1>
-    <button *ngIf="!editandoUbicacion && latitudTemporal != null" class="btn btn-primary btn-editar-ubicacion" (click)="editarUbicacion($event)">Editar</button>
+    <button *ngIf="!editandoUbicacion && latitudElegida != null" class="btn btn-primary btn-editar-ubicacion" (click)="editarUbicacion($event)">Editar</button>
+    <button *ngIf="!editandoUbicacion && latitudElegida != null" class="btn btn-danger btn-borrar-ubicacion" (click)="borrarUbicacion()">Borrar</button>
     <button *ngIf="editandoUbicacion" class="btn btn-danger btn-editar-ubicacion" (click)="cancelarEdicion()">Cancelar</button>
 </div>
 <div #mapaUbicacion id="mapa-ubicacion" class="ubicacion-mapa" [style.cursor]="(marcarUbicacion) ? 'crosshair' : auto">
-    
     <div *ngIf="!editandoUbicacion && latitudElegida == null" id="btn-anadir-ubicacion" (click)="editarUbicacion($event)">
         <i class="fa fa-plus-square"></i>
         <span>Añadir ubicación</span>
@@ -17,3 +17,22 @@
     <span *ngIf="guardandoUbicacion" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
     Guardar ubicación
 </button>
+
+
+
+
+
+<!-- Diálogo de borrado de ubicación -->
+<ng-template #modalBorrarUbicacion let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿Estás seguro de que quieres borrar la ubicación?</h5>
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Siempre puedes volver a asignar una nueva.</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="activeModal.close()" ngbAutofocus>Cancelar</button>
+        <button type="button" class="btn btn-danger"    (click)="confirmaBorrarUbicacion()">Borrar</button>
+    </div>
+</ng-template>

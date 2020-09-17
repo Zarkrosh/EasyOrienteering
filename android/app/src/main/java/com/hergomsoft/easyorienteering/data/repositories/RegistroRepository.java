@@ -1,6 +1,7 @@
 package com.hergomsoft.easyorienteering.data.repositories;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -11,20 +12,19 @@ import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.ApiResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.InicioResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
-import com.hergomsoft.easyorienteering.data.api.responses.RegistroResponse;
-import com.hergomsoft.easyorienteering.data.api.responses.RegistrosRecorridoResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.ParticipacionesRecorridoResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
 import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Registro;
 import com.hergomsoft.easyorienteering.util.AppExecutors;
+import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.NetworkBoundResource;
 import com.hergomsoft.easyorienteering.util.Resource;
 import com.hergomsoft.easyorienteering.util.SingleLiveEvent;
 
-import org.json.JSONObject;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,9 +42,9 @@ public class RegistroRepository extends ApiRepository {
     private Recorrido recorridoActual;
     private List<Registro> registroList;
 
-    private SingleLiveEvent<Recurso<Registro>> registroResponse;         // Respuesta de registro de control
-    private SingleLiveEvent<Recurso<Boolean>> comprobacionPendiente;     // Respuesta de comprobación de recorrido pendiente
-    private SingleLiveEvent<Recurso<AbandonoResponse>> abandonoResponse; // Respuesta de comprobación de recorrido pendiente
+    private SingleLiveEvent<Resource<Registro>> registroResponse;         // Respuesta de registro de control
+    private SingleLiveEvent<Resource<Boolean>> comprobacionPendiente;     // Respuesta de comprobación de recorrido pendiente
+    private SingleLiveEvent<Resource<AbandonoResponse>> abandonoResponse; // Respuesta de comprobación de recorrido pendiente
     private MutableLiveData<Control> siguienteControl;
 
     // Singleton
@@ -58,6 +58,7 @@ public class RegistroRepository extends ApiRepository {
     }
 
     private RegistroRepository(Context context) {
+        super(context);
         //registroDAO = DatosDatabase.getDatabase(application).getRegistroDAO();
         //controlDAO = DatosDatabase.getDatabase(application).getControlDAO();
         //recorridoDAO = DatosDatabase.getDatabase(application).getRecorridoDAO();
@@ -73,16 +74,15 @@ public class RegistroRepository extends ApiRepository {
      * Inicia el recorrido de una carrera. La respuesta puede tener código 422, en cuyo caso el
      * mensaje contiene un código de error preestablecido (ver documentación).
      * @param codigo Código del control
-     * @param idCarrera ID de la carrera
      * @param idRecorrido ID del recorrido
      * @param secreto Secreto del control
      */
-    public void iniciaRecorrido(String codigo, long idCarrera, long idRecorrido, String secreto) {
+    public void iniciaRecorrido(String codigo, long idRecorrido, String secreto) {
         RegistroRequest request = new RegistroRequest(codigo, secreto);
-        apiClient.iniciaRecorrido(idCarrera, idRecorrido, request).enqueue(new Callback<InicioResponse>() {
+        apiClient.iniciaRecorrido(idRecorrido, request).enqueue(new Callback<InicioResponse>() {
             @Override
             public void onResponse(Call<InicioResponse> call, Response<InicioResponse> response) {
-                Recurso<Registro> recurso = new Recurso();
+                Resource<Registro> recurso;
                 if(response.isSuccessful() && response.body() != null) {
                     InicioResponse ir = response.body();
                     carreraActual = ir.getCarrera();
@@ -91,21 +91,27 @@ public class RegistroRepository extends ApiRepository {
                         onFailure(call, new IllegalArgumentException("La carrera o el recorrido actuales son nulos"));
                     }
 
-                    RegistroResponse regResp = ir.getRegistro();
-                    Control control = carreraActual.getControles().get(regResp.getControl());
-                    if(control == null) onFailure(call, new IllegalArgumentException("No se ha encontrado el control con código: " + regResp.getControl()));
-                    Registro registro = new Registro(control, recorridoActual, regResp.getFecha());
-                    recurso.setRecurso(registro);
+                    Registro registro = ir.getRegistro();
+                    Control control = carreraActual.getControles().get(registro.getControl());
+                    if(control == null) onFailure(call, new IllegalArgumentException("No se ha encontrado el control con código: " + registro.getControl()));
+                    recurso = Resource.success(registro);
+                    registroList.clear();
                     registraControlLocal(registro);
                 } else if(response.code() == 422) {
                     // Error lanzado en caso de algún error. Contiene un código de error
-                    asignaCodigoError(recurso, response);
+                    String codigoError = "";
+                    try {
+                        codigoError = response.errorBody().string();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    recurso = getRecursoDesdeCodigo(codigoError);
                 } else if(response.code() == 404) {
                     // No existe la carrera con el ID indicado
-                    recurso.setError("No existe la carrera con el ID indicado");
+                    recurso = Resource.error("No existe la carrera con el ID indicado", null);
                 } else {
                     // Error desconocido
-                    recurso.setError("Código de respuesta inesperado: " + response.code());
+                    recurso = Resource.error("Código de respuesta inesperado: " + response.code(), null);
                 }
 
                 registroResponse.postValue(recurso);
@@ -126,37 +132,36 @@ public class RegistroRepository extends ApiRepository {
      */
     public void registraControl(String codigo, String secreto) {
         RegistroRequest request = new RegistroRequest(codigo, secreto);
-        apiClient.registraControl(carreraActual.getId(), request).enqueue(new Callback<RegistroResponse>() {
+        apiClient.registraControl(recorridoActual.getId(), request).enqueue(new Callback<Registro>() {
             @Override
-            public void onResponse(Call<RegistroResponse> call, Response<RegistroResponse> response) {
-                Recurso<Registro> recurso = new Recurso();
+            public void onResponse(Call<Registro> call, Response<Registro> response) {
+                Resource<Registro> recurso;
                 if(response.isSuccessful() && response.body() != null) {
-                    RegistroResponse resp = response.body();
-                    // Obtiene el control y el recorrido desde su código e ID
-                    //Control control = controlDAO.getByCodigo(resp.getControl());
-                    //Recorrido recorrido = recorridoDAO.getByID(resp.getRecorrido());
-                    Control control = carreraActual.getControles().get(resp.getControl());
-                    if(control == null) onFailure(call, new IllegalArgumentException("No se ha encontrado el control con código: " + resp.getControl()));
-
-                    Registro registro = new Registro(control, recorridoActual, resp.getFecha());
-                    recurso.setRecurso(registro);
-                    registraControlLocal(registro);
+                    Registro reg = response.body();
+                    recurso = Resource.success(reg);
+                    registraControlLocal(reg);
                 } else if(response.code() == 422) {
                     // Error lanzado en caso de algún error. Contiene un código de error
-                    asignaCodigoError(recurso, response);
+                    String codigoError = "";
+                    try {
+                        codigoError = response.errorBody().string();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    recurso = getRecursoDesdeCodigo(codigoError);
                 } else if(response.code() == 404) {
                     // No existe la carrera con el ID indicado
-                    recurso.setError("No existe la carrera con el ID indicado");
+                    recurso = Resource.error("No existe la carrera con el ID indicado", null);
                 } else {
                     // Error desconocido
-                    recurso.setError("Código de respuesta inesperado: " + response.code());
+                    recurso = Resource.error("Código de respuesta inesperado: " + response.code(), null);
                 }
 
                 registroResponse.postValue(recurso);
             }
 
             @Override
-            public void onFailure(Call<RegistroResponse> call, Throwable t) {
+            public void onFailure(Call<Registro> call, Throwable t) {
                 registroResponse.postValue(getRecursoConErrorConexion(t));
             }
         });
@@ -171,20 +176,19 @@ public class RegistroRepository extends ApiRepository {
         apiClient.getPendiente().enqueue(new Callback<PendienteResponse>() {
             @Override
             public void onResponse(Call<PendienteResponse> call, Response<PendienteResponse> response) {
-                Recurso<Boolean> resultado = new Recurso<>();
-                Boolean pendiente = null;
+                Resource<Boolean> recurso;
                 if(response.isSuccessful()) {
                     if(response.code() == 204) {
                         // No content: no tiene ninguna carrera pendiente
                         carreraActual = null;
                         recorridoActual = null;
-                        pendiente = false;
-                    } else {
+                        recurso = Resource.success(false);
+                    } else if(response.body() != null) {
                         PendienteResponse resp = response.body();
-                        if(resp.getCarrera() == null || resp.getRegistros() == null) {
+                        if(resp.getCarrera() == null || resp.getParticipacion() == null) {
                             // Error
-                            // TODO
-                            resultado.setError("Error. Respuesta del servidor inválida");
+                            Log.d("EASYO", resp.toString());
+                            recurso = Resource.error("Error. Respuesta del servidor inválida", null);
                         } else {
                             carreraActual = resp.getCarrera();
                             recorridoActual = null;
@@ -199,22 +203,20 @@ public class RegistroRepository extends ApiRepository {
                             // Borra todos los registros anteriores e introduce los nuevos
                             //new InsertRegistrosAT(registroDAO).execute(resp.getRegistros());
                             registroList = new ArrayList<>();
-                            for(RegistroResponse rr : resp.getRegistros()) {
-                                Control control = carreraActual.getControles().get(rr.getControl());
-                                if(control == null) onFailure(call, new IllegalArgumentException("No se ha encontrado el control con código: " + rr.getControl()));
-                                registroList.add(new Registro(control, recorridoActual, rr.getFecha()));
-                            }
+                            registroList.addAll(resp.getParticipacion().getRegistros());
                             actualizaSiguienteControl();
-                            pendiente = true;
+                            recurso = Resource.success(true);
                         }
+                    } else {
+                        // No debería pasar
+                        recurso = Resource.success(false);
                     }
                 } else {
                     // Error desconocido
-                    resultado.setError("Error desconocido. Código HTTP " + response.code());
+                    recurso = Resource.error("Error desconocido. Código HTTP " + response.code(), null);
                 }
 
-                resultado.setRecurso(pendiente);
-                comprobacionPendiente.postValue(resultado);
+                comprobacionPendiente.postValue(recurso);
             }
 
             @Override
@@ -231,11 +233,11 @@ public class RegistroRepository extends ApiRepository {
         apiClient.abandonaRecorrido(recorridoActual.getId()).enqueue(new Callback<AbandonoResponse>() {
             @Override
             public void onResponse(Call<AbandonoResponse> call, Response<AbandonoResponse> response) {
-                Recurso<AbandonoResponse> recurso = new Recurso<>();
-                if(response.code() == 200) {
-                    recurso.setRecurso(response.body());
+                Resource<AbandonoResponse> recurso;
+                if(response.code() == 200 && response.body() != null) {
+                    recurso = Resource.success(response.body());
                 } else {
-                    recurso.setError("Código de respuesta inesperado: " + response.code() + " (se esperaba 200)");
+                    recurso = Resource.error("Código de respuesta inesperado: " + response.code() + " (se esperaba 200)", null);
                 }
                 abandonoResponse.postValue(recurso);
             }
@@ -247,8 +249,8 @@ public class RegistroRepository extends ApiRepository {
         });
     }
 
-    public LiveData<Resource<RegistrosRecorridoResponse>> getRegistrosRecorrido(long idRecorrido) {
-        return new NetworkBoundResource<RegistrosRecorridoResponse, RegistrosRecorridoResponse>(AppExecutors.getInstance(), false) {
+    public LiveData<Resource<ParticipacionesRecorridoResponse>> getRegistrosRecorrido(long idRecorrido) {
+        return new NetworkBoundResource<ParticipacionesRecorridoResponse, ParticipacionesRecorridoResponse>(AppExecutors.getInstance(), false) {
             /*
             @Override
             protected void saveCallResult(@NonNull RegistrosRecorridoResponse item) {
@@ -272,33 +274,41 @@ public class RegistroRepository extends ApiRepository {
 
             @NonNull
             @Override
-            protected LiveData<ApiResponse<RegistrosRecorridoResponse>> createCall() {
+            protected LiveData<ApiResponse<ParticipacionesRecorridoResponse>> createCall() {
                 return apiClient.getRegistrosRecorrido(idRecorrido);
             }
         }.getAsLiveData();
     }
 
-    public SingleLiveEvent<Recurso<Boolean>> getPendienteResponse() { return comprobacionPendiente; }
-    public SingleLiveEvent<Recurso<Registro>> getRegistroResponse() { return registroResponse; }
-    public SingleLiveEvent<Recurso<AbandonoResponse>> getAbandonoResponse() { return abandonoResponse; }
+    public void resetDatos() {
+        this.carreraActual = null;
+        this.recorridoActual = null;
+    }
+
+    public SingleLiveEvent<Resource<Boolean>> getPendienteResponse() { return comprobacionPendiente; }
+    public SingleLiveEvent<Resource<Registro>> getRegistroResponse() { return registroResponse; }
+    public SingleLiveEvent<Resource<AbandonoResponse>> getAbandonoResponse() { return abandonoResponse; }
     public LiveData<Control> getSiguienteControl() { return siguienteControl; }
     public Carrera getCarreraActual() { return carreraActual; }
     public Recorrido getRecorridoActual() { return recorridoActual; }
 
     /**
      * Obtiene el código de error del cuerpo del mensaje de la respuesta.
-     * @param recurso Recurso al que asignar el error
-     * @param response Respuesta con el error
+     * @param codigoError Codigo de error
      */
-    private void asignaCodigoError(Recurso recurso, Response response) {
+    private Resource getRecursoDesdeCodigo(String codigoError) {
+        Resource res = null;
         try {
-            JSONObject json = new JSONObject(response.errorBody().string());
-            recurso.setError(json.getString("message"));
-            // TODO Convertir a error legible por el usuario
+            String errorLegible = "Registro incorrecto";
+            String s = Constants.erroresRegistro.get(codigoError);
+            if(s != null) errorLegible = s;
+            res = Resource.error(errorLegible, null);
         } catch (Exception e) {
             e.printStackTrace();
-            recurso.setError("Error inesperado al obtener el código de error");
+            res = Resource.error("Error inesperado al obtener el código de error", null);
         }
+
+        return res;
     }
 
     private void registraControlLocal(Registro registro) {

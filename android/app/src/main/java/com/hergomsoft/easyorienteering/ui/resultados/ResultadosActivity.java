@@ -1,9 +1,5 @@
 package com.hergomsoft.easyorienteering.ui.resultados;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -17,17 +13,19 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.components.DialogoCarga;
-import com.hergomsoft.easyorienteering.data.api.responses.RegistroResponse;
-import com.hergomsoft.easyorienteering.data.api.responses.RegistrosRecorridoResponse;
-import com.hergomsoft.easyorienteering.data.api.responses.RegistrosUsuario;
+import com.hergomsoft.easyorienteering.data.api.responses.ParticipacionesRecorridoResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.ParcialUsuario;
+import com.hergomsoft.easyorienteering.data.model.Participacion;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
+import com.hergomsoft.easyorienteering.data.model.Registro;
 import com.hergomsoft.easyorienteering.data.model.ResultadoUsuario;
 import com.hergomsoft.easyorienteering.data.model.Usuario;
-import com.hergomsoft.easyorienteering.ui.perfil.PerfilActivity;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
 import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.Resource;
@@ -86,9 +84,9 @@ public class ResultadosActivity extends BackableActivity {
             finish();
         }
 
-        viewModel.getResultados(idRecorrido).observe(this, new Observer<Resource<RegistrosRecorridoResponse>>() {
+        viewModel.getResultados(idRecorrido).observe(this, new Observer<Resource<ParticipacionesRecorridoResponse>>() {
             @Override
-            public void onChanged(Resource<RegistrosRecorridoResponse> response) {
+            public void onChanged(Resource<ParticipacionesRecorridoResponse> response) {
                 if(response != null) {
                     switch(response.status) {
                         case LOADING:
@@ -97,14 +95,13 @@ public class ResultadosActivity extends BackableActivity {
                             break;
                         case SUCCESS:
                             if(response.data != null) {
-                                RegistrosRecorridoResponse registrosUsuarios = response.data;
                                 Carrera.Modalidad modalidad = response.data.getModalidad();
                                 Recorrido recorrido = response.data.getRecorrido();
                                 setTitle(getString(R.string.resultados_resultados, recorrido.getNombre()));
                                 String[] trazado = recorrido.getTrazado();
                                 Map<String, Integer> puntuacionControles = response.data.getPuntuacionesControles();
                                 // Genera parciales independientes de los corredores
-                                List<ResultadoUsuario> resultados = generaResultados(modalidad, trazado, puntuacionControles, response.data.getRegistrosUsuarios());
+                                List<ResultadoUsuario> resultados = generaResultados(modalidad, trazado, puntuacionControles, response.data.getParticipaciones());
                                 generaTablaResultados(modalidad, trazado, resultados);
                                 viewModel.ocultaDialogoCarga();
                             } else {
@@ -122,28 +119,28 @@ public class ResultadosActivity extends BackableActivity {
         });
     }
 
-    private List<ResultadoUsuario> generaResultados(Carrera.Modalidad modalidad, String[] trazado, Map<String, Integer> puntuacionControles, List<RegistrosUsuario> registrosUsuarios) {
+    private List<ResultadoUsuario> generaResultados(Carrera.Modalidad modalidad, String[] trazado, Map<String, Integer> puntuacionControles, List<Participacion> participaciones) {
         List<ResultadoUsuario> resultados = new ArrayList<>();
 
-        if(registrosUsuarios.size() > 0) {
+        if(participaciones.size() > 0) {
             // Sets para calcular los puestos de los tiempos parciales y totales
             List<SortedSet<Long>> setsParciales = new ArrayList<>();
             for(int i = 0; i < trazado.length - 1; i++) setsParciales.add(new TreeSet<>());
             List<SortedSet<Long>> setsAcumulados = new ArrayList<>();
             for(int i = 0; i < trazado.length - 1; i++) setsAcumulados.add(new TreeSet<>());
             // Calcula los parciales de cada usuario
-            for(RegistrosUsuario ru : registrosUsuarios) {
-                Usuario corredor = ru.getUsuario();
+            for(Participacion participacion : participaciones) {
+                Usuario corredor = participacion.getCorredor();
                 ResultadoUsuario.Tipo tipo = ResultadoUsuario.Tipo.OK;
                 long tAcum = 0;
                 List<ParcialUsuario> parciales = new ArrayList<>();
                 Map<String, Integer> puntosRegistrados = new HashMap<>();
                 if(modalidad == Carrera.Modalidad.TRAZADO) {
                     // LINEA
-                    if(ru.getRegistros().size() < trazado.length) tipo = ResultadoUsuario.Tipo.PENDIENTE;
-                    for(int i = 1; i < ru.getRegistros().size(); i++) {
-                        Date dPri = ru.getRegistros().get(i-1).getFecha();
-                        Date dSec = ru.getRegistros().get(i).getFecha();
+                    if(participacion.getRegistros().size() < trazado.length) tipo = ResultadoUsuario.Tipo.PENDIENTE;
+                    for(int i = 1; i < participacion.getRegistros().size(); i++) {
+                        Date dPri = participacion.getRegistros().get(i-1).getFecha();
+                        Date dSec = participacion.getRegistros().get(i).getFecha();
                         if(dPri != null && dSec != null) {
                             long tPri = dPri.getTime() / 1000; // Segundos
                             long tSec = dSec.getTime() / 1000; // Segundos
@@ -162,7 +159,7 @@ public class ResultadosActivity extends BackableActivity {
                     boolean pendiente = true;
                     boolean abandonado = false;
                     String controlMeta = trazado[trazado.length - 1]; // El último control es la meta
-                    for(RegistroResponse r : ru.getRegistros()) {
+                    for(Registro r : participacion.getRegistros()) {
                         String codigoControl = r.getControl();
                         Date fechaRegistro = r.getFecha();
                         if(fechaRegistro != null) {
@@ -181,8 +178,8 @@ public class ResultadosActivity extends BackableActivity {
 
                     if(abandonado) tipo = ResultadoUsuario.Tipo.ABANDONADO;
                     else if(pendiente) tipo = ResultadoUsuario.Tipo.PENDIENTE;
-                    tAcum = ru.getRegistros().get(ru.getRegistros().size() - 1).getFecha().getTime() / 1000
-                            - ru.getRegistros().get(0).getFecha().getTime() / 1000;
+                    tAcum = participacion.getRegistros().get(participacion.getRegistros().size() - 1).getFecha().getTime() / 1000
+                            - participacion.getRegistros().get(0).getFecha().getTime() / 1000;
                 }
 
                 ResultadoUsuario res = new ResultadoUsuario(corredor.getId(), String.format("%s\n%s", corredor.getNombre(), corredor.getClub()), tAcum, tipo);
@@ -340,15 +337,6 @@ public class ResultadosActivity extends BackableActivity {
                 TextView tvTiempoTotal = row.findViewById(R.id.item_resultados_tiempo_total);
                 // Asigna valores
                 tvNombreClub.setText(r.getNombreClub().trim());
-                tvNombreClub.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Al pulsar en un corredor se visualiza su perfil
-                        Intent i = new Intent(ResultadosActivity.this, PerfilActivity.class);
-                        i.putExtra(Constants.EXTRA_ID_USUARIO, r.getIdUsuario());
-                        startActivity(i);
-                    }
-                });
                 String sTiempoTotal;
                 String sPosicion = "";
                 switch (r.getTipo()) {

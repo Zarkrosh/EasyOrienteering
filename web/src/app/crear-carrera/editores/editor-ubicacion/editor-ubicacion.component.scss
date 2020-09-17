@@ -9,10 +9,16 @@ h1 {
     font-weight: bold;
 }
 
-
-.btn-editar-ubicacion {
+.btn-borrar-ubicacion {
     position: absolute;
     right: 0;
+    top: 0;
+    height: 100%;
+    font-size: 0.8rem;
+}
+.btn-editar-ubicacion {
+    position: absolute;
+    left: 0;
     top: 0;
     height: 100%;
     font-size: 0.8rem;

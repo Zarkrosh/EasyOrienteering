@@ -11,6 +11,9 @@ $color-secondary: #007bff;
 $color-secondary-light: rgba($color-secondary, 0.8);
 $color-secondary-dark: #0061c9;
 
+body {
+    background: url("~/assets/img/background.png") center center repeat fixed;
+}
 
 alert {
     position: fixed;
@@ -68,9 +71,10 @@ alert {
     box-shadow: 0 0 0 0.2rem rgba($color-secondary, 0.5);
 }
 
-.easyo-container {
+.easyo-container-fit, .easyo-container {
     position: relative;
     width: $max-width-content;
+    min-height: 600px;
     margin: 50px auto;
     border-radius: 20px;
     box-shadow: 2px 2px #AAA7;
@@ -84,16 +88,39 @@ alert {
     margin-bottom: 30px;
 }
 
+.easyo-container-fit {
+    min-height: 0 !important;
+    padding: 0 !important;
+}
+
 .btns-cabecera button {
     position: absolute;
     top: 0;
     padding: 10px 20px;
+    border: 2px solid black;
 }
 .btn-cabecera-izda {
     left: 0;
+    border-top-left-radius: 20px;
 }
 .btn-cabecera-dcha {
     right: 0;
+    border-top-right-radius: 20px;
+}
+
+.btns-final button {
+    position: absolute;
+    bottom: 0;
+    padding: 10px 20px;
+    border: 2px solid black;
+}
+.btn-final-izda {
+    left: 0;
+    border-bottom-left-radius: 20px;
+}
+.btn-final-dcha {
+    right: 0;
+    border-bottom-right-radius: 20px;
 }
 
 
@@ -104,6 +131,7 @@ alert {
     display: flex;
     justify-content: center;
     align-items: center;
+    text-align: center;
 }
 .btn-reintentar {
     margin: 35px auto 0 auto;
@@ -135,11 +163,22 @@ alert {
 }
 
 
-.footer-web {
-    width: 100%;
-    height: 200px;
-    background-color: grey;
+
+
+
+/**** LOGIN / REGISTRO ****/
+.auth-wrapper {
+    width: 20%;
+    min-width: 400px;
+    margin: 60px auto;
+    border: 2px solid #000000;
+    border-radius: 20px;
+    padding: 0;
+    background-color: #fbfbfb;
+    box-shadow: 1px 0px 3px 0px gray;
 }
+
+
 
 
 /**** CODIGOS QR EN PDF ****/
@@ -186,10 +225,22 @@ alert {
 /**************************/
 
 
-/**** DIALOGO MODAL ****/
+.modal-footer {
+    justify-content: space-between !important;
+}
+/**** DIALOGO MODAL AJUSTADO ****/
 .modal-fit .modal-dialog {
     width: min-content !important;
     max-width: none !important;
+}
+
+/**** DIALOGO MODAL MAPA ****/
+.modal-mapa .modal-dialog {
+    width: min-content !important;
+    max-width: none !important;
+}
+.modal-mapa img {
+    max-height: 800px;
 }
 
 

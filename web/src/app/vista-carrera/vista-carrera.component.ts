@@ -1,9 +1,11 @@
 import { Component, OnInit, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ClienteApiService } from '../shared/cliente-api.service';
+import { ClienteApiService } from '../_services/cliente-api.service';
 import { AlertService } from '../alert';
-import { Carrera, Usuario } from '../shared/app.model';
+import { Carrera, Usuario } from '../_shared/app.model';
+import { Utils } from '../_shared/utils';
 import * as L from 'leaflet';
+import { TokenStorageService } from '../_services/token-storage.service';
 
 @Component({
   selector: 'app-vista-carrera',
@@ -12,14 +14,23 @@ import * as L from 'leaflet';
 })
 export class VistaCarreraComponent implements OnInit {
 
+  readonly CARRERA_TIPO_EVENTO = Carrera.TIPO_EVENTO;
+  readonly CARRERA_TIPO_CIRCUITO = Carrera.TIPO_CIRCUITO;
+
   // Alertas
-  optionsAlerts = {
+  alertOptions = {
     autoClose: true,
     keepAfterRouteChange: false
   };
 
   carrera: Carrera;
+  esOrganizador: boolean;
+  organizador: string;
+
   errorCarga: boolean;
+  errorPrivada: boolean;
+  descargandoMapas: boolean;
+  hayMapas: boolean;
 
   // Ubicación
   @ViewChildren('mapaUbicacion') queryMapa: QueryList<ElementRef>;
@@ -31,11 +42,12 @@ export class VistaCarreraComponent implements OnInit {
   constructor(private route: ActivatedRoute,
     private router: Router,
     private clienteApi: ClienteApiService,
-    protected alertService: AlertService) { }
+    protected alertService: AlertService,
+    private tokenService: TokenStorageService) { }
 
   ngOnInit() {
-    this.carrera = null;
-    this.errorCarga = false;
+    this.carrera = this.organizador = null;
+    this.errorCarga = this.errorPrivada = this.esOrganizador = this.hayMapas = false;
 
     this.cargaDatosCarrera();
   }
@@ -54,29 +66,39 @@ export class VistaCarreraComponent implements OnInit {
         resp => {
           if(resp.status == 200) {
             this.carrera = resp.body;
+            this.organizador = this.getOrganizador();
+            if(this.tokenService.isLoggedIn() && this.tokenService.getUser().id === this.carrera.organizador.id) {
+              this.esOrganizador = true;
+              for(let recorrido of this.carrera.recorridos) {
+                if(recorrido.mapa) this.hayMapas = true;
+              }
+            }
           } else {
-            this.alertService.error("Error al obtener la carrera", this.optionsAlerts);
+            this.alertService.error("Error al obtener la carrera", this.alertOptions);
             this.errorCarga = true;
           }
         }, err => {
-          if(err.status == 404) {
-            this.alertService.error("No existe ninguna carrera con ese ID", this.optionsAlerts);
-          } else if(err.status == 504) {
-            this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.optionsAlerts);
+          if(err.status == 403) {
+            this.errorPrivada = true;
           } else {
-            this.alertService.error("Error al obtener la carrera: " + JSON.stringify(err), this.optionsAlerts);
+            this.alertService.error(Utils.getMensajeError(err, "Error al obtener la carrera"), this.alertOptions);
           }
+
           this.errorCarga = true;
         }
       );
     })
   }
 
-  // TODO Convertir a pure pipe para mejorar rendimiento
   getOrganizador(): string {
+    let res: string ;
     let org: Usuario = this.carrera.organizador;
-    let res: string = org.nombre;
-    if(org.club.length > 0) res += " (" + org.club + ")"; 
+    if(org) {
+      res = org.nombre;
+      if(org.club.length > 0) res += " (" + org.club + ")"; 
+    } else {
+      res = "Cuenta borrada";
+    }
     return res;
   }
 
@@ -121,6 +143,31 @@ export class VistaCarreraComponent implements OnInit {
         animate: true,
         duration: 1
     });
+  }
+
+  descargarMapas(): void {
+    this.descargandoMapas = true;
+    this.clienteApi.getMapasCarrera(this.carrera.id).subscribe(
+      resp => {
+        if(resp.status == 200) {
+          let dataType = resp.type.toString();
+          let binaryData = [];
+          binaryData.push(resp);
+          let downloadLink = document.createElement('a');
+          downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
+          downloadLink.setAttribute('download', "Mapas");
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+        } else {
+          this.alertService.error("No hay mapas", this.alertOptions);
+        }
+        
+        this.descargandoMapas = false;
+      }, err => {
+        this.alertService.error(Utils.getMensajeError(err, "Error al descargar los mapas"), this.alertOptions);
+        this.descargandoMapas = false;
+      }
+    );
   }
 
   editarCarrera(): void {

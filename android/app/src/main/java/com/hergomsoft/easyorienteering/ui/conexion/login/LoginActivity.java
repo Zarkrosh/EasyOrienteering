@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -23,10 +24,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.data.model.ConexionState;
+import com.hergomsoft.easyorienteering.components.DialogoCarga;
+import com.hergomsoft.easyorienteering.ui.scan.ScanActivity;
+import com.hergomsoft.easyorienteering.ui.scan.ScanViewModel;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
 import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.ui.home.HomeActivity;
+import com.hergomsoft.easyorienteering.util.Resource;
 import com.hergomsoft.easyorienteering.util.Utils;
 
 public class LoginActivity extends BackableActivity {
@@ -38,7 +42,8 @@ public class LoginActivity extends BackableActivity {
     private ProgressBar loadingProgressBar;
     private TextView olvidoPass;
 
-    private LoginViewModel loginViewModel;
+    private LoginViewModel viewModel;
+
 
     private Activity activity; // Referencia para la ocultación de teclado
 
@@ -47,8 +52,7 @@ public class LoginActivity extends BackableActivity {
         super.onCreate(savedInstanceState);
         setTitle(getString(R.string.login_titulo));
         setContentView(R.layout.activity_conectarse);
-        loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
-                .get(LoginViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
         activity = this;
 
         inputEmailNombre = findViewById(R.id.conectarseEmailNombre);
@@ -63,7 +67,41 @@ public class LoginActivity extends BackableActivity {
         loadingProgressBar.getIndeterminateDrawable()
                 .setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN );
 
-        loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
+
+        setupListeners();
+        setupDialogoCarga();
+
+        btnConectar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingProgressBar.setVisibility(View.VISIBLE);
+                doLogin(inputEmailNombre.getText().toString(),
+                        inputPassword.getText().toString());
+            }
+        });
+
+        olvidoPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, OlvidoActivity.class);
+                intent.putExtra(Constants.EXTRA_EMAIL_NOMBRE, inputEmailNombre.getText().toString().trim());
+                startActivity(intent);
+            }
+        });
+    }
+
+    /**
+     * Configura el diálogo de uso general para operaciones de carga y notificaciones de éxito/error.
+     */
+    private void setupDialogoCarga() {
+        DialogoCarga dialogoCarga = new DialogoCarga(LoginActivity.this);
+        dialogoCarga.setObservadorEstado(this, viewModel.getEstadoDialogo());
+        dialogoCarga.setObservadorTitulo(this, viewModel.getTituloDialogo());
+        dialogoCarga.setObservadorMensaje(this, viewModel.getMensajeDialogo());
+    }
+
+    private void setupListeners() {
+        viewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override
             public void onChanged(@Nullable LoginFormState loginFormState) {
                 if (loginFormState == null) {
@@ -80,27 +118,26 @@ public class LoginActivity extends BackableActivity {
             }
         });
 
-        loginViewModel.getLoginState().observe(this, new Observer<ConexionState>() {
+        viewModel.getLoginState().observe(this, new Observer<Resource<String>>() {
             @Override
-            public void onChanged(ConexionState loginState) {
-                switch (loginState.getEstado()) {
-                    case ConexionState.ESTADO_CARGANDO:
+            public void onChanged(Resource<String> loginState) {
+                switch (loginState.status) {
+                    case LOADING:
                         // Oculta los botones de olvido y conexión
                         olvidoPass.setVisibility(View.GONE);
                         btnConectar.setVisibility(View.GONE);
                         // Muestra el indicador de carga
                         loadingProgressBar.setVisibility(View.VISIBLE);
                         break;
-                    case ConexionState.ESTADO_EXITO_FIN:
+                    case SUCCESS:
                         // Tras login exitoso redirige a la pantalla principal
-                        startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                        Intent i = new Intent(LoginActivity.this, HomeActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Borra histórico
+                        startActivity(i);
                         finish();
                         break;
-                    case ConexionState.ESTADO_ERROR:
-                        Integer idMensaje = loginState.getMensaje();
-                        String mensaje = "";
-                        if(idMensaje != null) mensaje = getString(idMensaje);
-                        textError.setText(mensaje);
+                    case ERROR:
+                        textError.setText(loginState.message);
                         // break; // No se hace break para ejecutar lo del default
                     default:
                         // Muestra los botones de olvido y conexión
@@ -126,7 +163,7 @@ public class LoginActivity extends BackableActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                loginViewModel.loginDataChanged(inputEmailNombre.getText().toString(),
+                viewModel.loginDataChanged(inputEmailNombre.getText().toString(),
                         inputPassword.getText().toString());
             }
         };
@@ -144,24 +181,6 @@ public class LoginActivity extends BackableActivity {
                 return false;
             }
         });
-
-        btnConectar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
-                doLogin(inputEmailNombre.getText().toString(),
-                        inputPassword.getText().toString());
-            }
-        });
-
-        olvidoPass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, OlvidoActivity.class);
-                intent.putExtra(Constants.EXTRA_EMAIL_NOMBRE, inputEmailNombre.getText().toString().trim());
-                startActivity(intent);
-            }
-        });
     }
 
     private void doLogin(String username, String password) {
@@ -169,7 +188,7 @@ public class LoginActivity extends BackableActivity {
         Utils.hideKeyboard(activity);
 
         textError.setText("");
-        loginViewModel.login(username, password);
+        viewModel.login(username, password);
     }
 
 }

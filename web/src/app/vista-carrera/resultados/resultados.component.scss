@@ -1,8 +1,24 @@
 @import "../../../styles.scss";
 
+
+.btn-volver::before {
+    margin-right: 5px;
+    content: "\f053";
+    font-family: "FontAwesome";
+}
+
+.btn-actualizar::before {
+    margin-right: 5px;
+    content: "\f01e";
+    font-family: "FontAwesome";
+}
+
 .tabla-resultados {
     display: block;
+    width: min-content;
     max-height: 700px;
+    max-width: 100%;
+    margin: 0 auto;
     border: 2px solid black;
     white-space: nowrap;
     overflow-x: auto;
@@ -19,9 +35,9 @@
     border-left: 1px solid gray;
     padding: 0 5px;
 }
-.tabla-resultados th {
-    border-left: 2px solid black;
+.tabla-resultados th {  
     padding: 0px 4px;
+    min-width: 30px;
 }
 
 .cabecera-trazado {
@@ -56,6 +72,35 @@
     font-weight: bold;
 }
 
+.posicion-pendiente {
+    background-color: blue;
+}
+.posicion-abandonada {
+    background-color: red;
+}
+
+
+.marca-tipo-resultado {
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+}
+.marca-pendiente {
+    background-color: rgb(69, 69, 255);
+}
+.marca-abandona {
+    background-color: rgb(255, 69, 69);
+}
+
+.marca-picado::before {
+    margin: 0 5px;
+    content: "\f058";
+    font-family: "FontAwesome";
+    font-weight: bold;
+    font-size: 1.3rem;
+    color: green;
+}
 
 .sin-resultados {
     margin: 20% 0;

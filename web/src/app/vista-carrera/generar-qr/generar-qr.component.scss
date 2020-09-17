@@ -7,14 +7,10 @@ $alto-dina4: 297mm;
     margin-right: 5px;
 }
 
-.btn-descargar-pdf::before {
+.btn-pdf::before {
     margin-right: 5px;
     content: "\f1c1";
     font-family: "FontAwesome";
-}
-.btn-descargar-pdf {
-    position: absolute;
-    right: 50px;
 }
 
 h1 {

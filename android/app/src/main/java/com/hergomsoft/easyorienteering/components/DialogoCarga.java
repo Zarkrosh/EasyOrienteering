@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,7 +36,10 @@ public class DialogoCarga extends AlertDialog {
 
     public DialogoCarga(Context context) {
         super(context);
+        init();
+    }
 
+    private void init() {
         View content = LayoutInflater.from(getContext()).inflate(R.layout.dialogo_carga, null);
         setView(content);
 
@@ -68,6 +72,7 @@ public class DialogoCarga extends AlertDialog {
             public void onChanged(Integer integer) {
                 switch (integer) {
                     case ESTADO_CARGANDO:
+                        setCancelable(false);
                         progress.setVisibility(View.VISIBLE);
                         imagen.setVisibility(View.INVISIBLE);
                         btnDismiss.setVisibility(View.INVISIBLE);
@@ -77,6 +82,7 @@ public class DialogoCarga extends AlertDialog {
                         show();
                         break;
                     case ESTADO_EXITO:
+                        setCancelable(false);
                         progress.setVisibility(View.INVISIBLE);
                         imagen.setVisibility(View.VISIBLE);
                         btnDismiss.setVisibility(View.INVISIBLE);
@@ -87,6 +93,7 @@ public class DialogoCarga extends AlertDialog {
                         show();
                         break;
                     case ESTADO_ERROR:
+                        setCancelable(true);
                         progress.setVisibility(View.INVISIBLE);
                         imagen.setVisibility(View.VISIBLE);
                         btnDismiss.setVisibility(View.VISIBLE);

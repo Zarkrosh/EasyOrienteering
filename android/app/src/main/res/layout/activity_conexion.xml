@@ -10,16 +10,22 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/padHorizontalPrincipales"
-        android:paddingTop="@dimen/padTopPrincipales"
-        android:paddingBottom="@dimen/padBotPrincipales">
+        android:layout_height="wrap_content">
+
+        <!-- Imagen de fondo -->
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/img_orientacion"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true" />
 
         <LinearLayout
             android:id="@+id/llTituloInicio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:layout_marginHorizontal="40dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -28,10 +34,12 @@
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="60dp"
                 android:layout_marginTop="30dp"
+                android:paddingHorizontal="4dp"
                 android:text="@string/app_name"
                 android:gravity="center"
+                android:background="@drawable/back_round_corners"
                 app:autoSizeTextType="uniform"
                 app:autoSizeMinTextSize="12sp"
                 app:autoSizeMaxTextSize="100sp"
@@ -46,12 +54,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="44dp"
+            android:layout_marginHorizontal="40dp"
             android:gravity="center"
+            android:padding="10dp"
             android:text="@string/conexion_continuar"
             android:textSize="20sp"
             android:textColor="@android:color/black"
+            android:background="@drawable/back_round_corners"
             app:layout_constraintTop_toBottomOf="@+id/llTituloInicio"
             tools:layout_editor_absoluteX="49dp" />
+
 
         <LinearLayout
             android:id="@+id/llGoogle"
@@ -62,6 +74,8 @@
             android:visibility="visible"
             app:layout_constraintTop_toBottomOf="@+id/textView7"
             tools:layout_editor_absoluteX="49dp">
+
+            <!--
 
             <ImageView
                 android:layout_width="40sp"
@@ -80,6 +94,8 @@
                 app:autoSizeMinTextSize="12sp"
                 app:autoSizeMaxTextSize="100sp"
                 app:autoSizeStepGranularity="2sp" />
+
+            -->
         </LinearLayout>
 
         <Button
@@ -87,34 +103,36 @@
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_gravity="start"
-            android:layout_marginTop="52dp"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/back_boton"
             android:enabled="false"
             android:text="@string/conexion_registrar"
             android:textAllCaps="false"
-            android:textSize="20sp"
             android:textColor="@android:color/white"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:background="@color/colorPrimary"
+            app:layout_constraintBottom_toTopOf="@+id/conexionBtnConectar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.494"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/llGoogle" />
+            app:layout_constraintHorizontal_bias="0.387"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/conexionBtnConectar"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_gravity="start"
-            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/back_boton"
             android:enabled="false"
             android:text="@string/conexion_conectar"
             android:textAllCaps="false"
-            android:textSize="20sp"
             android:textColor="@android:color/white"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:background="@color/colorPrimary"
-            app:layout_constraintTop_toBottomOf="@+id/conexionBtnRegistrar"
-            tools:layout_editor_absoluteX="50dp" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="40dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -1,11 +1,12 @@
 package com.hergomsoft.easyorienteering.data.api.responses;
 
 import com.hergomsoft.easyorienteering.data.model.Carrera;
+import com.hergomsoft.easyorienteering.data.model.Participacion;
 
 public class PendienteResponse {
     private Carrera carrera;
     private long idRecorrido;
-    private RegistroResponse[] registros;
+    private Participacion participacion;
 
     public Carrera getCarrera() {
         return carrera;
@@ -13,7 +14,7 @@ public class PendienteResponse {
     public long getIdRecorrido() {
         return idRecorrido;
     }
-    public RegistroResponse[] getRegistros() {
-        return registros;
+    public Participacion getParticipacion() {
+        return participacion;
     }
 }

@@ -3,8 +3,8 @@
         <div class="btns-cabecera" *ngIf="tipoVista === TIPO_EDITAR">
             <button class="btn btn-info btn-cabecera-izda" (click)="clickBotonVolver()">Volver a carrera</button>
             <button class="btn btn-danger btn-cabecera-dcha" (click)="clickBotonBorrarCarrera()" [disabled]="borrandoCarrera">
-                <span *ngIf="borrandoCarrera" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                 Borrar carrera
+                <span *ngIf="borrandoCarrera" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             </button>
         </div>
 
@@ -32,7 +32,7 @@
                                             <span>Evento</span>
                                         </div>
                                     </label>
-                                    <label>
+                                    <label *ngIf="f.visibilidad.value === PRIV_PUBLICA">
                                         <input type="radio" formControlName="tipo" value="CIRCUITO" class="form-control selector-opcion"/>
                                         <div class="selector-opcion-cont noselect">
                                             <span>Circuito</span>
@@ -70,7 +70,7 @@
                                             <span>Pública</span>
                                         </div>
                                     </label>
-                                    <label>
+                                    <label *ngIf="f.tipo.value === TIPO_EVENTO">
                                         <input type="radio" formControlName="visibilidad" value="{{PRIV_PRIVADA}}" class="form-control selector-opcion" />
                                         <div class="selector-opcion-cont noselect">
                                             <span>Privada</span>
@@ -84,7 +84,7 @@
                             <td>
                                 <div class="input-group">
                                     <input class="form-control" placeholder="dd/mm/yyyy"
-                                        formControlName="fecha" ngbDatepicker #d="ngbDatepicker" (click)="d.toggle()">
+                                        formControlName="fecha" ngbDatepicker #d="ngbDatepicker" [minDate]="minDate" [maxDate]="maxDate" (click)="d.toggle()">
 
                                     <div class="input-group-append">
                                         <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
@@ -139,7 +139,7 @@
                 <div id="lista-mapas">
                     <div *ngFor="let recorrido of carrera.recorridos">
                         <h4>{{recorrido.nombre}}</h4>
-                        <img *ngIf="recorrido.mapa && recorrido.mapa != true && recorrido.mapa != false" src={{recorrido.mapa}} />
+                        <img *ngIf="recorrido.mapa && recorrido.mapa != true && recorrido.mapa != false" src={{recorrido.mapa}} (click)="visualizarMapa(recorrido.mapa)" />
                         <button *ngIf="recorrido.mapa" class="btn btn-danger btn-borrar-mapa" (click)="clickBotonBorrarMapa(recorrido)"><i class="fa fa-times"></i></button>
 
                         <ng-container *ngIf="!recorrido.mapa">
@@ -200,7 +200,10 @@
         </ng-container>
 
 
-        <button class="btn btn-secondary btn-crear" (click)="guardaCarrera()" [disabled]="!carreraForm.valid">Guardar</button>
+        <button class="btn btn-secondary btn-crear" (click)="guardaCarrera()" [disabled]="!carreraForm.valid || guardandoCarrera">
+            Guardar
+            <span *ngIf="guardandoCarrera" class="spinner-border spinner-border-sm align-middle" role="status" aria-hidden="true"></span>
+        </button>
 
     </ng-container>
 
@@ -210,7 +213,7 @@
             <div class="lds-baliza"></div>
         </div>
         <div *ngIf="errorCarga">
-            <h1>Ocurrió un error :(</h1>
+            <h1>Ocurrió un error ☹</h1>
             <button class="btn btn-primary btn-reintentar" (click)="refresh()">Volver a intentar</button>
         </div>
     </div>
@@ -237,14 +240,14 @@
 <ng-template #modalBorrarCarrera let-modal>
     <div class="modal-header">
         <h5 class="modal-title">¿Estás seguro de que quieres borrar la carrera?</h5>
-        <button type="button" class="close" (click)="confirmaBorrarCarrera(false)" aria-label="Close">
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="modal-body">Tras borrar la carrera se perderán todos los datos y no se podrán recuperar.<br><br>Piénsalo bien ☹</div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="confirmaBorrarCarrera(false)" ngbAutofocus>Cancelar</button>
-        <button type="button" class="btn btn-danger"    (click)="confirmaBorrarCarrera(true)">Borrar carrera</button>
+        <button type="button" class="btn btn-secondary" (click)="activeModal.close()" ngbAutofocus>Cancelar</button>
+        <button type="button" class="btn btn-danger"    (click)="confirmaBorrarCarrera()">Borrar carrera</button>
     </div>
 </ng-template>
 
@@ -252,31 +255,33 @@
 <ng-template #modalBorrarMapa let-modal>
     <div class="modal-header">
         <h5 class="modal-title">¿Estás seguro de que quieres borrar el mapa?</h5>
-        <button type="button" class="close" (click)="confirmaBorrarMapa(false)" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div class="modal-body">Si el mapa ha sido generado con el trazador de esta página, puedes volver a generarlo volviendo a guardar los recorridos.</div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="confirmaBorrarMapa(false)" ngbAutofocus>Cancelar</button>
-        <button type="button" class="btn btn-danger"    (click)="confirmaBorrarMapa(true)">Borrar mapa</button>
-    </div>
-</ng-template>
-
-
-
-<!-- Diálogo de confirmación de edición 
-<ng-template #modalConfEdicion let-modal>
-    <div class="modal-header">
-        <h5 class="modal-title">¿Estás seguro de que quieres editar los {{(f.modalidad.value === MODALIDAD_SCORE) ? "controles" : "recorridos"}}?</h5>
-        <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="modal-body">Si el mapa ha sido generado con el trazador de esta página, puedes volver a generarlo volviendo a guardar los recorridos.</div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="activeModal.close()" ngbAutofocus>Cancelar</button>
-        <button type="button" class="btn btn-danger"    (click)="confirmaBorrarMapa(true)">Borrar mapa</button>
+        <button type="button" class="btn btn-danger"    (click)="confirmaBorrarMapa()">Borrar mapa</button>
     </div>
 </ng-template>
--->
+
+<!-- Diálogo de cancelación de edición -->
+<ng-template #modalCancelarEdicion let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">¿Estás seguro de que quieres cancelar la edición?</h5>
+        <button type="button" class="close" (click)="activeModal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">Perderás todos los datos modificados ☹</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="activeModal.close()" ngbAutofocus>Seguir editando</button>
+        <button type="button" class="btn btn-danger"    (click)="cancelarEdicion()">Cancelar edición</button>
+    </div>
+</ng-template>
+
+<!-- Diálogo de visualización de mapa -->
+<ng-template #modalVisualizacionMapa let-modal>
+    <img id="img-visualizacion" src="" />
+</ng-template>

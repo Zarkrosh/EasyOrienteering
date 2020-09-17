@@ -71,11 +71,10 @@ public class ExplorarViewModel extends AndroidViewModelConCarga {
                 if(listResource != null) {
                     switch (listResource.status) {
                         case SUCCESS:
-                            realizandoPeticion = false;
                             if(listResource.data != null && listResource.data.size() == numCarrerasPrev) {
-                                //noMasResultados = true; // TEST Cargador al final
+                                noMasResultados = true;
                             }
-                            carreras.removeSource(repositorySource);
+                            // No se hace break
                         case ERROR:
                             realizandoPeticion = false;
                             carreras.removeSource(repositorySource);

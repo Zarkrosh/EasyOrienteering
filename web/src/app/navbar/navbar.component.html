@@ -1,0 +1,16 @@
+<nav class="navbar navbar-expand-md navbar-dark bg-dark noselect" role="navigation">  
+    <div class="collapse navbar-collapse">
+        <div class="container-fluid">
+            <div class="navbar-header"><a class="nav-link btn-cabecera" routerLink='/'>EasyOrienteering</a></div>
+            <div id="navbar" class="collapse navbar-collapse flex-content-end">
+                <ul class="nav navbar-nav">
+                <li *ngIf="nav.loggedInView"><a class="nav-link btn-cabecera" routerLink='/crear/nueva'>Crear carrera</a></li>
+                <li><a class="nav-link btn-cabecera" routerLink='/explorar'>Explorar</a></li>
+                <li *ngIf="nav.loggedInView"><a class="nav-link btn-cabecera" routerLink='/perfil'>Mi perfil</a></li>
+                <li *ngIf="!nav.loggedInView"><a class="nav-link btn-cabecera" routerLink='/login'>Conectarse</a></li>
+                <li *ngIf="!nav.loggedInView"><a class="nav-link btn-cabecera" routerLink='/registro'>Registrarse</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>

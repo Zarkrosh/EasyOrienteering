@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "10df429d680350f315a6cd1c59c1915a",
+    "identityHash": "c393ffd24598f3dc9e75a773be5ddd9c",
     "entities": [
       {
         "tableName": "usuarios",
@@ -50,7 +50,7 @@
       },
       {
         "tableName": "carreras",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `nombre` TEXT, `tipo` TEXT, `modalidad` TEXT, `recorridos` TEXT, `timestamp` INTEGER, `organizador_id` INTEGER, `organizador_nombre` TEXT, `organizador_club` TEXT, `organizador_fechaRegistro` INTEGER, `organizador_timestamp` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `nombre` TEXT, `tipo` TEXT, `modalidad` TEXT, `privada` INTEGER NOT NULL, `latitud` REAL, `longitud` REAL, `notas` TEXT, `fecha` INTEGER, `recorridos` TEXT, `timestamp` INTEGER, `organizador_id` INTEGER, `organizador_nombre` TEXT, `organizador_club` TEXT, `organizador_fechaRegistro` INTEGER, `organizador_timestamp` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -74,6 +74,36 @@
             "fieldPath": "modalidad",
             "columnName": "modalidad",
             "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "privada",
+            "columnName": "privada",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitud",
+            "columnName": "latitud",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "longitud",
+            "columnName": "longitud",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "notas",
+            "columnName": "notas",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fecha",
+            "columnName": "fecha",
+            "affinity": "INTEGER",
             "notNull": false
           },
           {
@@ -131,7 +161,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"10df429d680350f315a6cd1c59c1915a\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"c393ffd24598f3dc9e75a773be5ddd9c\")"
     ]
   }
 }
