@@ -3,11 +3,11 @@ import { Control, Carrera, AppSettings } from 'src/app/_shared/app.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClienteApiService } from 'src/app/_services/cliente-api.service';
 import { AlertService } from 'src/app/alert';
+import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import * as QRCode from 'easyqrcodejs';
 import * as html2canvas from 'html2canvas';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { TokenStorageService } from 'src/app/_services/token-storage.service';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
