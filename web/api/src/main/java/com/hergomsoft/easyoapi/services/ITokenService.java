@@ -24,5 +24,11 @@ public interface ITokenService {
      */
     void borraToken(Token token);
     
+    /**
+     * Genera un token seguro.
+     * @return Token (string)
+     */
+    String generaToken();
+    
     
 }

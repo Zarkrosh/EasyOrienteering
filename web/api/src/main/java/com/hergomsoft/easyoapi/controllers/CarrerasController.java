@@ -72,13 +72,6 @@ public class CarrerasController {
             @Nullable @RequestParam("tipo") String tipo, 
             @Nullable @RequestParam("modalidad") String modalidad,
             Pageable pageable) {
-        // TEST
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(CarrerasController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
         
         if(nombre == null) nombre = "";
         if(tipo == null) tipo = "";

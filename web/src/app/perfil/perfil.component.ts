@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AlertService } from '../alert';
+import { TokenStorageService } from '../_services/token-storage.service';
+import { NavbarService } from '../_services/navbar.service';
 
 @Component({
   selector: 'app-perfil',
@@ -49,13 +51,15 @@ export class PerfilComponent implements OnInit {
   // Alertas
   alertOptions = {
     autoClose: true,
-    keepAfterRouteChange: false
+    keepAfterRouteChange: true
   };
 
   constructor(private clienteApi: ClienteApiService,
     private router: Router,
     private modalService: NgbModal,
     private formBuilder: FormBuilder,
+    private tokenService: TokenStorageService,
+    private navbarService: NavbarService,
     protected alertService: AlertService) {
 
     this.mensajeErrorCarga = null;
@@ -100,7 +104,7 @@ export class PerfilComponent implements OnInit {
 
       }, err => {
         if(err.status == 401) {
-          this.router.navigate(["/logout"]);
+          this.cerrarSesion();
         } else {
           this.mensajeErrorCarga = Utils.getMensajeError(err, "Error al obtener los datos de perfil");
         }
@@ -158,6 +162,7 @@ export class PerfilComponent implements OnInit {
             this.cambiandoClub = this.editandoClub = false;
           }, err => {
             this.alertService.error(Utils.getMensajeError(err, ""), this.alertOptions);
+            this.editorClub.nativeElement.value = this.usuario.club;
             this.cambiandoClub = this.editandoClub = false;
           }
         );
@@ -210,6 +215,12 @@ export class PerfilComponent implements OnInit {
     
   }
 
+  cerrarSesion(): void {
+    this.clienteApi.logout().subscribe(resp => {});
+    this.tokenService.logout();
+    this.navbarService.setLoggedInView(false);
+    this.router.navigate(["/login"]);
+  }
 
   clickBorrarCarrera(): void {
     this.activeModal = this.modalService.open(this.modalBorrarCuenta, {centered: true, size: 'md'});
@@ -217,8 +228,14 @@ export class PerfilComponent implements OnInit {
 
   confirmaBorrarCuenta(): void {
     this.activeModal.close();
-    alert("Picaste");
-    // TODO
+    this.clienteApi.deleteUsuario().subscribe(
+      resp => {
+        this.alertService.error("Cuenta borrada :(", this.alertOptions);
+        this.cerrarSesion();
+      }, err => {
+        this.alertService.error(Utils.getMensajeError(err, ""), this.alertOptions);
+      }
+    );
   }
 
 }

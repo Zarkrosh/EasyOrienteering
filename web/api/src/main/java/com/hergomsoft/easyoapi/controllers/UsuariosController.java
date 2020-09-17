@@ -4,13 +4,13 @@ import com.hergomsoft.easyoapi.models.Usuario;
 import com.hergomsoft.easyoapi.models.requests.CambioRequest;
 import com.hergomsoft.easyoapi.models.responses.MessageResponse;
 import com.hergomsoft.easyoapi.services.UsuarioService;
-import com.hergomsoft.easyoapi.utils.MessageException;
 import com.hergomsoft.easyoapi.utils.Validators;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +34,18 @@ public class UsuariosController {
     @GetMapping("")
     public Usuario getUsuario(Authentication authentication) {
         return usuarioService.getUsuarioPeticion(authentication);
+    }
+    
+    /**
+     * Borra el usuario que realiza la petición.
+     * Importante: no borra las carreras que ha organizado.
+     * 
+     * @param authentication 
+     */
+    @DeleteMapping("")
+    public void borraUsuario(Authentication authentication) {
+        Usuario usuario = getUsuario(authentication);
+        usuarioService.deleteUsuario(usuario);
     }
     
     /**

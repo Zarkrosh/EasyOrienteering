@@ -183,4 +183,9 @@ export class ClienteApiService {
     return this.http.post<Usuario>(url, datos, {observe: 'response', headers: cabeceras});
   }
 
+  deleteUsuario(): Observable<HttpResponse<any>> {
+    let url = ClienteApiService.BASE_URL + ClienteApiService.BASE_USUARIOS;
+    return this.http.delete<any>(url, {observe: 'response'});
+  }
+
 }

@@ -19,9 +19,15 @@ export class Utils {
             if(typeof err.error === 'string') {
                 if(puntos) res += ": " + err.error;
                 else res = err.error;
-            } else if(typeof err.error.message === 'string') {
-                if(puntos) res += ": " + err.error.message;
-                else res = err.error.message;
+            } else if(typeof err.error) {
+                if(err.message === 'string') {
+                    if(puntos) res += ": " + err.error.message;
+                    else res = err.error.message;
+                } else {
+                    res += (puntos) ? ":" : "" + " Error desconocido";
+                }
+            } else {
+                res += (puntos) ? ":" : "" + " Error desconocido";
             }
             console.log("[!] Debug error HTTP con código " + err.status);
             console.log(err);

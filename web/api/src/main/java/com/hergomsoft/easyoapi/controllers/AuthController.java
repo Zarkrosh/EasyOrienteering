@@ -64,7 +64,8 @@ public class AuthController {
                         .map(item -> item.getAuthority())
                         .collect(Collectors.toList());
         
-        String sToken = Utils.sha256(UUID.randomUUID().toString());
+        // Genera token
+        String sToken = tokenService.generaToken();
         Usuario usuario = usuarioService.getUsuario(userDetails.getId());
         if(usuario == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró el usuario.");
         Token token = new Token(sToken, usuario);

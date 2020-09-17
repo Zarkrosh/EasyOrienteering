@@ -67,7 +67,7 @@ export class VistaCarreraComponent implements OnInit {
           if(resp.status == 200) {
             this.carrera = resp.body;
             this.organizador = this.getOrganizador();
-            if(this.tokenService.isLoggedIn() && this.tokenService.getUser().username === this.carrera.organizador.nombre) {
+            if(this.tokenService.isLoggedIn() && this.tokenService.getUser().id === this.carrera.organizador.id) {
               this.esOrganizador = true;
               for(let recorrido of this.carrera.recorridos) {
                 if(recorrido.mapa) this.hayMapas = true;
@@ -91,9 +91,14 @@ export class VistaCarreraComponent implements OnInit {
   }
 
   getOrganizador(): string {
+    let res: string ;
     let org: Usuario = this.carrera.organizador;
-    let res: string = org.nombre;
-    if(org.club.length > 0) res += " (" + org.club + ")"; 
+    if(org) {
+      res = org.nombre;
+      if(org.club.length > 0) res += " (" + org.club + ")"; 
+    } else {
+      res = "Cuenta borrada";
+    }
     return res;
   }
 

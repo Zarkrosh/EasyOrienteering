@@ -1,11 +1,9 @@
 <div class="easyo-container">
 
     <div class="btns-cabecera" *ngIf="usuario">
-        <a [routerLink]="['/logout']">
-            <button type="button" class="btn btn-danger btn-cabecera-dcha">
-                Cerrar sesión
-            </button>
-        </a>
+        <button type="button" class="btn btn-danger btn-cabecera-dcha" (click)="cerrarSesion()">
+            Cerrar sesión
+        </button>
     </div>
 
 

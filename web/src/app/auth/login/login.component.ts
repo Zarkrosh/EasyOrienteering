@@ -12,8 +12,6 @@ import { NavbarService } from 'src/app/_services/navbar.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  readonly LOGIN = "login";
-  readonly LOGOUT = "logout";
 
   loginForm: FormGroup;
   cargando: boolean;
@@ -30,24 +28,16 @@ export class LoginComponent implements OnInit {
       private navbarService: NavbarService) {}
 
   ngOnInit() {
-    if(window.location.toString().indexOf(this.LOGOUT) > -1) {
-      // Cierra sesión
-      this.clienteApi.logout().subscribe(resp => {});
-      this.tokenService.logout();
-      this.navbarService.setLoggedInView(false);
-      this.router.navigate(["/login"]);
-    } else {
-      if(this.tokenService.isLoggedIn()) {
-        this.router.navigate(["/perfil"]);
-      }
-  
-      this.loginForm = this.formBuilder.group({
-        username: ['', Validators.required],
-        password: ['', Validators.required]
-      });
-      this.mensajeError = "";
-      this.cargando = false;
+    if(this.tokenService.isLoggedIn()) {
+      this.router.navigate(["/perfil"]);
     }
+
+    this.loginForm = this.formBuilder.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required]
+    });
+    this.mensajeError = "";
+    this.cargando = false;
   }
 
   // Para acceder más comodo a los campos del formulario

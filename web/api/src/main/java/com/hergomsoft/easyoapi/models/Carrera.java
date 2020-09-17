@@ -58,7 +58,7 @@ public class Carrera implements IdEntity {
     @Column(name = "MODALIDAD")
     private Modalidad modalidad;
     
-    @ManyToOne(optional = false)
+    @ManyToOne
     private Usuario organizador;
     
     @Column(name = "PRIVADA")

@@ -96,11 +96,6 @@ export class EditorRecorridosComponent implements OnInit {
     keepAfterRouteChange: true
   };
 
-  // TODO
-  //   Máximo de una salida y una meta por carrera
-  //   Mensaje de confirmación de abandono de página para evitar perder los datos
-
-
   constructor(private dataEditores: SharedEditorService,
     protected alertService: AlertService,
     private modalService: NgbModal,
@@ -392,7 +387,6 @@ export class EditorRecorridosComponent implements OnInit {
    * Cancela la edición.
    */
   cancelar(): void {
-    // TODO Mensaje de confirmación
     this.router.navigate(['/crear']);
   }
 

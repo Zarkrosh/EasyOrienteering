@@ -178,15 +178,7 @@ export class ResumenCarreraComponent implements OnInit {
       // Edición de carrera
       this.tipoVista = this.TIPO_EDITAR;
       this.titulo = "Editar carrera";
-      // ¿Puede editar?
-      // TODO
-      let editar = true;
-      if(editar) {
-        this.cargaDatosCarrera();
-      } else {
-        this.alertService.error("Solo el organizador puede editar esta carrera", this.alertOptions);
-        this.router.navigate(["/"]);
-      }
+      this.cargaDatosCarrera();
     } else {
       // Creación de carrera
       this.tipoVista = this.TIPO_CREAR;
@@ -228,8 +220,8 @@ export class ResumenCarreraComponent implements OnInit {
         resp => {
           if(resp.status == 200) {
             this.carrera = resp.body;
-
-            if(this.carrera.organizador.nombre === this.tokenService.getUser().username) {
+            // ¿Puede editar?
+            if(this.tokenService.isLoggedIn() && this.tokenService.getUser().id === this.carrera.organizador.id) {
               this.f.nombre.setValue(this.carrera.nombre);
               this.f.tipo.setValue(this.carrera.tipo);
               this.f.modalidad.setValue(this.carrera.modalidad);

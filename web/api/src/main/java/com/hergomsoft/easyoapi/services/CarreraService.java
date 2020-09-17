@@ -41,7 +41,7 @@ public class CarreraService implements ICarreraService {
     @Autowired
     private IParticipacionService participacionService;
     
-    @Value("${easyo.carreras.secretgeneral}")
+    @Value("#{environment.EASYO_CARRERAS_SECRETGENERAL}")
     private String secretCarreras; // Secreto guardado en el servidor
 
     @Override
