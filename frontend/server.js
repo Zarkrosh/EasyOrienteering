@@ -10,7 +10,7 @@ app.use(express.static(__dirname + '/dist/web'));
 
 // Proxy API
 var proxyOptions = {
-    target: 'http://easyorienteering-backend.herokuapp.com', 
+    target: 'https://' + process.env.EASYO_BACKEND, 
     changeOrigin: true, // No funciona
     onProxyRes: function (proxyRes, req, res) {
         proxyRes.headers['Access-Control-Allow-Origin'] = '*';
