@@ -17,7 +17,7 @@ export class Usuario {
     nombre: string;
     email: string;
     club: string;
-    fecharegistro: Date;
+    fecharegistro: string;
     roles: string[];
 }
 
@@ -40,7 +40,7 @@ export class Carrera {
     longitud: number;
     privada: boolean;
     notas: string;
-    fecha: Date;
+    fecha: string;
     soloRecorridos: boolean; // Interno
 
     constructor() {
