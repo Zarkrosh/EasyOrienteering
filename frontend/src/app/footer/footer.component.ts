@@ -8,7 +8,7 @@ import { FooterService } from '../_services/footer.service';
 })
 export class FooterComponent implements OnInit {
 
-  constructor(private footerService: FooterService) { }
+  constructor(public footerService: FooterService) { }
 
   ngOnInit() {
   }

@@ -4,7 +4,7 @@
     <button *ngIf="!editandoUbicacion && latitudElegida != null" class="btn btn-danger btn-borrar-ubicacion" (click)="borrarUbicacion()">Borrar</button>
     <button *ngIf="editandoUbicacion" class="btn btn-danger btn-editar-ubicacion" (click)="cancelarEdicion()">Cancelar</button>
 </div>
-<div #mapaUbicacion id="mapa-ubicacion" class="ubicacion-mapa" [style.cursor]="(marcarUbicacion) ? 'crosshair' : auto">
+<div #mapaUbicacion id="mapa-ubicacion" class="ubicacion-mapa" [style.cursor]="(marcarUbicacion) ? 'crosshair' : 'auto'">
     <div *ngIf="!editandoUbicacion && latitudElegida == null" id="btn-anadir-ubicacion" (click)="editarUbicacion($event)">
         <i class="fa fa-plus-square"></i>
         <span>Añadir ubicación</span>
@@ -12,9 +12,7 @@
 </div>
 <span [ngClass]="(marcarUbicacion) ? 'mensaje-ubicacion-exito' : 'mensaje-ubicacion-error'" class="mensaje-ubicacion" [style.visibility]="(editandoUbicacion) ? 'visible' : 'hidden'">{{mensajeUbicacion}}</span>
 <button [style.visibility]="(editandoUbicacion && marcarUbicacion && latitudTemporal != null) ? 'visible' : 'hidden'" 
-    class="btn btn-primary btn-guardar-ubicacion" (click)="guardarUbicacion()" [disabled]="guardandoUbicacion">
-
-    <span *ngIf="guardandoUbicacion" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    class="btn btn-primary btn-guardar-ubicacion" (click)="guardarUbicacion()">
     Guardar ubicación
 </button>
 
