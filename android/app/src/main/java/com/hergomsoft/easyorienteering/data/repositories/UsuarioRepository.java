@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 
+import com.hergomsoft.easyorienteering.data.api.requests.CambioPassRequest;
 import com.hergomsoft.easyorienteering.data.api.requests.CambioRequest;
 import com.hergomsoft.easyorienteering.data.api.requests.LoginRequest;
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroCuentaRequest;
@@ -29,11 +30,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class UsuarioRepository extends ApiRepository {
-    private SingleLiveEvent<Resource<String>> loginState;           // Respuesta de login
-    private SingleLiveEvent<Resource<String>> registerState;        // Respuesta de registro
-    private SingleLiveEvent<Resource<String>> logoutState;          // Respuesta de logout
-    private SingleLiveEvent<Resource<String>> cambioNombreResponse;
-    private SingleLiveEvent<Resource<String>> cambioClubResponse;
+    private SingleLiveEvent<Resource<String>> loginState;             // Respuesta de login
+    private SingleLiveEvent<Resource<String>> registerState;          // Respuesta de registro
+    private SingleLiveEvent<Resource<String>> logoutState;            // Respuesta de logout
+    private SingleLiveEvent<Resource<String>> borradoCuentaState;     // Respuesta de borrado de cuenta
+    private SingleLiveEvent<Resource<String>> cambioNombreResponse;   // Respuesta de cambio de nombre
+    private SingleLiveEvent<Resource<String>> cambioClubResponse;     // Respuesta de cambio de club
+    private SingleLiveEvent<Resource<String>> cambioPasswordResponse; // Respuesta de cambio de contraseña
 
     private UsuarioDAO usuarioDAO;
 
@@ -57,18 +60,31 @@ public class UsuarioRepository extends ApiRepository {
         loginState = new SingleLiveEvent<>();
         registerState = new SingleLiveEvent<>();
         logoutState = new SingleLiveEvent<>();
+        borradoCuentaState = new SingleLiveEvent<>();
         cambioNombreResponse = new SingleLiveEvent<>();
         cambioClubResponse = new SingleLiveEvent<>();
-
+        cambioPasswordResponse = new SingleLiveEvent<>();
 
         cargaDatosUsuarioConectado();
     }
 
     public SingleLiveEvent<Resource<String>> getLoginState() { return loginState; }
     public SingleLiveEvent<Resource<String>> getRegisterState() { return registerState; }
-    public SingleLiveEvent<Resource<String>> getLogoutState() { return logoutState; }
+    public SingleLiveEvent<Resource<String>> getEstadoLogout() { return logoutState; }
+    public SingleLiveEvent<Resource<String>> getEstadoBorradoCuenta() { return borradoCuentaState; }
     public SingleLiveEvent<Resource<String>> getCambioNombreResponse() { return cambioNombreResponse; }
     public SingleLiveEvent<Resource<String>> getCambioClubResponse() { return cambioClubResponse; }
+    public SingleLiveEvent<Resource<String>> getCambioPasswordResponse() { return cambioPasswordResponse; }
+
+    public long getIdUsuarioConectado() {
+        return idUsuarioConectado;
+    }
+    public String getTokenUsuarioConectado() {
+        return tokenUsuarioConectado;
+    }
+    public boolean isLoggedIn() {
+        return idUsuarioConectado != null;
+    }
 
     public LiveData<Resource<Usuario>> getUsuario(long id) {
         return new NetworkBoundResource<Usuario, Usuario>(AppExecutors.getInstance(), true) {
@@ -168,17 +184,36 @@ public class UsuarioRepository extends ApiRepository {
         });
     }
 
+    public void cambiaPassword(String prevPass, String newPass) {
+        CambioPassRequest cambio = new CambioPassRequest(prevPass, newPass);
+        apiClient.cambiaPassword(cambio).enqueue(new Callback<MessageResponse>() {
+            @Override
+            public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
+                Resource<String> recurso;
+                if(response.isSuccessful() && response.body() != null) {
+                    recurso = Resource.success(response.body().getMessage());
+                } else {
+                    if(response.body() != null) {
+                        recurso = Resource.error(response.body().getMessage(), null);
+                    } else {
+                        // TODO Manejar más causas error
+                        recurso = Resource.error("Error al cambiar la contraseña", null);
+                    }
+                }
 
+                cambioPasswordResponse.postValue(recurso);
+            }
 
-
-
-
-    public boolean isLoggedIn() {
-        return idUsuarioConectado != null;
+            @Override
+            public void onFailure(Call<MessageResponse> call, Throwable t) {
+                cambioPasswordResponse.postValue(getRecursoConErrorConexion(t));
+            }
+        });
     }
 
-    public void logout() {
 
+
+    public void logout() {
         apiClient.logoutUsuario().enqueue(new Callback<MessageResponse>() {
             @Override
             public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
@@ -269,11 +304,26 @@ public class UsuarioRepository extends ApiRepository {
         });
     }
 
-    public long getIdUsuarioConectado() {
-        return idUsuarioConectado;
-    }
-    public String getTokenUsuarioConectado() {
-        return tokenUsuarioConectado;
+    public void borrarCuenta() {
+        apiClient.borrarCuenta().enqueue(new Callback<MessageResponse>() {
+            @Override
+            public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
+                Resource<String> recurso;
+                if(response.isSuccessful()) {
+                    recurso = Resource.success("");
+                    borraDatosUsuarioConectado();
+                } else {
+                    recurso = Resource.error("No se pudo borrar la cuenta", null);
+                }
+
+                borradoCuentaState.postValue(recurso);
+            }
+
+            @Override
+            public void onFailure(Call<MessageResponse> call, Throwable t) {
+                borradoCuentaState.postValue(Resource.error("No se pudo conectar con el servidor", null));
+            }
+        });
     }
 
     private void guardaDatosUsuario(Long idUsuario, String tokenUsuario) {

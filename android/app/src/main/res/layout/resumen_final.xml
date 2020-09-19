@@ -10,8 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginTopTitResumen"
+        android:layout_marginHorizontal="10dp"
         android:gravity="center"
-        android:text="@string/resumen_segunda_titulo"
+        android:text="@string/resumen_final_titulo"
         android:textColor="@android:color/black"
         android:textSize="@dimen/tamTitulo"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,13 +26,39 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginTopContResumen"
         android:gravity="center"
-        android:paddingHorizontal="@dimen/padHorizContResumen"
-        android:text="@string/resumen_segunda_contenido"
+        android:text="@string/resumen_final_contenido"
         android:textColor="@android:color/black"
         android:textSize="@dimen/tamContenido"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/img_splash_image"
+        app:layout_constraintBottom_toTopOf="@+id/resumenSiguiente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView9" />
+
+    <Button
+        android:id="@+id/resumenSiguiente"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:background="@drawable/back_boton"
+        android:text="@string/resumen_siguiente"
+        android:textColor="@android:color/white"
+        android:textSize="22sp"
+        android:onClick="finalizaResumen"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

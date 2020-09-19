@@ -17,7 +17,7 @@ export class Usuario {
     nombre: string;
     email: string;
     club: string;
-    fecharegistro: string;
+    fechaRegistro: string;
     roles: string[];
 }
 

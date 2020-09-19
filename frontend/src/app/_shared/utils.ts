@@ -4,6 +4,7 @@ export class Utils {
         let res = prefijo;
         let puntos = prefijo && prefijo.length > 0;
 
+        debugger;
         if(err.status == 504) {
             res = "No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.";
         } else if(err.status == 404) {
@@ -20,7 +21,7 @@ export class Utils {
                 if(puntos) res += ": " + err.error;
                 else res = err.error;
             } else if(typeof err.error) {
-                if(err.message === 'string') {
+                if(typeof err.error.message === 'string') {
                     if(puntos) res += ": " + err.error.message;
                     else res = err.error.message;
                 } else {

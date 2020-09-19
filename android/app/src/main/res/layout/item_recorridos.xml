@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_marginBottom="@dimen/detalles_espaciado_recorridos"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/back_boton_item_recorridos">
 

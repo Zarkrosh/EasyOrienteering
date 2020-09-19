@@ -30,7 +30,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private LinearLayout layoutPerfil;
     private TextView textUsername;
-    private ImageButton btnPerfil;
+    //private ImageButton btnPerfil;
     private Button btnMisCarreras;
     private Button btnExplorar;
     private Button btnUnirme;
@@ -47,7 +47,7 @@ public class HomeActivity extends AppCompatActivity {
 
         layoutPerfil = findViewById(R.id.home_layoutPerfil);
         textUsername = findViewById(R.id.home_textUsername);
-        btnPerfil = findViewById(R.id.home_btnPerfil);
+        //btnPerfil = findViewById(R.id.home_btnPerfil);
         btnMisCarreras = findViewById(R.id.btnMisCarreras);
         btnExplorar = findViewById(R.id.btnExplorar);
         btnUnirme = findViewById(R.id.btnUnirme);
@@ -65,12 +65,13 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(HomeActivity.this, ConfiguracionActivity.class));
             }
         });
+        /*
         btnPerfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(HomeActivity.this, ConfiguracionActivity.class));
             }
-        });
+        });*/
 
         // Al pulsar el botón, se muestra la lista de carreras en las que ha participado el usuario
         btnMisCarreras.setOnClickListener(new View.OnClickListener() {
@@ -125,9 +126,9 @@ public class HomeActivity extends AppCompatActivity {
                             if(usuarioResource.data != null) {
                                 viewModel.ocultaDialogoCarga();
                                 textUsername.setText(usuarioResource.data.getNombre());
-                                // Carga imagen circular
-                                // TODO Cargar imagen de perfil
-                                Picasso.with(HomeActivity.this).load(R.drawable.img_sample_user).transform(new CircleTransform()).into(btnPerfil);
+                                // Carga imagen de perfil (circular)
+                                // TODO
+                                //Picasso.with(HomeActivity.this).load(R.drawable.img_sample_user).transform(new CircleTransform()).into(btnPerfil);
                             } else {
                                 viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR,
                                         getString(R.string.error_inesperado), usuarioResource.message);

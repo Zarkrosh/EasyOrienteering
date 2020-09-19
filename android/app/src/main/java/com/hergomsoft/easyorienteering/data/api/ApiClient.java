@@ -2,6 +2,7 @@ package com.hergomsoft.easyorienteering.data.api;
 
 import androidx.lifecycle.LiveData;
 
+import com.hergomsoft.easyorienteering.data.api.requests.CambioPassRequest;
 import com.hergomsoft.easyorienteering.data.api.requests.CambioRequest;
 import com.hergomsoft.easyorienteering.data.api.requests.LoginRequest;
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroCuentaRequest;
@@ -16,11 +17,13 @@ import com.hergomsoft.easyorienteering.data.api.responses.ParticipacionesRecorri
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Registro;
 import com.hergomsoft.easyorienteering.data.model.Usuario;
+import com.hergomsoft.easyorienteering.util.Constants;
 
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -59,6 +62,8 @@ public interface ApiClient {
     Call<MessageResponse> registerUsuario(@Body RegistroCuentaRequest request);
     @POST("auth/logout")
     Call<MessageResponse> logoutUsuario();
+    @POST("auth/change")
+    Call<MessageResponse> cambiaPassword(@Body CambioPassRequest registro);
 
     // USUARIOS
     @GET("usuarios/{id}")
@@ -67,5 +72,7 @@ public interface ApiClient {
     Call<Usuario> cambiaNombreUsuario(@Body CambioRequest registro);
     @POST("usuarios/cambioclub")
     Call<Usuario> cambiaClub(@Body CambioRequest registro);
+    @DELETE("usuarios")
+    Call<MessageResponse> borrarCuenta();
 
 }

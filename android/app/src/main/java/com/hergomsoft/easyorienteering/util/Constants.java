@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Constants {
+    // API
+    public static final String API = "192.168.1.69:4200";
+    //public static final String API = "easyorienteering.herokuapp.com";
+
     // SharedPreferences
     public static final String PREFS_NAME = "PrefsEasyO";
     public static final String PREFS_PRIMER_INICIO = "priminicio";
@@ -38,10 +42,6 @@ public class Constants {
 
     // Códigos de error de registro
     public static final Map<String, String> erroresRegistro = new HashMap<>();
-
-
-
-
     static {
         erroresRegistro.put("REG-0", "Este control no pertenece a la carrera");
         erroresRegistro.put("REG-1", "Tienes que escanear una salida");

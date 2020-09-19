@@ -38,6 +38,9 @@ public class ConfiguracionActivity extends BackableActivity {
     DialogoCarga dialogoCarga;
     AlertDialog dialogoCambioNombre;
     AlertDialog dialogoCambioClub;
+    AlertDialog dialogoCambioPassword;
+    AlertDialog dialogoConfCerrarSesion;
+    AlertDialog dialogoConfBorrarCuenta;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,57 +57,37 @@ public class ConfiguracionActivity extends BackableActivity {
         Button btnCambiarClub = findViewById(R.id.conf_btn_cambiar_club);
         Button btnCambiarContrasena = findViewById(R.id.conf_btn_cambiar_contrasena);
         Button btnResumen = findViewById(R.id.conf_btn_resumen);
-        Button btnCompartirApp = findViewById(R.id.conf_btn_compartir_app);
+        //Button btnCompartirApp = findViewById(R.id.conf_btn_compartir_app);
         Button btnBorrarCuenta = findViewById(R.id.conf_btn_borrar_cuenta);
         Button btnCerrarSesion = findViewById(R.id.conf_btn_cerrar_sesion);
 
         // DEBUG
-        View.OnClickListener todoListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(ConfiguracionActivity.this, "TODO", Toast.LENGTH_SHORT).show();
-            }
-        };
+        View.OnClickListener todoListener = v -> Toast.makeText(ConfiguracionActivity.this, "TODO", Toast.LENGTH_SHORT).show();
 
         btnFotoPerfil.setOnClickListener(todoListener);
-        btnCambiarNombre.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialogoCambioNombre.show();
-            }
+        btnCambiarNombre.setOnClickListener(v -> dialogoCambioNombre.show());
+        btnCambiarClub.setOnClickListener(v -> dialogoCambioClub.show());
+        btnCambiarContrasena.setOnClickListener(v -> dialogoCambioPassword.show());
+        btnResumen.setOnClickListener(v -> {
+            Intent i = new Intent(ConfiguracionActivity.this, ResumenActivity.class);
+            i.putExtra(Constants.EXTRA_VOLUNTARIO, true);
+            startActivity(i);
         });
-        btnCambiarClub.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialogoCambioClub.show();
-            }
-        });
-        btnCambiarContrasena.setOnClickListener(todoListener);
-        btnResumen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(ConfiguracionActivity.this, ResumenActivity.class);
-                i.putExtra(Constants.EXTRA_VOLUNTARIO, true);
-                startActivity(i);
-            }
-        });
-        btnCompartirApp.setOnClickListener(todoListener);
-        btnBorrarCuenta.setOnClickListener(todoListener);
-        btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewModel.cerrarSesion();
-            }
-        });
+        //btnCompartirApp.setOnClickListener(todoListener);
+        btnBorrarCuenta.setOnClickListener(v -> dialogoConfBorrarCuenta.show());
+        btnCerrarSesion.setOnClickListener(v -> dialogoConfCerrarSesion.show());
 
         setupDialogos();
         setupObservadores();
     }
 
     private void setupDialogos() {
-        setupDialogoCarga();        // Diálogo de carga de peticiones
-        setupDialogoCambioNombre(); // Diálogo de cambio de nombre de usuario
-        setupDialogoCambioClub();   // Diálogo de cambio de club
+        setupDialogoCarga();            // Diálogo de carga de peticiones
+        setupDialogoCambioNombre();     // Diálogo de cambio de nombre de usuario
+        setupDialogoCambioClub();       // Diálogo de cambio de club
+        setupDialogoCambioPassword();   // Diálogo de cambio de contraseña
+        setupDialogoConfCerrarSesion(); // Diálogo de confirmación de cerrado de sesión
+        setupDialogoConfBorrarCuenta(); // Diálogo de confirmación de borrado de cuenta
     }
 
     private void setupDialogoCarga() {
@@ -196,7 +179,71 @@ public class ConfiguracionActivity extends BackableActivity {
         dialogoCambioClub.setView(view);
     }
 
-    public void setupObservadores() {
+    private void setupDialogoCambioPassword() {
+        dialogoCambioPassword = new AlertDialog.Builder(this).create();
+        final View view = getLayoutInflater().inflate(R.layout.dialogo_cambio_pass, null);
+        final EditText inputPrev = view.findViewById(R.id.conf_input_cambio_pass_actual);
+        final EditText inputNueva = view.findViewById(R.id.conf_input_cambio_pass_nueva);
+        final EditText inputNuevaConf = view.findViewById(R.id.conf_input_cambio_pass_conf);
+        final Button btnCancelar = view.findViewById(R.id.conf_btn_cancelar_cambio_pass);
+        final Button btnGuardar = view.findViewById(R.id.conf_btn_guardar_cambio_pass);
+        inputNuevaConf.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                String conf = inputNuevaConf.getText().toString();
+                if(conf.contentEquals(inputNueva.getText().toString()) && conf.length() >= Constants.MIN_PASSWORD_LENGTH) {
+                    btnGuardar.setEnabled(true);
+                } else {
+                    // TODO Indicador visual
+                    btnGuardar.setEnabled(false);
+                }
+            }
+        });
+        btnCancelar.setOnClickListener(v -> dialogoCambioPassword.dismiss());
+        btnGuardar.setOnClickListener(v -> {
+            viewModel.realizaCambioPassword(inputPrev.getText().toString(), inputNueva.getText().toString());
+            dialogoCambioPassword.dismiss();
+        });
+        dialogoCambioPassword.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                inputPrev.setText("");
+                inputNueva.setText("");
+                inputNuevaConf.setText("");
+            }
+        });
+        dialogoCambioPassword.setView(view);
+    }
+
+    private void setupDialogoConfCerrarSesion() {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setTitle(R.string.conf_cerrar_sesion);
+        alertBuilder.setMessage(R.string.conf_cerrar_sesion_mensaje);
+        alertBuilder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            // Cierra la sesión
+            viewModel.cerrarSesion();
+        });
+        alertBuilder.setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss());
+        dialogoConfCerrarSesion = alertBuilder.create();
+    }
+
+    private void setupDialogoConfBorrarCuenta() {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setTitle(R.string.conf_borrar_cuenta);
+        alertBuilder.setMessage(R.string.conf_borrar_cuenta_mensaje);
+        alertBuilder.setPositiveButton(R.string.conf_borrar, (dialog, which) -> {
+            // Borra la cuenta
+            viewModel.confirmaBorradoCuenta();
+        });
+        alertBuilder.setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss());
+        dialogoConfBorrarCuenta = alertBuilder.create();
+    }
+
+    private void setupObservadores() {
         // Carga de datos de usuario
         viewModel.cargaDatosUsuario().observe(this, new Observer<Resource<Usuario>>() {
             @Override
@@ -286,6 +333,31 @@ public class ConfiguracionActivity extends BackableActivity {
             }
         });
 
+        // Respuesta a la petición de cambio de contraseña
+        viewModel.getCambioPasswordResponse().observe(this, new Observer<Resource<String>>() {
+            @Override
+            public void onChanged(Resource<String> cambiado) {
+                switch (cambiado.status) {
+                    case SUCCESS:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO, "", getString(R.string.conf_resp_password_cambiada));
+                        // Tras una pequeña espera oculta el diálogo
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                viewModel.ocultaResultadoDialogo();
+                            }
+                        }, 1500);
+                        break;
+                    case ERROR:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), cambiado.message);
+                        break;
+                    default:
+                        viewModel.ocultaDialogoCarga();
+                }
+            }
+        });
+
         // Estado de logout
         viewModel.getEstadoLogout().observe(this, new Observer<Resource<String>>() {
             @Override
@@ -298,6 +370,34 @@ public class ConfiguracionActivity extends BackableActivity {
                         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Borra histórico
                         startActivity(i);
                         finish();
+                        break;
+                    case ERROR:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), resource.message);
+                        break;
+                }
+            }
+        });
+
+        // Estado de borrado de cuenta
+        viewModel.getEstadoBorradoCuenta().observe(this, new Observer<Resource<String>>() {
+            @Override
+            public void onChanged(Resource<String> resource) {
+                switch(resource.status) {
+                    case SUCCESS:
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO, "", getString(R.string.conf_resp_cuenta_borrada));
+                        // Tras una pequeña espera...
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // ... redirige a la pantalla de conexión
+                                viewModel.ocultaDialogoCarga();
+                                Intent i = new Intent(ConfiguracionActivity.this, ConexionActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Borra histórico
+                                startActivity(i);
+                                finish();
+                            }
+                        }, 1500);
                         break;
                     case ERROR:
                         viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), resource.message);

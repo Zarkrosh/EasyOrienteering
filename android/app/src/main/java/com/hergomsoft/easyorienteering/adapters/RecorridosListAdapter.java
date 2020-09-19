@@ -1,6 +1,5 @@
 package com.hergomsoft.easyorienteering.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
 
 import java.util.ArrayList;
@@ -64,8 +62,8 @@ public class RecorridosListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recorridos_detalles, parent, false);
-        return new CarrerasListAdapter.CarreraViewHolder(view, recorridoListener);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recorridos, parent, false);
+        return new RecorridosListAdapter.RecorridoViewHolder(view, recorridoListener);
     }
 
     @Override
@@ -73,28 +71,17 @@ public class RecorridosListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         ((RecorridosListAdapter.RecorridoViewHolder) holder).bind(recorridos.get(position));
     }
 
-    /*
-    @Override
-    public int getItemViewType(int position) {
-        if(position == carreras.size() - 1 && cargando) {
-            return TIPO_CARGANDO;
-        } else {
-            return TIPO_CARRERA;
-        }
-    }
-     */
-
     @Override
     public int getItemCount() { return recorridos.size(); }
 
 
     /**
      * Reemplaza la lista de recorridos por una nueva y actualiza los datos.
-     * @param recorridos Lista de recorridos
+     * @param nRecorridos Nueva lista de recorridos
      */
-    public void actualizaRecorridos(List<Recorrido> recorridos) {
+    public void actualizaRecorridos(List<Recorrido> nRecorridos) {
         this.recorridos.clear();
-        this.recorridos.addAll(recorridos);
+        this.recorridos.addAll(nRecorridos);
         notifyDataSetChanged();
     }
 }

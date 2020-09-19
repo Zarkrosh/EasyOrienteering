@@ -24,7 +24,7 @@
         android:paddingStart="20dp"
         android:paddingEnd="10dp"
         android:paddingVertical="10dp"
-        android:background="@drawable/back_round_corners"
+        android:background="@drawable/back_boton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:orientation="horizontal">
@@ -34,11 +34,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:textSize="18sp"
+            android:text="@string/home_mi_perfil"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:layout_gravity="center" />
+            android:textColor="@android:color/white"
+            android:layout_gravity="center"/>
 
+        <!--
         <ImageButton
             android:id="@+id/home_btnPerfil"
             android:layout_width="@dimen/dimImgPerfil"
@@ -47,6 +49,7 @@
             android:padding="1dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop" />
+        -->
 
     </LinearLayout>
 

@@ -32,7 +32,7 @@ public class LoginViewModel extends AndroidViewModelConCarga {
 
     public void loginDataChanged(String emailUsername, String password) {
         if (!Utils.nombreUsuarioValido(emailUsername) && !Utils.emailValido(emailUsername)) {
-            loginFormState.setValue(new LoginFormState(R.string.conexion_nombre_email_invalido, null));
+            loginFormState.setValue(new LoginFormState(R.string.conexion_nombre_invalido, null));
         } else if (!Utils.isPasswordValid(password)) {
             loginFormState.setValue(new LoginFormState(null, R.string.conexion_password_largo));
         } else {

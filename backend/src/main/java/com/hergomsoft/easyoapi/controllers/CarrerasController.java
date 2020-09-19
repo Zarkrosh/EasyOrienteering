@@ -103,7 +103,7 @@ public class CarrerasController {
                 }
                 
                 if(usuario != null) {
-                    if(Objects.equals(usuario.getId(), res.getOrganizador().getId())) {
+                    if(res.getOrganizador() != null && Objects.equals(usuario.getId(), res.getOrganizador().getId())) {
                         // Es el organizador, puede acceder
                         permiso = true;
                     } else if(participacionService.haParticipadoEnCarrera(usuario, res)) {
@@ -133,7 +133,7 @@ public class CarrerasController {
         
         Carrera carrera = getCarrera(authentication, idCarrera);
         Usuario usuario = usuarioService.getUsuarioPeticion(authentication);
-        if(Objects.equals(usuario.getId(), carrera.getOrganizador().getId())) {
+        if(carrera.getOrganizador() != null && Objects.equals(usuario.getId(), carrera.getOrganizador().getId())) {
             // Comprueba si tiene mapas
             boolean hayMapas = false;
             int i = 0;
@@ -192,8 +192,7 @@ public class CarrerasController {
             @RequestBody Carrera carrera, @PathVariable long id) {
         Usuario usuario = usuarioService.getUsuarioPeticion(authentication);
         Carrera c = getCarrera(authentication, id);
-        //if(Objects.equals(usuario.getId(), c.getOrganizador().getId())) {
-        if(true) { // DEBUG
+        if(c.getOrganizador() != null && Objects.equals(usuario.getId(), c.getOrganizador().getId())) {
             carreraService.editCarrera(c, carrera);
         } else {
             // No es el organizador de la carrera
@@ -207,7 +206,7 @@ public class CarrerasController {
             @PathVariable long id) {
         Usuario usuario = usuarioService.getUsuarioPeticion(authentication);
         Carrera c = getCarrera(authentication, id);
-        if(Objects.equals(usuario.getId(), c.getOrganizador().getId())) {
+        if(c.getOrganizador() != null && Objects.equals(usuario.getId(), c.getOrganizador().getId())) {
             carreraService.deleteCarrera(id);
         } else {
             // No es el organizador de la carrera
@@ -224,8 +223,7 @@ public class CarrerasController {
         Usuario usuario = usuarioService.getUsuarioPeticion(authentication);
         Carrera carrera = getCarrera(authentication, id);
         // Solo es accesible por el organizador de la carrera
-        //if(Objects.equals(usuario.getId(), carrera.getOrganizador().getId())) {
-        if(true) { // DEBUG
+        if(carrera.getOrganizador() != null && Objects.equals(usuario.getId(), carrera.getOrganizador().getId())) {
             res = carreraService.getControlesConSecretosCarrera(carrera);
         } else {
             // No es el organizador de la carrera

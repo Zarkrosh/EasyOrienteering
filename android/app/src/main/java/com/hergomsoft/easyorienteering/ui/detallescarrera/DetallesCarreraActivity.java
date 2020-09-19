@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hergomsoft.easyorienteering.R;
@@ -14,6 +15,7 @@ import com.hergomsoft.easyorienteering.adapters.OnItemListener;
 import com.hergomsoft.easyorienteering.adapters.RecorridosListAdapter;
 import com.hergomsoft.easyorienteering.components.DialogoCarga;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
+import com.hergomsoft.easyorienteering.ui.resultados.ResultadosActivity;
 import com.hergomsoft.easyorienteering.util.BackableActivity;
 import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.Resource;
@@ -56,12 +58,13 @@ public class DetallesCarreraActivity extends BackableActivity {
         adapterRecorridos = new RecorridosListAdapter(new OnItemListener() {
             @Override
             public void onItemClick(int position) {
-                Intent intent = new Intent(DetallesCarreraActivity.this, DetallesCarreraActivity.class);
+                Intent intent = new Intent(DetallesCarreraActivity.this, ResultadosActivity.class);
                 intent.putExtra(Constants.EXTRA_ID_RECORRIDO, adapterRecorridos.getRecorridoSeleccionado(position).getId());
                 startActivity(intent);
             }
         });
         listaRecorridos.setAdapter(adapterRecorridos);
+        listaRecorridos.setLayoutManager(new LinearLayoutManager(this));
 
         setupDialogoCarga();
         setupObservadores();
@@ -105,8 +108,12 @@ public class DetallesCarreraActivity extends BackableActivity {
                                 nombreCarrera.setText(carrera.getNombre());
                                 tipoCarrera.setText(carrera.getTipo().toString());
                                 modalidadCarrera.setText(carrera.getModalidad().toString());
-                                organizadorCarrera.setText(carrera.getOrganizador().getNombre());
-
+                                if(carrera.getOrganizador() != null) {
+                                    organizadorCarrera.setText(carrera.getOrganizador().getNombre());
+                                } else {
+                                    // El organizador borró su cuenta
+                                    organizadorCarrera.setText(R.string.cuenta_borrada);
+                                }
                                 DateFormat format = DateFormat.getDateInstance();
                                 fechaCarrera.setText(format.format(carrera.getFecha()));
                                 adapterRecorridos.actualizaRecorridos(carrera.getRecorridos());
