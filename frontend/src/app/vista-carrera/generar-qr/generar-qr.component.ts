@@ -155,9 +155,10 @@ export class GenerarQRComponent implements OnInit {
         logoHeight: 50,
         logoBackgroundColor: '#ffffff'
       };
-      if(control.tipo === Control.TIPO_SALIDA) options.logo = "http://localhost:4200/assets/img/salida.png";
-      else if(control.tipo === Control.TIPO_CONTROL) options.logo = "http://localhost:4200/assets/img/control.png";
-      else if(control.tipo === Control.TIPO_META) options.logo = "http://localhost:4200/assets/img/meta.png";
+      let origin = window.location.origin;
+      if(control.tipo === Control.TIPO_SALIDA) options.logo = origin + "/assets/img/salida.png";
+      else if(control.tipo === Control.TIPO_CONTROL) options.logo = origin + "/assets/img/control.png";
+      else if(control.tipo === Control.TIPO_META) options.logo = origin + "/assets/img/meta.png";
       new QRCode(divQR, options);
 
       // Compone el elemento

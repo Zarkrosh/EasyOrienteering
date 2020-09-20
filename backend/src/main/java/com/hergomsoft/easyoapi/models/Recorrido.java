@@ -2,13 +2,16 @@ package com.hergomsoft.easyoapi.models;
 
 import com.hergomsoft.easyoapi.models.serializers.IdEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hergomsoft.easyoapi.models.serializers.CountSerializer;
 import com.hergomsoft.easyoapi.models.serializers.MapaDeserializer;
 import com.hergomsoft.easyoapi.models.serializers.MapaSerializer;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,7 +20,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
@@ -52,6 +57,10 @@ public class Recorrido implements IdEntity, Serializable {
     @Column(name = "MAPA")
     @Type(type="org.hibernate.type.BinaryType")
     private byte[] mapa;
+    
+    @JsonSerialize(using = CountSerializer.class)
+    @OneToMany(mappedBy = "recorrido", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Participacion> participaciones;
 
     public Recorrido() {}
 
@@ -101,6 +110,14 @@ public class Recorrido implements IdEntity, Serializable {
 
     public void setMapa(byte[] mapa) {
         this.mapa = mapa;
-    }    
+    }
 
+    public List<Participacion> getParticipaciones() {
+        return participaciones;
+    }
+
+    public void setParticipaciones(List<Participacion> participaciones) {
+        this.participaciones = participaciones;
+    }
+    
 }

@@ -43,6 +43,8 @@
     <!-- Resultados -->
     <dimen name="tamLetraItemResultados">16sp</dimen>
     <dimen name="marginStartItemResultados">10dp</dimen>
+    <dimen name="conexion_alto_botones">60dp</dimen>
+    <dimen name="conexion_textSize_botones">26sp</dimen>
 
 
 </resources>

@@ -21,7 +21,6 @@ import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.Resource;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 
 public class DetallesCarreraActivity extends BackableActivity {
 
@@ -109,14 +108,17 @@ public class DetallesCarreraActivity extends BackableActivity {
                                 tipoCarrera.setText(carrera.getTipo().toString());
                                 modalidadCarrera.setText(carrera.getModalidad().toString());
                                 if(carrera.getOrganizador() != null) {
-                                    organizadorCarrera.setText(carrera.getOrganizador().getNombre());
+                                    String org = carrera.getOrganizador().getNombre();
+                                    String club = carrera.getOrganizador().getClub();
+                                    if(club != null && club.length() > 0) org += String.format("\n(%s)", club);
+                                    organizadorCarrera.setText(org);
                                 } else {
                                     // El organizador borró su cuenta
                                     organizadorCarrera.setText(R.string.cuenta_borrada);
                                 }
                                 DateFormat format = DateFormat.getDateInstance();
                                 fechaCarrera.setText(format.format(carrera.getFecha()));
-                                adapterRecorridos.actualizaRecorridos(carrera.getRecorridos());
+                                adapterRecorridos.actualizaRecorridos(carrera.getRecorridos(), carrera);
 
                                 viewModel.ocultaDialogoCarga();
                             }

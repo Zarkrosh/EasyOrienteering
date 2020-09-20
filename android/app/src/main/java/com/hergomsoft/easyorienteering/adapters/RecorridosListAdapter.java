@@ -9,20 +9,21 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hergomsoft.easyorienteering.R;
+import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class RecorridosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private Carrera carrera;
     private List<Recorrido> recorridos;
     private OnItemListener recorridoListener;
 
 
     public static class RecorridoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView nombre, acabados, controles;
+        public TextView nombre, participantes, controles;
         OnItemListener recorridoListener;
 
         public RecorridoViewHolder(@NonNull View itemView, OnItemListener recorridoListener) {
@@ -30,15 +31,20 @@ public class RecorridosListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             this.recorridoListener = recorridoListener;
 
             nombre = itemView.findViewById(R.id.item_recorridos_nombre_recorrido);
-            acabados = itemView.findViewById(R.id.item_recorridos_numero_acabados);
+            participantes = itemView.findViewById(R.id.item_recorridos_numero_participantes);
             controles = itemView.findViewById(R.id.item_recorridos_numero_controles);
             itemView.setOnClickListener(this);
         }
 
-        public void bind(Recorrido recorrido) {
+        public void bind(Recorrido recorrido, Carrera carrera) {
             nombre.setText(recorrido.getNombre());
-            acabados.setText(String.valueOf(new Random().nextInt(100)));
-            controles.setText(String.valueOf(recorrido.getTrazado().length));
+            participantes.setText(String.valueOf(recorrido.getParticipaciones()));
+            String nControles = String.valueOf(recorrido.getTrazado().length);
+            if(carrera.getModalidad() == Carrera.Modalidad.SCORE) {
+                if(carrera.getControles() != null) nControles = String.valueOf(carrera.getControles().size());
+                else nControles = ""; // Fallo al persistir controles
+            }
+            controles.setText(nControles);
         }
 
         @Override
@@ -68,7 +74,7 @@ public class RecorridosListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((RecorridosListAdapter.RecorridoViewHolder) holder).bind(recorridos.get(position));
+        ((RecorridosListAdapter.RecorridoViewHolder) holder).bind(recorridos.get(position), carrera);
     }
 
     @Override
@@ -79,7 +85,8 @@ public class RecorridosListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
      * Reemplaza la lista de recorridos por una nueva y actualiza los datos.
      * @param nRecorridos Nueva lista de recorridos
      */
-    public void actualizaRecorridos(List<Recorrido> nRecorridos) {
+    public void actualizaRecorridos(List<Recorrido> nRecorridos, Carrera carrera) {
+        this.carrera = carrera;
         this.recorridos.clear();
         this.recorridos.addAll(nRecorridos);
         notifyDataSetChanged();

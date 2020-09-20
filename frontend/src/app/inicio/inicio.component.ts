@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertService } from '../alert';
+import { TokenStorageService } from '../_services/token-storage.service';
 
 @Component({
   selector: 'app-inicio',
@@ -14,10 +15,13 @@ export class InicioComponent implements OnInit {
     keepAfterRouteChange: false
   };
 
-  constructor(protected alertService: AlertService) { }
+  conectado: boolean = false;
+
+  constructor(protected alertService: AlertService,
+    public tokenService: TokenStorageService) { }
 
   ngOnInit() {
-    
+    this.conectado = this.tokenService.isLoggedIn();
   }
 
 }

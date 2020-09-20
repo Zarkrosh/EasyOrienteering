@@ -76,10 +76,12 @@ export class Recorrido {
     nombre: string;
     trazado: string[]; // Sin incluir salida/meta
     mapa: any; // Mapa en B64 "data:image/jpeg;base64, ..." o true/false para indicar presencia
+    participaciones: number;
 
     constructor(nombre: string) {
         this.nombre = nombre;
         this.trazado = []
+        this.participaciones = 0;
     }
 }
 

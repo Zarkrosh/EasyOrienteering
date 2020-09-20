@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.ViewSwitcher;
@@ -71,7 +72,7 @@ public class ExplorarActivity extends BackableActivity {
         setupListeners();
         setupMapa();
         setupObservadores();
-        viewModel.buscaCarreras("", 0);
+        viewModel.buscaCarreras("", "", "", 0);
     }
 
     private void setupListeners() {
@@ -85,11 +86,22 @@ public class ExplorarActivity extends BackableActivity {
         };
         listaCarreras.addOnScrollListener(scrollListener);
 
+        // Cambios en los filtros
+        listaCarreras.setSelectoresListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                buscaCarreras();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
         // Cambio en el buscador
         listaCarreras.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String nombre) {
-                buscaCarreras(nombre);
+                buscaCarreras();
                 return false;
             }
 
@@ -132,8 +144,11 @@ public class ExplorarActivity extends BackableActivity {
         });
     }
 
-    private void buscaCarreras(String nombre) {
-        viewModel.buscaCarreras(nombre, 0);
+    private void buscaCarreras() {
+        String nombre = listaCarreras.getFiltroNombre();
+        String tipo = listaCarreras.getFiltroTipo();
+        String modalidad = listaCarreras.getFiltroModalidad();
+        viewModel.buscaCarreras(nombre, tipo, modalidad, 0);
         listaCarreras.scrollSuaveArriba();
         listaCarreras.quitaFocusBuscador();
     }

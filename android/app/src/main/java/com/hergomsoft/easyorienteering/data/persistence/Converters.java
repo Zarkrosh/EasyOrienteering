@@ -5,11 +5,13 @@ import androidx.room.TypeConverter;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
+import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
 
 import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class Converters {
     @TypeConverter
@@ -69,7 +71,19 @@ public class Converters {
     }
     @TypeConverter
     public static String fromLista(List<Recorrido> recorridos) {
-        Type type = new TypeToken<List<Recorrido>>() {}.getType();
+        Type type = new TypeToken<List<Recorrido>>(){}.getType();
         return new Gson().toJson(recorridos, type);
+    }
+
+    // CONTROLES
+    @TypeConverter
+    public static Map<String, Control> toControles(String value) {
+        Type type = new TypeToken<Map<String, Control>>(){}.getType();
+        return new Gson().fromJson(value, type);
+    }
+    @TypeConverter
+    public static String fromControels(Map<String, Control> controles) {
+        Type type = new TypeToken<Map<String, Control>>(){}.getType();
+        return new Gson().toJson(controles, type);
     }
 }

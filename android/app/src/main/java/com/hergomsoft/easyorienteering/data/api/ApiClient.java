@@ -7,17 +7,15 @@ import com.hergomsoft.easyorienteering.data.api.requests.CambioRequest;
 import com.hergomsoft.easyorienteering.data.api.requests.LoginRequest;
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroCuentaRequest;
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroRequest;
-import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.ApiResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.InicioResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.LoginResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.MessageResponse;
-import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.ParticipacionesRecorridoResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Registro;
 import com.hergomsoft.easyorienteering.data.model.Usuario;
-import com.hergomsoft.easyorienteering.util.Constants;
 
 import java.util.List;
 
@@ -53,7 +51,7 @@ public interface ApiClient {
     @POST("recorridos/iniciar/{idRecorrido}")
     Call<InicioResponse> iniciaRecorrido(@Path("idRecorrido") long idRecorrido, @Body RegistroRequest registro);
     @POST("recorridos/abandonar/{idRecorrido}")
-    Call<AbandonoResponse> abandonaRecorrido(@Path("idRecorrido") long idRecorrido);
+    Call<MessageResponse> abandonaRecorrido(@Path("idRecorrido") long idRecorrido);
 
     // AUTENTICACIÓN
     @POST("auth/login")

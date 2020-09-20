@@ -31,19 +31,6 @@
         android:textStyle="bold"
         tools:text="Abel Herrero\nORCA"/>
 
-    <!-- Puntuación -->
-    <TextView
-        android:id="@+id/item_resultados_puntuacion"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/marginStartItemResultados"
-        android:padding="5dp"
-        android:gravity="center"
-        android:textColor="@android:color/black"
-        android:textSize="@dimen/tamLetraItemResultados"
-        android:textStyle="bold"
-        tools:text="189"/>
-
     <!-- Tiempo total -->
     <TextView
         android:id="@+id/item_resultados_tiempo_total"
@@ -56,6 +43,19 @@
         android:textSize="@dimen/tamLetraItemResultados"
         android:textStyle="bold"
         tools:text="1:21.33	"/>
+
+    <!-- Puntuación -->
+    <TextView
+        android:id="@+id/item_resultados_puntuacion"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/marginStartItemResultados"
+        android:padding="5dp"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/tamLetraItemResultados"
+        android:textStyle="bold"
+        tools:text="189"/>
 
     <!-- Controles añadidos dinámicamente -->
 

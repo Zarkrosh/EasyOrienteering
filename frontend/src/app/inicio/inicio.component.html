@@ -1,6 +1,6 @@
 <div class="easyo-container-fit">
 
-    <div class="wrapper-inicio">
+    <div class="wrapper-inicio" *ngIf="!conectado">
         <div class="contenido-inicio">
 
             <div class="item-esquema">
@@ -33,8 +33,12 @@
         <div class="lateral-inicio">
             <h3>¿Quieres probar?</h3>
             <p>EasyOrienteering es <b>completamente gratuito</b> y fácil de usar.</p>
-            <button>Regístrate</button>
+            <a routerLink='/registro'><button>Regístrate</button></a>
         </div>
     </div>
     
+</div>
+
+<div class="easyo-container">
+
 </div>

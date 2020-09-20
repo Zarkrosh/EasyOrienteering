@@ -5,6 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_marginBottom="6dp"
+    android:background="@color/colorPresionado"
     android:orientation="horizontal">
 
     <TextView
@@ -13,9 +15,11 @@
         android:layout_weight="0.7"
         android:layout_height="match_parent"
         android:layout_marginStart="20dp"
+        android:layout_marginEnd="6dp"
         android:gravity="start|center_vertical"
         android:textSize="18sp"
         android:textStyle="bold"
+        android:textColor="@android:color/black"
         tools:text="VI Liga Norte 2020" />
 
     <LinearLayout
@@ -33,6 +37,7 @@
             android:gravity="center"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="@android:color/black"
             tools:text="CIRCUITO"  />
 
         <TextView
@@ -43,6 +48,7 @@
             android:gravity="center"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="@android:color/black"
             tools:text="TRAZADO"  />
 
     </LinearLayout>

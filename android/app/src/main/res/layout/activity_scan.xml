@@ -65,34 +65,6 @@
                     android:layout_height="match_parent">
                 </SurfaceView>
 
-                <!--
-                <TextView android:id="@+id/scan_mensaje"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="40dp"
-                    android:text="@string/scan_escanea_triangulo"
-                    android:textColor="@android:color/white"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-                -->
-
-
-                <!-- DEBUG Nº ESCANEOS -->
-                <TextView
-                    android:id="@+id/testContador"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginBottom="40dp"
-                    android:textSize="25sp"
-                    android:textColor="@android:color/white"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>

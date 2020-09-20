@@ -42,15 +42,6 @@
                             class="resultado-posicion">({{parcial.posicionParcial}})</td>
                     </ng-template>
 
-                    <!--
-                    <ng-template *ngIf="modalidad === MOD_TRAZADO">
-                        <td *ngFor="let parcial of resultado.parciales">
-                            <div>
-                                <span>{{parcial.tiempoParcial}} ({{parcial.posicionParcial}})</span>
-                                <span>{{parcial.tiempoAcumulado}} ({{parcial.posicionAcumulada}})</span>
-                            </div>
-                        </td>
-                    </ng-template>-->
                     <ng-container *ngIf="modalidad === MOD_SCORE">
                         <!-- TODO Puntuación total -->
                         <td rowspan="2"><b>{{resultado.puntuacion}}</b></td>

@@ -52,7 +52,6 @@ export class LoginComponent implements OnInit {
     this.clienteApi.login(this.f.username.value, this.f.password.value).subscribe(
       resp => {
         if(resp.status == 200) {
-          console.log(resp);
           // Login exitoso, redirige a la página de perfil
           this.tokenService.saveUser(resp.body);
           this.tokenService.saveToken(resp.body.token);
