@@ -234,7 +234,7 @@ public class CarreraService implements ICarreraService {
         
         // Fecha 
         Date fecha = carrera.getFecha();
-        if(!edit) {
+        if(false && !edit) {
             // Al crear una carrera la fecha no puede ser anterior a la de hoy ni posterior a la de hoy dentro de un año
             Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
             int dia = calendar.get(Calendar.DAY_OF_MONTH);

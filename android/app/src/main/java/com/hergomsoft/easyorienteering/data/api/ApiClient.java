@@ -16,6 +16,7 @@ import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Registro;
 import com.hergomsoft.easyorienteering.data.model.Usuario;
+import com.hergomsoft.easyorienteering.util.Constants;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ApiClient {
-    String BASE_URL = "https://192.168.1.69:4200/api/";
+    String BASE_URL = "https://" + Constants.API + "/api/";
     String MAPA_URL = "recorridos/mapa/"; // + idRecorrido
 
     // CARRERAS
@@ -43,7 +44,7 @@ public interface ApiClient {
 
     // RECORRIDOS
     @GET("recorridos/{idRecorrido}")
-    LiveData<ApiResponse<ParticipacionesRecorridoResponse>> getRegistrosRecorrido(@Path("idRecorrido") long idRecorrido);
+    LiveData<ApiResponse<ParticipacionesRecorridoResponse>> getParticipacionesRecorrido(@Path("idRecorrido") long idRecorrido);
     @POST("recorridos/{id}")
     Call<Registro> registraControl(@Path("id") long idCarrera, @Body RegistroRequest registro);
     @GET("recorridos/pendiente")
@@ -61,15 +62,15 @@ public interface ApiClient {
     @POST("auth/logout")
     Call<MessageResponse> logoutUsuario();
     @POST("auth/change")
-    Call<MessageResponse> cambiaPassword(@Body CambioPassRequest registro);
+    Call<MessageResponse> cambiaPassword(@Body CambioPassRequest request);
 
     // USUARIOS
     @GET("usuarios/{id}")
     LiveData<ApiResponse<Usuario>> getUsuario(@Path("id") long id);
     @POST("usuarios/cambionombre")
-    Call<Usuario> cambiaNombreUsuario(@Body CambioRequest registro);
+    Call<Usuario> cambiaNombreUsuario(@Body CambioRequest request);
     @POST("usuarios/cambioclub")
-    Call<Usuario> cambiaClub(@Body CambioRequest registro);
+    Call<Usuario> cambiaClubUsuario(@Body CambioRequest request);
     @DELETE("usuarios")
     Call<MessageResponse> borrarCuenta();
 

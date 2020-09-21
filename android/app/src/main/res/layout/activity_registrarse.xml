@@ -32,7 +32,6 @@
             android:layout_height="50dp"
             android:layout_marginTop="5dp"
             android:inputType="textEmailAddress"
-            android:text="asdf@test.com"
             app:layout_constraintTop_toBottomOf="@+id/textView"
             tools:layout_editor_absoluteX="50dp" />
 
@@ -71,7 +70,6 @@
             android:layout_height="50dp"
             android:layout_marginTop="5dp"
             android:hint="Al menos 3 letras"
-            android:text="Orientador98"
             android:inputType="textEmailAddress"
             app:layout_constraintTop_toBottomOf="@+id/llNombre"
             tools:layout_editor_absoluteX="50dp" />
@@ -93,7 +91,6 @@
             android:layout_height="50dp"
             android:layout_marginTop="5dp"
             android:inputType="textCapCharacters"
-            android:text="ORCA"
             app:layout_constraintTop_toBottomOf="@+id/textView14"
             tools:layout_editor_absoluteX="50dp" />
 
@@ -120,7 +117,6 @@
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                android:text="asdfasdf"
                 android:hint="@string/registro_pass_largo"
                 android:inputType="textPassword"/>
 
@@ -159,7 +155,6 @@
                 android:layout_height="50dp"
                 android:layout_weight="1"
                 android:inputType="textPassword"
-                android:text="asdfasdf"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.717"
                 app:layout_constraintStart_toStartOf="parent" />

@@ -23,16 +23,6 @@ public class Converters {
         return date == null ? null : date.getTime();
     }
 
-    @TypeConverter
-    public static String[] toStringArray(String value) {
-        Type type = new TypeToken<List<String>>(){}.getType();
-        return new Gson().fromJson(value, type);
-    }
-    @TypeConverter
-    public static String fromStringArray(String[] array) {
-        return new Gson().toJson(array);
-    }
-
     // TIPO DE CARRERA
     @TypeConverter
     public static String fromTipo(Carrera.Tipo tipo) { return tipo.name(); }
@@ -65,12 +55,12 @@ public class Converters {
 
     // LISTA DE RECORRIDOS
     @TypeConverter
-    public static List<Recorrido> toLista(String value) {
+    public static List<Recorrido> toRecorridos(String value) {
         Type type = new TypeToken<List<Recorrido>>(){}.getType();
         return new Gson().fromJson(value, type);
     }
     @TypeConverter
-    public static String fromLista(List<Recorrido> recorridos) {
+    public static String fromRecorridos(List<Recorrido> recorridos) {
         Type type = new TypeToken<List<Recorrido>>(){}.getType();
         return new Gson().toJson(recorridos, type);
     }

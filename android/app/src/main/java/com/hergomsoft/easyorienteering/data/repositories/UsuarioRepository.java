@@ -156,7 +156,7 @@ public class UsuarioRepository extends ApiRepository {
 
     public void cambiaClub(String nombre) {
         CambioRequest cambio = new CambioRequest(nombre);
-        apiClient.cambiaClub(cambio).enqueue(new Callback<Usuario>() {
+        apiClient.cambiaClubUsuario(cambio).enqueue(new Callback<Usuario>() {
             @Override
             public void onResponse(Call<Usuario> call, Response<Usuario> response) {
                 Resource<String> recurso;
@@ -305,13 +305,13 @@ public class UsuarioRepository extends ApiRepository {
     }
 
     public void borrarCuenta() {
+        borraDatosUsuarioConectado();
         apiClient.borrarCuenta().enqueue(new Callback<MessageResponse>() {
             @Override
             public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
                 Resource<String> recurso;
                 if(response.isSuccessful()) {
                     recurso = Resource.success("");
-                    borraDatosUsuarioConectado();
                 } else {
                     recurso = Resource.error("No se pudo borrar la cuenta", null);
                 }
@@ -361,15 +361,4 @@ public class UsuarioRepository extends ApiRepository {
         editor.apply();
     }
 
-
-    // TEST
-    public void borraDatosUsuarios() {
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                usuarioDAO.clearAll();
-            }
-        });
-
-    }
 }

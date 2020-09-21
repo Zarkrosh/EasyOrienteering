@@ -9,8 +9,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.hergomsoft.easyorienteering.data.api.responses.ApiResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
-import com.hergomsoft.easyorienteering.data.model.Recurso;
-import com.hergomsoft.easyorienteering.data.model.Usuario;
 import com.hergomsoft.easyorienteering.data.persistence.CarreraDAO;
 import com.hergomsoft.easyorienteering.data.persistence.EasyODatabase;
 import com.hergomsoft.easyorienteering.util.AppExecutors;
@@ -20,10 +18,6 @@ import com.hergomsoft.easyorienteering.util.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class CarreraRepository extends ApiRepository {
 

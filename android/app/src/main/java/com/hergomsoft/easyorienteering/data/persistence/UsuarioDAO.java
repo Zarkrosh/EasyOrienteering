@@ -17,7 +17,4 @@ public interface UsuarioDAO {
     @Query("SELECT * FROM usuarios WHERE id = :id")
     LiveData<Usuario> getUsuario(long id);
 
-    @Query("DELETE FROM usuarios")
-    void clearAll();
-
 }

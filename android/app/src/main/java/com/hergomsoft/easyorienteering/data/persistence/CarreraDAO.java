@@ -24,6 +24,4 @@ public interface CarreraDAO {
     @Query("SELECT * FROM carreras WHERE UPPER(nombre) LIKE '%' || :nombre || '%'  AND tipo LIKE '%' || :tipo || '%' AND modalidad LIKE '%' || :modalidad || '%' ORDER BY id DESC LIMIT ((:numeroPagina + 1) * 20)")
     LiveData<List<Carrera>> buscaCarreras(String nombre, String tipo, String modalidad, int numeroPagina);
 
-    @Query("DELETE FROM carreras")
-    void clearAll();
 }

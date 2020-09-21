@@ -2,16 +2,11 @@ package com.hergomsoft.easyorienteering.data.repositories;
 
 import android.content.Context;
 
-import androidx.lifecycle.LiveData;
-
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.GsonBuildConfig;
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.api.ApiClient;
-import com.hergomsoft.easyorienteering.data.model.Carrera;
-import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.util.LiveDataCallAdapterFactory;
 import com.hergomsoft.easyorienteering.util.Resource;
 
@@ -27,12 +22,10 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -51,14 +44,26 @@ public abstract class ApiRepository {
 
     public ApiRepository(Context context) {
         this.context = context;
-        /*
+
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor)
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request request = chain.request();
+                        String token = UsuarioRepository.getInstance(context).getTokenUsuarioConectado();
+                        if(token != null) {
+                            request = chain.request().newBuilder()
+                                    .addHeader("Authorization", "Bearer " + token)
+                                    .build();
+                        }
+                        return chain.proceed(request);
+                    }
+                })
                 .addNetworkInterceptor(new StethoInterceptor()) // DEBUG
                 .build();
-        */
-        OkHttpClient client = getUnsafeHTTPSClient(context); // TODO Borrar en producción
+        //OkHttpClient client = getUnsafeHTTPSClient(context);
 
 
         Gson gson = new GsonBuilder()

@@ -273,7 +273,7 @@ public class RegistroRepository extends ApiRepository {
             @NonNull
             @Override
             protected LiveData<ApiResponse<ParticipacionesRecorridoResponse>> createCall() {
-                return apiClient.getRegistrosRecorrido(idRecorrido);
+                return apiClient.getParticipacionesRecorrido(idRecorrido);
             }
         }.getAsLiveData();
     }
