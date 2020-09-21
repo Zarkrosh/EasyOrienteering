@@ -5,8 +5,9 @@ import java.util.Map;
 
 public class Constants {
     // API
-    //public static final String API = "192.168.1.69:4200";
-    public static final String API = "easyorienteering.herokuapp.com";
+    public static final String API_DEV = "192.168.1.69:4200";
+    public static final String API_PROD = "easyorienteering.herokuapp.com";
+    public static final String API = API_DEV;
 
     // SharedPreferences
     public static final String PREFS_NAME = "PrefsEasyO";

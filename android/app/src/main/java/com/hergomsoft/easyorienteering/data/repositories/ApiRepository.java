@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.hergomsoft.easyorienteering.R;
 import com.hergomsoft.easyorienteering.data.api.ApiClient;
+import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.LiveDataCallAdapterFactory;
 import com.hergomsoft.easyorienteering.util.Resource;
 
@@ -45,9 +46,11 @@ public abstract class ApiRepository {
     public ApiRepository(Context context) {
         this.context = context;
 
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor)
+        OkHttpClient client;
+        if(Constants.API.contentEquals(Constants.API_PROD)) {
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            client = new OkHttpClient.Builder().addInterceptor(interceptor)
                 .addInterceptor(new Interceptor() {
                     @Override
                     public Response intercept(Chain chain) throws IOException {
@@ -63,8 +66,9 @@ public abstract class ApiRepository {
                 })
                 .addNetworkInterceptor(new StethoInterceptor()) // DEBUG
                 .build();
-        //OkHttpClient client = getUnsafeHTTPSClient(context);
-
+        } else{
+            client = getUnsafeHTTPSClient(context);
+        }
 
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd HH:mm:ss")

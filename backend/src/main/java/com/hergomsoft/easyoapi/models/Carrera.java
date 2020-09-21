@@ -4,6 +4,7 @@ import com.hergomsoft.easyoapi.models.serializers.IdEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,9 +25,14 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 
 @Entity
 @Table(name = "carreras")
+@TypeDefs({
+    @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class),
+})
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Carrera implements IdEntity {
     public static final int MAX_LEN_NOMBRE = 100;
@@ -81,7 +87,7 @@ public class Carrera implements IdEntity {
     @OneToMany(mappedBy = "carrera", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Recorrido> recorridos = new ArrayList<>();
     
-    @Type(type = "json")
+    @Type(type = "jsonb")
     @Column(name = "CONTROLES", columnDefinition = "json")
     private Map<String, Control> controles = new HashMap<>();
 

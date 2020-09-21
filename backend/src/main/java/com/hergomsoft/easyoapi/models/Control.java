@@ -5,7 +5,6 @@ public class Control {
     public enum Tipo {SALIDA, CONTROL, META};
     
     private String codigo;
-    //@Enumerated(EnumType.STRING)
     private Tipo tipo;
     private Integer puntuacion;
     private Coordenada coords;

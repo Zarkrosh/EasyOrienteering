@@ -2,7 +2,7 @@ package com.hergomsoft.easyoapi.models;
 
 import com.hergomsoft.easyoapi.models.serializers.IdEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +20,7 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
 @TypeDefs({
-    @TypeDef(name = "json", typeClass = JsonStringType.class),
+    @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class),
 })
 @Entity
 @Table( name = "participaciones")
@@ -36,7 +36,7 @@ public class Participacion implements IdEntity {
     @Column(name = "FECHA_INICIO")
     private Date fechaInicio;
     
-    @Type(type = "json")
+    @Type(type = "jsonb")
     @Column(name = "REGISTROS", columnDefinition = "json")
     private List<Registro> registros;
     
