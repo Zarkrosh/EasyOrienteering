@@ -8,6 +8,9 @@
     border-collapse: separate;
     border-spacing: 1.5rem;
 }
+.datos-usuario input {
+    font-size: 1.3rem;
+}
 .datos-usuario input[readonly] {
     color: inherit;
     background: transparent;

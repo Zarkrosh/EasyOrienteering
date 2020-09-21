@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
@@ -25,6 +27,8 @@ import java.util.List;
 
 public class ListaCarrerasComponent extends LinearLayout implements OnItemListener {
 
+    Spinner selectorTipo;
+    Spinner selectorModalidad;
     SearchView buscador;
     ProgressBar progressBar;
     TextView error;
@@ -49,6 +53,8 @@ public class ListaCarrerasComponent extends LinearLayout implements OnItemListen
     private void init() {
         inflate(context, R.layout.lista_carreras, this);
 
+        selectorTipo = findViewById(R.id.lista_carreras_selector_tipo);
+        selectorModalidad = findViewById(R.id.lista_carreras_selector_modalidad);
         buscador = findViewById(R.id.lista_carreras_buscador);
         recyclerCarreras = findViewById(R.id.lista_carreras_lista);
         progressBar = findViewById(R.id.lista_carreras_progress);
@@ -98,26 +104,39 @@ public class ListaCarrerasComponent extends LinearLayout implements OnItemListen
         muestraLista();
     }
 
-    public void borraCarreras() {
-        adapterCarreras.borraCarreras();
-        muestraLista();
-    }
-
     public void scrollSuaveArriba() {
         recyclerCarreras.smoothScrollToPosition(0);
     }
-
     public void quitaFocusBuscador() {
         buscador.clearFocus();
     }
 
-    public void addOnScrollListener(RecyclerView.OnScrollListener scrollListener) {
-        recyclerCarreras.addOnScrollListener(scrollListener);
+    public void addOnScrollListener(RecyclerView.OnScrollListener scrollListener) { recyclerCarreras.addOnScrollListener(scrollListener); }
+    public void setOnQueryTextListener(SearchView.OnQueryTextListener listener) { buscador.setOnQueryTextListener(listener); }
+    public void setSelectoresListener(AdapterView.OnItemSelectedListener listener) {
+        selectorTipo.setOnItemSelectedListener(listener);
+        selectorModalidad.setOnItemSelectedListener(listener);
     }
 
-    public void setOnQueryTextListener(SearchView.OnQueryTextListener listener) {
-        buscador.setOnQueryTextListener(listener);
+    public String getFiltroTipo() {
+        String selected = (String) selectorTipo.getSelectedItem();
+        if(selected.contentEquals(context.getResources().getStringArray(R.array.entries_tipo)[0])) {
+            // La primera opción es no utilizar filtro
+            return "";
+        } else {
+            return selected;
+        }
     }
+    public String getFiltroModalidad() {
+        String selected = (String) selectorModalidad.getSelectedItem();
+        if(selected.contentEquals(context.getResources().getStringArray(R.array.entries_modalidad)[0])) {
+            // La primera opción es no utilizar filtro
+            return "";
+        } else {
+            return selected;
+        }
+    }
+    public String getFiltroNombre() { return buscador.getQuery().toString(); }
 
     @Override
     public void onItemClick(int position) {

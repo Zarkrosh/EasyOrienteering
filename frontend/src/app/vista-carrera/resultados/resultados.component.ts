@@ -3,6 +3,7 @@ import { AlertService } from 'src/app/alert';
 import { ClienteApiService } from 'src/app/_services/cliente-api.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Recorrido, ResultadoUsuario, ParcialUsuario, Carrera, ParticipacionesRecorridoResponse, Control } from 'src/app/_shared/app.model';
+import { Utils } from 'src/app/_shared/utils';
 
 @Component({
   selector: 'app-resultados',
@@ -74,10 +75,8 @@ export class ResultadosComponent implements OnInit {
           } else if(err.status == 504) {
             this.alertService.error("No hay conexión con el servidor. Espera un momento y vuelve a intentarlo.", this.alertOptions);
           } else {
-            let mensaje = "Error al obtener los resultados"
-            if(typeof err.error === 'string') mensaje += ": " + err.error;
+            let mensaje = Utils.getMensajeError(err, "");
             this.alertService.error(mensaje, this.alertOptions);
-            console.log(err);
           }
           this.errorCarga = true;
         }
@@ -160,7 +159,9 @@ export class ResultadosComponent implements OnInit {
     if(this.modalidad === Carrera.MOD_TRAZADO) {
       this.cabecerasTrazado = [];
       for(let i = 0; i < trazado.length - 1; i++) {
-        this.cabecerasTrazado.push(trazado[i] + " - " + trazado[i+1]);
+        let p = (i === 0) ? "S" : i;
+        let s = (i < trazado.length-2) ? (i+1) + " (" + trazado[i+1] + ")" : "M";
+        this.cabecerasTrazado.push(p + "-" + s);
       }
       // Ordena lista por tiempo total y tipo
       resultados.sort(function(r1, r2) {
@@ -241,7 +242,6 @@ export class ResultadosComponent implements OnInit {
     }
 
     this.resultados = resultados;
-    console.log(this.resultados);
   }
 
 

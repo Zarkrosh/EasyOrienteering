@@ -72,7 +72,7 @@ public class RecorridosController {
                 }
                 
                 if(usuario != null) {
-                    if(Objects.equals(usuario.getId(), recorrido.getCarrera().getOrganizador().getId())) {
+                    if(recorrido.getCarrera().getOrganizador() != null && Objects.equals(usuario.getId(), recorrido.getCarrera().getOrganizador().getId())) {
                         // Es el organizador, puede acceder
                         permiso = true;
                     } else if(participacionService.haParticipadoEnRecorrido(usuario, recorrido)) {
@@ -110,7 +110,7 @@ public class RecorridosController {
                 // Comprueba que no ha corrido dicho recorrido ya 
                 if(!participacionService.haParticipadoEnRecorrido(corredor, recorrido)) {
                     // Comprueba que no es el organizador de la carrera
-                    if(!Objects.equals(corredor.getId(), carrera.getOrganizador().getId())) {
+                    if(carrera.getOrganizador() == null || !Objects.equals(corredor.getId(), carrera.getOrganizador().getId())) {
                         // Comprueba que el control es una salida
                         Control control = carrera.getControles().get(peticion.getCodigo());
                         if(control != null) {
@@ -284,7 +284,7 @@ public class RecorridosController {
             // ¿Puede acceder al mapa?
             boolean permiso = false;
             Usuario usuario = usuarioService.getUsuarioPeticion(authentication);
-            if(Objects.equals(usuario.getId(), rec.getCarrera().getOrganizador().getId())) {
+            if(rec.getCarrera().getOrganizador() != null && Objects.equals(usuario.getId(), rec.getCarrera().getOrganizador().getId())) {
                 // Es el organizador, puede acceder
                 permiso = true;
             } else if(participacionService.haParticipadoEnRecorrido(usuario, rec)) {

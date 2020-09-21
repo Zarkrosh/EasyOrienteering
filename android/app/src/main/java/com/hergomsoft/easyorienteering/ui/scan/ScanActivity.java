@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -30,7 +28,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -41,13 +38,12 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.hergomsoft.easyorienteering.R;
-import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
+import com.hergomsoft.easyorienteering.components.DialogoCarga;
+import com.hergomsoft.easyorienteering.data.api.responses.MessageResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
-import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Registro;
-import com.hergomsoft.easyorienteering.components.DialogoCarga;
 import com.hergomsoft.easyorienteering.ui.resultados.ResultadosActivity;
 import com.hergomsoft.easyorienteering.util.Constants;
 import com.hergomsoft.easyorienteering.util.Resource;
@@ -56,8 +52,6 @@ import com.hergomsoft.easyorienteering.util.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import okhttp3.ResponseBody;
 
 public class ScanActivity extends AppCompatActivity {
 
@@ -94,9 +88,6 @@ public class ScanActivity extends AppCompatActivity {
     private ScanViewModel viewModel;
     private Toast toastPermisos;
 
-    // TEST
-    private MutableLiveData<Integer> contadorEscaneos;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,16 +123,6 @@ public class ScanActivity extends AppCompatActivity {
         slide_in_right.setDuration(getResources().getInteger(R.integer.duracion_slide_fast));
         slide_out_left.setDuration(getResources().getInteger(R.integer.duracion_slide_fast));
         slide_out_right.setDuration(getResources().getInteger(R.integer.duracion_slide_fast));
-
-        // TEST
-        contadorEscaneos = new MutableLiveData<>(0);
-        TextView testContador = findViewById(R.id.testContador);
-        contadorEscaneos.observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                testContador.setText("" + integer);
-            }
-        });
 
         // Comprueba permisos
         if (compruebaPermisos()) {
@@ -231,10 +212,10 @@ public class ScanActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     viewModel.ocultaResultadoDialogo();
-                                    viewModel.resetDatos();
                                     Intent i = new Intent(ScanActivity.this, ResultadosActivity.class);
                                     i.putExtra(Constants.EXTRA_ID_RECORRIDO, viewModel.getRecorridoActual().getId());
                                     startActivity(i);
+                                    viewModel.resetDatos();
                                 }
                             }, 2000);
                         } else {
@@ -242,7 +223,7 @@ public class ScanActivity extends AppCompatActivity {
                         }
                         break;
                     case ERROR:
-                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.registro_error), registroControl.message);
+                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), registroControl.message);
                         viewModel.clearUltimoEscaneado();
                         break;
                     default:
@@ -290,30 +271,35 @@ public class ScanActivity extends AppCompatActivity {
         });
 
         // Respuesta de abandono de recorrido
-        viewModel.getAbandonoResponse().observe(this, new Observer<Resource<AbandonoResponse>>() {
+        viewModel.getAbandonoResponse().observe(this, new Observer<Resource<MessageResponse>>() {
             @Override
-            public void onChanged(Resource<AbandonoResponse> response) {
+            public void onChanged(Resource<MessageResponse> response) {
                 setupModoInicioRecorrido();
                 switch (response.status) {
                     case SUCCESS:
                         viewModel.ocultaDialogoCarga();
-                        AbandonoResponse r = response.data;
-                        if(r.isAbandonado()) {
+                        MessageResponse r = response.data;
+                        if(!r.isError()) {
                             viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_EXITO,"", getString(R.string.scan_carga_abandonado));
-                            // Tras unos segundos, oculta el diálogo automáticamente
+                            // Tras unos segundos, oculta el diálogo automáticamente y redirige a los resultados
                             Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    viewModel.ocultaDialogoCarga();
+                                    viewModel.ocultaResultadoDialogo();
+                                    Intent i = new Intent(ScanActivity.this, ResultadosActivity.class);
+                                    i.putExtra(Constants.EXTRA_ID_RECORRIDO, viewModel.getRecorridoActual().getId());
+                                    startActivity(i);
+                                    viewModel.resetDatos();
                                 }
                             }, 2000);
                         } else {
-                            viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), r.getError());
+                            viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), r.getMessage());
                         }
                         break;
                     case ERROR:
                         viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), response.message);
+                        viewModel.resetDatos();
                         break;
                     default:
                         viewModel.ocultaDialogoCarga();
@@ -369,6 +355,17 @@ public class ScanActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // Captura de la cámara
+        viewModel.getEstadoCapturaCamara().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean capturar) {
+                if(capturar != null) {
+                    if(capturar) iniciaCapturaCamara();
+                    else detieneCapturaCamara();
+                }
+            }
+        });
     }
 
     /**
@@ -406,7 +403,7 @@ public class ScanActivity extends AppCompatActivity {
         viewSwitcher.setOutAnimation(slide_out_right);
         viewSwitcher.setDisplayedChild(0);
         btnSwitch.setImageResource(R.drawable.img_trazado);
-        iniciaCapturaCamara();
+        viewModel.setCapturaCamara(true);
     }
 
     /**
@@ -417,7 +414,7 @@ public class ScanActivity extends AppCompatActivity {
         viewSwitcher.setOutAnimation(slide_out_left);
         viewSwitcher.setDisplayedChild(1);
         btnSwitch.setImageResource(R.drawable.img_qr);
-        detieneCapturaCamara();
+        viewModel.setCapturaCamara(false);
     }
 
 
@@ -456,7 +453,7 @@ public class ScanActivity extends AppCompatActivity {
         cameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                iniciaCapturaCamara();
+                viewModel.setCapturaCamara(true);
             }
 
             @Override
@@ -464,7 +461,7 @@ public class ScanActivity extends AppCompatActivity {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-                detieneCapturaCamara();
+                viewModel.setCapturaCamara(false);
             }
         });
     }
@@ -488,8 +485,6 @@ public class ScanActivity extends AppCompatActivity {
                 if (barcodes.size() > 0) {
                     String escaneado = barcodes.valueAt(0).displayValue;
                     if(!viewModel.checkUltimoEscaneado(escaneado)) {
-                        contadorEscaneos.postValue(contadorEscaneos.getValue() + 1); // DEBUG TODO BORRAR
-
                         // Obtiene los datos locales de la carrera y recorrido actuales
                         Carrera carrera = viewModel.getCarreraActual();
                         if(carrera == null) {
@@ -566,12 +561,12 @@ public class ScanActivity extends AppCompatActivity {
             @Override
             public void onShow(DialogInterface dialog) {
                 // Pausa la captura de la cámara
-                detieneCapturaCamara();
+                viewModel.setCapturaCamara(false);
             }
         });
         dialogoCarga.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
-            public void onDismiss(DialogInterface dialog) { iniciaCapturaCamara(); }
+            public void onDismiss(DialogInterface dialog) { viewModel.setCapturaCamara(true); }
         });
     }
 
@@ -593,7 +588,7 @@ public class ScanActivity extends AppCompatActivity {
         alertBuilder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                if(!dialogoCarga.isShowing()) iniciaCapturaCamara();
+                if(!dialogoCarga.isShowing()) viewModel.setCapturaCamara(true);
                 viewModel.clearUltimoEscaneado();
             }
         });
@@ -614,7 +609,7 @@ public class ScanActivity extends AppCompatActivity {
                 public void run() {
                     if(!dialogConfirmacion.isShowing()) {
                         // Pausa la captura de la cámara
-                        detieneCapturaCamara();
+                        viewModel.setCapturaCamara(false);
                         // Muestra el diálogo
                         dialogConfirmacion.show();
                     }
@@ -650,14 +645,14 @@ public class ScanActivity extends AppCompatActivity {
         alertBuilder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                iniciaCapturaCamara();
+                viewModel.setCapturaCamara(true);
             }
         });
         dialogRecorridoPendiente = alertBuilder.create();
         dialogRecorridoPendiente.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-                detieneCapturaCamara();
+                viewModel.setCapturaCamara(false);
             }
         });
     }
@@ -703,14 +698,14 @@ public class ScanActivity extends AppCompatActivity {
         alertBuilder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                iniciaCapturaCamara();
+                viewModel.setCapturaCamara(true);
             }
         });
         dialogAbandono = alertBuilder.create();
         dialogAbandono.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-                detieneCapturaCamara();
+                viewModel.setCapturaCamara(false);
             }
         });
     }

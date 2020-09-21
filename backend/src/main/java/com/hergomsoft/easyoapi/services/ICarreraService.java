@@ -41,7 +41,7 @@ public interface ICarreraService {
     Carrera saveCarrera(Carrera carrera);
     
     /**
-     * Actualiza todos los datos de una carrera en la base de datos.
+     * Actualiza los datos de una carrera en la base de datos.
      * @param anterior Carrera anterior
      * @param nueva Carrera editada
      */

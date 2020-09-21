@@ -8,15 +8,14 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.hergomsoft.easyorienteering.data.api.requests.RegistroRequest;
-import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.ApiResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.InicioResponse;
-import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.MessageResponse;
 import com.hergomsoft.easyorienteering.data.api.responses.ParticipacionesRecorridoResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.PendienteResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
-import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Registro;
 import com.hergomsoft.easyorienteering.util.AppExecutors;
 import com.hergomsoft.easyorienteering.util.Constants;
@@ -44,7 +43,7 @@ public class RegistroRepository extends ApiRepository {
 
     private SingleLiveEvent<Resource<Registro>> registroResponse;         // Respuesta de registro de control
     private SingleLiveEvent<Resource<Boolean>> comprobacionPendiente;     // Respuesta de comprobación de recorrido pendiente
-    private SingleLiveEvent<Resource<AbandonoResponse>> abandonoResponse; // Respuesta de comprobación de recorrido pendiente
+    private SingleLiveEvent<Resource<MessageResponse>> abandonoResponse; // Respuesta de comprobación de recorrido pendiente
     private MutableLiveData<Control> siguienteControl;
 
     // Singleton
@@ -201,7 +200,6 @@ public class RegistroRepository extends ApiRepository {
                             }
 
                             // Borra todos los registros anteriores e introduce los nuevos
-                            //new InsertRegistrosAT(registroDAO).execute(resp.getRegistros());
                             registroList = new ArrayList<>();
                             registroList.addAll(resp.getParticipacion().getRegistros());
                             actualizaSiguienteControl();
@@ -230,10 +228,10 @@ public class RegistroRepository extends ApiRepository {
      * Realiza una petición de abandono de recorrido.
      */
     public void abandonaRecorrido() {
-        apiClient.abandonaRecorrido(recorridoActual.getId()).enqueue(new Callback<AbandonoResponse>() {
+        apiClient.abandonaRecorrido(recorridoActual.getId()).enqueue(new Callback<MessageResponse>() {
             @Override
-            public void onResponse(Call<AbandonoResponse> call, Response<AbandonoResponse> response) {
-                Resource<AbandonoResponse> recurso;
+            public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
+                Resource<MessageResponse> recurso;
                 if(response.code() == 200 && response.body() != null) {
                     recurso = Resource.success(response.body());
                 } else {
@@ -243,7 +241,7 @@ public class RegistroRepository extends ApiRepository {
             }
 
             @Override
-            public void onFailure(Call<AbandonoResponse> call, Throwable t) {
+            public void onFailure(Call<MessageResponse> call, Throwable t) {
                 abandonoResponse.postValue(getRecursoConErrorConexion(t));
             }
         });
@@ -275,7 +273,7 @@ public class RegistroRepository extends ApiRepository {
             @NonNull
             @Override
             protected LiveData<ApiResponse<ParticipacionesRecorridoResponse>> createCall() {
-                return apiClient.getRegistrosRecorrido(idRecorrido);
+                return apiClient.getParticipacionesRecorrido(idRecorrido);
             }
         }.getAsLiveData();
     }
@@ -287,7 +285,7 @@ public class RegistroRepository extends ApiRepository {
 
     public SingleLiveEvent<Resource<Boolean>> getPendienteResponse() { return comprobacionPendiente; }
     public SingleLiveEvent<Resource<Registro>> getRegistroResponse() { return registroResponse; }
-    public SingleLiveEvent<Resource<AbandonoResponse>> getAbandonoResponse() { return abandonoResponse; }
+    public SingleLiveEvent<Resource<MessageResponse>> getAbandonoResponse() { return abandonoResponse; }
     public LiveData<Control> getSiguienteControl() { return siguienteControl; }
     public Carrera getCarreraActual() { return carreraActual; }
     public Recorrido getRecorridoActual() { return recorridoActual; }

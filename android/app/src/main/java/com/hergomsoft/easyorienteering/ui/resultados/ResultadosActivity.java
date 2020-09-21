@@ -98,8 +98,20 @@ public class ResultadosActivity extends BackableActivity {
                                 Carrera.Modalidad modalidad = response.data.getModalidad();
                                 Recorrido recorrido = response.data.getRecorrido();
                                 setTitle(getString(R.string.resultados_resultados, recorrido.getNombre()));
-                                String[] trazado = recorrido.getTrazado();
                                 Map<String, Integer> puntuacionControles = response.data.getPuntuacionesControles();
+                                String[] trazado = recorrido.getTrazado();
+                                if(modalidad == Carrera.Modalidad.SCORE) {
+                                    List<String> listaControles = new ArrayList<>();
+                                    // No hay trazado, sino la lista de controles
+                                    for(String k : puntuacionControles.keySet()) {
+                                        if(!k.contentEquals(Constants.CODIGO_SALIDA) && !k.contentEquals(Constants.CODIGO_META))
+                                            listaControles.add(k);
+                                    }
+                                    Collections.sort(listaControles);
+                                    listaControles.add(0, Constants.CODIGO_SALIDA);
+                                    listaControles.add(Constants.CODIGO_META);
+                                    trazado = listaControles.toArray(trazado);
+                                }
                                 // Genera parciales independientes de los corredores
                                 List<ResultadoUsuario> resultados = generaResultados(modalidad, trazado, puntuacionControles, response.data.getParticipaciones());
                                 generaTablaResultados(modalidad, trazado, resultados);
@@ -132,12 +144,13 @@ public class ResultadosActivity extends BackableActivity {
             for(Participacion participacion : participaciones) {
                 Usuario corredor = participacion.getCorredor();
                 ResultadoUsuario.Tipo tipo = ResultadoUsuario.Tipo.OK;
-                long tAcum = 0;
+                if(participacion.isAbandonado()) tipo = ResultadoUsuario.Tipo.ABANDONADO;
+                else if(participacion.isPendiente()) tipo = ResultadoUsuario.Tipo.PENDIENTE;
+                long tAcum = 0; // Segundos
                 List<ParcialUsuario> parciales = new ArrayList<>();
                 Map<String, Integer> puntosRegistrados = new HashMap<>();
                 if(modalidad == Carrera.Modalidad.TRAZADO) {
                     // LINEA
-                    if(participacion.getRegistros().size() < trazado.length) tipo = ResultadoUsuario.Tipo.PENDIENTE;
                     for(int i = 1; i < participacion.getRegistros().size(); i++) {
                         Date dPri = participacion.getRegistros().get(i-1).getFecha();
                         Date dSec = participacion.getRegistros().get(i).getFecha();
@@ -156,9 +169,6 @@ public class ResultadosActivity extends BackableActivity {
                     }
                 } else {
                     // SCORE
-                    boolean pendiente = true;
-                    boolean abandonado = false;
-                    String controlMeta = trazado[trazado.length - 1]; // El último control es la meta
                     for(Registro r : participacion.getRegistros()) {
                         String codigoControl = r.getControl();
                         Date fechaRegistro = r.getFecha();
@@ -166,18 +176,13 @@ public class ResultadosActivity extends BackableActivity {
                             Integer puntuacion = puntuacionControles.get(codigoControl);
                             if(puntuacion != null) {
                                 puntosRegistrados.put(codigoControl, puntuacion);
-                                if(codigoControl.contentEquals(controlMeta)) pendiente = false;
-                            } else {
-                                // No debería ocurrir
                             }
                         } else {
                             // Recorrido abandonado
-                            abandonado = true;
+                            tipo = ResultadoUsuario.Tipo.ABANDONADO;
                         }
                     }
 
-                    if(abandonado) tipo = ResultadoUsuario.Tipo.ABANDONADO;
-                    else if(pendiente) tipo = ResultadoUsuario.Tipo.PENDIENTE;
                     tAcum = participacion.getRegistros().get(participacion.getRegistros().size() - 1).getFecha().getTime() / 1000
                             - participacion.getRegistros().get(0).getFecha().getTime() / 1000;
                 }
@@ -271,8 +276,6 @@ public class ResultadosActivity extends BackableActivity {
             if(modalidad == Carrera.Modalidad.TRAZADO) {
                 // LINEA
                 cabecera = (TableRow) getLayoutInflater().inflate(R.layout.item_resultados_linea, null);
-                TextView tvCabeceraDiferencia = cabecera.findViewById(R.id.item_resultados_diferencia);
-                tvCabeceraDiferencia.setText(R.string.resultados_diferencia);
             } else {
                 // SCORE
                 cabecera = (TableRow) getLayoutInflater().inflate(R.layout.item_resultados_score, null);
@@ -321,12 +324,10 @@ public class ResultadosActivity extends BackableActivity {
             int pos = 1;
             for(ResultadoUsuario r : resultados) {
                 TableRow row;
-                TextView tvDiferencia = null;
                 TextView tvPuntuacion = null;
                 if(modalidad == Carrera.Modalidad.TRAZADO) {
                     // LINEA
                     row = (TableRow) getLayoutInflater().inflate(R.layout.item_resultados_linea, null);
-                    tvDiferencia = row.findViewById(R.id.item_resultados_diferencia);
                 } else {
                     // SCORE
                     row = (TableRow) getLayoutInflater().inflate(R.layout.item_resultados_score, null);
@@ -343,15 +344,17 @@ public class ResultadosActivity extends BackableActivity {
                     case OK:
                         sPosicion = String.format("%d", r.getPosicion());
                         sTiempoTotal = Utils.getTiempoResultadoFromSecs(r.getTiempoTotal());
-                        if(tvDiferencia != null && r.getDiferenciaGanador() > 0) tvDiferencia.setText(String.format("+%s", Utils.getTiempoResultadoFromSecs(r.getDiferenciaGanador())));
-                        if(tvPuntuacion != null) tvPuntuacion.setText(String.format("%d", r.getPuntuacion()));
+                        if(r.getDiferenciaGanador() > 0) sTiempoTotal += String.format("\n+%s", Utils.getTiempoResultadoFromSecs(r.getDiferenciaGanador()));
+                        if(tvPuntuacion != null) tvPuntuacion.setText(Integer.toString(r.getPuntuacion()));
                         break;
                     case PENDIENTE:
                         sTiempoTotal = getString(R.string.resultados_pendiente);
-                        if(tvPuntuacion != null) tvPuntuacion.setText(String.format("%d", r.getPuntuacion()));
+                        tvTiempoTotal.setTextColor(Color.BLUE);
+                        if(tvPuntuacion != null) tvPuntuacion.setText(Integer.toString(r.getPuntuacion()));
                         break;
                     case ABANDONADO:
                     default:
+                        tvTiempoTotal.setTextColor(Color.RED);
                         sTiempoTotal = getString(R.string.resultados_abandonado);
                 }
                 tvPosicion.setText(sPosicion);
@@ -382,8 +385,7 @@ public class ResultadosActivity extends BackableActivity {
                     }
                 } else {
                     // SCORE -> Indica si el control ha sido registrado o no
-                    for(int i = 1; i < trazado.length; i++) {
-                        // Se omite el control de salida
+                    for(int i = 1; i < trazado.length; i++) { // Omite salida
                         TextView tvControl = new TextView(this);
                         tvControl.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                         tvControl.setText((r.getPuntosRegistrados().containsKey(trazado[i]) ? "X" : ""));

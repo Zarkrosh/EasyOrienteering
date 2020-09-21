@@ -8,39 +8,26 @@ public class Participacion {
     private Long id;
     private Date fechaInicio;
     private List<Registro> registros;
-    private Boolean abandonado;
-    private Boolean pendiente;
+    private boolean abandonado;
+    private boolean pendiente;
     private Usuario corredor;
     private Recorrido recorrido;
-
-    //public Participacion() {}
-
 
     public Long getId() {
         return id;
     }
-
     public Date getFechaInicio() {
         return fechaInicio;
     }
-
     public List<Registro> getRegistros() {
         return registros;
     }
-
-    public Boolean getAbandonado() {
+    public Boolean isAbandonado() {
         return abandonado;
     }
-
-    public Boolean getPendiente() {
+    public Boolean isPendiente() {
         return pendiente;
     }
-
-    public Usuario getCorredor() {
-        return corredor;
-    }
-
-    public Recorrido getRecorrido() {
-        return recorrido;
-    }
+    public Usuario getCorredor() { return corredor; }
+    public Recorrido getRecorrido() { return recorrido; }
 }

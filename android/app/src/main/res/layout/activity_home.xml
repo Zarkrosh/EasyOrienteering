@@ -8,11 +8,12 @@
 
     <!-- Imagen de fondo -->
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/img_orientacion"
+        android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        android:adjustViewBounds="true" />
+        android:src="@drawable/img_orientacion" />
 
     <LinearLayout
         android:id="@+id/home_layoutPerfil"
@@ -24,7 +25,7 @@
         android:paddingStart="20dp"
         android:paddingEnd="10dp"
         android:paddingVertical="10dp"
-        android:background="@drawable/back_round_corners"
+        android:background="@drawable/back_boton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:orientation="horizontal">
@@ -34,11 +35,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:textSize="18sp"
+            android:text="@string/home_mi_perfil"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:layout_gravity="center" />
+            android:textColor="@android:color/white"
+            android:layout_gravity="center"/>
 
+        <!--
         <ImageButton
             android:id="@+id/home_btnPerfil"
             android:layout_width="@dimen/dimImgPerfil"
@@ -47,8 +50,29 @@
             android:padding="1dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop" />
+        -->
 
     </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginHorizontal="40dp"
+        android:background="@drawable/back_round_corners"
+        android:gravity="center"
+        android:paddingHorizontal="4dp"
+        android:text="@string/app_name"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold"
+        app:autoSizeMaxTextSize="100sp"
+        app:autoSizeMinTextSize="12sp"
+        app:autoSizeStepGranularity="2sp"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintBottom_toTopOf="@+id/btnMisCarreras"
+        app:layout_constraintTop_toBottomOf="@+id/home_layoutPerfil"
+        app:layout_constraintVertical_bias="0.33" />
 
     <Button android:id="@+id/btnMisCarreras"
         android:layout_width="0dp"

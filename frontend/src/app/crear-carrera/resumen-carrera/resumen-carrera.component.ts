@@ -11,7 +11,7 @@ import { FooterService } from 'src/app/_services/footer.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 
 /**
- * This Service handles how the date is represented in scripts i.e. ngModel.
+ * Gestiona cómo se maneja la fecha a nivel de modelo.
  */
 @Injectable()
 export class CustomAdapter extends NgbDateAdapter<string> {
@@ -22,21 +22,21 @@ export class CustomAdapter extends NgbDateAdapter<string> {
     if (value) {
       let date = value.split(this.DELIMITER);
       return {
-        day : parseInt(date[0], 10),
+        day : parseInt(date[2], 10),
         month : parseInt(date[1], 10),
-        year : parseInt(date[2], 10)
+        year : parseInt(date[0], 10)
       };
     }
     return null;
   }
 
   toModel(date: NgbDateStruct | null): string | null {
-    return date ? date.day + this.DELIMITER + date.month + this.DELIMITER + date.year : null;
+    return date ? date.year + this.DELIMITER + date.month + this.DELIMITER + date.day : null;
   }
 }
 
 /**
- * This Service handles how the date is rendered and parsed from keyboard i.e. in the bound input field.
+ * Gestiona cómo se representa la fecha a nivel de cadena.
  */
 @Injectable()
 export class CustomDateParserFormatter extends NgbDateParserFormatter {
@@ -151,7 +151,7 @@ export class ResumenCarreraComponent implements OnInit {
     }
     
     let today = new Date();
-    let todayDate = today.getUTCDate() + "-" + (today.getUTCMonth()+1) + "-" + today.getUTCFullYear();
+    let todayDate = today.getUTCFullYear() + "-" + (today.getUTCMonth()+1) + "-" + today.getUTCDate();
     // Fecha mínima de selección
     this.minDate = {
       day: today.getUTCDate(),
@@ -226,8 +226,16 @@ export class ResumenCarreraComponent implements OnInit {
               this.f.tipo.setValue(this.carrera.tipo);
               this.f.modalidad.setValue(this.carrera.modalidad);
               this.f.visibilidad.setValue((this.carrera.privada) ? 'privada' : 'publica');
-              this.f.fecha.setValue(this.carrera.fecha);
               this.f.notas.setValue(this.carrera.notas);
+              let d = new Date(this.carrera.fecha);
+              this.minDate = {
+                day: d.getUTCDate(),
+                month: d.getUTCMonth()+1,
+                year: d.getUTCFullYear()
+              };
+              let fecha = d.getUTCFullYear() + "-" + (d.getUTCMonth()+1) + "-" + d.getUTCDate();
+              this.f.fecha.setValue(fecha);
+
               this.actualizaListaControles();
             } else {
               this.alertService.error("Solo puede editar la carrera su organizador", this.alertOptions);

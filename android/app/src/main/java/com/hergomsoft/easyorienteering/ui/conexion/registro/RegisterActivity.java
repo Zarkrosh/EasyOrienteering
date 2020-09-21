@@ -42,7 +42,6 @@ public class RegisterActivity extends BackableActivity {
     private CheckBox checkAcepto;
     private ImageButton btnPoliticas;
     private Button btnRegistrar;
-    private RegisterDialog dialog;
 
     private RegisterViewModel viewModel;
 
@@ -69,9 +68,6 @@ public class RegisterActivity extends BackableActivity {
         btnPoliticas = findViewById(R.id.registrarsePoliticas);
         btnRegistrar = findViewById(R.id.btnRegistrar);
 
-        dialog = new RegisterDialog(RegisterActivity.this);
-        // Fondo transparente para los bordes redondeados
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         btnRegistrar.setEnabled(false); // Deshabilitado por defecto
         passConfError = false;
 

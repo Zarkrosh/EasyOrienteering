@@ -43,14 +43,12 @@ public class SplashActivity extends AppCompatActivity {
         // Comprueba primer inicio de la aplicación
         SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
         Intent intent;
-        //boolean primerInicio = prefs.getBoolean(Constants.PREFS_PRIMER_INICIO, true);
-        boolean primerInicio = false; // Bug. Comprobar setter del primer inicio al omitir
+        boolean primerInicio = prefs.getBoolean(Constants.PREFS_PRIMER_INICIO, true);
         if(primerInicio) {
             intent = new Intent(SplashActivity.this, ResumenActivity.class);
             intent.putExtra(Constants.EXTRA_VOLUNTARIO, false);
         } else {
             // Comprueba si hay una cuenta conectada
-            // TODO
             boolean conectado = UsuarioRepository.getInstance(this).isLoggedIn();
             if(conectado) {
                 // Si hay una cuenta conectada, muestra la pantalla principal

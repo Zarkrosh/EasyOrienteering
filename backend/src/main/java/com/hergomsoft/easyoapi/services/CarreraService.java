@@ -81,26 +81,17 @@ public class CarreraService implements ICarreraService {
             carrera.setSecret(secret);
             
             // Comprueba que los datos de la carrera son válidos
-            checkDatosCarrera(carrera);
-
-            // TODO Evita guardar mapas en edición si no se han modificado (si son nulls).
+            checkDatosCarrera(carrera, false);
 
             // Guarda la carrera general
             Carrera res = carreraRepository.save(carrera);
-            // Luego guarda los recorridos y controles que no son guardados en cascada
+            // Luego guarda los recorridos que no son guardados en cascada
             List<Recorrido> gRecorridos = new ArrayList<>();
             for(Recorrido r : carrera.getRecorridos()) {
                 r.setCarrera(res);
                 gRecorridos.add(recorridoService.guardaRecorrido(r));
             }
             res.setRecorridos(gRecorridos);
-            /*
-            Map<String, Control> gControles = new HashMap<>();
-            for(Control c : carrera.getControles().values()) {
-                gControles.put(c.getCodigo(), repoControl.save(c));
-            }
-            res.setControles(gControles);
-            */
             return res;
         } else {
             throw new IllegalArgumentException("La carrera a guardar no puede ser null");
@@ -113,8 +104,17 @@ public class CarreraService implements ICarreraService {
             if(anterior != null) {
                 nueva.setId(anterior.getId());
                 nueva.setSecret(anterior.getSecret());
+                
+                // Restricciones de edición
+                // No puede cambiar la modalidad
+                if(anterior.getModalidad() != nueva.getModalidad())
+                    throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No se puede cambiar la modalidad de la carrera.");    
+                // No se pueden cambiar los controles y recorridos
+                nueva.setControles(anterior.getControles());
+                nueva.setRecorridos(anterior.getRecorridos());
+                
                 // Comprueba datos válidos
-                checkDatosCarrera(nueva);
+                checkDatosCarrera(nueva, true);
                 carreraRepository.save(nueva);
                 
                 // ¿Cambios en mapas?
@@ -219,28 +219,33 @@ public class CarreraService implements ICarreraService {
     /**
      * Realiza una comprobación y corrección de los datos de la carrera.
      * @param carrera Carrera a comprobar
+     * @param edit Los datos son una edición de la carrera
      */
-    private void checkDatosCarrera(Carrera carrera) {
+    private void checkDatosCarrera(Carrera carrera, boolean edit) {
         String nombre = carrera.getNombre().trim();
         if(nombre.length() >= Carrera.MIN_LEN_NOMBRE && nombre.length() <= Carrera.MAX_LEN_NOMBRE) {
             carrera.setNombre(nombre);
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("La longitud del nombre debe comprender entre %d y %d caracteres.", Carrera.MIN_LEN_NOMBRE, Carrera.MAX_LEN_NOMBRE));
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, String.format("La longitud del nombre debe comprender entre %d y %d caracteres.", Carrera.MIN_LEN_NOMBRE, Carrera.MAX_LEN_NOMBRE));
         }
         String notas = (carrera.getNotas() != null) ? carrera.getNotas().trim() : "";
         if(notas.length() > Carrera.MAX_LEN_NOTAS) notas = notas.substring(0, Carrera.MAX_LEN_NOTAS);
         carrera.setNotas(notas);
         
-        // Fecha (no puede ser anterior a la de hoy ni posterior a la de hoy dentro de un año)
+        // Fecha 
         Date fecha = carrera.getFecha();
-        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
-        int dia = calendar.get(Calendar.DAY_OF_MONTH);
-        int mes = calendar.get(Calendar.MONTH) + 1;
-        int ano = calendar.get(Calendar.YEAR);
-        Date minFecha = new Date(LocalDateTime.of(ano, mes, dia, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
-        Date maxFecha = new Date(LocalDateTime.of(ano + 1, mes, dia, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
-        //if(fecha != null && (fecha.before(minFecha) || fecha.after(maxFecha)))
-        //    throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "La fecha debe ser como mínimo hoy y como máximo el año que viene.");
+        if(false && !edit) {
+            // Al crear una carrera la fecha no puede ser anterior a la de hoy ni posterior a la de hoy dentro de un año
+            Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+            int dia = calendar.get(Calendar.DAY_OF_MONTH);
+            int mes = calendar.get(Calendar.MONTH) + 1;
+            int ano = calendar.get(Calendar.YEAR);
+            Date minFecha = new Date(LocalDateTime.of(ano, mes, dia, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
+            Date maxFecha = new Date(LocalDateTime.of(ano + 1, mes, dia, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
+            if(fecha != null && (fecha.before(minFecha) || fecha.after(maxFecha)))
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "La fecha debe ser como mínimo hoy y como máximo el año que viene.");
+        }
+        
         
         // Controles
         if(carrera.getControles() == null || carrera.getControles().isEmpty()) 
@@ -271,22 +276,27 @@ public class CarreraService implements ICarreraService {
         if(nMetas != 1) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Debe existir una única meta.");
         
         
-        
         // Comprobaciones relativas al tipo
         if(carrera.getTipo() == Carrera.Tipo.EVENTO) {
             // EVENTO
+            // Fecha obligatoria
             if(fecha == null)
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Se debe indicar la fecha del evento.");
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Se debe indicar la fecha del evento.");
         } else {
             // CIRCUITO
             // Ubicacion obligatoria
+            if(carrera.getLatitud() == null || carrera.getLongitud() == null)
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Un circuito debe tener una ubicación obligatoria.");
+            // Solo puede ser público
+            if(carrera.isPrivada()) 
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Un circuito no puede ser privado.");
         }
         
         // Comprobaciones relativas a la modalidad
         if(carrera.getModalidad() == Carrera.Modalidad.TRAZADO) {
             // TRAZADO
             if(carrera.getRecorridos() == null || carrera.getRecorridos().isEmpty())
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe haber por lo menos un recorrido.");      
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Debe haber por lo menos un recorrido.");      
             // Los controles no tienen puntuación
             for(Control c : carrera.getControles().values()) c.setPuntuacion(0);
         } else {

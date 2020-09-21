@@ -16,6 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="36dp"
+            android:paddingHorizontal="12dp"
+            android:gravity="center"
             android:textColor="@android:color/black"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -68,9 +70,9 @@
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Organizador"
+                    android:text="@string/detalles_organizador"
                     android:textStyle="bold"
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
@@ -95,7 +97,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Fecha del evento"
+                    android:text="@string/detalles_fecha"
                     android:textStyle="bold"
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
@@ -119,7 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="Resultados"
+            android:text="@string/detalles_resultados"
             android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="@android:color/black"
@@ -127,10 +129,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tableDatos" />
 
-        <RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/detalles_lista_recorridos"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="20dp"
             app:layout_constraintTop_toBottomOf="@+id/textView16" />

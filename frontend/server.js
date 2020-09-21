@@ -1,20 +1,14 @@
 const express = require('express');
-const cors = require('cors');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
-
-app.use(cors());
 
 app.use(express.static(__dirname + '/dist/web'));
 
 // Proxy API
 var proxyOptions = {
     target: 'https://' + process.env.EASYO_BACKEND, 
-    changeOrigin: true, // No funciona
-    onProxyRes: function (proxyRes, req, res) {
-        proxyRes.headers['Access-Control-Allow-Origin'] = '*';
-    }
+    changeOrigin: true
 }
 app.use('/api', createProxyMiddleware(proxyOptions));
 

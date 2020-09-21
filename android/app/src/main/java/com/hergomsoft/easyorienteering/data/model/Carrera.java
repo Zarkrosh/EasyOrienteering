@@ -43,7 +43,6 @@ public class Carrera {
 
     @Expose
     private List<Recorrido> recorridos;
-    @Ignore
     @Expose
     private Map<String, Control> controles;
 
@@ -102,9 +101,7 @@ public class Carrera {
         this.organizador = organizador;
     }
 
-    public List<Recorrido> getRecorridos() {
-        return recorridos;
-    }
+    public List<Recorrido> getRecorridos() { return recorridos; }
     public void setRecorridos(List<Recorrido> recorridos) {
         this.recorridos = recorridos;
     }

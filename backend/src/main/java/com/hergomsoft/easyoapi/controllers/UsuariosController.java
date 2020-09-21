@@ -43,11 +43,13 @@ public class UsuariosController {
      * Importante: no borra las carreras que ha organizado.
      * 
      * @param authentication 
+     * @return Mensaje con el resultado
      */
     @DeleteMapping("")
-    public void borraUsuario(Authentication authentication) {
+    public MessageResponse borraUsuario(Authentication authentication) {
         Usuario usuario = getUsuario(authentication);
         usuarioService.deleteUsuario(usuario);
+        return new MessageResponse("Cuenta borrada", false);
     }
     
     /**

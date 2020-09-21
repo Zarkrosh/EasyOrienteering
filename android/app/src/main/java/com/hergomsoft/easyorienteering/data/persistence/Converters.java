@@ -5,11 +5,13 @@ import androidx.room.TypeConverter;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
+import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
 
 import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class Converters {
     @TypeConverter
@@ -19,16 +21,6 @@ public class Converters {
     @TypeConverter
     public static Long fromDate(Date date) {
         return date == null ? null : date.getTime();
-    }
-
-    @TypeConverter
-    public static String[] toStringArray(String value) {
-        Type type = new TypeToken<List<String>>(){}.getType();
-        return new Gson().fromJson(value, type);
-    }
-    @TypeConverter
-    public static String fromStringArray(String[] array) {
-        return new Gson().toJson(array);
     }
 
     // TIPO DE CARRERA
@@ -63,13 +55,25 @@ public class Converters {
 
     // LISTA DE RECORRIDOS
     @TypeConverter
-    public static List<Recorrido> toLista(String value) {
+    public static List<Recorrido> toRecorridos(String value) {
         Type type = new TypeToken<List<Recorrido>>(){}.getType();
         return new Gson().fromJson(value, type);
     }
     @TypeConverter
-    public static String fromLista(List<Recorrido> recorridos) {
-        Type type = new TypeToken<List<Recorrido>>() {}.getType();
+    public static String fromRecorridos(List<Recorrido> recorridos) {
+        Type type = new TypeToken<List<Recorrido>>(){}.getType();
         return new Gson().toJson(recorridos, type);
+    }
+
+    // CONTROLES
+    @TypeConverter
+    public static Map<String, Control> toControles(String value) {
+        Type type = new TypeToken<Map<String, Control>>(){}.getType();
+        return new Gson().fromJson(value, type);
+    }
+    @TypeConverter
+    public static String fromControels(Map<String, Control> controles) {
+        Type type = new TypeToken<Map<String, Control>>(){}.getType();
+        return new Gson().toJson(controles, type);
     }
 }

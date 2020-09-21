@@ -19,7 +19,7 @@ public class ResumenActivity extends BackableActivity {
     private boolean voluntario;
 
     private Button btnOmitir;
-    private Button btnFinalizar;
+    private Button btnSiguiente;
     private ViewPager pager;
     private TabLayout tabs;
     private Button btnFin;
@@ -31,7 +31,7 @@ public class ResumenActivity extends BackableActivity {
         setContentView(R.layout.activity_resumen);
 
         btnOmitir = findViewById(R.id.resumenOmitir);
-        //btnFinalizar = findViewById(R.id.resumenOmitir);
+        //btnSiguiente = findViewById(R.id.resumenSiguiente);
         pager = findViewById(R.id.resumenPager);
         tabs = findViewById(R.id.resumenPuntos);
 
@@ -45,24 +45,20 @@ public class ResumenActivity extends BackableActivity {
             // Ya la ha visto -> se permite volver atrás (pero no omitir)
             btnOmitir.setVisibility(View.GONE);
         } else {
-            // Primera vez -> no se permite volver atrás
+            // Primera vez -> no se permite volver atrás (pero sí omitir)
             getSupportActionBar().hide();
+            btnOmitir.setVisibility(View.VISIBLE);
         }
 
 
-        View.OnClickListener listenerFinaliza = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finalizaResumen();
-            }
-        };
+        View.OnClickListener listenerFinaliza = this::finalizaResumen;
         btnOmitir.setOnClickListener(listenerFinaliza);
-        //btnFinalizar.setOnClickListener(listenerFinaliza);
+        //btnSiguiente.setOnClickListener(listenerFinaliza);
     }
 
-    private void finalizaResumen() {
+    public void finalizaResumen(View v) {
         if(voluntario) {
-            // Vuelve atrás (configuración)
+            // Vuelve atrás
             finish();
         } else {
             // Para que no vuelva a mostrar de nuevo el resumen

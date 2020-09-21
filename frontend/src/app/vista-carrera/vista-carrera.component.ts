@@ -16,6 +16,8 @@ export class VistaCarreraComponent implements OnInit {
 
   readonly CARRERA_TIPO_EVENTO = Carrera.TIPO_EVENTO;
   readonly CARRERA_TIPO_CIRCUITO = Carrera.TIPO_CIRCUITO;
+  readonly MOD_TRAZADO = Carrera.MOD_TRAZADO;
+  readonly MOD_SCORE = Carrera.MOD_SCORE;
 
   // Alertas
   alertOptions = {
@@ -66,8 +68,9 @@ export class VistaCarreraComponent implements OnInit {
         resp => {
           if(resp.status == 200) {
             this.carrera = resp.body;
+            this.carrera.controles = new Map(Object.entries(this.carrera.controles));
             this.organizador = this.getOrganizador();
-            if(this.tokenService.isLoggedIn() && this.tokenService.getUser().id === this.carrera.organizador.id) {
+            if(this.tokenService.isLoggedIn() && this.carrera.organizador && this.tokenService.getUser().id === this.carrera.organizador.id) {
               this.esOrganizador = true;
               for(let recorrido of this.carrera.recorridos) {
                 if(recorrido.mapa) this.hayMapas = true;

@@ -53,7 +53,7 @@ public class DatosPrueba {
     final float PROBABILIDAD_CLUB = 0.7f;
     final int LARGO_PASSWORD = 12;
     final Date MIN_RANDOM_DATE = new Date(LocalDateTime.of(2020, 1, 1, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
-    final Date MAX_RANDOM_DATE = new Date(LocalDateTime.of(2020, 7, 1, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
+    final Date MAX_RANDOM_DATE = new Date(LocalDateTime.of(2020, 12, 31, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
     final int MIN_CONTROLES = 10;
     final int MAX_CONTROLES = 40;
     final int MIN_CONTROLES_RECORRIDO = 10;
@@ -135,81 +135,84 @@ public class DatosPrueba {
         Date fechaSalida = new Date(LocalDateTime.of(2020, 8, 25, 9, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
         int cont = 1;
         for(Carrera carrera : carrerasGeneradas) {
-            System.out.println("[*] " + cont++ + " / " + carrerasGeneradas.size());
-            int numeroCorredores = getIntAleatorio(MIN_CORREDORES_RESULTADOS, MAX_CORREDORES_RESULTADOS);
-            if(carrera.getModalidad() == Carrera.Modalidad.TRAZADO) {
-                for(Recorrido recorrido : carrera.getRecorridos()) {
-                    Collections.shuffle(usuariosGenerados);
-                    Map<Usuario, Participacion> participaciones = new HashMap<>();
-                    List<Usuario> corredores = new ArrayList<>();
-                    for(int i = 0; i < numeroCorredores; i++) {
-                        corredores.add(usuariosGenerados.get(i));
-                        participaciones.put(usuariosGenerados.get(i), new Participacion(usuariosGenerados.get(i), recorrido));
-                    }
-                    Map<Usuario, Long> millisAcumulados = new HashMap<>();
-                    
-                    for(String codigoControl : recorrido.getTrazado()) {
-                        int millisOptimo = getIntAleatorio(MIN_TIEMPO_PARCIAL, MAX_TIEMPO_PARCIAL) * 1000;
+            if(carrera.getFecha().before(new Date())) {
+                // Solo genera resultados para carreras pasadas
+                System.out.println("[*] " + cont++ + " / " + carrerasGeneradas.size());
+                int numeroCorredores = getIntAleatorio(MIN_CORREDORES_RESULTADOS, MAX_CORREDORES_RESULTADOS);
+                if(carrera.getModalidad() == Carrera.Modalidad.TRAZADO) {
+                    for(Recorrido recorrido : carrera.getRecorridos()) {
+                        Collections.shuffle(usuariosGenerados);
+                        Map<Usuario, Participacion> participaciones = new HashMap<>();
+                        List<Usuario> corredores = new ArrayList<>();
                         for(int i = 0; i < numeroCorredores; i++) {
-                            float desviacion = millisOptimo * getFloatAleatorio(0, MAX_DESVIACION_PARCIAL);
-                            long millisParcial = millisOptimo + (long) desviacion;
-                            long millisAcum = millisAcumulados.getOrDefault(corredores.get(i), 0l) + millisParcial;
-                            millisAcumulados.put(usuariosGenerados.get(i), millisAcum);
+                            corredores.add(usuariosGenerados.get(i));
+                            participaciones.put(usuariosGenerados.get(i), new Participacion(usuariosGenerados.get(i), recorrido));
+                        }
+                        Map<Usuario, Long> millisAcumulados = new HashMap<>();
+
+                        for(String codigoControl : recorrido.getTrazado()) {
+                            int millisOptimo = getIntAleatorio(MIN_TIEMPO_PARCIAL, MAX_TIEMPO_PARCIAL) * 1000;
+                            for(int i = 0; i < numeroCorredores; i++) {
+                                float desviacion = millisOptimo * getFloatAleatorio(0, MAX_DESVIACION_PARCIAL);
+                                long millisParcial = millisOptimo + (long) desviacion;
+                                long millisAcum = millisAcumulados.getOrDefault(corredores.get(i), 0l) + millisParcial;
+                                millisAcumulados.put(usuariosGenerados.get(i), millisAcum);
+                                Date fechaRegistro = new Date(fechaSalida.getTime() + millisAcum);
+                                Registro registro = new Registro(codigoControl, fechaRegistro);
+                                // Actualiza la participación
+                                participaciones.get(corredores.get(i)).getRegistros().add(registro);
+                            }
+                        }
+
+                        // Guarda las participaciones
+                        for(Participacion p : participaciones.values()) {
+                            p.setFechaInicio(p.getRegistros().get(0).getFecha());
+                            p.setPendiente(false);
+                            participacionService.guardaParticipacion(p);
+                        }
+                    }
+                } else {
+                    // SCORE
+                    List<Control> controles = new ArrayList<>(carrera.getControles().values());
+                    Recorrido recScore = carrera.getRecorridos().get(0);
+                    Collections.shuffle(usuariosGenerados);
+                    for(int i = 0; i < numeroCorredores; i++) {
+                        Participacion participacion = new Participacion(usuariosGenerados.get(i), recScore);
+                        Collections.shuffle(controles);
+                        List<Control> registrados = new ArrayList<>();
+                        if(getFloatAleatorio(0, 1) <= PROBABILIDAD_FULL_SCORE) {
+                            // Registra todos los controles
+                            for(Control c : controles) {
+                                if(c.getTipo() == Control.Tipo.CONTROL) registrados.add(c);
+                            }
+                        } else {
+                            // Registra algunos controles
+                            int numeroRegistrados = getIntAleatorio((int)(controles.size() * MIN_PORCENTAJE_COMPLETITUD_SCORE), controles.size() - 1);
+                            for(int j = 0; j < numeroRegistrados; j++) {
+                                Control c = controles.get(j);
+                                if(c.getTipo() == Control.Tipo.CONTROL) registrados.add(c);
+                            }
+                        }
+
+                        // Todos los usuarios registran la salida a la misma hora
+                        Registro regSalida = new Registro(Constants.CODIGO_SALIDA, fechaSalida);
+                        participacion.getRegistros().add(regSalida);
+
+                        // Registran con tiempos aleatorios sus controles
+                        long millisAcum = 0;
+                        Collections.shuffle(registrados);
+                        for(Control c : registrados) {
+                            millisAcum += getIntAleatorio(MIN_TIEMPO_PARCIAL, MAX_TIEMPO_PARCIAL) * 1000;
                             Date fechaRegistro = new Date(fechaSalida.getTime() + millisAcum);
-                            Registro registro = new Registro(codigoControl, fechaRegistro);
-                            // Actualiza la participación
-                            participaciones.get(corredores.get(i)).getRegistros().add(registro);
+                            Registro registro = new Registro(c.getCodigo(), fechaRegistro);
+                            participacion.getRegistros().add(registro);
                         }
+                        // Meta
+                        participacion.getRegistros().add(new Registro(Constants.CODIGO_META, new Date(fechaSalida.getTime() + millisAcum + 20000))); // 20s sprint
+                        participacion.setFechaInicio(participacion.getRegistros().get(0).getFecha());
+                        participacion.setPendiente(false);
+                        participacionService.guardaParticipacion(participacion);
                     }
-                    
-                    // Guarda las participaciones
-                    for(Participacion p : participaciones.values()) {
-                        p.setFechaInicio(p.getRegistros().get(0).getFecha());
-                        p.setPendiente(false);
-                        participacionService.guardaParticipacion(p);
-                    }
-                }
-            } else {
-                // SCORE
-                List<Control> controles = new ArrayList<>(carrera.getControles().values());
-                Recorrido recScore = carrera.getRecorridos().get(0);
-                Collections.shuffle(usuariosGenerados);
-                for(int i = 0; i < numeroCorredores; i++) {
-                    Participacion participacion = new Participacion(usuariosGenerados.get(i), recScore);
-                    Collections.shuffle(controles);
-                    List<Control> registrados = new ArrayList<>();
-                    if(getFloatAleatorio(0, 1) <= PROBABILIDAD_FULL_SCORE) {
-                        // Registra todos los controles
-                        for(Control c : controles) {
-                            if(c.getTipo() == Control.Tipo.CONTROL) registrados.add(c);
-                        }
-                    } else {
-                        // Registra algunos controles
-                        int numeroRegistrados = getIntAleatorio((int)(controles.size() * MIN_PORCENTAJE_COMPLETITUD_SCORE), controles.size() - 1);
-                        for(int j = 0; j < numeroRegistrados; j++) {
-                            Control c = controles.get(j);
-                            if(c.getTipo() == Control.Tipo.CONTROL) registrados.add(c);
-                        }
-                    }
-                    
-                    // Todos los usuarios registran la salida a la misma hora
-                    Registro regSalida = new Registro(Constants.CODIGO_SALIDA, fechaSalida);
-                    participacion.getRegistros().add(regSalida);
-                    
-                    // Registran con tiempos aleatorios sus controles
-                    long millisAcum = 0;
-                    Collections.shuffle(registrados);
-                    for(Control c : registrados) {
-                        millisAcum += getIntAleatorio(MIN_TIEMPO_PARCIAL, MAX_TIEMPO_PARCIAL) * 1000;
-                        Date fechaRegistro = new Date(fechaSalida.getTime() + millisAcum);
-                        Registro registro = new Registro(c.getCodigo(), fechaRegistro);
-                        participacion.getRegistros().add(registro);
-                    }
-                    // Meta
-                    participacion.getRegistros().add(new Registro(Constants.CODIGO_META, new Date(fechaSalida.getTime() + millisAcum + 20000))); // 20s sprint
-                    participacion.setFechaInicio(participacion.getRegistros().get(0).getFecha());
-                    participacion.setPendiente(false);
-                    participacionService.guardaParticipacion(participacion);
                 }
             }
         }

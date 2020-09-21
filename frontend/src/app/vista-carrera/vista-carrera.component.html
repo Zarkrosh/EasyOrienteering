@@ -44,8 +44,9 @@
                 <div *ngFor="let recorrido of carrera.recorridos" class="recorrido">
                     <div class="datos-recorrido">
                         <span class="nombre-recorrido"><b>{{recorrido.nombre}}</b></span>
-                        <span class="numero-corredores">18</span>
-                        <span class="numero-controles">12</span>
+                        <span class="numero-corredores">{{recorrido.participaciones}}</span>
+                        <span *ngIf="carrera.modalidad === MOD_TRAZADO" class="numero-controles">{{recorrido.trazado.length}}</span>
+                        <span *ngIf="carrera.modalidad === MOD_SCORE" class="numero-controles">{{carrera.controles.size}}</span>
                     </div>
                     <a class="overlay-recorrido" (click)="verResultados(recorrido.id)">
                         <span>Ver resultados</span>

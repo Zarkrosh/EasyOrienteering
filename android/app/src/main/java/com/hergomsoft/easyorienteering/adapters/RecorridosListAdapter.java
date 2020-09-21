@@ -1,6 +1,5 @@
 package com.hergomsoft.easyorienteering.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,16 +14,16 @@ import com.hergomsoft.easyorienteering.data.model.Recorrido;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class RecorridosListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private Carrera carrera;
     private List<Recorrido> recorridos;
     private OnItemListener recorridoListener;
 
 
     public static class RecorridoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView nombre, acabados, controles;
+        public TextView nombre, participantes, controles;
         OnItemListener recorridoListener;
 
         public RecorridoViewHolder(@NonNull View itemView, OnItemListener recorridoListener) {
@@ -32,15 +31,20 @@ public class RecorridosListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             this.recorridoListener = recorridoListener;
 
             nombre = itemView.findViewById(R.id.item_recorridos_nombre_recorrido);
-            acabados = itemView.findViewById(R.id.item_recorridos_numero_acabados);
+            participantes = itemView.findViewById(R.id.item_recorridos_numero_participantes);
             controles = itemView.findViewById(R.id.item_recorridos_numero_controles);
             itemView.setOnClickListener(this);
         }
 
-        public void bind(Recorrido recorrido) {
+        public void bind(Recorrido recorrido, Carrera carrera) {
             nombre.setText(recorrido.getNombre());
-            acabados.setText(String.valueOf(new Random().nextInt(100)));
-            controles.setText(String.valueOf(recorrido.getTrazado().length));
+            participantes.setText(String.valueOf(recorrido.getParticipaciones()));
+            String nControles = String.valueOf(recorrido.getTrazado().length);
+            if(carrera.getModalidad() == Carrera.Modalidad.SCORE) {
+                if(carrera.getControles() != null) nControles = String.valueOf(carrera.getControles().size());
+                else nControles = ""; // Fallo al persistir controles
+            }
+            controles.setText(nControles);
         }
 
         @Override
@@ -64,25 +68,14 @@ public class RecorridosListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recorridos_detalles, parent, false);
-        return new CarrerasListAdapter.CarreraViewHolder(view, recorridoListener);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recorridos, parent, false);
+        return new RecorridosListAdapter.RecorridoViewHolder(view, recorridoListener);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((RecorridosListAdapter.RecorridoViewHolder) holder).bind(recorridos.get(position));
+        ((RecorridosListAdapter.RecorridoViewHolder) holder).bind(recorridos.get(position), carrera);
     }
-
-    /*
-    @Override
-    public int getItemViewType(int position) {
-        if(position == carreras.size() - 1 && cargando) {
-            return TIPO_CARGANDO;
-        } else {
-            return TIPO_CARRERA;
-        }
-    }
-     */
 
     @Override
     public int getItemCount() { return recorridos.size(); }
@@ -90,11 +83,12 @@ public class RecorridosListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     /**
      * Reemplaza la lista de recorridos por una nueva y actualiza los datos.
-     * @param recorridos Lista de recorridos
+     * @param nRecorridos Nueva lista de recorridos
      */
-    public void actualizaRecorridos(List<Recorrido> recorridos) {
+    public void actualizaRecorridos(List<Recorrido> nRecorridos, Carrera carrera) {
+        this.carrera = carrera;
         this.recorridos.clear();
-        this.recorridos.addAll(recorridos);
+        this.recorridos.addAll(nRecorridos);
         notifyDataSetChanged();
     }
 }

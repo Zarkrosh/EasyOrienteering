@@ -43,9 +43,11 @@ public class ExplorarViewModel extends AndroidViewModelConCarga {
         return carreras;
     }
 
-    public void buscaCarreras(String busqueda, int numeroPagina) {
+    public void buscaCarreras(String busqueda, String tipo, String modalidad, int numeroPagina) {
         if(!realizandoPeticion) {
             this.nombre = busqueda;
+            this.tipo = (tipo != null) ? tipo.toUpperCase() : "";
+            this.modalidad = (modalidad != null) ? modalidad.toUpperCase() : "";
             this.numeroPagina = numeroPagina;
             noMasResultados = false;
             realizaBusqueda();

@@ -72,7 +72,7 @@
             android:paddingStart="25dp"
             android:paddingEnd="25dp"
             android:text="@string/conf_cambiar_nombre"
-            android:background="@drawable/back_boton_configuracion"
+            android:background="@drawable/back_item_configuracion"
             android:textSize="18sp"
             android:textAllCaps="false" />
 
@@ -84,7 +84,7 @@
             android:paddingStart="25dp"
             android:paddingEnd="25dp"
             android:text="@string/conf_cambiar_club"
-            android:background="@drawable/back_boton_configuracion"
+            android:background="@drawable/back_item_configuracion"
             android:textSize="18sp"
             android:textAllCaps="false" />
 
@@ -96,7 +96,7 @@
             android:paddingStart="25dp"
             android:paddingEnd="25dp"
             android:text="@string/conf_cambiar_contrasena"
-            android:background="@drawable/back_boton_configuracion"
+            android:background="@drawable/back_item_configuracion"
             android:textSize="18sp"
             android:textAllCaps="false" />
 
@@ -119,10 +119,11 @@
             android:paddingStart="25dp"
             android:paddingEnd="25dp"
             android:text="@string/conf_que_es_easyorienteering"
-            android:background="@drawable/back_boton_configuracion"
+            android:background="@drawable/back_item_configuracion"
             android:textSize="18sp"
             android:textAllCaps="false" />
 
+        <!--
         <Button
             android:id="@+id/conf_btn_compartir_app"
             android:layout_width="match_parent"
@@ -134,6 +135,7 @@
             android:background="@drawable/back_boton_configuracion"
             android:textSize="18sp"
             android:textAllCaps="false" />
+            -->
 
         <Button
             android:id="@+id/conf_btn_borrar_cuenta"
@@ -144,7 +146,7 @@
             android:paddingEnd="25dp"
             android:text="@string/conf_borrar_cuenta"
             android:textColor="@color/error"
-            android:background="@drawable/back_boton_configuracion"
+            android:background="@drawable/back_item_configuracion"
             android:textSize="18sp"
             android:textAllCaps="false" />
 
@@ -157,7 +159,7 @@
             android:paddingEnd="25dp"
             android:text="@string/conf_cerrar_sesion"
             android:textColor="@color/error"
-            android:background="@drawable/back_boton_configuracion"
+            android:background="@drawable/back_item_configuracion"
             android:textSize="18sp"
             android:textAllCaps="false" />
 

@@ -6,8 +6,8 @@
     <!-- Resumen -->
     <dimen name="puntosMaxWidth">20dp</dimen>
     <dimen name="marginBotPuntos">20dp</dimen>
-    <dimen name="marginTopTitResumen">100dp</dimen>
-    <dimen name="marginTopContResumen">100dp</dimen>
+    <dimen name="marginTopTitResumen">60dp</dimen>
+    <dimen name="marginTopContResumen">75dp</dimen>
     <dimen name="padHorizContResumen">30dp</dimen>
     <dimen name="tamTitulo">30sp</dimen>
     <dimen name="tamContenido">22sp</dimen>
@@ -30,6 +30,9 @@
     <dimen name="padBotPrincipales">20dp</dimen>
     <dimen name="altoBotonesPoliticas">60dp</dimen>
 
+    <!-- Detalles de carrera -->
+    <dimen name="detalles_espaciado_recorridos">10dp</dimen>
+
 
     <!-- Vista escaneo/mapa -->
     <dimen name="tamBotonSwitch">80dp</dimen>
@@ -40,6 +43,8 @@
     <!-- Resultados -->
     <dimen name="tamLetraItemResultados">16sp</dimen>
     <dimen name="marginStartItemResultados">10dp</dimen>
+    <dimen name="conexion_alto_botones">60dp</dimen>
+    <dimen name="conexion_textSize_botones">26sp</dimen>
 
 
 </resources>

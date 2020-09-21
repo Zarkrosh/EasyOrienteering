@@ -2,37 +2,30 @@ package com.hergomsoft.easyorienteering.ui.scan;
 
 import android.app.Application;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.hergomsoft.easyorienteering.R;
+import com.hergomsoft.easyorienteering.components.DialogoCarga;
 import com.hergomsoft.easyorienteering.data.api.ApiClient;
-import com.hergomsoft.easyorienteering.data.api.responses.AbandonoResponse;
+import com.hergomsoft.easyorienteering.data.api.responses.MessageResponse;
 import com.hergomsoft.easyorienteering.data.model.Carrera;
 import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
-import com.hergomsoft.easyorienteering.data.model.Recurso;
 import com.hergomsoft.easyorienteering.data.model.Registro;
-import com.hergomsoft.easyorienteering.data.repositories.CarreraRepository;
 import com.hergomsoft.easyorienteering.data.repositories.RegistroRepository;
 import com.hergomsoft.easyorienteering.util.AndroidViewModelConCarga;
-import com.hergomsoft.easyorienteering.components.DialogoCarga;
 import com.hergomsoft.easyorienteering.util.Resource;
 import com.hergomsoft.easyorienteering.util.Utils;
 
 import java.io.File;
-import java.util.List;
-
-import okhttp3.ResponseBody;
 
 import static android.Manifest.permission.CAMERA;
 
@@ -56,10 +49,11 @@ public class ScanViewModel extends AndroidViewModelConCarga {
     // LiveDatas
     private LiveData<Resource<Boolean>> peticionPendiente;
     private LiveData<Resource<Registro>> registroResponse;
-    private LiveData<Resource<AbandonoResponse>> abandonoResponse;
+    private LiveData<Resource<MessageResponse>> abandonoResponse;
     // MutableLiveDatas
     private MutableLiveData<ModoVista> modoVista;
     private MutableLiveData<ModoEscaneo> modoEscaneo;
+    private MutableLiveData<Boolean> estadoCapturaCamara;
     // MediatorLiveData
     private MediatorLiveData<Resource<File>> mapaResponse;
 
@@ -72,16 +66,18 @@ public class ScanViewModel extends AndroidViewModelConCarga {
         abandonoResponse = registroRepository.getAbandonoResponse();
         modoVista = new MutableLiveData<>(ModoVista.ESCANEO);
         modoEscaneo = new MutableLiveData<>(ModoEscaneo.INICIO_RECORRIDO);
+        estadoCapturaCamara = new MutableLiveData<>(false);
         mapaResponse = new MediatorLiveData<>();
         ultimoEscaneado = "";
     }
 
     public LiveData<Resource<Boolean>> getCarreraPendienteResponse() { return peticionPendiente; }
     public LiveData<Resource<Registro>> getRegistroResponse() { return registroResponse; }
-    public LiveData<Resource<AbandonoResponse>> getAbandonoResponse() { return abandonoResponse; }
+    public LiveData<Resource<MessageResponse>> getAbandonoResponse() { return abandonoResponse; }
     public LiveData<Resource<File>> getMapaResponse() { return mapaResponse; }
     public LiveData<ModoVista> getAlternadoVistas() { return modoVista; }
     public LiveData<ModoEscaneo> getModoEscaneo() { return modoEscaneo; }
+    public LiveData<Boolean> getEstadoCapturaCamara() { return estadoCapturaCamara; }
 
     public Carrera getCarreraActual() { return registroRepository.getCarreraActual(); }
     public Recorrido getRecorridoActual() { return registroRepository.getRecorridoActual(); }
@@ -190,6 +186,10 @@ public class ScanViewModel extends AndroidViewModelConCarga {
         secreto = Utils.getSecretoControlEscaneado(escaneado);
 
         return codigo != null && idRecorrido != null && secreto != null;
+    }
+
+    public void setCapturaCamara(boolean capturar) {
+        estadoCapturaCamara.postValue(capturar);
     }
 
     public void resetDatos() {

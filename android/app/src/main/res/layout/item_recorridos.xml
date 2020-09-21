@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_marginBottom="@dimen/detalles_espaciado_recorridos"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/back_boton_item_recorridos">
+    android:background="@drawable/back_item_recorridos">
 
     <TextView
         android:id="@+id/item_recorridos_nombre_recorrido"
@@ -26,7 +27,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/item_recorridos_numero_acabados"
+            android:id="@+id/item_recorridos_numero_participantes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

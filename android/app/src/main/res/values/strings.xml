@@ -12,6 +12,7 @@
     <string name="error">Error</string>
     <string name="error_inesperado">Error inesperado</string>
     <string name="cargando_datos">Cargando datos…</string>
+    <string name="cuenta_borrada">Cuenta borrada</string>
 
 
     <!-- Permisos -->
@@ -22,15 +23,21 @@
     <!-- Resumen -->
     <string name="resumenTitulo">Resumen</string>
     <string name="resumenOmitir">OMITIR</string>
-    <string name="resumen_primera_titulo">Ejemplo 1</string>
-    <string name="resumen_primera_contenido">Este es un texto de ejemplo para la primera parte del resumen</string>
-    <string name="resumen_segunda_titulo">Segundo ejemplo</string>
-    <string name="resumen_segunda_contenido">Este es un texto de ejemplo para la segunda parte del resumen</string>
+    <string name="resumen_que_es_titulo">¿Qué es EasyOrienteering?</string>
+    <string name="resumen_que_es_contenido">Con esta aplicación puedes participar en las carreras que otros orientadores hayan preparado.\n\nLas carreras pueden ser eventos o circuitos.\n\nUn evento es una carrera que se organiza en un día concreto, mientras que un circuito suele estar disponible siempre.</string>
+    <string name="resumen_como_funciona_titulo">¿Cómo funciona?</string>
+    <string name="resumen_como_funciona_contenido">Tras escanear un código QR de salida, empezarás a participar en un recorrido.\n\nSi el recorrido es trazado, debes pasar por los puntos de control en el orden establecido.\n\nSi el recorrido es score, tú eliges el orden.</string>
+    <string name="resumen_resultados_titulo">Resultados</string>
+    <string name="resumen_resultados_contenido">También podrás ver los resultados de las carreras y competir con otros orientadores.</string>
+    <string name="resumen_final_titulo">¿Empezamos?</string>
+    <string name="resumen_final_contenido">Recuerda siempre pensar antes de correr ;)</string>
+    <string name="resumen_siguiente">Siguiente</string>
+
 
     <!-- Comunes (conexión) -->
     <string name="conexion_cuenta_google">Usar cuenta de Google</string>
-    <string name="conexion_email_nombre">Email o nombre de usuario</string>
-    <string name="conexion_nombre_email_invalido">Email o nombre de usuario no válido</string>
+    <string name="conexion_nombre">Nombre de usuario</string>
+    <string name="conexion_nombre_invalido">Nombre de usuario no válido</string>
     <string name="conexion_password_largo">La contraseña debe ser de al menos 8 caracteres de largo</string>
     <string name="conexion_password">Contraseña</string>
 
@@ -82,9 +89,10 @@
     <string name="olvido_error">Ocurrió un error. Comprueba tu conexión e inténtalo de nuevo</string>
 
     <!-- Pantalla principal -->
+    <string name="home_mi_perfil">Mi perfil</string>
     <string name="home_mis_carreras">Mis carreras</string>
     <string name="home_explorar">Explorar</string>
-    <string name="home_unirme">Unirme a evento</string>
+    <string name="home_unirme">Unirme a carrera</string>
 
     <!-- Pantalla de escaneo -->
     <string name="scan_error_es_control">Has escaneado un control, debes escanear un triángulo de salida</string>
@@ -125,6 +133,9 @@
     <string name="detalles_carrera">Detalles de carrera</string>
     <string name="detalles_carrera_error_id">ID de carrera inválido</string>
     <string name="detalles_carrera_cargando">Cargando carrera…</string>
+    <string name="detalles_fecha">Fecha del evento</string>
+    <string name="detalles_organizador">Organizador</string>
+    <string name="detalles_resultados">Resultados</string>
 
 
     <!-- Configuración -->
@@ -135,13 +146,23 @@
     <string name="conf_que_es_easyorienteering">¿Qué es EasyOrienteering?</string>
     <string name="conf_compartir_aplicacion">Compartir aplicación</string>
     <string name="conf_borrar_cuenta">Borrar cuenta</string>
+    <string name="conf_borrar">Borrar</string>
+    <string name="conf_borrar_cuenta_mensaje">¿Estás seguro de que quieres borrar la cuenta? No la podrás recuperar y desaparecerás de los resultados de los recorridos en los que hayas participado.\n\nLas carreras que hayas creado no se borrarán. Si deseas borrarlas debes hacerlo de forma individual.</string>
+    <string name="conf_resp_cuenta_borrada">Cuenta borrada</string>
     <string name="conf_cerrar_sesion">Cerrar sesión</string>
+    <string name="conf_cerrar_sesion_mensaje">¿Estás seguro de que quieres cerrar tu sesión en este dispositivo?</string>
     <string name="conf_nuevo_nombre">Nuevo nombre</string>
     <string name="conf_nuevo_club">Nuevo club</string>
     <string name="conf_cambiando_nombre">Cambiando nombre…</string>
     <string name="conf_resp_nombre_cambiado">Nombre cambiado con éxito</string>
     <string name="conf_cambiando_club">Cambiando club…</string>
     <string name="conf_resp_club_cambiado">Club cambiado con éxito</string>
+    <string name="conf_cambiando_password">Cambiando contraseña…</string>
+    <string name="conf_resp_password_cambiada">Contraseña cambiada con éxito</string>
+    <string name="conf_cambiar_pass">Cambiar contraseña</string>
+    <string name="conf_pass_actual">Contraseña actual</string>
+    <string name="conf_pass_nueva">Contraseña nueva</string>
+    <string name="conf_pass_conf">Contraseña nueva (confirmación)</string>
     <string name="conf_cerrando_sesion">Cerrando sesión…</string>
 
 
@@ -151,14 +172,27 @@
     <!-- Resultados -->
     <string name="resultados_resultados">Resultados %1$s</string>
     <string name="resultados_cargando">Cargando resultados…</string>
-    <string name="resultados_posicion">Pos.</string>
-    <string name="resultados_nombre_club">Nombre\nClub</string>
+    <string name="resultados_posicion">#</string>
+    <string name="resultados_nombre_club">Nombre / Club</string>
     <string name="resultados_puntuacion">Puntuación</string>
-    <string name="resultados_tiempo_total">Tiempo total</string>
+    <string name="resultados_tiempo_total">Tiempo</string>
     <string name="resultados_diferencia">Diferencia</string>
     <string name="resultados_abandonado">Abandona</string>
     <string name="resultados_pendiente">Pendiente</string>
     <string name="resultados_sin_resultados">No hay resultados</string>
+
+
+    <!-- Explorar -->
+    <string-array name="entries_tipo">
+        <item>Cualquiera</item>
+        <item>Evento</item>
+        <item>Circuito</item>
+    </string-array>
+    <string-array name="entries_modalidad">
+        <item>Cualquiera</item>
+        <item>Trazado</item>
+        <item>Score</item>
+    </string-array>
 
 
 </resources>

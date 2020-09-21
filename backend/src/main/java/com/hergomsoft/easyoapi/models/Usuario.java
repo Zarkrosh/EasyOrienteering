@@ -25,7 +25,7 @@ import org.hibernate.annotations.Type;
 })
 public class Usuario implements IdEntity {
     public static final int MAXLEN_NOMBRE = 30;
-    public static final int MINLEN_NOMBRE = 2;
+    public static final int MINLEN_NOMBRE = 3;
     public static final int MAXLEN_EMAIL = 100;
     public static final int MAXLEN_CLUB = 30;
     public static final int MINLEN_CLUB = 0;

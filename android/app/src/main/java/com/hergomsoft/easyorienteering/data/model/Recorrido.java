@@ -18,11 +18,15 @@ public class Recorrido {
     @Expose
     private Boolean mapa;
 
-    public Recorrido(long id, String nombre, String[] trazado, Boolean mapa) {
+    @Expose
+    private int participaciones;
+
+    public Recorrido(long id, String nombre, String[] trazado, Boolean mapa, int participaciones) {
         this.id = id;
         this.nombre = nombre;
         this.trazado = trazado;
         this.mapa = mapa;
+        this.participaciones = participaciones;
     }
 
     public long getId() { return id; }
@@ -36,4 +40,7 @@ public class Recorrido {
 
     public Boolean tieneMapa() { return (mapa != null && mapa); }
     public void setMapa(Boolean mapa) { this.mapa = mapa; }
+
+    public int getParticipaciones() { return participaciones; }
+    public void setParticipaciones(int participaciones) { this.participaciones = participaciones; }
 }
