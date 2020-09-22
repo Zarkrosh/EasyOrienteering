@@ -22,6 +22,12 @@ export class RegistroComponent implements OnInit {
 
   @ViewChild("password", {static: false}) passField: ElementRef;
 
+  // Alertas
+  alertOptions = {
+    autoClose: true,
+    keepAfterRouteChange: true
+  };
+
   constructor(
       private formBuilder: FormBuilder,
       private router: Router,
@@ -69,7 +75,8 @@ export class RegistroComponent implements OnInit {
         this.cargando = false;
       },
       err => {
-        this.mensajeError = Utils.getMensajeError(err, "");
+        this.mensajeError = Utils.getMensajeError(err, "Error al registrar la cuenta");
+        this.alertService.error(this.mensajeError, this.alertOptions);
         this.cargando = false;
       }
     );
@@ -81,6 +88,10 @@ export class RegistroComponent implements OnInit {
     let passwordConf = group.get('passwordConf').value;
 
     return pass === passwordConf ? null : { notSame: true }     
+  }
+
+  login() {
+    this.router.navigate(["/login"]);
   }
 
 }

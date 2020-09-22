@@ -23,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -173,6 +174,14 @@ public class CarrerasController {
             throw new ResponseStatusException(
                 HttpStatus.FORBIDDEN, "Solo puede descargar los mapas el organizador.");
         } 
+    }
+    
+    // DEBUG
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public void handle(Exception e) {
+        System.out.println("Returning HTTP 400 Bad Request");
+        System.out.println(e);
     }
 
     @PostMapping("")

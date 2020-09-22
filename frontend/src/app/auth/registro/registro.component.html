@@ -45,7 +45,8 @@
         <div *ngIf="registrado" class="container registroWrapper confirmacion">
             <h1>Cuenta registrada</h1>
             <i class="fa fa-check-circle simboloConfirmacion"></i>
-            <p>Recibirás un correo en el email que has indicado con un enlace para activar tu cuenta. Tan solo haz click en él 😄</p>
+            <p>Puedes entrar a tu cuenta con estos datos 😄</p>
+            <button class="btn btn-primary mt-4" (click)="login()">Conectarse</button>
         </div>
     </div>
 

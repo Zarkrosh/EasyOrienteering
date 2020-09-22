@@ -2,11 +2,14 @@ package com.hergomsoft.easyoapi.models;
 
 import com.hergomsoft.easyoapi.models.serializers.IdEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hergomsoft.easyoapi.models.serializers.CountSerializer;
+import com.hergomsoft.easyoapi.models.serializers.EmptyDeserializer;
 import com.hergomsoft.easyoapi.models.serializers.MapaDeserializer;
 import com.hergomsoft.easyoapi.models.serializers.MapaSerializer;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import java.io.Serializable;
 import java.util.List;
@@ -26,7 +29,7 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
 @TypeDefs({
-    @TypeDef(name = "json", typeClass = JsonStringType.class),
+    @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class),
 })
 @Entity
 @Table(name = "recorridos")
@@ -45,7 +48,7 @@ public class Recorrido implements IdEntity, Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Carrera carrera;
     
-    @Type(type = "json")
+    @Type(type = "jsonb")
     @Column(name = "TRAZADO", columnDefinition = "json")
     private List<String> trazado; // Salida - Controles intermedios* - Meta
 
@@ -56,7 +59,9 @@ public class Recorrido implements IdEntity, Serializable {
     @Type(type="org.hibernate.type.BinaryType")
     private byte[] mapa;
     
+    
     @JsonSerialize(using = CountSerializer.class)
+    @JsonDeserialize(using = EmptyDeserializer.class)
     @OneToMany(mappedBy = "recorrido", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Participacion> participaciones;
 

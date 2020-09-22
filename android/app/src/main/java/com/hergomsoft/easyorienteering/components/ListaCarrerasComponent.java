@@ -27,7 +27,9 @@ import java.util.List;
 
 public class ListaCarrerasComponent extends LinearLayout implements OnItemListener {
 
+    LinearLayout llFiltroTipo;
     Spinner selectorTipo;
+    LinearLayout llFiltroModalidad;
     Spinner selectorModalidad;
     SearchView buscador;
     ProgressBar progressBar;
@@ -53,7 +55,9 @@ public class ListaCarrerasComponent extends LinearLayout implements OnItemListen
     private void init() {
         inflate(context, R.layout.lista_carreras, this);
 
+        llFiltroTipo = findViewById(R.id.lista_carreras_filtro_tipo);
         selectorTipo = findViewById(R.id.lista_carreras_selector_tipo);
+        llFiltroModalidad = findViewById(R.id.lista_carreras_filtro_modalidad);
         selectorModalidad = findViewById(R.id.lista_carreras_selector_modalidad);
         buscador = findViewById(R.id.lista_carreras_buscador);
         recyclerCarreras = findViewById(R.id.lista_carreras_lista);
@@ -86,6 +90,18 @@ public class ListaCarrerasComponent extends LinearLayout implements OnItemListen
         recyclerCarreras.setVisibility(View.INVISIBLE);
         error.setVisibility(View.VISIBLE);
         error.setText(sError);
+    }
+
+    public void muestraFiltros(boolean mostrar) {
+        if(mostrar) {
+            llFiltroTipo.setVisibility(VISIBLE);
+            llFiltroModalidad.setVisibility(VISIBLE);
+            buscador.setVisibility(VISIBLE);
+        } else {
+            llFiltroTipo.setVisibility(GONE);
+            llFiltroModalidad.setVisibility(GONE);
+            buscador.setVisibility(GONE);
+        }
     }
 
     public void muestraLista() {

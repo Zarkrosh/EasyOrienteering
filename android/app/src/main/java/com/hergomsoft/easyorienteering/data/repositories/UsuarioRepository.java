@@ -214,6 +214,7 @@ public class UsuarioRepository extends ApiRepository {
 
 
     public void logout() {
+        borraDatosUsuarioConectado();
         apiClient.logoutUsuario().enqueue(new Callback<MessageResponse>() {
             @Override
             public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {

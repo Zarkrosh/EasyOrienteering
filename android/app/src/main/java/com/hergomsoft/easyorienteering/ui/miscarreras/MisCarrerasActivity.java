@@ -46,7 +46,9 @@ public class MisCarrerasActivity extends BackableActivity {
     private void setupListas() {
         // Crea las listas
         listaCarrerasParticipadas = new ListaCarrerasComponent(this);
+        listaCarrerasParticipadas.muestraFiltros(false);
         listaCarrerasOrganizadas = new ListaCarrerasComponent(this);
+        listaCarrerasOrganizadas.muestraFiltros(false);
         // Al cambiar el contenido del buscador, se filtran automáticamente las carreras
         // TODO ¿Paginación? ¿BD?
 

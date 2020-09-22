@@ -5,7 +5,7 @@
         </button>
     </div>
 
-    <h1>Resultados <i>{{(recorrido) ?  recorrido.nombre : ""}}</i></h1>
+    <h1 *ngIf="recorrido"><i>Resultados {{recorrido.nombre}}</i></h1>
 
     <table *ngIf="resultados && resultados.length > 0" class="tabla-resultados text-center" (mousedown)="mouseDownResultados($event)" 
             (mousemove)="mouseMoveResultados($event)" (mouseup)="mouseUpResultados()" (mouseleave)="mouseUpResultados()" #tablaResultados>

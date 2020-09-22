@@ -155,10 +155,10 @@ export class VistaCarreraComponent implements OnInit {
         if(resp.status == 200) {
           let dataType = resp.type.toString();
           let binaryData = [];
-          binaryData.push(resp);
+          binaryData.push(resp.body);
           let downloadLink = document.createElement('a');
           downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
-          downloadLink.setAttribute('download', "Mapas");
+          downloadLink.setAttribute('download', "mapas-carrera.zip");
           document.body.appendChild(downloadLink);
           downloadLink.click();
         } else {

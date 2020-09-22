@@ -266,9 +266,8 @@ export class ResumenCarreraComponent implements OnInit {
     
     // Evita envío innecesario de mapas y errores
     for(let recorrido of this.carrera.recorridos) {
-      
       if(recorrido.mapa == true) {
-        //recorrido.mapa = ""; // Indica que no se ha modificado
+        // No se utiliza la cadena vacía debido a un problema en la deserialización en el servidor
         recorrido.mapa = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="; // En blanco
       }
       // Si es null es porque se ha borrado, se deja así
