@@ -5,6 +5,7 @@ import { AppSettings, Carrera } from '../_shared/app.model';
 import { Router } from '@angular/router';
 import { AlertService } from '../alert';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Utils } from '../_shared/utils';
 
 @Component({
   selector: 'app-explorar',
@@ -65,26 +66,20 @@ export class ExplorarComponent implements OnInit {
   }
 
   realizaBusqueda(): void {
-    console.log("[*] Buscando página " + this.paginaActual); // DEBUG
+    //console.log("[*] Buscando página " + this.paginaActual); // DEBUG
     this.buscando = true;
     this.clienteApi.buscaCarreras(this.busqueda.nombre, this.busqueda.tipo, this.busqueda.modalidad, this.paginaActual, AppSettings.NUMERO_RESULTADOS_BUSQUEDA).subscribe(
       resp => {
         if(resp.status === 200) {
           this.resultados = this.resultados.concat(resp.body as Carrera[]);
         } else {
-          // ?
           this.alertService.warn("Respuesta inesperada", this.alertOptions);
           console.log(resp);
         }
         this.buscando = false;
       }, err => {
-        if(err.status == 504) {
-          this.alertService.error("No hay conexión con el servidor", this.alertOptions);
-        } else {
-          let mensaje = "Se produjo un error";
-          if(typeof err.error === 'string') mensaje += ": " + err.error;
-          this.alertService.error(mensaje, this.alertOptions);
-        }
+        let mensaje = Utils.getMensajeError(err, "Ocurrió un error");
+        this.alertService.error(mensaje, this.alertOptions);
         
         console.log(err);
         this.buscando = false;

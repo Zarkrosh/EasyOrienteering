@@ -48,24 +48,7 @@ public abstract class ApiRepository {
 
         OkHttpClient client;
         if(Constants.API.contentEquals(Constants.API_PROD)) {
-            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            client = new OkHttpClient.Builder().addInterceptor(interceptor)
-                .addInterceptor(new Interceptor() {
-                    @Override
-                    public Response intercept(Chain chain) throws IOException {
-                        Request request = chain.request();
-                        String token = UsuarioRepository.getInstance(context).getTokenUsuarioConectado();
-                        if(token != null) {
-                            request = chain.request().newBuilder()
-                                    .addHeader("Authorization", "Bearer " + token)
-                                    .build();
-                        }
-                        return chain.proceed(request);
-                    }
-                })
-                .addNetworkInterceptor(new StethoInterceptor()) // DEBUG
-                .build();
+            client = getSafeHTTPSClient(context);
         } else{
             client = getUnsafeHTTPSClient(context);
         }
@@ -103,7 +86,26 @@ public abstract class ApiRepository {
         return recurso;
     }
 
-
+    private OkHttpClient getSafeHTTPSClient(Context context) {
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        return new OkHttpClient.Builder().addInterceptor(interceptor)
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request request = chain.request();
+                        String token = UsuarioRepository.getInstance(context).getTokenUsuarioConectado();
+                        if(token != null) {
+                            request = chain.request().newBuilder()
+                                    .addHeader("Authorization", "Bearer " + token)
+                                    .build();
+                        }
+                        return chain.proceed(request);
+                    }
+                })
+                .addNetworkInterceptor(new StethoInterceptor()) // DEBUG
+                .build();
+    }
 
     private OkHttpClient getUnsafeHTTPSClient(Context context) {
         SSLContext sslContext = null;
@@ -151,7 +153,6 @@ public abstract class ApiRepository {
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
         return new OkHttpClient.Builder().addInterceptor(interceptor)
                 .addNetworkInterceptor(new StethoInterceptor()) // DEBUG
                 .addInterceptor(new Interceptor() {

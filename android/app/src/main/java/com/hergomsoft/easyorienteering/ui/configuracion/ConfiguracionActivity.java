@@ -362,19 +362,12 @@ public class ConfiguracionActivity extends BackableActivity {
         viewModel.getEstadoLogout().observe(this, new Observer<Resource<String>>() {
             @Override
             public void onChanged(Resource<String> resource) {
-                switch(resource.status) {
-                    case SUCCESS:
-                        // Redirige a la pantalla de conexión
-                        viewModel.ocultaDialogoCarga();
-                        Intent i = new Intent(ConfiguracionActivity.this, ConexionActivity.class);
-                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Borra histórico
-                        startActivity(i);
-                        finish();
-                        break;
-                    case ERROR:
-                        viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), resource.message);
-                        break;
-                }
+                // Redirige a la pantalla de conexión
+                viewModel.ocultaDialogoCarga();
+                Intent i = new Intent(ConfiguracionActivity.this, ConexionActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Borra histórico
+                startActivity(i);
+                finish();
             }
         });
 

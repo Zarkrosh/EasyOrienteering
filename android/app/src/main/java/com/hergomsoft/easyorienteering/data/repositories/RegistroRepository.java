@@ -32,10 +32,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class RegistroRepository extends ApiRepository {
-    //private RegistroDAO registroDAO;
-    //private ControlDAO controlDAO;
-    //private RecorridoDAO recorridoDAO;
-
     // Datos de la carrera
     private Carrera carreraActual;
     private Recorrido recorridoActual;
@@ -58,9 +54,6 @@ public class RegistroRepository extends ApiRepository {
 
     private RegistroRepository(Context context) {
         super(context);
-        //registroDAO = DatosDatabase.getDatabase(application).getRegistroDAO();
-        //controlDAO = DatosDatabase.getDatabase(application).getControlDAO();
-        //recorridoDAO = DatosDatabase.getDatabase(application).getRecorridoDAO();
 
         registroResponse = new SingleLiveEvent<>();
         comprobacionPendiente = new SingleLiveEvent<>();

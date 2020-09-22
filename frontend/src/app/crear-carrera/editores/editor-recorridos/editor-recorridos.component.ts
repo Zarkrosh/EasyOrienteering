@@ -86,7 +86,7 @@ export class EditorRecorridosComponent implements OnInit {
   @ViewChild('modalRecorrido', {static: true}) modalRecorrido: ElementRef<NgbModal>;
   @ViewChild('modalEleccionInicial', {static: true}) modalEleccionInicial: ElementRef<NgbModal>;
   @ViewChild('modalCancelar', {static: true}) modalCancelar: ElementRef<NgbModal>;
-  eleccionTrazar;
+  eleccionTrazar: string;
   activeModal: NgbModalRef;
   tempControl: Control; // Temporal para la confirmación de borrado
 
@@ -269,6 +269,12 @@ export class EditorRecorridosComponent implements OnInit {
             }
           }
         );
+
+        // TODO Solucionar
+        if(this.tipoEdicion === this.EDICION_CONTROLES) {
+          // Existe un bug en el trazador, no se da a elegir
+          this.activeModal.close(this.ELECCION_NO_TRAZAR);
+        }
       }
     } else {
       throw "Error al cargar la carrera";

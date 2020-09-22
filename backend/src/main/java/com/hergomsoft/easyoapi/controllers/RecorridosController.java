@@ -291,8 +291,7 @@ public class RecorridosController {
                 // Participante, puede acceder
                 permiso = true;
             }
-            
-            //permiso = true; // DEBUG
+
             if(permiso) {
                 if(rec.getMapa() != null) {
                     try {

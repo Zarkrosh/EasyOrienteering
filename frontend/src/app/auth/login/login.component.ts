@@ -19,6 +19,12 @@ export class LoginComponent implements OnInit {
 
   @ViewChild("password", {static: false}) passField: ElementRef;
 
+   // Alertas
+   alertOptions = {
+    autoClose: true,
+    keepAfterRouteChange: true
+  };
+
   constructor(
       private formBuilder: FormBuilder,
       private router: Router,
@@ -74,6 +80,7 @@ export class LoginComponent implements OnInit {
           this.passField.nativeElement.focus();
           this.mensajeError = "Login incorrecto";
         }
+        this.alertService.error(this.mensajeError, this.alertOptions);
         this.cargando = false;
       }
     );

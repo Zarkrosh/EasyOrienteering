@@ -2,6 +2,7 @@ package com.hergomsoft.easyoapi.models;
 
 import com.hergomsoft.easyoapi.models.serializers.IdEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,12 +17,17 @@ import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 
 @Entity
 @Table(	name = "usuarios", 
     uniqueConstraints = { 
         @UniqueConstraint(columnNames = "nombre"),
         @UniqueConstraint(columnNames = "email") 
+})
+@TypeDefs({
+    @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class),
 })
 public class Usuario implements IdEntity {
     public static final int MAXLEN_NOMBRE = 30;
@@ -58,7 +64,7 @@ public class Usuario implements IdEntity {
     @Column(name = "FECHA_REGISTRO", nullable = false)
     private Date fechaRegistro;
     
-    @Type(type = "json")
+    @Type(type = "jsonb")
     @Column(name = "ROLES", columnDefinition = "json")
     private Set<RolUsuario> roles = new HashSet<>();
 

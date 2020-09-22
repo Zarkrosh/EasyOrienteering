@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -246,12 +247,10 @@ public class ScanActivity extends AppCompatActivity {
                         case SUCCESS:
                             if(mapaResponse.data != null) {
                                 try {
-                                    //byte[] bytes = mapaResponse.data.bytes();
-                                    //Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                                     vistaMapa.setImage(ImageSource.uri(mapaResponse.data.getAbsolutePath()));
                                     mensajeMapa.setVisibility(View.GONE);
                                 } catch (Exception e) {
-                                    mensajeMapa.setText("Error al obtener el mapa: " + e.getMessage());
+                                    mensajeMapa.setText(e.getMessage());
                                     mensajeMapa.setVisibility(View.VISIBLE);
                                 }
                             } else {
@@ -261,7 +260,7 @@ public class ScanActivity extends AppCompatActivity {
                             progressMapa.setVisibility(View.GONE);
                             break;
                         case ERROR:
-                            mensajeMapa.setText("Error al obtener el mapa: " + mapaResponse.message);
+                            mensajeMapa.setText(mapaResponse.message);
                             progressMapa.setVisibility(View.GONE);
                             mensajeMapa.setVisibility(View.VISIBLE);
                             break;

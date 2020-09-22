@@ -18,15 +18,19 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -109,35 +113,24 @@ public class CarreraService implements ICarreraService {
                 // No puede cambiar la modalidad
                 if(anterior.getModalidad() != nueva.getModalidad())
                     throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No se puede cambiar la modalidad de la carrera.");    
-                // No se pueden cambiar los controles y recorridos
+                // No se pueden cambiar los controles
                 nueva.setControles(anterior.getControles());
-                nueva.setRecorridos(anterior.getRecorridos());
+                // Solo se pueden cambiar los mapas en los recorridos
+                List<Recorrido> recorridos = anterior.getRecorridos();
+                for(Recorrido rec : nueva.getRecorridos()) {
+                    if(rec.getId() != null && (rec.getMapa() == null || rec.getMapa().length > 50)) {
+                        Recorrido r = recorridos.stream().filter(recorrido -> Objects.equals(recorrido.getId(), rec.getId())).findFirst().orElse(null);
+                        if(r != null) r.setMapa(rec.getMapa());
+                    }
+                }
+                nueva.setRecorridos(recorridos);
                 
                 // Comprueba datos válidos
                 checkDatosCarrera(nueva, true);
                 carreraRepository.save(nueva);
-                
-                // ¿Cambios en mapas?
-                //    Vacío para indicar que no se ha cambiado
-                //    Nulo para indicar que se ha borrado
-                for(Recorrido rec : nueva.getRecorridos()) {
-                    if(rec.getId() != null) {
-                        if(rec.getMapa() == null) {
-                            // Mapa borrado
-                            // TODO
-                        } else {
-                            // TODO
-                        }
-                    }
-                }
-                
-                /*
-                NOTAS:
-                    - Solo se actualizan los mapas de los recorridos si es necesario.
-                    - No se actualizan los controles.
-                */
             } else {
                 // No existe ninguna carrera con ese ID
+                throw new IllegalArgumentException("La carrera a editar no puede ser null");
             }
         } else {
             throw new IllegalArgumentException("La carrera a guardar no puede ser null");
@@ -206,9 +199,12 @@ public class CarreraService implements ICarreraService {
     @Override
     public List<Carrera> getCarrerasParticipadasUsuario(Usuario usuario) {
         List<Participacion> participaciones = participacionService.getParticipacionesUsuario(usuario);
-        Set<Carrera> set = new HashSet<>();
-        for(Participacion p : participaciones) set.add(p.getRecorrido().getCarrera());
-        return new ArrayList<>(set);
+        List<Carrera> lista = new ArrayList<>();
+        for(Participacion p : participaciones) {
+            Carrera carrera = p.getRecorrido().getCarrera();
+            if(!lista.contains(carrera)) lista.add(carrera);
+        }
+        return lista;
     }
 
     @Override
