@@ -1,13 +1,13 @@
-import { Component, OnInit, ElementRef, ViewChild, HostListener } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { AlertService } from '../../../alert';
-import { SharedEditorService } from '../shared-editor.service';
-import { Control, Recorrido, AppSettings, Carrera } from 'src/app/_shared/app.model';
+import { Control, Recorrido, AppSettings, Carrera } from 'src/app/_shared/model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import { EditorTrazadoComponent } from '../editor-trazado/editor-trazado.component';
 import { DataService } from 'src/app/_services/data.service';
 import { FormBuilder } from '@angular/forms';
 import { FooterService } from 'src/app/_services/footer.service';
+import { SharedEditorService } from 'src/app/_services/shared-editor.service';
 
 @Component({
   selector: 'app-editor-recorridos',
@@ -146,8 +146,6 @@ export class EditorRecorridosComponent implements OnInit {
     // Controlador de adición de control
     this.dataEditores.nuevoControl.subscribe((control) => {
       if(control !== null) {
-        console.log("[RECORRIDOS] Nueva petición de control:");
-        console.log(control);
         if(this.controles.size < this.MAX_CONTROLES_CARRERA) {
           if(control.tipo === Control.TIPO_SALIDA && this.controles.has(this.CODIGO_SALIDA)) {
             this.alertService.error("Solo puede haber una salida por carrera.", this.alertOptions);
@@ -308,12 +306,10 @@ export class EditorRecorridosComponent implements OnInit {
                 trazado.pop();
               }
               trazado.push(this.CODIGO_META);
-              console.log("[*] Recorrido " + recorrido.nombre + " sin finalizar, finalizado automáticamente.");
             }
           }
 
           for(let vacio of vacios) {
-            console.log("[*] Borrando recorrido vacío: " + vacio);
             this.nombresRecorridos.splice(this.nombresRecorridos.indexOf(vacio), 1);
             this.recorridos.delete(vacio);
           }
@@ -369,9 +365,6 @@ export class EditorRecorridosComponent implements OnInit {
       // Guarda los mapas en el servicio de datos compartido
       this.data.setMapaBase(this.trazador.getImagenMapaBase()); // TODO esto afecta al trazador, depurar
       this.data.setMapasTrazados(mapasTrazados);
-    } else {
-      // ELECCION_SOLO_RECORRIDOS
-      // TODO ¿Hace falta algo?
     }
 
     // Guarda el borrador
@@ -713,7 +706,6 @@ export class EditorRecorridosComponent implements OnInit {
                 }
               }
 
-              // TODO ¿Alguna validación más?
               if(this.tipoEdicion === this.EDICION_CONTROLES) {
                 // SCORE
                 if(!this.controles.get(codigo)) {

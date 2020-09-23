@@ -93,9 +93,6 @@ export class EditorUbicacionComponent implements OnInit {
     if(this.editandoUbicacion) {
       if(this.mapaUbicacion.getZoom() >= this.MIN_ZOOM_MARCAR) {
         this.setMarcadorUbicacion(evento.latlng.lat, evento.latlng.lng);
-      } else {
-        // Agita el mensaje de ubicación
-        // TODO
       }
     }
   }

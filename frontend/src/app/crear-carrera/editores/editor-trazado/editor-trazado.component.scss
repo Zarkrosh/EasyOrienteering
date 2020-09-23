@@ -1,19 +1,5 @@
 @import "../../../../styles.scss";
 
-/* DEBUG PURPOSES */
-#debug-info {
-    position: absolute;
-    width: 90%;
-    display: inline-flex;
-    background-color: gainsboro;
-    padding: 10px;
-    z-index: 15;
-}
-#debug-info span {
-    margin-right: 20px;
-}
-
-
 
 #vista-mapa {
     position: relative;

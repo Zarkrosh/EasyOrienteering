@@ -1,8 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, Input, SimpleChanges } from '@angular/core';
-import { Recorrido, Control, Coordenadas, AppSettings } from '../../../_shared/app.model';
+import { Recorrido, Control, Coordenadas, AppSettings } from '../../../_shared/model';
 import { AlertService } from '../../../alert';
-import { SharedEditorService } from '../shared-editor.service';
-import { EditorRecorridosComponent } from '../editor-recorridos/editor-recorridos.component';
+import { SharedEditorService } from 'src/app/_services/shared-editor.service';
 
 @Component({
   selector: 'editor-trazado',
@@ -10,8 +9,6 @@ import { EditorRecorridosComponent } from '../editor-recorridos/editor-recorrido
   styleUrls: ['./editor-trazado.component.scss']
 })
 export class EditorTrazadoComponent implements OnInit {
-  DEBUG_VISUAL = false; // DEBUG
-
   // Medidas y aspectos de los símbolos (según ISOM 2017)
   MM_UNIT_ORI = 8; // Valor (original) para controlar el escalado
   MM_UNIT = 8;     // Valor para controlar el escalado
@@ -70,10 +67,6 @@ export class EditorTrazadoComponent implements OnInit {
   moviendoMapa: boolean;
   dragX: number;
   dragY: number;
-  mapX: number; // TEST
-  mapY: number; // TEST
-  canvX: number; // TEST
-  canvY: number; // TEST
 
   // Modelo compartido
   @Input()
@@ -111,15 +104,10 @@ export class EditorTrazadoComponent implements OnInit {
     }
   }
 
-  ngAfterViewInit() {
-    //this.cargaMapaAutomatico(); // DEBUG Para no tener que estar cargándolo a mano
-  }
-
   setupObservadores() {
     // Controlador de cambio de mapa base
     this.sharedData.mapaBase.subscribe((nMapa) => {
       if(nMapa != null && nMapa.length > 0) {
-        console.log("[TRAZADOR] Cargando mapa");
         this.cargaMapa(nMapa);
       }
     });
@@ -237,7 +225,6 @@ export class EditorTrazadoComponent implements OnInit {
 
   /* Limpia el lienzo del mapa */
   clearCanvasMap() {
-    console.log("CLEAR (Mapa)")
     this.contextMapa.clearRect(0, 0, this.canvasMapa.nativeElement.width, this.canvasMapa.nativeElement.height);
   }
 
@@ -258,10 +245,6 @@ export class EditorTrazadoComponent implements OnInit {
   mouseMoveMarcador(evento) {
     var fCoords = this.getCoordenadasCanvasMarcador(evento); // Coordenadas en el lienzo de marcador
     var rCoords = this.getCoordenadasSistema(fCoords);       // Coordenadas reales del sistema
-    this.mapX = rCoords.x; // DEBUG
-    this.mapY = rCoords.y; // DEBUG
-    this.canvX = fCoords.x + Math.abs(this.offsetX);
-    this.canvY = fCoords.y + Math.abs(this.offsetY);
 
     if(this.clicking) {
       // Está moviendo el cursor sobre el mapa con el botón izquierdo del ratón pulsado
@@ -334,7 +317,6 @@ export class EditorTrazadoComponent implements OnInit {
       
       if(this.CODIGO_CONTROL_MARCADO !== null) {
           // Movimiento de control
-          // TODO Cambiar el marcador a rellenado por ejemplo
           if(this.MARKER_STATE == "") this.vistaMapa.nativeElement.classList.remove("grabbable");
       }
       
@@ -423,7 +405,6 @@ export class EditorTrazadoComponent implements OnInit {
     var fCoords = this.getCoordenadasCanvasMarcador(evento);
     //var delta = Math.max(-1, Math.min(1, (evento.wheelDelta || -evento.detail)));
     var delta = -(evento.deltaY / Math.abs(evento.deltaY)); // Normaliza el delta
-    // TODO Verificar que funciona en más navegadores
 
     this.zoomLevel += delta;
     if(this.zoomLevel > this.MAX_ZOOM) {
@@ -446,7 +427,6 @@ export class EditorTrazadoComponent implements OnInit {
    * @param nivel Nivel de zoom
    */
   setZoom(nivel, coordsMarcador, delta) {
-    console.log("ZOOM: " + this.zoomLevel); // DEBUG
     this.zoomLevel = nivel;
     var scale = this.getEscaladoZoom();
 
@@ -900,7 +880,6 @@ export class EditorTrazadoComponent implements OnInit {
 
   /* Limpia el lienzo del trazado */
   borraTrazado() {
-    console.log("CLEAR (Trazado)"); // debug
     this.contextTrazado.clearRect(Math.abs(this.offsetX), Math.abs(this.offsetY), 
                 this.canvasTrazado.nativeElement.width + Math.abs(this.offsetX), 
                 this.canvasTrazado.nativeElement.height + Math.abs(this.offsetY));
@@ -1044,7 +1023,6 @@ export class EditorTrazadoComponent implements OnInit {
       this.offsetY = -(this.imgMapa.height / 2);
       this.desplazaCanvas(); // Actualiza posiciones de los canvas
 
-      // TEST
       this.setupCanvas();
       this.redibujaMapa();
       this.redibujaTrazado();
@@ -1055,42 +1033,4 @@ export class EditorTrazadoComponent implements OnInit {
     this.imgMapaOrig.src = srcImagenMapa;
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-  /* DEBUG: borrar */
-  cargaMapaAutomatico() {
-    this.imgMapa = new Image();
-    this.imgMapaOrig = new Image();
-    this.imgMapa.onload = (() => {
-      this.setZoom(0, new Coordenadas(0,0), 0);
-      this.actualizaLimites();
-
-      //this.offsetX = -(this.imgMapa.width / 2);
-      //this.offsetY = -(this.imgMapa.height / 2);
-      this.offsetX = -500;
-      this.offsetY = -1000;
-      this.desplazaCanvas(); // Actualiza posiciones de los canvas
-
-      // TEST
-      this.setupCanvas();
-      this.redibujaMapa();
-      this.redibujaTrazado();
-
-      //this.updateCanvasDims(this.canvasMarcador.nativeElement);
-      //this.setupCanvas(false);
-    });
-
-    this.imgMapa.src = "assets/img/sample-map.jpg";
-    this.imgMapaOrig.src = "assets/img/sample-map.jpg";
-  }
 }

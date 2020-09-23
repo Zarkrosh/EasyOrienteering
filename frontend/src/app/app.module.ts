@@ -26,7 +26,7 @@ import { DatePipe } from '@angular/common';
 import { ResultadosComponent } from './vista-carrera/resultados/resultados.component';
 import { PipeTiempo } from './_shared/pipes/PipeTiempo';
 import { NotFoundComponent } from './not-found/not-found.component';
-import { PipeFechaBonita } from './_shared/pipes/PipeFechaBonita';
+import { PipeFecha } from './_shared/pipes/PipeFecha';
 import { authInterceptorProviders } from './_helpers/AuthInterceptor';
 import { FooterComponent } from './footer/footer.component';
 import { NavbarComponent } from './navbar/navbar.component';
@@ -49,7 +49,7 @@ import { NavbarComponent } from './navbar/navbar.component';
     MapaCircuitosComponent,
     ResultadosComponent,
     PipeTiempo,
-    PipeFechaBonita,
+    PipeFecha,
     NotFoundComponent,
     FooterComponent,
     NavbarComponent

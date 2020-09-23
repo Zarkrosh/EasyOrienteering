@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ClienteApiService } from '../_services/cliente-api.service';
-import { AppSettings, Carrera } from '../_shared/app.model';
+import { AppSettings, Carrera } from '../_shared/model';
 import { Router } from '@angular/router';
 import { AlertService } from '../alert';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -20,9 +20,7 @@ export class ExplorarComponent implements OnInit {
   buscando: boolean;
   busqueda;
 
-  // TEST
   @ViewChild('modalMapaCircuitos', {static: true}) modalMapaCircuitos: ElementRef<NgbModal>;
-
 
   // Alertas
   alertOptions = {
@@ -66,7 +64,6 @@ export class ExplorarComponent implements OnInit {
   }
 
   realizaBusqueda(): void {
-    //console.log("[*] Buscando página " + this.paginaActual); // DEBUG
     this.buscando = true;
     this.clienteApi.buscaCarreras(this.busqueda.nombre, this.busqueda.tipo, this.busqueda.modalidad, this.paginaActual, AppSettings.NUMERO_RESULTADOS_BUSQUEDA).subscribe(
       resp => {

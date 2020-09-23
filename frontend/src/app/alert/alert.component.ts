@@ -3,7 +3,7 @@ import { Router, NavigationStart } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { Alert, AlertType } from './alert.model';
-import { AlertService } from './alert.service';
+import { AlertService } from '../_services/alert.service';
 
 /**
  * Credit: https://jasonwatmore.com/post/2019/07/05/angular-8-alert-toaster-notifications

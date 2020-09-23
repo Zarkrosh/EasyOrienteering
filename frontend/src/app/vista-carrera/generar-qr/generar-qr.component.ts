@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Control, Carrera, AppSettings } from 'src/app/_shared/app.model';
+import { Control, Carrera, AppSettings } from 'src/app/_shared/model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClienteApiService } from 'src/app/_services/cliente-api.service';
 import { AlertService } from 'src/app/alert';
@@ -104,8 +104,6 @@ export class GenerarQRComponent implements OnInit {
 
 
   actualizaPaginasPDF() {
-    console.log("[*] Actualizando páginas");
-
     // Genera las páginas en base a la configuración actual
     const chunk = 6; // 3 filas y 2 columnas 
     this.paginasControles = [];

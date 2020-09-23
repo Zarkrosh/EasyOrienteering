@@ -43,7 +43,6 @@
                     </ng-template>
 
                     <ng-container *ngIf="modalidad === MOD_SCORE">
-                        <!-- TODO Puntuación total -->
                         <td rowspan="2"><b>{{resultado.puntuacion}}</b></td>
                         <td rowspan="2" *ngFor="let picado of resultado.puntosRegistrados">
                             <span class="marca-picado" *ngIf="picado"></span>

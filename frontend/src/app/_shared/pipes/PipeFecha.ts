@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({name: 'fechaBonita'})
-export class PipeFechaBonita implements PipeTransform {
+export class PipeFecha implements PipeTransform {
 
     readonly DELIMITADORES = ["/", "-"];
     readonly MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];

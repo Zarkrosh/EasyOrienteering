@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Carrera, ParticipacionesRecorridoResponse, Usuario } from '../_shared/app.model';
+import { Carrera, ParticipacionesRecorridoResponse, Usuario } from '../_shared/model';
 
 @Injectable({
   providedIn: 'root'

@@ -1,5 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { Usuario, Carrera } from '../_shared/app.model';
+import { Usuario, Carrera } from '../_shared/model';
 import { ClienteApiService } from '../_services/cliente-api.service';
 import { Utils } from '../_shared/utils';
 import { Router } from '@angular/router';

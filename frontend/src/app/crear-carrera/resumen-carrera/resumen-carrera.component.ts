@@ -2,7 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild, ViewChildren, QueryList, Inje
 import { NgbModal, NgbDateStruct, NgbDateAdapter, NgbDateParserFormatter, NgbCalendar, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AlertService } from 'src/app/alert';
-import { AppSettings, Carrera, Control, Recorrido } from 'src/app/_shared/app.model';
+import { AppSettings, Carrera, Control, Recorrido } from 'src/app/_shared/model';
 import { ClienteApiService } from 'src/app/_services/cliente-api.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { EditorUbicacionComponent } from '../editores/editor-ubicacion/editor-ubicacion.component';
@@ -199,7 +199,6 @@ export class ResumenCarreraComponent implements OnInit {
       }
     }
 
-    // TODO Asíncrono para ediciones y restauraciones de borrador
     this.data.mapasTrazados.subscribe(mapas => {
       if(this.carrera && mapas && mapas.size > 0) {
         for(let recorrido of this.carrera.recorridos) {
@@ -260,11 +259,8 @@ export class ResumenCarreraComponent implements OnInit {
 
   guardaCarrera() {
     this.guardandoCarrera = true;
-    // TODO Diferenciar entre creación y edición
-    //  Si es creación, se envían todos los datos (formulario, mapas, etc)
-    //  Si es edición, se envían los datos modificados (?) 
-    
-    // Evita envío innecesario de mapas y errores
+
+    // Evita envío innecesario de mapas
     for(let recorrido of this.carrera.recorridos) {
       if(recorrido.mapa == true) {
         // No se utiliza la cadena vacía debido a un problema en la deserialización en el servidor
@@ -339,7 +335,7 @@ export class ResumenCarreraComponent implements OnInit {
     
 
     // Elimina el borrador
-    //localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA); // TODO descomentar
+    localStorage.removeItem(AppSettings.LOCAL_STORAGE_CARRERA);
   }
 
 
@@ -382,7 +378,7 @@ export class ResumenCarreraComponent implements OnInit {
       } catch (e) {
         console.log(e);
         this.alertService.error("Error al restaurar el borrador.", this.alertOptions);
-        //this.nuevaCarreraVacia(); // TODO Descomentar
+        this.nuevaCarreraVacia();
       }
     } else {
       // Descarta el borrador y crea una nueva

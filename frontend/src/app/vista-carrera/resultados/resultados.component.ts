@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { AlertService } from 'src/app/alert';
 import { ClienteApiService } from 'src/app/_services/cliente-api.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Recorrido, ResultadoUsuario, ParcialUsuario, Carrera, ParticipacionesRecorridoResponse, Control } from 'src/app/_shared/app.model';
+import { Recorrido, ResultadoUsuario, ParcialUsuario, Carrera, ParticipacionesRecorridoResponse, Control } from 'src/app/_shared/model';
 import { Utils } from 'src/app/_shared/utils';
 
 @Component({

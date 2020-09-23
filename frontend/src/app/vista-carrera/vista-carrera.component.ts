@@ -2,7 +2,7 @@ import { Component, OnInit, ElementRef, ViewChildren, QueryList } from '@angular
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClienteApiService } from '../_services/cliente-api.service';
 import { AlertService } from '../alert';
-import { Carrera, Usuario } from '../_shared/app.model';
+import { Carrera, Usuario } from '../_shared/model';
 import { Utils } from '../_shared/utils';
 import * as L from 'leaflet';
 import { TokenStorageService } from '../_services/token-storage.service';
