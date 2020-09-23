@@ -83,6 +83,7 @@ public class ConfiguracionViewModel extends AndroidViewModelConCarga {
     }
 
     public void confirmaBorradoCuenta() {
+        actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.conf_borrando_cuenta));
         usuarioRepository.borrarCuenta();
     }
 }

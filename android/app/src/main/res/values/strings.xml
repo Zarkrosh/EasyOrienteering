@@ -79,7 +79,7 @@
     <string name="politicas_politica_corto">POLÍTICA</string>
     <string name="politicas_condiciones">CONDICIONES DE USO</string>
     <string name="politicas_condiciones_corto">CONDICIONES</string>
-    <!-- TODO: Contenidos de las políticas -->
+    <!-- Contenidos de las políticas -->
 
     <!-- Pantalla de olvido de contraseña -->
     <string name="olvido_titulo">¿Olvidaste tu contraseña?</string>
@@ -148,6 +148,7 @@
     <string name="conf_borrar_cuenta">Borrar cuenta</string>
     <string name="conf_borrar">Borrar</string>
     <string name="conf_borrar_cuenta_mensaje">¿Estás seguro de que quieres borrar la cuenta? No la podrás recuperar y desaparecerás de los resultados de los recorridos en los que hayas participado.\n\nLas carreras que hayas creado no se borrarán. Si deseas borrarlas debes hacerlo de forma individual.</string>
+    <string name="conf_borrando_cuenta">Borrando cuenta…</string>
     <string name="conf_resp_cuenta_borrada">Cuenta borrada</string>
     <string name="conf_cerrar_sesion">Cerrar sesión</string>
     <string name="conf_cerrar_sesion_mensaje">¿Estás seguro de que quieres cerrar tu sesión en este dispositivo?</string>

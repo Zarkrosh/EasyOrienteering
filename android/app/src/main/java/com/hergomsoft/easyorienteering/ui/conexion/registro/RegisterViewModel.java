@@ -47,12 +47,4 @@ public class RegisterViewModel extends AndroidViewModelConCarga {
         }
     }
 
-    /**
-     * Comprueba si la dirección de email especificada ya está asociada a una cuenta.
-     * @param email Dirección de email
-     */
-    public void checkEmailOcupado(String email) {
-        // TODO: comprobar si el email ya está asociado a una cuenta
-    }
-
 }

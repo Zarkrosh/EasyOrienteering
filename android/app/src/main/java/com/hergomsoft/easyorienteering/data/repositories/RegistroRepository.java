@@ -160,6 +160,21 @@ public class RegistroRepository extends ApiRepository {
     }
 
     /**
+     * Devuelve true si el usuario ya ha registrado el control.
+     * @param codigo Código de control
+     * @return True si ya ha registrado control
+     */
+    public boolean haRegistradoControl(String codigo) {
+        boolean registrado = false;
+        int i = 0;
+        while(!registrado && i < registroList.size()) {
+            if(registroList.get(i).getControl().contentEquals(codigo)) registrado = true;
+            i++;
+        }
+        return registrado;
+    }
+
+    /**
      * Realiza la comprobación de si el usuario tiene alguna carrera pendiente.
      * Si la respuesta es false, limpia cualquier dato anterior e indica que no hay ningún recorrido pendiente.
      * Si la respuesta es true, se generan los datos necesarios y se indica que hay un recorrido pendiente.

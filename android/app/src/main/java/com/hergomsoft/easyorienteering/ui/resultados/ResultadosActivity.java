@@ -232,7 +232,11 @@ public class ResultadosActivity extends BackableActivity {
                         p.setPosicionAcumulada(acumuladosOrdenados.get(i).indexOf(p.getTiempoAcumulado()) + 1);
                         i++;
                     }
-                    ru.setPosicion(ru.getParciales().get(ru.getParciales().size() - 1).getPosicionAcumulada());
+                    if(ru.getParciales().size() > 0) {
+                        ru.setPosicion(ru.getParciales().get(ru.getParciales().size() - 1).getPosicionAcumulada());
+                    } else {
+                        ru.setPosicion(0);
+                    }
                     ru.setDiferenciaGanador(ru.getTiempoTotal() - tiempoGanador);
                 }
             } else {
@@ -256,7 +260,7 @@ public class ResultadosActivity extends BackableActivity {
                     }
                 });
                 // Actualiza posiciones
-                // TODO Tener en cuenta empates de puntuación y tiempo
+                // FEATURE: Tener en cuenta empates de puntuación y tiempo
                 int posicion = 1;
                 for(ResultadoUsuario ru : resultados) {
                     ru.setPosicion(posicion++);

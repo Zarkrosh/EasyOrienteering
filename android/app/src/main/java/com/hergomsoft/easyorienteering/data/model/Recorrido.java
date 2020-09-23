@@ -6,19 +6,10 @@ import com.google.gson.annotations.Expose;
 
 
 public class Recorrido {
-    @PrimaryKey
     private long id;
-
-    @Expose
     private String nombre;
-
-    @Expose
     private String[] trazado;
-
-    @Expose
     private Boolean mapa;
-
-    @Expose
     private int participaciones;
 
     public Recorrido(long id, String nombre, String[] trazado, Boolean mapa, int participaciones) {

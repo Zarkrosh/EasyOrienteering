@@ -30,6 +30,9 @@ import com.hergomsoft.easyorienteering.util.Utils;
 
 public class RegisterActivity extends BackableActivity {
 
+    // FEATURE: Comprueba si el email está asociado a otra cuenta al perder el focus
+    // FEATURE: Comprueba si el nombre de usuario ya está en uso
+
     private final int TIMEOUT_MENSAJE_EXITO = 2500;
 
     private EditText inputEmail;
@@ -106,7 +109,6 @@ public class RegisterActivity extends BackableActivity {
                     inputPassword.setError(getString(registerFormState.getPasswordError()));
                 }
                 if (registerFormState.getPasswordConfError() != null) {
-                    // TODO: Mejorar la lógica de esto
                     if(registerFormState.getPasswordConfError()) {
                         // Las contraseñas no coinciden
                         // Muestra imagen de error
@@ -187,30 +189,10 @@ public class RegisterActivity extends BackableActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                // TODO: Cambia el indicador de fuerza de la contraseña en base a su largo y uso de diferentes tipos de caracteres.
+                // FEATURE: Cambia el indicador de fuerza de la contraseña en base a su largo y uso de diferentes tipos de caracteres.
             }
         };
         inputPasswordConf.addTextChangedListener(passwordStrengthChecker);
-
-        // Comprueba si el email está asociado a otra cuenta al perder el focus (TODO No funciona correctamente)
-        inputEmail.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    viewModel.checkEmailOcupado(inputEmail.getText().toString());
-                }
-            }
-        });
-
-        // Comprobación de nombre de usuario existente
-        inputNombre.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    // TODO: comprobar si el nombre ya está asociado a una cuenta
-                }
-            }
-        });
 
         // Checkbox de aceptación de políticas
         checkAcepto.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

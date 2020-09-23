@@ -141,7 +141,6 @@ public class UsuarioRepository extends ApiRepository {
                     }
                 } else {
                     recurso = Resource.error("Error al cambiar el nombre", null);
-                    // TODO Manejar causa error
                 }
 
                 cambioNombreResponse.postValue(recurso);
@@ -171,7 +170,6 @@ public class UsuarioRepository extends ApiRepository {
                     });
                 } else {
                     recurso = Resource.error("Error al cambiar el club", null);
-                    // TODO Manejar causa error
                 }
 
                 cambioClubResponse.postValue(recurso);
@@ -196,7 +194,6 @@ public class UsuarioRepository extends ApiRepository {
                     if(response.body() != null) {
                         recurso = Resource.error(response.body().getMessage(), null);
                     } else {
-                        // TODO Manejar más causas error
                         recurso = Resource.error("Error al cambiar la contraseña", null);
                     }
                 }
@@ -306,13 +303,13 @@ public class UsuarioRepository extends ApiRepository {
     }
 
     public void borrarCuenta() {
-        borraDatosUsuarioConectado();
         apiClient.borrarCuenta().enqueue(new Callback<MessageResponse>() {
             @Override
             public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
                 Resource<String> recurso;
                 if(response.isSuccessful()) {
                     recurso = Resource.success("");
+                    borraDatosUsuarioConectado();
                 } else {
                     recurso = Resource.error("No se pudo borrar la cuenta", null);
                 }

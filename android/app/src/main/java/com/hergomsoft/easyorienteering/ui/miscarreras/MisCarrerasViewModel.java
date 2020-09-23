@@ -31,8 +31,4 @@ public class MisCarrerasViewModel extends AndroidViewModel {
         return carreraRepository.getCarrerasOrganizadasUsuario();
     }
 
-    public void actualizaBusqueda(String busqueda) {
-        // TODO
-    }
-
 }

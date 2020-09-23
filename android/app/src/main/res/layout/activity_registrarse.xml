@@ -165,7 +165,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:adjustViewBounds="true"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
 
         </LinearLayout>
 
@@ -175,6 +176,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:gravity="center"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/llPassConf"
             android:orientation="horizontal">
@@ -185,6 +187,7 @@
                 android:layout_height="40dp"
                 android:layout_weight="0.9"
                 android:paddingEnd="6dp"
+                android:checked="true"
                 android:text="@string/registro_acepto" />
 
             <ImageButton

@@ -8,7 +8,7 @@
     android:fillViewport="true"
     tools:context=".ui.resultados.ResultadosActivity">
 
-    <!-- TODO Columnas laterales y fila superior fijadas -->
+    <!-- Estaría bien que la cabecera estuviera fija y la columna del nombre -->
 
     <RelativeLayout
         android:layout_width="match_parent"

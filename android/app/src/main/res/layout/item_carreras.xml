@@ -9,6 +9,10 @@
     android:background="@color/colorPresionado"
     android:orientation="horizontal">
 
+
+    <!-- Estaría bien mostrar la fecha de última participacion en "Mis Carreras" -->
+
+
     <TextView
         android:id="@+id/item_carreras_nombre"
         android:layout_width="0dp"
@@ -53,6 +57,5 @@
 
     </LinearLayout>
 
-    <!-- TODO: TextView con fecha de último realizado de recorrido -->
 
 </LinearLayout>

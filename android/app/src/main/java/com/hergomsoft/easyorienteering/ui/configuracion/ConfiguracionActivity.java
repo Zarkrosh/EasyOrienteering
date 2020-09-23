@@ -61,10 +61,6 @@ public class ConfiguracionActivity extends BackableActivity {
         Button btnBorrarCuenta = findViewById(R.id.conf_btn_borrar_cuenta);
         Button btnCerrarSesion = findViewById(R.id.conf_btn_cerrar_sesion);
 
-        // DEBUG
-        View.OnClickListener todoListener = v -> Toast.makeText(ConfiguracionActivity.this, "TODO", Toast.LENGTH_SHORT).show();
-
-        btnFotoPerfil.setOnClickListener(todoListener);
         btnCambiarNombre.setOnClickListener(v -> dialogoCambioNombre.show());
         btnCambiarClub.setOnClickListener(v -> dialogoCambioClub.show());
         btnCambiarContrasena.setOnClickListener(v -> dialogoCambioPassword.show());
@@ -73,7 +69,6 @@ public class ConfiguracionActivity extends BackableActivity {
             i.putExtra(Constants.EXTRA_VOLUNTARIO, true);
             startActivity(i);
         });
-        //btnCompartirApp.setOnClickListener(todoListener);
         btnBorrarCuenta.setOnClickListener(v -> dialogoConfBorrarCuenta.show());
         btnCerrarSesion.setOnClickListener(v -> dialogoConfCerrarSesion.show());
 
@@ -198,7 +193,7 @@ public class ConfiguracionActivity extends BackableActivity {
                 if(conf.contentEquals(inputNueva.getText().toString()) && conf.length() >= Constants.MIN_PASSWORD_LENGTH) {
                     btnGuardar.setEnabled(true);
                 } else {
-                    // TODO Indicador visual
+                    // FEATURE: Indicador visual
                     btnGuardar.setEnabled(false);
                 }
             }
@@ -262,7 +257,6 @@ public class ConfiguracionActivity extends BackableActivity {
                                 }
 
                                 // Carga imagen circular
-                                // TODO Cargar imagen de perfil
                                 Picasso.with(ConfiguracionActivity.this).load(R.drawable.img_sample_user).transform(new CircleTransform()).into(btnFotoPerfil);
                             } else {
                                 viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR,

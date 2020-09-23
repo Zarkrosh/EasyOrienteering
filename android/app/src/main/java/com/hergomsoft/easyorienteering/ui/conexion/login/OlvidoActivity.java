@@ -77,13 +77,7 @@ public class OlvidoActivity extends BackableActivity {
                 progress.setVisibility(View.VISIBLE);
 
                 // Envia la petición de restablecimiento de contraseña
-                // TODO
-                Toast.makeText(OlvidoActivity.this, "[TODO] Petición de restablecimiento", Toast.LENGTH_SHORT).show();
-
-                // Espera al resultado
-                // TODO
-                //progress.setVisibility(View.GONE);
-                //textResultado.setText(...);
+                // FEATURE
             }
         });
     }

@@ -49,8 +49,6 @@ public class MisCarrerasActivity extends BackableActivity {
         listaCarrerasParticipadas.muestraFiltros(false);
         listaCarrerasOrganizadas = new ListaCarrerasComponent(this);
         listaCarrerasOrganizadas.muestraFiltros(false);
-        // Al cambiar el contenido del buscador, se filtran automáticamente las carreras
-        // TODO ¿Paginación? ¿BD?
 
         // Configura el ViewPager
         String[] titulosTabs = {getString(R.string.mis_carreras_participadas),

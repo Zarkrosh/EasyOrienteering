@@ -371,10 +371,9 @@ public class ScanActivity extends AppCompatActivity {
      * Produce una animación visual y sonora que notifica al usuario del registro exitoso de un control.
      */
     private void animacionRegistroControl() {
-        // Animación visual
-        // TODO
         // Reproduce sonido
         soundPool.play(beepSound, 1, 1, 1, 0 ,1);
+        // Una animación visual quedaría bien también
     }
 
     /**
@@ -504,8 +503,7 @@ public class ScanActivity extends AppCompatActivity {
                                 // Carrera en score
                                 if(Utils.esEscaneoControl(escaneado)) {
                                     // Comprueba que no ha registrado ya el control (de forma local)
-                                    // TODO
-                                    boolean yaRegistrado = false;
+                                    boolean yaRegistrado = viewModel.haRegistradoControl(Utils.getCodigoControlEscaneado(escaneado));
                                     if(yaRegistrado) {
                                         // En un score solo se puede registrar una vez un control
                                         viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR, getString(R.string.error), getString(R.string.scan_error_ya_registrado));

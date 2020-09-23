@@ -56,8 +56,6 @@ public class ExplorarActivity extends BackableActivity {
 
         viewModel = ViewModelProviders.of(this).get(ExplorarViewModel.class);
 
-        // TODO Gestionar permisos
-
         viewSwitcher = findViewById(R.id.explorar_switcher);
         btnCambioVista = findViewById(R.id.explorar_btn_cambio_vista);
         listaCarreras = findViewById(R.id.explorar_lista_carreras);
@@ -179,9 +177,10 @@ public class ExplorarActivity extends BackableActivity {
         mapView.setMultiTouchControls(true);
         mapController = mapView.getController();
         mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
-        // TODO Cargar configuración anterior (centro, zoom...)
         mapController.setZoom(6.8);
         mapController.setCenter(new GeoPoint(40.0, -3.0));
+
+        // FEATURE: Cargar configuración anterior (centro, zoom...)
     }
 
 

@@ -109,9 +109,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setupObservadores() {
-        // Comprueba si tiene algún recorrido pendiente
-        viewModel.compruebaRecorridoPendiente();
-
         // Carga datos del usuario
         viewModel.cargaDatosUsuario().observe(this, new Observer<Resource<Usuario>>() {
             @Override
@@ -127,7 +124,6 @@ public class HomeActivity extends AppCompatActivity {
                                 viewModel.ocultaDialogoCarga();
                                 textUsername.setText(usuarioResource.data.getNombre());
                                 // Carga imagen de perfil (circular)
-                                // TODO
                                 //Picasso.with(HomeActivity.this).load(R.drawable.img_sample_user).transform(new CircleTransform()).into(btnPerfil);
                             } else {
                                 viewModel.actualizaDialogoCarga(DialogoCarga.ESTADO_ERROR,

@@ -19,10 +19,6 @@ public class HomeViewModel extends AndroidViewModelConCarga {
         usuarioRepository = UsuarioRepository.getInstance(app);
     }
 
-    public void compruebaRecorridoPendiente() {
-        // TODO
-    }
-
     public LiveData<Resource<Usuario>> cargaDatosUsuario() {
         // Obtiene el ID del usuario conectado
         long idUsuario = usuarioRepository.getIdUsuarioConectado();

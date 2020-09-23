@@ -27,18 +27,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         // En dispositivos con versión < 5.0 hay un problema existente con SSL. Esto lo soluciona
-        // TODO Sigue crasheando
-        try {
-            ProviderInstaller.installIfNeeded(this);
-        } catch (GooglePlayServicesRepairableException e) {
-            // Thrown when Google Play Services is not installed, up-to-date, or enabled
-            // Show dialog to allow users to install, update, or otherwise enable Google Play services.
-            GooglePlayServicesUtil.getErrorDialog(e.getConnectionStatusCode(), this, 0);
-        } catch (GooglePlayServicesNotAvailableException e) {
-            Log.e("SecurityException", "Google Play Services not available.");
-        } catch (Exception e) {
-            Log.d("Unknown Exception", e.getMessage());
-        }
+        mitigaErrorSSL();
 
         // Comprueba primer inicio de la aplicación
         SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
@@ -61,5 +50,19 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         startActivity(intent);
+    }
+
+    public void mitigaErrorSSL() {
+        try {
+            ProviderInstaller.installIfNeeded(this);
+        } catch (GooglePlayServicesRepairableException e) {
+            // Thrown when Google Play Services is not installed, up-to-date, or enabled
+            // Show dialog to allow users to install, update, or otherwise enable Google Play services.
+            GooglePlayServicesUtil.getErrorDialog(e.getConnectionStatusCode(), this, 0);
+        } catch (GooglePlayServicesNotAvailableException e) {
+            Log.e("SecurityException", "Google Play Services not available.");
+        } catch (Exception e) {
+            Log.d("Unknown Exception", e.getMessage());
+        }
     }
 }

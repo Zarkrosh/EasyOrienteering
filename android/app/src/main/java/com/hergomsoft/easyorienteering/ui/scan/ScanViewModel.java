@@ -1,7 +1,6 @@
 package com.hergomsoft.easyorienteering.ui.scan;
 
 import android.app.Application;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
@@ -11,6 +10,8 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.hergomsoft.easyorienteering.R;
@@ -22,6 +23,7 @@ import com.hergomsoft.easyorienteering.data.model.Control;
 import com.hergomsoft.easyorienteering.data.model.Recorrido;
 import com.hergomsoft.easyorienteering.data.model.Registro;
 import com.hergomsoft.easyorienteering.data.repositories.RegistroRepository;
+import com.hergomsoft.easyorienteering.data.repositories.UsuarioRepository;
 import com.hergomsoft.easyorienteering.util.AndroidViewModelConCarga;
 import com.hergomsoft.easyorienteering.util.Resource;
 import com.hergomsoft.easyorienteering.util.Utils;
@@ -45,7 +47,8 @@ public class ScanViewModel extends AndroidViewModelConCarga {
     private String ultimoEscaneado;
 
     // Repositorios
-    private RegistroRepository recorridoRepository;
+    private RegistroRepository registroRepository;
+    private UsuarioRepository usuarioRepository;
 
     // LiveDatas
     private LiveData<Resource<Boolean>> peticionPendiente;
@@ -61,10 +64,11 @@ public class ScanViewModel extends AndroidViewModelConCarga {
 
     public ScanViewModel(Application app) {
         super(app);
-        recorridoRepository = RegistroRepository.getInstance(app);
-        peticionPendiente = recorridoRepository.getPendienteResponse();
-        registroResponse = recorridoRepository.getRegistroResponse();
-        abandonoResponse = recorridoRepository.getAbandonoResponse();
+        registroRepository = RegistroRepository.getInstance(app);
+        usuarioRepository = UsuarioRepository.getInstance(app);
+        peticionPendiente = registroRepository.getPendienteResponse();
+        registroResponse = registroRepository.getRegistroResponse();
+        abandonoResponse = registroRepository.getAbandonoResponse();
         modoVista = new MutableLiveData<>(ModoVista.ESCANEO);
         modoEscaneo = new MutableLiveData<>(ModoEscaneo.INICIO_RECORRIDO);
         estadoCapturaCamara = new MutableLiveData<>(false);
@@ -80,9 +84,9 @@ public class ScanViewModel extends AndroidViewModelConCarga {
     public LiveData<ModoEscaneo> getModoEscaneo() { return modoEscaneo; }
     public LiveData<Boolean> getEstadoCapturaCamara() { return estadoCapturaCamara; }
 
-    public Carrera getCarreraActual() { return recorridoRepository.getCarreraActual(); }
-    public Recorrido getRecorridoActual() { return recorridoRepository.getRecorridoActual(); }
-    public LiveData<Control> getSiguienteControl() { return recorridoRepository.getSiguienteControl(); }
+    public Carrera getCarreraActual() { return registroRepository.getCarreraActual(); }
+    public Recorrido getRecorridoActual() { return registroRepository.getRecorridoActual(); }
+    public LiveData<Control> getSiguienteControl() { return registroRepository.getSiguienteControl(); }
 
     /**
      * Devuelve true si el nuevo escaneo es el mismo que el anterior.
@@ -119,7 +123,7 @@ public class ScanViewModel extends AndroidViewModelConCarga {
      */
     public void compruebaRecorridoPendiente() {
         actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.scan_carga_pendiente));
-        recorridoRepository.comprobarRecorridoPendiente();
+        registroRepository.comprobarRecorridoPendiente();
     }
 
     /**
@@ -128,14 +132,24 @@ public class ScanViewModel extends AndroidViewModelConCarga {
      */
     public void confirmaInicioRecorrido() {
         actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.scan_carga_inicio));
-        recorridoRepository.iniciaRecorrido(codigo, idRecorrido, secreto);
+        registroRepository.iniciaRecorrido(codigo, idRecorrido, secreto);
     }
 
     public void cargaMapaRecorrido() {
-        Recorrido actual = recorridoRepository.getRecorridoActual();
+        Recorrido actual = registroRepository.getRecorridoActual();
         if(actual != null && actual.tieneMapa()) {
+            // Genera petición con el token de autorización
+            String token = usuarioRepository.getTokenUsuarioConectado();
+            if(token == null) token = "";
+            GlideUrl url = new GlideUrl(
+                    ApiClient.BASE_URL + ApiClient.MAPA_URL + actual.getId(),
+                    new LazyHeaders.Builder()
+                            .addHeader("Authorization", "Bearer " + token)
+                            .build()
+            );
+
             Glide.with(getApplication())
-                .download(ApiClient.BASE_URL + ApiClient.MAPA_URL + actual.getId())
+                .download(url)
                 .into(new SimpleTarget<File>() {
                     @Override
                     public void onLoadStarted(@Nullable Drawable placeholder) {
@@ -165,7 +179,16 @@ public class ScanViewModel extends AndroidViewModelConCarga {
         actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.scan_carga_registrando));
         codigo = Utils.getCodigoControlEscaneado(escaneado);
         secreto = Utils.getSecretoControlEscaneado(escaneado);
-        recorridoRepository.registraControl(codigo, secreto);
+        registroRepository.registraControl(codigo, secreto);
+    }
+
+    /**
+     * Devuelve true si el usuario ya ha registrado el control.
+     * @param codigo Código de control
+     * @return True si ya ha registrado control
+     */
+    public boolean haRegistradoControl(String codigo) {
+        return registroRepository.haRegistradoControl(codigo);
     }
 
     /**
@@ -173,7 +196,7 @@ public class ScanViewModel extends AndroidViewModelConCarga {
      */
     public void confirmaAbandonoRecorrido() {
         actualizaDialogoCarga(DialogoCarga.ESTADO_CARGANDO, "", getApplication().getApplicationContext().getString(R.string.scan_carga_abandono));
-        recorridoRepository.abandonaRecorrido();
+        registroRepository.abandonaRecorrido();
     }
 
     /**
@@ -194,7 +217,7 @@ public class ScanViewModel extends AndroidViewModelConCarga {
     }
 
     public void resetDatos() {
-        recorridoRepository.resetDatos();
+        registroRepository.resetDatos();
         modoVista.setValue(ModoVista.ESCANEO);
         modoEscaneo.setValue(ModoEscaneo.INICIO_RECORRIDO);
     }
